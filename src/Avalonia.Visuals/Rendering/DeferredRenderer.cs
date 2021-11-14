@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define SHOWDEPTH
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -416,7 +417,9 @@ namespace Avalonia.Rendering
 
         }
 
+#if SHOWDEPTH
         private int t_Depth = 0;   // tmstest
+#endif
 
         private void Render(IDrawingContextImpl context, VisualNode node, IVisual layer, Rect clipBounds)
         {
@@ -425,8 +428,10 @@ namespace Avalonia.Rendering
 
             if (layer == null || node.LayerRoot == layer)
             {
-                Debug.WriteLine($"--- depth={t_Depth} {node.Visual} children={node.Children.Count} ---");
+#if SHOWDEPTH
+                Debug.WriteLine($"--- depth={t_Depth} {node.Visual} children={node.Children.Count} ---"); // NOTE - THIS SLOWS DOWN ALL RENDERING!! Don't keep this in, normally
                 t_Depth += 1;
+#endif
                 clipBounds = node.ClipBounds.Intersect(clipBounds);
 
                 if (!clipBounds.IsEmpty && node.Opacity > 0)
@@ -456,7 +461,9 @@ namespace Avalonia.Rendering
                     node.EndRender(context, isLayerRoot);
                 }
 
+#if SHOWDEPTH
                 t_Depth -= 1;
+#endif
             }
         }
 
@@ -483,7 +490,9 @@ namespace Avalonia.Rendering
                             // TMS: 1 of 2 places to comment out to get transparent client area.
                             // This does the background, and the left hand nav pane.
                             double opacity = node.Opacity;
+#if SHOWDEPTH
                             t_Depth = 0;
+#endif
                             Render(context, node, layer.LayerRoot, node.ClipBounds);
                             context.PopClip();
                             if (DrawDirtyRects)
