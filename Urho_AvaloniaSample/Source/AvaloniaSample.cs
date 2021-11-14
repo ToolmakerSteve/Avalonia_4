@@ -77,13 +77,29 @@ namespace AvaloniaSample
             var mainWindow = new ControlCatalog.MainWindow();
             AvaloniaUrhoContext.MainWindow = mainWindow;
             mainWindow.Show(UI.Root);
-            mainWindow.Position = new Avalonia.PixelPoint(100, 100);
-			// mainWindow.Width = Graphics.Width / avaloniaContext.RenderScaling;
-			// mainWindow.Height = Graphics.Height / avaloniaContext.RenderScaling;
 
-		}
+            //mainWindow.Position = new Avalonia.PixelPoint(100, 100);
+            mainWindow.Position = new Avalonia.PixelPoint(0,0);   // TMS
+            if (true)
+            {   // Full screen.
+                mainWindow.Width = (int)ToDIUnits(Graphics.Width);
+                mainWindow.Height = (int)ToDIUnits(Graphics.Height);
+            } else
+            {
+                var width0DI = mainWindow.Width;
+                var width1DI = ToDIUnits(Graphics.Width);
+                mainWindow.Width = (int)(width1DI / 2);
+                mainWindow.Height = (int)ToDIUnits(Graphics.Height);
+            }
 
-		void CreateScene ()
+        }
+
+        public float ToDIUnits(int pixels)
+        {
+            return pixels / (float)avaloniaContext.RenderScaling;
+        }
+
+        void CreateScene ()
 		{
 			scene = new Scene ();
 
