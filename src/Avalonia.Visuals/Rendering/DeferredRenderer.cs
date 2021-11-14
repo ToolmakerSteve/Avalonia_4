@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Avalonia.Logging;
@@ -415,11 +416,14 @@ namespace Avalonia.Rendering
 
         }
 
+        private int t_Depth = 0;   // tmstest
 
         private void Render(IDrawingContextImpl context, VisualNode node, IVisual layer, Rect clipBounds)
         {
             if (layer == null || node.LayerRoot == layer)
             {
+                Debug.WriteLine($"--- depth={t_Depth} {node.Visual} children={node.Children.Count} ---");
+                t_Depth += 1;
                 clipBounds = node.ClipBounds.Intersect(clipBounds);
 
                 if (!clipBounds.IsEmpty && node.Opacity > 0)
@@ -448,6 +452,8 @@ namespace Avalonia.Rendering
 
                     node.EndRender(context, isLayerRoot);
                 }
+
+                t_Depth -= 1;
             }
         }
 
@@ -471,7 +477,11 @@ namespace Avalonia.Rendering
                             context.Clear(Colors.Transparent);
                             context.Transform = Matrix.Identity;
                             context.PushClip(node.ClipBounds);
-                            //tmstest Render(context, node, layer.LayerRoot, node.ClipBounds);
+                            // TMS: 1 of 2 places to comment out to get transparent client area.
+                            // This does the background, and the left hand nav pane.
+                            double opacity = node.Opacity;
+                            t_Depth = 0;
+                            Render(context, node, layer.LayerRoot, node.ClipBounds);
                             context.PopClip();
                             if (DrawDirtyRects)
                             {
@@ -490,7 +500,9 @@ namespace Avalonia.Rendering
                                 context.Transform = Matrix.Identity;
                                 context.PushClip(snappedRect);
                                 context.Clear(Colors.Transparent);
-                                //tmstest Render(context, node, layer.LayerRoot, snappedRect);
+                                // TMS: 2 of 2 places to comment out to get transparent client area.
+                                // If keep this, details such as Acrylic rectangles appear. Background and some other stuff transparent.
+                                Render(context, node, layer.LayerRoot, snappedRect);
                                 context.PopClip();
 
                                 if (DrawDirtyRects)
