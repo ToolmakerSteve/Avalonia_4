@@ -299,6 +299,17 @@ namespace Avalonia.Skia
             if (rect.Rect.Height > 8192 || rect.Rect.Width > 8192)
                 boxShadows = default;
 
+            // tmstest: Suppress large opaque rectangles.
+            if (rect.Rect.Width >= 600)//== 1024)
+            {
+                Debug.WriteLine($"----- brush={brush} w={rect.Rect.Width} h={rect.Rect.Height} -----");
+                var brush1 = brush as Media.Immutable.ImmutableSolidColorBrush?;
+                if (brush1 != null && brush1.Value.Color.A > 100)
+                {
+                    return;
+                }
+            }
+
             var rc = rect.Rect.ToSKRect();
             var isRounded = rect.IsRounded;
             var needRoundRect = rect.IsRounded || (boxShadows.HasInsetShadows);

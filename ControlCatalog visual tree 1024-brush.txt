@@ -1,0 +1,68 @@
+'--- depth=0 ControlCatalog.MainWindow children=1 ---
+--- depth=1 Avalonia.Controls.Panel children=4 ---
+--- depth=2 Avalonia.Controls.Border children=0 ---
+----- brush=White -----
+--- depth=2 Avalonia.Controls.Border children=0 ---
+----- brush=Transparent -----
+--- depth=2 Avalonia.Controls.Panel children=0 ---
+----- brush=Transparent -----
+--- depth=2 Avalonia.Controls.Primitives.VisualLayerManager children=3 ---
+--- depth=3 Avalonia.Controls.Presenters.ContentPresenter children=1 ---
+----- brush= -----
+--- depth=4 Avalonia.Controls.Panel children=2 ---
+--- depth=5 Avalonia.Controls.Panel children=1 ---
+--- depth=6 Avalonia.Controls.DockPanel children=2 ---
+--- depth=7 Avalonia.Controls.Menu children=1 ---
+--- depth=8 Avalonia.Controls.Border children=1 ---
+----- brush=Transparent -----
+--- depth=9 Avalonia.Controls.Presenters.ItemsPresenter children=1 ---
+--- depth=10 Avalonia.Controls.StackPanel children=2 ---
+--- depth=11 Avalonia.Controls.MenuItem children=1 ---
+--- depth=12 Avalonia.Controls.Border children=1 ---
+--- depth=13 Avalonia.Controls.Panel children=2 ---
+--- depth=14 Avalonia.Controls.Presenters.ContentPresenter children=1 ---
+--- depth=15 Avalonia.Controls.Primitives.AccessText children=0 ---
+--- depth=14 Avalonia.Controls.Primitives.Popup children=0 ---
+--- depth=11 Avalonia.Controls.MenuItem children=1 ---
+--- depth=12 Avalonia.Controls.Border children=1 ---
+--- depth=13 Avalonia.Controls.Panel children=2 ---
+--- depth=14 Avalonia.Controls.Presenters.ContentPresenter children=1 ---
+--- depth=15 Avalonia.Controls.Primitives.AccessText children=0 ---
+--- depth=14 Avalonia.Controls.Primitives.Popup children=0 ---
+--- depth=7 ControlCatalog.MainView children=1 ---
+--- depth=8 Avalonia.Controls.Presenters.ContentPresenter children=1 ---
+----- brush= -----
+--- depth=9 Avalonia.Controls.Grid children=1 ---
+--- depth=10 Avalonia.Controls.TabControl children=1 ---
+--- depth=11 Avalonia.Controls.Border children=1 ---
+----- brush= -----
+--- depth=12 Avalonia.Controls.DockPanel children=3 ---
+--- depth=13 Avalonia.Controls.ScrollViewer children=1 ---
+--- depth=14 Avalonia.Controls.Grid children=4 ---
+--- depth=15 Avalonia.Controls.Presenters.ScrollContentPresenter children=1 ---
+--- depth=16 Avalonia.Controls.Presenters.ItemsPresenter children=1 ---
+--- depth=15 Avalonia.Controls.Primitives.ScrollBar children=0 ---
+--- depth=15 Avalonia.Controls.Primitives.ScrollBar children=1 ---
+--- depth=16 Avalonia.Controls.Grid children=1 ---
+--- depth=15 Avalonia.Controls.Panel children=0 ---
+--- depth=13 Avalonia.Controls.ContentControl children=1 ---
+--- depth=14 Avalonia.Controls.Presenters.ContentPresenter children=1 ---
+--- depth=15 Avalonia.Controls.StackPanel children=4 ---
+--- depth=16 Avalonia.Controls.ComboBox children=1 ---
+--- depth=16 Avalonia.Controls.ComboBox children=1 ---
+--- depth=16 Avalonia.Controls.ComboBox children=1 ---
+--- depth=16 Avalonia.Controls.ComboBox children=1 ---
+--- depth=13 Avalonia.Controls.ScrollViewer children=1 ---
+--- depth=14 Avalonia.Controls.Grid children=4 ---
+--- depth=15 Avalonia.Controls.Presenters.ScrollContentPresenter children=1 ---
+--- depth=16 Avalonia.Controls.Presenters.ContentPresenter children=1 ---
+--- depth=15 Avalonia.Controls.Primitives.ScrollBar children=0 ---
+--- depth=15 Avalonia.Controls.Primitives.ScrollBar children=1 ---
+--- depth=16 Avalonia.Controls.Grid children=1 ---
+--- depth=15 Avalonia.Controls.Panel children=0 ---
+--- depth=5 Avalonia.Controls.Border children=0 ---
+--- depth=3 Avalonia.Controls.Primitives.AdornerLayer children=1 ---
+--- depth=4 Avalonia.Controls.Notifications.WindowNotificationManager children=1 ---
+--- depth=5 Avalonia.Controls.ReversibleStackPanel children=0 ---
+--- depth=3 Avalonia.Controls.Primitives.ChromeOverlayLayer children=1 ---
+--- depth=4 Avalonia.Controls.Chrome.TitleBar children=0 ---

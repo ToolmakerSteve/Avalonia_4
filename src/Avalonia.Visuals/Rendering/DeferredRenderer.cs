@@ -420,6 +420,9 @@ namespace Avalonia.Rendering
 
         private void Render(IDrawingContextImpl context, VisualNode node, IVisual layer, Rect clipBounds)
         {
+            //if (t_Depth > 16)//8)//4)//2)
+            //    return;   // tmstest: Only do top few nodes.
+
             if (layer == null || node.LayerRoot == layer)
             {
                 Debug.WriteLine($"--- depth={t_Depth} {node.Visual} children={node.Children.Count} ---");
