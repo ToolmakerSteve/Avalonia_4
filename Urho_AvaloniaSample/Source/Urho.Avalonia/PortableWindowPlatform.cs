@@ -64,9 +64,10 @@ namespace Urho.Avalonia
             return new UrhoWindowImpl(_context);
         }
 
-        ITrayIconImpl IWindowingPlatform.CreateTrayIcon()
+        ITrayIconImpl? IWindowingPlatform.CreateTrayIcon()
         {
-            throw new NotImplementedException();
+            //TMS throw new NotImplementedException();
+            return null;
         }
     }
 }
