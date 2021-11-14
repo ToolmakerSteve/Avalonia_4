@@ -82,6 +82,12 @@ namespace Urho.Avalonia
 
         }
 
+        public byte ReadPixelAlpha(Vector2 pos)
+        {
+            pos *= (float)_windowImpl.RenderScaling;
+            return _windowImpl.FramebufferSource.ReadPixelAlpha((int)pos.X, (int)pos.Y);
+        }
+
         private void OnDefocused(DefocusedEventArgs obj)
         {
             Priority = 100;
@@ -337,12 +343,6 @@ namespace Urho.Avalonia
         {
             _inputModifiers.Set(mod);
             bool handled = SendRawPointerEvent(evtType, position);
-
-            if (!handled && evtType == RawPointerEventType.LeftButtonDown)
-                _isMouseDownOnScene = true;
-            else
-            { }
-
             return handled;
         }
 
@@ -800,9 +800,14 @@ namespace Urho.Avalonia
 
                 _windowImpl.Input?.Invoke(args);
 
-                if (type == RawPointerEventType.LeftButtonDown && !args.Handled)
+                if (type == RawPointerEventType.LeftButtonDown)
                 {   // Non-Handled Mouse-Down event - Falls through to the Scene!   najak
-                    _isMouseDownOnScene = true;
+                    if (!args.Handled)
+                    {   // Was NOT Handled by Avalonia ... so check if Pixel is Visible
+                        byte alpha = ReadPixelAlpha(position);
+                        if (alpha == 0)
+                            _isMouseDownOnScene = true;
+                    }
                 }
 
                 if (_isMouseDownOnScene)

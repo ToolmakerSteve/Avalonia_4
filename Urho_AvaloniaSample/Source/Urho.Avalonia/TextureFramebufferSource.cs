@@ -162,11 +162,28 @@ namespace Urho.Avalonia
 
         }
 
+        public const int PixelByteSize = 1 << PixelSizeBitShift;
+        public const int PixelSizeBitShift = 2;
+
+        public byte ReadPixelAlpha(int x, int y)
+        {
+            if (_lastUpdateDataBuffer == null)
+                return 0;
+
+            const int AlphaChannel = 3;
+            int offset = (y * RowBytes) + (x << PixelSizeBitShift) + AlphaChannel; // get 4th channel -- alpha
+            byte alpha = _lastUpdateDataBuffer[offset];
+            return alpha;
+        }
+
+        private byte[] _lastUpdateDataBuffer;
+
         private void OnUpdate(UpdateEventArgs obj)
         {
 
             if (_disposedByteArrayPool.TryDequeue(out byte[] data))
             {
+                _lastUpdateDataBuffer = data;
                 _texture.SetData(0, 0, 0, _texture.Width, _texture.Height, data);
 #if MANAGED_BUFFER
                 _freeByteArrayPool.Enqueue(data);
@@ -201,7 +218,7 @@ namespace Urho.Avalonia
                     var texture2D = Texture;
                     if (Width != texture2D.Width || Height != texture2D.Height)
                     {
-                        RowBytes = Width * 4;
+                        RowBytes = Width * PixelByteSize;
                         using (var l = _avaloniaContext.DeferredRendererLock.Lock())
                         {
                             if (RowBytes * Height > Length)

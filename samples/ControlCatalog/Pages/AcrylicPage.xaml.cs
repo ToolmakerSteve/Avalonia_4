@@ -18,7 +18,7 @@ namespace ControlCatalog.Pages
                 if (dec is ExperimentalAcrylicBorder)
                 {
                     ExperimentalAcrylicBorder element = dec as ExperimentalAcrylicBorder;
-                    element.PointerPressed += Stack_PointerPressed;
+                    //STUBBED OUT!: element.PointerPressed += Stack_PointerPressed;
                 }
             }
             // END == najak
