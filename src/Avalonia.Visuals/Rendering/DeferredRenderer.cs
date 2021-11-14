@@ -428,7 +428,7 @@ namespace Avalonia.Rendering
 
             if (layer == null || node.LayerRoot == layer)
             {
-#if SHOWDEPTH
+#if c
                 Debug.WriteLine($"--- depth={t_Depth} {node.Visual} children={node.Children.Count} ---"); // NOTE - THIS SLOWS DOWN ALL RENDERING!! Don't keep this in, normally
                 t_Depth += 1;
 #endif
