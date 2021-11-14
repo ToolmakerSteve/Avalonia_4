@@ -302,42 +302,48 @@ namespace Urho.Avalonia
 
         }
 
+        // najak - added to re-reroute INput back to the Scene, when input not handled by an Avalonia Control
+        static public Action SceneInputHandlerMethod; // najak-HACK - to permit MouseInput to go through Avalonia transparencies.
+        private bool _isMouseDownOnScene;
 
         private void OnClickBegin(ClickEventArgs e)
         {
             if (e.Element != this)
                 return;
+
+            bool handled = _OnClickBegin(e); // najak - modified to make return "Handled" result.
+        }
+        private bool _OnClickBegin(ClickEventArgs e)
+        {
             var screenPos = this.ScreenPosition;
             var position = new Vector2(e.X - screenPos.X, e.Y - screenPos.Y);
             // var position = new Vector2((e.X - screenPos.X) / (float)_windowImpl.RenderScaling, (e.Y - screenPos.Y) / (float)_windowImpl.RenderScaling);
-            
+
             //  Log.Info("" + screenPos + " " + position);
             WheelX = 0.0f;
             WheelY = 0.0f;
 
             switch ((MouseButton)e.Button)
             {
-                case MouseButton.Left:
-                    _inputModifiers.Set(RawInputModifiers.LeftMouseButton);
-                    SendRawPointerEvent(RawPointerEventType.LeftButtonDown, position);
-                    break;
-                case MouseButton.Middle:
-                    _inputModifiers.Set(RawInputModifiers.MiddleMouseButton);
-                    SendRawPointerEvent(RawPointerEventType.MiddleButtonDown, position);
-                    break;
-                case MouseButton.Right:
-                    _inputModifiers.Set(RawInputModifiers.RightMouseButton);
-                    SendRawPointerEvent(RawPointerEventType.RightButtonDown, position);
-                    break;
-                case MouseButton.X1:
-                    _inputModifiers.Set(RawInputModifiers.XButton1MouseButton);
-                    SendRawPointerEvent(RawPointerEventType.XButton1Down, position);
-                    break;
-                case MouseButton.X2:
-                    _inputModifiers.Set(RawInputModifiers.XButton2MouseButton);
-                    SendRawPointerEvent(RawPointerEventType.XButton2Down, position);
-                    break;
+                case MouseButton.Left: return __OnClickBegin(position, RawInputModifiers.LeftMouseButton, RawPointerEventType.LeftButtonDown);
+                case MouseButton.Middle: return __OnClickBegin(position, RawInputModifiers.MiddleMouseButton, RawPointerEventType.MiddleButtonDown);
+                case MouseButton.Right: return __OnClickBegin(position, RawInputModifiers.RightMouseButton, RawPointerEventType.RightButtonDown);
+                case MouseButton.X1: return __OnClickBegin(position, RawInputModifiers.XButton1MouseButton, RawPointerEventType.XButton1Down);
+                case MouseButton.X2: return __OnClickBegin(position, RawInputModifiers.XButton2MouseButton, RawPointerEventType.XButton2Down);
             }
+            return false;
+        }
+        private bool __OnClickBegin(Vector2 position, RawInputModifiers mod, RawPointerEventType evtType)
+        {
+            _inputModifiers.Set(mod);
+            bool handled = SendRawPointerEvent(evtType, position);
+
+            if (!handled && evtType == RawPointerEventType.LeftButtonDown)
+                _isMouseDownOnScene = true;
+            else
+            { }
+
+            return handled;
         }
 
         private void OnClickEnd(ClickEndEventArgs e)
@@ -349,6 +355,7 @@ namespace Urho.Avalonia
             switch ((MouseButton)e.Button)
             {
                 case MouseButton.Left:
+                    _isMouseDownOnScene = false; // najak-HACK - to release Mouse
                     _inputModifiers.Set(RawInputModifiers.LeftMouseButton);
                     SendRawPointerEvent(RawPointerEventType.LeftButtonUp, position);
                     break;
@@ -774,7 +781,7 @@ namespace Urho.Avalonia
 
         
 
-        private void SendRawPointerEvent(RawPointerEventType type, Vector2 position)
+        private bool SendRawPointerEvent(RawPointerEventType type, Vector2 position)
         {
             if (_windowImpl != null)
             {
@@ -792,8 +799,20 @@ namespace Urho.Avalonia
                     modifiers);
 
                 _windowImpl.Input?.Invoke(args);
-                
+
+                if (type == RawPointerEventType.LeftButtonDown && !args.Handled)
+                {   // Non-Handled Mouse-Down event - Falls through to the Scene!   najak
+                    _isMouseDownOnScene = true;
+                }
+
+                if (_isMouseDownOnScene)
+                {   // If Mouse Down on Scene, then Scene handles all events.   najak
+                    if (SceneInputHandlerMethod != null)
+                        SceneInputHandlerMethod();
+                }
+                return args.Handled;
             }
+            return false; // was No Handled by UI
         }
 
         private void SendRawKeyEvent(RawKeyEventType type, AvaloniaKey key, RawInputModifiers modifiers)

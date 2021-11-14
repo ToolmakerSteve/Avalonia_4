@@ -83,6 +83,8 @@ namespace AvaloniaSample
 
 		protected override void Start ()
 		{
+            Urho.Avalonia.UrhoAvaloniaElement.SceneInputHandlerMethod = _HandleUserInput; // najak-HACK - to permit MouseInput to go through Avalonia transparencies.
+
 			if (Platform != Platforms.Android)
             {
 				// TBD elix22 ,  crashing on Android
@@ -148,10 +150,28 @@ namespace AvaloniaSample
 		/// </summary>
 		protected void SimpleMoveCamera3D (float timeStep, float moveSpeed = 10.0f)
 		{
-			const float mouseSensitivity = .1f;
+            // najak-HACK - Let's Urho ALWAYS Handle Keyboard input  --- NOTE: We need another Hack for this to detect when Avalonia wants Exclusive Keyboard focus (e.g. TextBox, Chat, etc)
+            if (Input.GetKeyDown(Key.W))
+                CameraNode.Translate(Vector3.UnitZ * moveSpeed * timeStep);
+            if (Input.GetKeyDown(Key.S))
+                CameraNode.Translate(-Vector3.UnitZ * moveSpeed * timeStep);
+            if (Input.GetKeyDown(Key.A))
+                CameraNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
+            if (Input.GetKeyDown(Key.D))
+                CameraNode.Translate(Vector3.UnitX * moveSpeed * timeStep);
 
-			if (UI.FocusElement != null)
-				return;
+            if (UI.FocusElement != null)
+                return;
+            else
+                _HandleUserInput(timeStep, moveSpeed);
+        }
+        private void _HandleUserInput()// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
+        {
+            _HandleUserInput(0.02f, 10f);//najak-TODO - make the timeStep 'real'
+        }
+        private void _HandleUserInput(float timeStep, float moveSpeed)// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
+        {
+            const float mouseSensitivity = .1f;
 
             if (Input.GetMouseButtonDown(MouseButton.Left))
             {
@@ -162,11 +182,6 @@ namespace AvaloniaSample
 
                 CameraNode.Rotation = new Quaternion(Pitch, Yaw, 0);
             }
-
-			if (Input.GetKeyDown (Key.W)) CameraNode.Translate ( Vector3.UnitZ * moveSpeed * timeStep);
-			if (Input.GetKeyDown (Key.S)) CameraNode.Translate (-Vector3.UnitZ * moveSpeed * timeStep);
-			if (Input.GetKeyDown (Key.A)) CameraNode.Translate (-Vector3.UnitX * moveSpeed * timeStep);
-			if (Input.GetKeyDown (Key.D)) CameraNode.Translate ( Vector3.UnitX * moveSpeed * timeStep);
 		}
 
 		protected void MoveCameraByTouches (float timeStep)
