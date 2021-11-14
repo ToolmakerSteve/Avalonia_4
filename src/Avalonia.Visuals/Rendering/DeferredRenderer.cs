@@ -471,7 +471,7 @@ namespace Avalonia.Rendering
                             context.Clear(Colors.Transparent);
                             context.Transform = Matrix.Identity;
                             context.PushClip(node.ClipBounds);
-                            Render(context, node, layer.LayerRoot, node.ClipBounds);
+                            //tmstest Render(context, node, layer.LayerRoot, node.ClipBounds);
                             context.PopClip();
                             if (DrawDirtyRects)
                             {
@@ -490,7 +490,7 @@ namespace Avalonia.Rendering
                                 context.Transform = Matrix.Identity;
                                 context.PushClip(snappedRect);
                                 context.Clear(Colors.Transparent);
-                                Render(context, node, layer.LayerRoot, snappedRect);
+                                //tmstest Render(context, node, layer.LayerRoot, snappedRect);
                                 context.PopClip();
 
                                 if (DrawDirtyRects)
