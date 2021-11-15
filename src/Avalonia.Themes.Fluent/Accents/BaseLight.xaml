@@ -3,6 +3,7 @@
        xmlns:sys="clr-namespace:System;assembly=netstandard">
   <Style.Resources>
     <!-- System Control Colors -->
+    <Color x:Key="SystemTransparentColor">#00000000</Color>
     <Color x:Key="SystemAltHighColor">#FFFFFFFF</Color>
     <Color x:Key="SystemAltLowColor">#33FFFFFF</Color>
     <Color x:Key="SystemAltMediumColor">#99FFFFFF</Color>
@@ -34,7 +35,7 @@
     <Color x:Key="SystemRevealListMediumColor">#2E000000</Color>
 
     <SolidColorBrush x:Key="SystemControlBackgroundAccentBrush" Color="{DynamicResource SystemAccentColor}" />
-    <SolidColorBrush x:Key="SystemControlBackgroundAltHighBrush" Color="{StaticResource SystemAltHighColor}" />
+    <SolidColorBrush x:Key="SystemControlBackgroundAltHighBrush" Color="{StaticResource SystemTransparentColor}" />
     <SolidColorBrush x:Key="SystemControlBackgroundAltMediumHighBrush" Color="{StaticResource SystemAltMediumHighColor}" />
     <SolidColorBrush x:Key="SystemControlBackgroundAltMediumBrush" Color="{StaticResource SystemAltMediumColor}" />
     <SolidColorBrush x:Key="SystemControlBackgroundAltMediumLowBrush" Color="{StaticResource SystemAltMediumLowColor}" />
