@@ -300,7 +300,7 @@ namespace Avalonia.Skia
                 boxShadows = default;
 
             // tmstest: Suppress large opaque rectangles.
-            if (rect.Rect.Width >= 600 || rect.Rect.Height > 100)//== 1024)
+            if (rect.Rect.Width >= 600 || rect.Rect.Height > 200)//== 1024)
             {
                 //Debug.WriteLine($"----- brush={brush} w={rect.Rect.Width} h={rect.Rect.Height} -----");
                 var brush1 = brush as Media.Immutable.ImmutableSolidColorBrush?;

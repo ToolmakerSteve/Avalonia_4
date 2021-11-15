@@ -131,8 +131,13 @@ namespace AvaloniaSample
 			if (Input.GetKeyDown(Key.S)) CameraNode.Translate(-Vector3.UnitY * moveSpeed * timeStep);
 			if (Input.GetKeyDown(Key.A)) CameraNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
 			if (Input.GetKeyDown(Key.D)) CameraNode.Translate( Vector3.UnitX * moveSpeed * timeStep);
+            // TBD: Intent is "X Down, Z Up". Might need to swap signs.
+            if (Input.GetKeyDown(Key.X))
+                CameraNode.Translate(Vector3.UnitZ * moveSpeed * timeStep);
+            if (Input.GetKeyDown(Key.Z))
+                CameraNode.Translate(-Vector3.UnitZ * moveSpeed * timeStep);
 
-			if (Input.GetKeyDown(Key.PageUp))
+            if (Input.GetKeyDown(Key.PageUp))
 			{
 				Camera camera = CameraNode.GetComponent<Camera>();
 				camera.Zoom = camera.Zoom * 1.01f;
@@ -159,6 +164,12 @@ namespace AvaloniaSample
                 CameraNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
             if (Input.GetKeyDown(Key.D))
                 CameraNode.Translate(Vector3.UnitX * moveSpeed * timeStep);
+            // TBD: Intent is "X Down, Z Up". Might need to swap signs.
+            if (Input.GetKeyDown(Key.X))
+                CameraNode.Translate(-Vector3.UnitY * moveSpeed * timeStep);
+            if (Input.GetKeyDown(Key.Z))
+                CameraNode.Translate(Vector3.UnitY * moveSpeed * timeStep);
+
 
             if (UI.FocusElement != null)
                 return;
