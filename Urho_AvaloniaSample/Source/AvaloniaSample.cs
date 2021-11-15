@@ -13,6 +13,7 @@ namespace AvaloniaSample
 	public class AvaloniaSample : Sample
 	{
         const bool UseWaterScene = true;//true;   // TMS
+        const bool IncludeAvaloniaLayer = true;//true;   // TMS
 
 		Camera Camera = null;
 		Scene Scene;
@@ -74,9 +75,12 @@ namespace AvaloniaSample
 			Input.SetMouseVisible(true);
 			Input.SetMouseMode(MouseMode.Free);
 
-            //CreateWindow(InitializeAvaloniaControlCatalogDemo);
-            CreateWindow(InitializeTopHUD);
-            //CreateWindow(InitializeRenderDemo);
+            if (IncludeAvaloniaLayer)
+            {
+                //CreateWindow(InitializeAvaloniaControlCatalogDemo);
+                CreateWindow(InitializeTopHUD);
+                //CreateWindow(InitializeRenderDemo);
+            }
         }
 
         protected override void OnUpdate(float timeStep)
