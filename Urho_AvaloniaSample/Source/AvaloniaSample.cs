@@ -50,8 +50,8 @@ namespace AvaloniaSample
 			Input.SetMouseVisible(true);
 			Input.SetMouseMode(MouseMode.Free);
 
-            CreateWindow(InitializeAvaloniaControlCatalogDemo);
-            //CreateWindow(InitializeSandboxDemo);
+            //CreateWindow(InitializeAvaloniaControlCatalogDemo);
+            CreateWindow(InitializeTopHUD);
             //CreateWindow(InitializeRenderDemo);
         }
 
@@ -91,20 +91,20 @@ namespace AvaloniaSample
             mainWindow.Show(UI.Root);
         }
 
-        //Avalonia.Controls.Window InitializeSandboxDemo()
-        //{
-        //    avaloniaContext = Context.ConfigureAvalonia<TopHUD.App>();
-        //    avaloniaContext.RenderScaling = 2.0;
-        //    var window = new TopHUD.MainWindow();
+        Avalonia.Controls.Window InitializeTopHUD()
+        {
+            avaloniaContext = Context.ConfigureAvalonia<TopHUD.App>();
+            avaloniaContext.RenderScaling = 2.0;
+            var window = new TopHUD.MainWindow();
 
-        //    //var panel = new AC.Panel();
-        //    //panel.Parent = window;
-        //    //window.Content = panel;
+            //var panel = new AC.Panel();
+            //panel.Parent = window;
+            //window.Content = panel;
 
 
 
-        //    return window;
-        //}
+            return window;
+        }
         //Avalonia.Controls.Window InitializeRenderDemo()
         //{
         //    avaloniaContext = Context.ConfigureAvalonia<RenderDemo.App>();

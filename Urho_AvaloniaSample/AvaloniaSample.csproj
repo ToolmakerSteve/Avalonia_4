@@ -183,6 +183,7 @@
   <ItemGroup>
     <ProjectReference Include="..\packages\Avalonia\Avalonia.csproj" />
     <ProjectReference Include="..\samples\ControlCatalog\ControlCatalog.csproj" />
+    <ProjectReference Include="..\samples\TopHUD\TopHUD.csproj" />
     <ProjectReference Include="..\src\Avalonia.Desktop\Avalonia.Desktop.csproj" />
     <ProjectReference Include="..\src\Avalonia.Diagnostics\Avalonia.Diagnostics.csproj" />
     <ProjectReference Include="..\src\Avalonia.ReactiveUI\Avalonia.ReactiveUI.csproj" />
