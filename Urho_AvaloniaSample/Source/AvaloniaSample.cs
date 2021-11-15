@@ -14,6 +14,7 @@ namespace AvaloniaSample
 
 		Camera Camera = null;
 		Scene Scene;
+        Viewport Viewport2;
 
         private AvaloniaUrhoContext avaloniaContext;
        
@@ -68,8 +69,20 @@ namespace AvaloniaSample
 		{
 			base.OnUpdate(timeStep);
 
+            // TMS HACK: Which pane are we over?
+            bool overViewport2 = false;
+            if (ShowTwoViewports && Viewport2 != null)
+            {
+                IntVector2 mousePosition = Input.MousePosition; //TBD - ScreenPosition;
+                IntRect rect2 = Viewport2.Rect;
+                if (mousePosition.X < rect2.Right)
+                    overViewport2 = true;
+                else
+                    overViewport2 = false;   // (redundant - for debugging)
+            }
+
             if (Camera != null)
-                SimpleMoveCamera3D(timeStep);
+                SimpleMoveCamera3D(timeStep, 10.0f, overViewport2);
 		}
 
 		void InitializeAvaloniaControlCatalogDemo()
@@ -277,9 +290,9 @@ namespace AvaloniaSample
 
             // Set up the second camera viewport as left-hand pane (half of screen width).
             rect = RectBySize(0, 0, halfWidth, graphics.Height);
-            Viewport rearViewport = new Viewport(Context, Scene, CameraNode2.GetComponent<Camera>(), rect, null);
+            Viewport2 = new Viewport(Context, Scene, CameraNode2.GetComponent<Camera>(), rect, null);
 
-            renderer.SetViewport(1, rearViewport);
+            renderer.SetViewport(1, Viewport2);
         }
         #endregion
 

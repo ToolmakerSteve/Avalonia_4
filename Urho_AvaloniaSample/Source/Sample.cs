@@ -38,7 +38,7 @@ namespace AvaloniaSample
 		Sprite logoSprite;
 		UI ui;
 
-        protected const bool ShowTwoViewports = true;//true;
+        protected const bool ShowTwoViewports = true;//true;   TMS
 
         protected const float TouchSensitivity = 2;
 		protected float Yaw { get; set; }
@@ -159,7 +159,7 @@ namespace AvaloniaSample
 		/// <summary>
 		/// Move camera for 3D samples
 		/// </summary>
-		protected void SimpleMoveCamera3D (float timeStep, float moveSpeed = 10.0f)
+		protected void SimpleMoveCamera3D (float timeStep, float moveSpeed = 10.0f, bool overViewport2 = false)
 		{
             Vector3 unitMove = Vector3.Zero;
             // najak-HACK - Let's Urho ALWAYS Handle Keyboard input  --- NOTE: We need another Hack for this to detect when Avalonia wants Exclusive Keyboard focus (e.g. TextBox, Chat, etc)
@@ -179,8 +179,9 @@ namespace AvaloniaSample
 
             if (unitMove != Vector3.Zero)
             {
-                CameraPositionNode?.Translate(unitMove * moveSpeed * timeStep);
-                if (CameraPositionNode == null)
+                if (!ShowTwoViewports || overViewport2)
+                    CameraPositionNode?.Translate(unitMove * moveSpeed * timeStep);
+                else
                     CameraNode.Translate(unitMove * moveSpeed * timeStep);
             }
 
