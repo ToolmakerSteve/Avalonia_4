@@ -286,6 +286,8 @@ namespace AvaloniaSample
                 //CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitX, 90.0f), TransformSpace.Local);
                 // TODO: motions are relative to camera orientation; how make them absolute orientation?
                 CameraNode2.Rotation = new Quaternion(90, 0, 0);
+                // Move camera 2 up in the air, to show larger terrain area.
+                CameraNode2.Position = new Vector3(0, 100, 0);
 
                 Camera topCamera = CameraNode2.CreateComponent<Camera>();
             }
