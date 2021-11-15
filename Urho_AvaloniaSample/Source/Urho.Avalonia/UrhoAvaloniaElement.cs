@@ -805,7 +805,7 @@ namespace Urho.Avalonia
                     if (!args.Handled)
                     {   // Was NOT Handled by Avalonia ... so check if Pixel is Visible
                         byte alpha = ReadPixelAlpha(position);
-                        if (alpha == 0)
+                        if (alpha < 10)
                             _isMouseDownOnScene = true;
                     }
                 }
