@@ -6,16 +6,21 @@ using Urho.IO;
 using Avalonia.Styling;
 using Avalonia.Markup.Xaml.Styling;
 using AC = Avalonia.Controls;
+using Urho.Urho2D;
 
 namespace AvaloniaSample
 {
 	public class AvaloniaSample : Sample
 	{
-
+        const bool UseWaterScene = true;//true;   // TMS
 
 		Camera Camera = null;
 		Scene Scene;
         Viewport Viewport2;
+        // Used by Water Scene.
+        Node waterNode;
+        Node reflectionCameraNode;
+
 
         private AvaloniaUrhoContext avaloniaContext;
        
@@ -30,6 +35,7 @@ namespace AvaloniaSample
         {
             base.Setup();
         }
+
 		protected override void Start ()
 		{
 			base.Start ();
@@ -37,7 +43,25 @@ namespace AvaloniaSample
 			VGRendering.LoadResources();
 
             Log.LogLevel = LogLevel.Info;
-            CreateScene();
+
+
+            Scene = new Scene();
+
+            Node parentOfCamera = GetMainCamerasParentAndMaybeSetCameraWorldBaseNode();
+            // Create a scene node for the camera, which we will move around
+            // Can override camera's default settings later. (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
+            CameraNode = parentOfCamera.CreateChild("camera");
+            Camera = CameraNode.CreateComponent<Camera>();
+            SetCameraPositionNode();
+
+            if (UseWaterScene)
+                CreateWaterScene(Scene);
+            else
+                CreateMushroomScene(Scene);
+
+            if (ShowTwoViewports)
+                SetupSecondCamera();
+
             SimpleCreateInstructionsWithWasd();
             if (ShowTwoViewports)
                 SetupTwoViewports();
@@ -58,6 +82,11 @@ namespace AvaloniaSample
         protected override void OnUpdate(float timeStep)
 		{
 			base.OnUpdate(timeStep);
+
+            var reflectionCamera = reflectionCameraNode?.GetComponent<Camera>();
+            if (reflectionCamera != null)
+                reflectionCamera.AspectRatio = (float)Graphics.Width / Graphics.Height;
+
 
             // TMS HACK: Which pane are we over?
             bool overViewport2 = false;
@@ -155,21 +184,19 @@ namespace AvaloniaSample
             return pixels / (float)avaloniaContext.RenderScaling;
         }
 
-        void CreateScene ()
+        void CreateMushroomScene(Scene scene)
         {
-            Scene = new Scene();
-
             // Create the Octree component to the scene. This is required before adding any drawable components, or else nothing will
             // show up. The default octree volume will be from (-1000, -1000, -1000) to (1000, 1000, 1000) in world coordinates; it
             // is also legal to place objects outside the volume but their visibility can then not be checked in a hierarchically
             // optimizing manner
-            Scene.CreateComponent<Octree>();
+            scene.CreateComponent<Octree>();
 
 
             // Create a child scene node (at world origin) and a StaticModel component into it. Set the StaticModel to show a simple
             // plane mesh with a "stone" material. Note that naming the scene nodes is optional. Scale the scene node larger
             // (100 x 100 world units)
-            var planeNode = Scene.CreateChild("Plane");
+            var planeNode = scene.CreateChild("Plane");
             planeNode.Scale = new Vector3(100, 1, 100);
             var planeObject = planeNode.CreateComponent<StaticModel>();
             planeObject.Model = ResourceCache.GetModel("Models/Plane.mdl");
@@ -179,7 +206,7 @@ namespace AvaloniaSample
             // Create a directional light to the world so that we can see something. The light scene node's orientation controls the
             // light direction; we will use the SetDirection() function which calculates the orientation from a forward direction vector.
             // The light will use default settings (white light, no shadows)
-            var lightNode = Scene.CreateChild("DirectionalLight");
+            var lightNode = scene.CreateChild("DirectionalLight");
             lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
             var light = lightNode.CreateComponent<Light>();
             light.LightType = LightType.Directional;
@@ -188,7 +215,7 @@ namespace AvaloniaSample
             // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
             // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
             // generate the necessary 3D texture coordinates for cube mapping
-            var skyNode = Scene.CreateChild("Sky");
+            var skyNode = scene.CreateChild("Sky");
             skyNode.SetScale(500.0f); // The scale actually does not matter
             var skybox = skyNode.CreateComponent<Skybox>();
             skybox.Model = ResourceCache.GetModel("Models/Box.mdl");
@@ -205,7 +232,7 @@ namespace AvaloniaSample
             const int NMushrooms = 20; //200
             for (int i = 0; i < NMushrooms; i++)
             {
-                var mushroom = Scene.CreateChild("Mushroom");
+                var mushroom = scene.CreateChild("Mushroom");
                 mushroom.Position = new Vector3(rand.Next(90) - 45, 0, rand.Next(90) - 45);
                 mushroom.Rotation = new Quaternion(0, rand.Next(360), 0);
                 mushroom.SetScale(0.5f + rand.Next(20000) / 10000.0f);
@@ -214,41 +241,139 @@ namespace AvaloniaSample
                 mushroomObject.SetMaterial(ResourceCache.GetMaterial("Materials/Mushroom.xml"));
             }
 
-            SetupCameras();
+            MushroomSceneMainCameraSettings(CameraPositionNode);
+        }
+
+        void CreateWaterScene(Scene scene)
+        {
+            var cache = ResourceCache;
+
+            // Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
+            scene.CreateComponent<Octree>();
+
+            // Create a Zone component for ambient lighting & fog control
+            var zoneNode = scene.CreateChild("Zone");
+            var zone = zoneNode.CreateComponent<Zone>();
+            zone.SetBoundingBox(new BoundingBox(-1000.0f, 1000.0f));
+            zone.AmbientColor = new Color(0.15f, 0.15f, 0.15f);
+            zone.FogColor = new Color(1.0f, 1.0f, 1.0f);
+            zone.FogStart = 500.0f;
+            zone.FogEnd = 750.0f;
+
+            // Create a directional light to the world. Enable cascaded shadows on it
+            var lightNode = scene.CreateChild("DirectionalLight");
+            lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
+            var light = lightNode.CreateComponent<Light>();
+            light.LightType = LightType.Directional;
+            light.CastShadows = true;
+            light.ShadowBias = new BiasParameters(0.00025f, 0.5f);
+            light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
+            light.SpecularIntensity = 0.5f;
+            // Apply slightly overbright lighting to match the skybox
+            light.Color = new Color(1.2f, 1.2f, 1.2f);
+
+            // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
+            // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
+            // generate the necessary 3D texture coordinates for cube mapping
+            var skyNode = scene.CreateChild("Sky");
+            skyNode.SetScale(500.0f); // The scale actually does not matter
+            var skybox = skyNode.CreateComponent<Skybox>();
+            skybox.Model = cache.GetModel("Models/Box.mdl");
+            skybox.SetMaterial(cache.GetMaterial("Materials/Skybox.xml"));
+
+            // Create heightmap terrain
+            var terrainNode = scene.CreateChild("Terrain");
+            terrainNode.Position = new Vector3(0.0f, 0.0f, 0.0f);
+            var terrain = terrainNode.CreateComponent<Terrain>();
+            terrain.PatchSize = 64;
+            terrain.Spacing = new Vector3(2.0f, 0.5f, 2.0f); // Spacing between vertices and vertical resolution of the height map
+            terrain.Smoothing = true;
+            terrain.SetHeightMap(cache.GetImage("Textures/HeightMap.png"));
+            terrain.Material = cache.GetMaterial("Materials/Terrain.xml");
+            // The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
+            // terrain patches and other objects behind it
+            terrain.Occluder = true;
+
+            // Create 1000 boxes in the terrain. Always face outward along the terrain normal
+            uint numObjects = 1000;
+            for (uint i = 0; i < numObjects; ++i)
+            {
+                var objectNode = scene.CreateChild("Box");
+                Vector3 position = new Vector3(NextRandom(2000.0f) - 1000.0f, 0.0f, NextRandom(2000.0f) - 1000.0f);
+                position.Y = terrain.GetHeight(position) + 2.25f;
+                objectNode.Position = position;
+                // Create a rotation quaternion from up vector to terrain normal
+                objectNode.Rotation = Quaternion.FromRotationTo(new Vector3(0.0f, 1.0f, 0.0f), terrain.GetNormal(position));
+                objectNode.SetScale(5.0f);
+                var obj = objectNode.CreateComponent<StaticModel>();
+                obj.Model = cache.GetModel("Models/Box.mdl");
+                obj.SetMaterial(cache.GetMaterial("Materials/Stone.xml"));
+                obj.CastShadows = true;
+            }
+
+            // Create a water plane object that is as large as the terrain
+            waterNode = scene.CreateChild("Water");
+            waterNode.Scale = new Vector3(2048.0f, 1.0f, 2048.0f);
+            waterNode.Position = new Vector3(0.0f, 5.0f, 0.0f);
+            var water = waterNode.CreateComponent<StaticModel>();
+            water.Model = cache.GetModel("Models/Plane.mdl");
+            water.SetMaterial(cache.GetMaterial("Materials/Water.xml"));
+            // Set a different viewmask on the water plane to be able to hide it from the reflection camera
+            water.ViewMask = 0x80000000;
+
+            WaterSceneMainCameraSettings(CameraPositionNode, Camera);
         }
 
 
         #region "-- First camera and viewport --"
-        private void SetupCameras()
+        private void MushroomSceneMainCameraSettings(Node cameraPositionNode)
         {
+            // Set an initial position (for the camera node(s)) above the plane
+            cameraPositionNode.Position = new Vector3(0, 5, 0);
+        }
 
-            Node parent;
+        /// <summary>
+        /// When two viewports, sets CameraWorldBaseNode.
+        /// </summary>
+        /// <returns>parentOfMainCameraNode: The node that will be parent of CameraNode.</returns>
+        private Node GetMainCamerasParentAndMaybeSetCameraWorldBaseNode()
+        {
+            Node parentOfMainCameraNode;
             if (ShowTwoViewports)
             {
                 CameraWorldBaseNode = Scene.CreateChild("cameraBase");
 
-                parent = CameraWorldBaseNode;
+                parentOfMainCameraNode = CameraWorldBaseNode;
+            }
+            else
+            {   // One camera - create it directly in the scene.
+                parentOfMainCameraNode = Scene;
+            }
+
+            return parentOfMainCameraNode;
+        }
+
+        /// <summary>
+        /// Sets CameraPositionNode.
+        /// </summary>
+        private void SetCameraPositionNode()
+        {
+            if (ShowTwoViewports)
+            {
                 // This node gets the position.
                 CameraPositionNode = CameraWorldBaseNode;
             }
             else
             {   // One camera - create it directly in the scene.
-                parent = Scene;
                 CameraPositionNode = CameraNode;
             }
+        }
 
-            // Set an initial position (for the camera node(s)) above the plane
-            CameraPositionNode.Position = new Vector3(0, 5, 0);
-
-            // Create a scene node for the camera, which we will move around
-            // The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
-            CameraNode = parent.CreateChild("camera");
-            Camera = CameraNode.CreateComponent<Camera>();
-
-            if (ShowTwoViewports)
-            {
-                SetupSecondCamera();
-            }
+        private void WaterSceneMainCameraSettings(Node cameraPositionNode, Camera camera)
+        {
+            camera.FarClip = 750.0f;
+            // Set an initial position for the camera scene node above the plane
+            cameraPositionNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
         }
 
         void SetupOneViewport()
@@ -257,6 +382,47 @@ namespace AvaloniaSample
             // at minimum. Additionally we could configure the viewport screen size and the rendering path (eg. forward / deferred) to
             // use, but now we just use full screen and default render path configured in the engine command line options
             Renderer.SetViewport(0, new Viewport(Context, Scene, Camera, null));
+
+            if (UseWaterScene)
+                SetupWaterReflectionAndItsViewport(Graphics, ResourceCache);
+        }
+
+        private void SetupWaterReflectionAndItsViewport(Graphics graphics, Urho.Resources.ResourceCache cache)
+        {
+            // Create a mathematical plane to represent the water in calculations
+
+            Plane waterPlane = new Plane(waterNode.WorldRotation * new Vector3(0.0f, 1.0f, 0.0f), waterNode.WorldPosition);
+            // Create a downward biased plane for reflection view clipping. Biasing is necessary to avoid too aggressive clipping
+            Plane waterClipPlane = new Plane(waterNode.WorldRotation * new Vector3(0.0f, 1.0f, 0.0f), waterNode.WorldPosition - new Vector3(0.0f, 0.1f, 0.0f));
+
+            // Create camera for water reflection
+            // It will have the same farclip and position as the main viewport camera, but uses a reflection plane to modify
+            // its position when rendering
+            reflectionCameraNode = CameraNode.CreateChild();
+            var reflectionCamera = reflectionCameraNode.CreateComponent<Camera>();
+            reflectionCamera.FarClip = 750.0f;
+            reflectionCamera.ViewMask = 0x7fffffff; // Hide objects with only bit 31 in the viewmask (the water plane)
+            reflectionCamera.AutoAspectRatio = false;
+            reflectionCamera.UseReflection = true;
+            reflectionCamera.ReflectionPlane = waterPlane;
+            reflectionCamera.UseClipping = true; // Enable clipping of geometry behind water plane
+            reflectionCamera.ClipPlane = waterClipPlane;
+            // The water reflection texture is rectangular. Set reflection camera aspect ratio to match
+            reflectionCamera.AspectRatio = (float)graphics.Width / graphics.Height;
+            // View override flags could be used to optimize reflection rendering. For example disable shadows
+            //reflectionCamera.ViewOverrideFlags = ViewOverrideFlags.DisableShadows;
+
+            // Create a texture and setup viewport for water reflection. Assign the reflection texture to the diffuse
+            // texture unit of the water material
+            int texSize = 1024;
+            Texture2D renderTexture = new Texture2D();
+            renderTexture.SetSize(texSize, texSize, Graphics.RGBFormat, TextureUsage.Rendertarget);
+            renderTexture.FilterMode = TextureFilterMode.Bilinear;
+            RenderSurface surface = renderTexture.RenderSurface;
+            var rttViewport = new Viewport(Context, Scene, reflectionCamera, null);
+            surface.SetViewport(0, rttViewport);
+            var waterMat = cache.GetMaterial("Materials/Water.xml");
+            waterMat.SetTexture(TextureUnit.Diffuse, renderTexture);
         }
         #endregion
 
