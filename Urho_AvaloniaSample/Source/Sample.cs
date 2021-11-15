@@ -38,12 +38,23 @@ namespace AvaloniaSample
 		Sprite logoSprite;
 		UI ui;
 
-		protected const float TouchSensitivity = 2;
+        protected const bool ShowTwoViewports = true;//true;
+
+        protected const float TouchSensitivity = 2;
 		protected float Yaw { get; set; }
 		protected float Pitch { get; set; }
 		protected bool TouchEnabled { get; set; }
-		protected Node CameraNode { get; set; }
-		protected MonoDebugHud MonoDebugHud { get; set; }
+        /// <summary>
+        /// Only used when two cameras (two viewports).
+        /// So can move both cameras in world coords, instead of relative to camera orientation.
+        /// </summary>
+        protected Node CameraWorldBaseNode { get; set; }
+        // Set to the node that is positioned by keys. When one camera, is CameraNode. When two cameras, is CameraWorldBaseNode.
+        protected Node CameraPositionNode;
+        protected Node CameraNode { get; set; }
+        protected Node CameraNode2 { get; set; }
+
+        protected MonoDebugHud MonoDebugHud { get; set; }
 
 		[Preserve]
 		protected Sample(ApplicationOptions options = null) : base(options) {}
@@ -131,11 +142,6 @@ namespace AvaloniaSample
 			if (Input.GetKeyDown(Key.S)) CameraNode.Translate(-Vector3.UnitY * moveSpeed * timeStep);
 			if (Input.GetKeyDown(Key.A)) CameraNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
 			if (Input.GetKeyDown(Key.D)) CameraNode.Translate( Vector3.UnitX * moveSpeed * timeStep);
-            // TBD: Intent is "X Down, Z Up". Might need to swap signs.
-            if (Input.GetKeyDown(Key.X))
-                CameraNode.Translate(Vector3.UnitZ * moveSpeed * timeStep);
-            if (Input.GetKeyDown(Key.Z))
-                CameraNode.Translate(-Vector3.UnitZ * moveSpeed * timeStep);
 
             if (Input.GetKeyDown(Key.PageUp))
 			{
@@ -155,20 +161,28 @@ namespace AvaloniaSample
 		/// </summary>
 		protected void SimpleMoveCamera3D (float timeStep, float moveSpeed = 10.0f)
 		{
+            Vector3 unitMove = Vector3.Zero;
             // najak-HACK - Let's Urho ALWAYS Handle Keyboard input  --- NOTE: We need another Hack for this to detect when Avalonia wants Exclusive Keyboard focus (e.g. TextBox, Chat, etc)
             if (Input.GetKeyDown(Key.W))
-                CameraNode.Translate(Vector3.UnitZ * moveSpeed * timeStep);
+                unitMove += Vector3.UnitZ;
             if (Input.GetKeyDown(Key.S))
-                CameraNode.Translate(-Vector3.UnitZ * moveSpeed * timeStep);
+                unitMove -= Vector3.UnitZ;
             if (Input.GetKeyDown(Key.A))
-                CameraNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
+                unitMove -= Vector3.UnitX;
             if (Input.GetKeyDown(Key.D))
-                CameraNode.Translate(Vector3.UnitX * moveSpeed * timeStep);
+                unitMove += Vector3.UnitX;
             // TBD: Intent is "X Down, Z Up". Might need to swap signs.
             if (Input.GetKeyDown(Key.X))
-                CameraNode.Translate(-Vector3.UnitY * moveSpeed * timeStep);
+                unitMove -= Vector3.UnitY;
             if (Input.GetKeyDown(Key.Z))
-                CameraNode.Translate(Vector3.UnitY * moveSpeed * timeStep);
+                unitMove += Vector3.UnitY;
+
+            if (unitMove != Vector3.Zero)
+            {
+                CameraPositionNode?.Translate(unitMove * moveSpeed * timeStep);
+                if (CameraPositionNode == null)
+                    CameraNode.Translate(unitMove * moveSpeed * timeStep);
+            }
 
 
             if (UI.FocusElement != null)
@@ -176,6 +190,7 @@ namespace AvaloniaSample
             else
                 _HandleUserInput(timeStep, moveSpeed);
         }
+
         private void _HandleUserInput()// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
         {
             _HandleUserInput(0.02f, 10f);//najak-TODO - make the timeStep 'real'

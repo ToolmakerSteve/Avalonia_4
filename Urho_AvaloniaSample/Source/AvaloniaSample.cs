@@ -10,12 +10,10 @@ namespace AvaloniaSample
 {
 	public class AvaloniaSample : Sample
 	{
-        const bool ShowTwoViewports = true;//true;
 
 
 		Camera Camera = null;
 		Scene Scene;
-        Node CameraNode2;
 
         private AvaloniaUrhoContext avaloniaContext;
        
@@ -176,16 +174,34 @@ namespace AvaloniaSample
         #region "-- First camera and viewport --"
         private void SetupCameras()
         {
+
+            Node parent;
+            if (ShowTwoViewports)
+            {
+                CameraWorldBaseNode = Scene.CreateChild("cameraBase");
+
+                parent = CameraWorldBaseNode;
+                // This node gets the position.
+                CameraPositionNode = CameraWorldBaseNode;
+            }
+            else
+            {   // One camera - create it directly in the scene.
+                parent = Scene;
+                CameraPositionNode = CameraNode;
+            }
+
+            // Set an initial position (for the camera node(s)) above the plane
+            CameraPositionNode.Position = new Vector3(0, 5, 0);
+
             // Create a scene node for the camera, which we will move around
             // The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
-            CameraNode = Scene.CreateChild("camera");
+            CameraNode = parent.CreateChild("camera");
             Camera = CameraNode.CreateComponent<Camera>();
 
-            // Set an initial position for the camera scene node above the plane
-            CameraNode.Position = new Vector3(0, 5, 0);
-
             if (ShowTwoViewports)
+            {
                 SetupSecondCamera();
+            }
         }
 
         void SetupOneViewport()
@@ -218,9 +234,11 @@ namespace AvaloniaSample
             }
             else
             {
-                CameraNode2 = CameraNode.CreateChild("TopViewCamera");
-                // TODO: Straight down. BUT then it shouldn't use rotation of first camera; only position.
-                CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitX, 90.0f), TransformSpace.Local);
+                CameraNode2 = CameraWorldBaseNode.CreateChild("TopViewCamera");
+                // Straight down. BUT then it shouldn't use rotation of first camera; only position.
+                //CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitX, 90.0f), TransformSpace.Local);
+                // TODO: motions are relative to camera orientation; how make them absolute orientation?
+                CameraNode2.Rotation = new Quaternion(90, 0, 0);
 
                 Camera topCamera = CameraNode2.CreateComponent<Camera>();
             }
