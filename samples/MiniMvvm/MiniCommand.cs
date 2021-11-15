@@ -36,6 +36,9 @@ namespace MiniMvvm
 
         public override async void Execute(object parameter)
         {
+            if (parameter == null)
+                return; // najak - null check added
+
             if(Busy)
                 return;
             try
