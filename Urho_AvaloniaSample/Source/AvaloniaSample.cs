@@ -91,6 +91,11 @@ namespace AvaloniaSample
             avaloniaContext.RenderScaling = 2.0;
 
             var mainWindow = new ControlCatalog.MainWindow();
+
+            // najak - Needed to make Window Default Background be Transparent, rather than solid-white!
+            var avRoot = Avalonia.VisualTree.VisualExtensions.GetVisualRoot(mainWindow) as global::Avalonia.Controls.TopLevel;
+            avRoot.TransparencyBackgroundFallback = Avalonia.Media.Brushes.Purple;
+
             AvaloniaUrhoContext.MainWindow = mainWindow;
             mainWindow.Show(UI.Root);
 
