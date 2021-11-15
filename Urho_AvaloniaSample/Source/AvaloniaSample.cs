@@ -5,6 +5,7 @@ using Urho.Avalonia;
 using Urho.IO;
 using Avalonia.Styling;
 using Avalonia.Markup.Xaml.Styling;
+using AC = Avalonia.Controls;
 
 namespace AvaloniaSample
 {
@@ -49,23 +50,12 @@ namespace AvaloniaSample
 			Input.SetMouseVisible(true);
 			Input.SetMouseMode(MouseMode.Free);
 
-            InitializeAvaloniaSample();
-			
-		
-		}
-
-        void InitializeAvaloniaSample()
-        {
-            // InitializeAvaloniaTodoDemo();
-            // InitializeAvaloniaDockDemo();
-            // InitializeAvaloniaDockDemo2();
-            //  InitializeAvaloniaNotePadDemo();
-
-            InitializeAvaloniaControlCatalogDemo();
+            CreateWindow(InitializeAvaloniaControlCatalogDemo);
+            //CreateWindow(InitializeSandboxDemo);
+            //CreateWindow(InitializeRenderDemo);
         }
 
-
-		protected override void OnUpdate(float timeStep)
+        protected override void OnUpdate(float timeStep)
 		{
 			base.OnUpdate(timeStep);
 
@@ -85,12 +75,13 @@ namespace AvaloniaSample
                 SimpleMoveCamera3D(timeStep, 10.0f, overViewport2);
 		}
 
-		void InitializeAvaloniaControlCatalogDemo()
-		{
-            avaloniaContext = Context.ConfigureAvalonia<ControlCatalog.App>();
-            avaloniaContext.RenderScaling = 2.0;
+        private void CreateWindow(Func<Avalonia.Controls.Window> createMethod)
+        {
+            var mainWindow = createMethod();
 
-            var mainWindow = new ControlCatalog.MainWindow();
+            mainWindow.Width = this.Graphics.Width / 2;
+            mainWindow.Height = (this.Graphics.Height / 8);
+            mainWindow.Position = new Avalonia.PixelPoint(0, 0);   // TMS
 
             // najak - Needed to make Window Default Background be Transparent, rather than solid-white!
             var avRoot = Avalonia.VisualTree.VisualExtensions.GetVisualRoot(mainWindow) as global::Avalonia.Controls.TopLevel;
@@ -98,22 +89,60 @@ namespace AvaloniaSample
 
             AvaloniaUrhoContext.MainWindow = mainWindow;
             mainWindow.Show(UI.Root);
+        }
 
-            //mainWindow.Position = new Avalonia.PixelPoint(100, 100);
-            mainWindow.Position = new Avalonia.PixelPoint(0,0);   // TMS
-            // TBD whether one HUD over both viewports, or each viewport has own HUD.
-            if (false)//ShowTwoViewports)
-            {   // Left half-screen.
-                var width0DI = mainWindow.Width;
-                var width1DI = ToDIUnits(Graphics.Width);
-                mainWindow.Width = (int)(width1DI / 2);
-                mainWindow.Height = (int)ToDIUnits(Graphics.Height);
-            }
-            else
-            {   // Full screen.
-                mainWindow.Width = (int)ToDIUnits(Graphics.Width);
-                mainWindow.Height = (int)ToDIUnits(Graphics.Height);
-            }
+        //Avalonia.Controls.Window InitializeSandboxDemo()
+        //{
+        //    avaloniaContext = Context.ConfigureAvalonia<TopHUD.App>();
+        //    avaloniaContext.RenderScaling = 2.0;
+        //    var window = new TopHUD.MainWindow();
+
+        //    //var panel = new AC.Panel();
+        //    //panel.Parent = window;
+        //    //window.Content = panel;
+
+
+
+        //    return window;
+        //}
+        //Avalonia.Controls.Window InitializeRenderDemo()
+        //{
+        //    avaloniaContext = Context.ConfigureAvalonia<RenderDemo.App>();
+        //    avaloniaContext.RenderScaling = 2.0;
+        //    return new RenderDemo.MainWindow();
+        //}
+
+        Avalonia.Controls.Window InitializeAvaloniaControlCatalogDemo()
+		{
+            avaloniaContext = Context.ConfigureAvalonia<ControlCatalog.App>();
+            avaloniaContext.RenderScaling = 2.0;
+
+            return new ControlCatalog.MainWindow();
+
+            //// najak - Needed to make Window Default Background be Transparent, rather than solid-white!
+            //var avRoot = Avalonia.VisualTree.VisualExtensions.GetVisualRoot(mainWindow) as global::Avalonia.Controls.TopLevel;
+            //avRoot.TransparencyBackgroundFallback = Avalonia.Media.Brushes.Transparent;
+
+            //var content = mainWindow.Content;
+
+            //AvaloniaUrhoContext.MainWindow = mainWindow;
+            //mainWindow.Show(UI.Root);
+
+            ////mainWindow.Position = new Avalonia.PixelPoint(100, 100);
+            //mainWindow.Position = new Avalonia.PixelPoint(0,0);   // TMS
+            //// TBD whether one HUD over both viewports, or each viewport has own HUD.
+            //if (false)//ShowTwoViewports)
+            //{   // Left half-screen.
+            //    var width0DI = mainWindow.Width;
+            //    var width1DI = ToDIUnits(Graphics.Width);
+            //    mainWindow.Width = (int)(width1DI / 2);
+            //    mainWindow.Height = (int)ToDIUnits(Graphics.Height);
+            //}
+            //else
+            //{   // Full screen.
+            //    mainWindow.Width = (int)ToDIUnits(Graphics.Width);
+            //    mainWindow.Height = (int)ToDIUnits(Graphics.Height);
+            //}
         }
 
         /// <summary>
