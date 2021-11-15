@@ -201,18 +201,29 @@ namespace AvaloniaSample
         #region "-- Two viewports (and two cameras) --"
         void SetupSecondCamera()
         {
-            // Parent the rear camera node to the front camera node and turn it 180 degrees to face backward
-            // Here, we use the angle-axis constructor for Quaternion instead of the usual Euler angles
-            CameraNode2 = CameraNode.CreateChild("RearCamera");
-            CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitY, 180.0f), TransformSpace.Local);
+            if (false)
+            {   // "Rear-view mirror".
+                // Parent the rear camera node to the front camera node and turn it 180 degrees to face backward
+                // Here, we use the angle-axis constructor for Quaternion instead of the usual Euler angles
+                CameraNode2 = CameraNode.CreateChild("RearCamera");
+                CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitY, 180.0f), TransformSpace.Local);
 
-            Camera rearCamera = CameraNode2.CreateComponent<Camera>();
-            rearCamera.FarClip = 300.0f;
-            // Because the rear viewport is rather small, disable occlusion culling from it. Use the camera's
-            // "view override flags" for this. We could also disable eg. shadows or force low material quality
-            // if we wanted
+                Camera rearCamera = CameraNode2.CreateComponent<Camera>();
+                rearCamera.FarClip = 300.0f;
+                // Because the rear viewport is rather small, disable occlusion culling from it. Use the camera's
+                // "view override flags" for this. We could also disable eg. shadows or force low material quality
+                // if we wanted
 
-            rearCamera.ViewOverrideFlags = ViewOverrideFlags.DisableOcclusion;
+                rearCamera.ViewOverrideFlags = ViewOverrideFlags.DisableOcclusion;
+            }
+            else
+            {
+                CameraNode2 = CameraNode.CreateChild("TopViewCamera");
+                // TODO: Straight down. BUT then it shouldn't use rotation of first camera; only position.
+                CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitX, 90.0f), TransformSpace.Local);
+
+                Camera topCamera = CameraNode2.CreateComponent<Camera>();
+            }
         }
 
         /// <summary>
@@ -226,9 +237,9 @@ namespace AvaloniaSample
             renderer.NumViewports = 2;
             int halfWidth = (int)(Graphics.Width / 2);
 
-            // Set up the first camera viewport as left-hand pane (half of screen width).
+            // Set up the first camera viewport as right-hand pane (half of screen width).
             Viewport viewport = new Viewport(Context, Scene, CameraNode.GetComponent<Camera>(), null);
-            var rect = RectBySize(0, 0, halfWidth, Graphics.Height);
+            var rect = RectBySize(halfWidth, 0, halfWidth, Graphics.Height);
             Renderer.SetViewport(0, new Viewport(Context, Scene, CameraNode.GetComponent<Camera>(), rect, null));
 
             // Clone the default render path so that we do not interfere with the other viewport, then add
@@ -246,8 +257,8 @@ namespace AvaloniaSample
             effectRenderPath.SetEnabled("FXAA2", false);
             viewport.RenderPath = effectRenderPath;
 
-            // Set up the second camera viewport as right-hand pane (half of screen width).
-            rect = RectBySize(halfWidth, 0, halfWidth, graphics.Height);
+            // Set up the second camera viewport as left-hand pane (half of screen width).
+            rect = RectBySize(0, 0, halfWidth, graphics.Height);
             Viewport rearViewport = new Viewport(Context, Scene, CameraNode2.GetComponent<Camera>(), rect, null);
 
             renderer.SetViewport(1, rearViewport);
