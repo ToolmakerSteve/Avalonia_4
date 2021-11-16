@@ -16,6 +16,7 @@ namespace AvaloniaSample
         const bool UseWaterScene = true;//true;   // TMS
         const bool IncludeAvaloniaLayer = false;//true;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
+        const bool StoneWallTest1 = true && UseWaterScene;   // TMS
 
         Camera Camera = null;
 		Scene Scene;
@@ -36,12 +37,14 @@ namespace AvaloniaSample
 
 		public AvaloniaSample(ApplicationOptions options):base(options){}
 
+
+        #region "-- Setup, Start --"
         protected override void Setup()
         {
             base.Setup();
         }
 
-		protected override void Start ()
+		protected override void Start()
 		{
 			base.Start ();
 
@@ -89,57 +92,6 @@ namespace AvaloniaSample
             }
         }
 
-        uint startTime = 0;
-        uint lastTime = 0;
-
-        protected override void OnUpdate(float timeStep)
-        {
-            base.OnUpdate(timeStep);
-
-            OnUpdate_Wireframe();
-
-            var reflectionCamera = ReflectionCameraNode?.GetComponent<Camera>();
-            if (reflectionCamera != null)
-                reflectionCamera.AspectRatio = (float)Graphics.Width / Graphics.Height;
-
-
-            // TMS HACK: Which pane are we over?
-            bool overViewport2 = false;
-            if (ShowTwoViewports && Viewport2 != null)
-            {
-                IntVector2 mousePosition = Input.MousePosition; //TBD - ScreenPosition;
-                IntRect rect2 = Viewport2.Rect;
-                if (mousePosition.X < rect2.Right)
-                    overViewport2 = true;
-                else
-                    overViewport2 = false;   // (redundant - for debugging)
-            }
-
-            if (Camera != null)
-                SimpleMoveCamera3D(timeStep, 10.0f, overViewport2);
-        }
-
-        private void OnUpdate_Wireframe()
-        {
-            if (ShowWireframe)
-            {
-                int liveMillis = 0;
-                uint now = Time.SystemTime;
-                if (startTime > 0)
-                    liveMillis = (int)(now - startTime);
-                else
-                    startTime = now;
-
-                int flashesPerSecond = 6;
-                // "1.0f" to have wireframe stay visible; lesser values to flash on and off.
-                float fractionOn = 1.0f; //0.7f; //0.3f;
-                int millisPerFlash = (int)Math.Round(1000.0 / flashesPerSecond);
-                int millisOn = (int)Math.Round(millisPerFlash * fractionOn);
-
-                bool asWireframe = (liveMillis % millisPerFlash) < millisOn;
-                SetWireframeVisibility(asWireframe);
-            }
-        }
 
         private void CreateWindow(Func<Avalonia.Controls.Window> createMethod)
         {
@@ -179,7 +131,7 @@ namespace AvaloniaSample
         //}
 
         Avalonia.Controls.Window InitializeAvaloniaControlCatalogDemo()
-		{
+        {
             avaloniaContext = Context.ConfigureAvalonia<ControlCatalog.App>();
             avaloniaContext.RenderScaling = 2.0;
 
@@ -210,16 +162,85 @@ namespace AvaloniaSample
             //    mainWindow.Height = (int)ToDIUnits(Graphics.Height);
             //}
         }
+        #endregion
 
-        /// <summary>
-        /// Convert pixels to Avalonia Device-Independent Units.
-        /// </summary>
-        /// <param name="pixels"></param>
-        /// <returns></returns>
-        public float ToDIUnits(int pixels)
+        #region "-- OnUpdate --"
+        uint _startTime = 0;
+        bool WallDrawStarted;
+        Vector2 LastWallPosition2D;
+
+
+        protected override void OnUpdate(float timeStep)
         {
-            return pixels / (float)avaloniaContext.RenderScaling;
+            base.OnUpdate(timeStep);
+
+            OnUpdate_Wireframe();
+
+            var reflectionCamera = ReflectionCameraNode?.GetComponent<Camera>();
+            if (reflectionCamera != null)
+                reflectionCamera.AspectRatio = (float)Graphics.Width / Graphics.Height;
+
+
+            // TMS HACK: Which pane are we over?
+            bool overViewport2 = false;
+            if (ShowTwoViewports && Viewport2 != null)
+            {
+                IntVector2 mousePosition = Input.MousePosition; //TBD - ScreenPosition;
+                IntRect rect2 = Viewport2.Rect;
+                if (mousePosition.X < rect2.Right)
+                    overViewport2 = true;
+                else
+                    overViewport2 = false;   // (redundant - for debugging)
+            }
+
+            if (Camera != null)
+            {
+                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && overViewport2 && StoneWallTest1)
+                {
+                    if (Input.GetMouseButtonDown(MouseButton.Left))
+                    {
+                        OnUpdate_DrawWall();
+                    }
+                }
+
+            }
         }
+
+        private void OnUpdate_Wireframe()
+        {
+            if (ShowWireframe)
+            {
+                int liveMillis = 0;
+                uint now = Time.SystemTime;
+                if (_startTime > 0)
+                    liveMillis = (int)(now - _startTime);
+                else
+                    _startTime = now;
+
+                int flashesPerSecond = 6;
+                // "1.0f" to have wireframe stay visible; lesser values to flash on and off.
+                float fractionOn = 1.0f; //0.7f; //0.3f;
+                int millisPerFlash = (int)Math.Round(1000.0 / flashesPerSecond);
+                int millisOn = (int)Math.Round(millisPerFlash * fractionOn);
+
+                bool asWireframe = (liveMillis % millisPerFlash) < millisOn;
+                SetWireframeVisibility(asWireframe);
+            }
+        }
+
+        private void OnUpdate_DrawWall()
+        {
+
+            if (!WallDrawStarted)
+            {
+                WallDrawStarted = true;
+            }
+            else
+            {
+
+            }
+        }
+        #endregion
 
 
         #region "-- scene specifics --"
@@ -590,6 +611,19 @@ namespace AvaloniaSample
             Viewport2 = new Viewport(Context, Scene, CameraNode2.GetComponent<Camera>(), rect, null);
 
             renderer.SetViewport(1, Viewport2);
+        }
+        #endregion
+
+
+        #region "-- local Helpers --"
+        /// <summary>
+        /// Convert pixels to Avalonia Device-Independent Units.
+        /// </summary>
+        /// <param name="pixels"></param>
+        /// <returns></returns>
+        public float ToDIUnits(int pixels)
+        {
+            return pixels / (float)avaloniaContext.RenderScaling;
         }
         #endregion
 

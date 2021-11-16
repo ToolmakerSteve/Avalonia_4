@@ -166,9 +166,13 @@ namespace AvaloniaSample
 
 
         /// <summary>
-        /// Move camera for 3D samples
+        /// Move camera for 3D samples.
         /// </summary>
-        protected void SimpleMoveCamera3D(float timeStep, float moveSpeed = 10.0f, bool overViewport2 = false)
+        /// <param name="timeStep"></param>
+        /// <param name="moveSpeed"></param>
+        /// <param name="overViewport2"></param>
+        /// <returns>true if did move (a move key was down)</returns>
+        protected bool SimpleMoveCamera3D(float timeStep, float moveSpeed = 10.0f, bool overViewport2 = false)
 		{
             uint CurrentTime = Time.SystemTime;
             uint deltaTime = 0;
@@ -176,6 +180,8 @@ namespace AvaloniaSample
                 deltaTime = CurrentTime - PreviousTime;
             // For next call. Don't reference PreviousTime after this; use deltaTime.
             PreviousTime = CurrentTime;
+
+            bool didMove = false;
 
             // Might be multiple keys held down, so sum them.
             Vector3 cameraPlaneMove = Vector3.Zero;
@@ -203,6 +209,7 @@ namespace AvaloniaSample
 
             if (movingInPlane || altitudeMove.HasValue)
             {
+                didMove = true;
                 var moveMult = moveSpeed * timeStep;
                 if (GroundSpeedMultByAltitude)
                 {
@@ -276,9 +283,10 @@ namespace AvaloniaSample
 
 
             if (UI.FocusElement != null)
-                return;
+                return didMove;
             else
                 _HandleUserInput(timeStep, moveSpeed);
+            return false;
         }
 
         private void _HandleUserInput()// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
