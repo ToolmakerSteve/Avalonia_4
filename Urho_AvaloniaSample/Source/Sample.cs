@@ -77,7 +77,7 @@ namespace AvaloniaSample
 			set { logoSprite.Visible = value; }
 		}
 		
-		static readonly Random random = new Random();
+		protected static readonly Random random = new Random(12345678);
 		/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
 		public static float NextRandom() { return (float)random.NextDouble(); }
 		/// Return a random float between 0.0 and range, inclusive from both ends.
@@ -156,33 +156,91 @@ namespace AvaloniaSample
 			}
 		}
 
-		/// <summary>
-		/// Move camera for 3D samples
-		/// </summary>
-		protected void SimpleMoveCamera3D (float timeStep, float moveSpeed = 10.0f, bool overViewport2 = false)
+        uint PreviousTime = 0;
+
+
+        /// <summary>
+        /// Move camera for 3D samples
+        /// </summary>
+        protected void SimpleMoveCamera3D(float timeStep, float moveSpeed = 10.0f, bool overViewport2 = false)
 		{
-            Vector3 unitMove = Vector3.Zero;
+            uint CurrentTime = Time.SystemTime;
+            uint deltaTime = 0;
+            if (PreviousTime != 0)
+                deltaTime = CurrentTime - PreviousTime;
+            // For next call. Don't reference PreviousTime after this; use deltaTime.
+            PreviousTime = CurrentTime;
+
+            // Might be multiple keys held down, so sum them.
+            Vector3 cameraPlaneMove = Vector3.Zero;
             // najak-HACK - Let's Urho ALWAYS Handle Keyboard input  --- NOTE: We need another Hack for this to detect when Avalonia wants Exclusive Keyboard focus (e.g. TextBox, Chat, etc)
             if (Input.GetKeyDown(Key.W))
-                unitMove += Vector3.UnitZ;
+                cameraPlaneMove += Vector3.UnitZ;
             if (Input.GetKeyDown(Key.S))
-                unitMove -= Vector3.UnitZ;
+                cameraPlaneMove -= Vector3.UnitZ;
             if (Input.GetKeyDown(Key.A))
-                unitMove -= Vector3.UnitX;
+                cameraPlaneMove -= Vector3.UnitX;
             if (Input.GetKeyDown(Key.D))
-                unitMove += Vector3.UnitX;
+                cameraPlaneMove += Vector3.UnitX;
+
+            Vector3? altitudeMove = null;
             // TBD: Intent is "X Down, Z Up". Might need to swap signs.
             if (Input.GetKeyDown(Key.X))
-                unitMove -= Vector3.UnitY;
-            if (Input.GetKeyDown(Key.Z))
-                unitMove += Vector3.UnitY;
+                altitudeMove = -Vector3.UnitY;
+            else if (Input.GetKeyDown(Key.Z))
+                altitudeMove = Vector3.UnitY;
 
-            if (unitMove != Vector3.Zero)
+            bool movingInPlane = cameraPlaneMove != Vector3.Zero;
+            var allAxesMove = cameraPlaneMove;
+            if (altitudeMove.HasValue)
+                allAxesMove += altitudeMove.Value;
+
+            if (movingInPlane || altitudeMove.HasValue)
             {
-                if (!ShowTwoViewports || overViewport2)
-                    CameraPositionNode?.Translate(unitMove * moveSpeed * timeStep);
+                var moveMult = moveSpeed * timeStep;
+                //Debug.WriteLine($"--- deltaTime={deltaTime}, mult={moveMult}, elapsed={Time.ElapsedTime}, step={Time.TimeStep}, over2={overViewport2} ---");
+                if (ShowTwoViewports)
+                {
+                    if (overViewport2)
+                    {
+                        // This moves both cameras in world ground plane.
+                        CameraPositionNode?.Translate(cameraPlaneMove * moveMult);
+                        if (altitudeMove.HasValue)
+                        {
+                            // Move camera2 in Altitude, which is Y above;
+                            // but in CameraNode2's orientation (pointing down), it is "-Z".
+                            altitudeMove = Vector3.UnitZ * -Math.Sign(altitudeMove.Value.Y);
+                            CameraNode2.Translate(altitudeMove.Value * moveMult);
+                        }
+                    }
+                    else
+                    {
+                        // Find the equivalent world-move of this camera-oriented move.
+                        var worldPositionBefore = CameraNode.WorldPosition;
+                        CameraNode.Translate(allAxesMove * moveMult);
+                        var worldPositionAfter = CameraNode.WorldPosition;
+                        // Undo the move. Will instead apply equivalent to CameraPositionNode.
+                        CameraNode.Translate(allAxesMove * -moveMult);
+
+                        var worldDelta = worldPositionAfter - worldPositionBefore;
+                        //var altitudeAfter = worldPositionAfter.Y;
+                        var altitudeDelta = worldDelta.Y;
+                        //Debug.WriteLine($"--- {allAxesMove} -> {worldPositionAfter}, worldDelta {worldDelta}, altitude {altitudeAfter} ---");
+
+                        // HACK: I don't know why the camera moves so slowly when change world position to world Translate.
+                        moveMult *= 10;
+
+                        // Move both cameras in world coords.
+                        // TODO: Why so much slower than when apply directly to either CameraNode?
+                        CameraPositionNode.Translate(worldDelta * moveMult);
+                        // Cancel out Camera 2's altitude change. (convert Y change to -Z, then negate to +Z to compensate for change to CameraPositionNode.)
+                        CameraNode2.Translate(new Vector3(0, 0, altitudeDelta * moveMult));
+                    }
+                }
                 else
-                    CameraNode.Translate(unitMove * moveSpeed * timeStep);
+                {   // There is only one camera. Apply all axes to it.
+                    CameraNode.Translate(allAxesMove * moveMult);
+                }
             }
 
 

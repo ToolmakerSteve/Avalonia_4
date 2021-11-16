@@ -13,7 +13,7 @@ namespace AvaloniaSample
 	public class AvaloniaSample : Sample
 	{
         const bool UseWaterScene = true;//true;   // TMS
-        const bool IncludeAvaloniaLayer = true;//true;   // TMS
+        const bool IncludeAvaloniaLayer = false;//true;   // TMS
 
 		Camera Camera = null;
 		Scene Scene;
@@ -188,6 +188,8 @@ namespace AvaloniaSample
             return pixels / (float)avaloniaContext.RenderScaling;
         }
 
+
+        #region "-- scene specifics --"
         void CreateMushroomScene(Scene scene)
         {
             // Create the Octree component to the scene. This is required before adding any drawable components, or else nothing will
@@ -232,14 +234,13 @@ namespace AvaloniaSample
             // see the model get simpler as it moves further away). Finally, rendering a large number of the same object with the
             // same material allows instancing to be used, if the GPU supports it. This reduces the amount of CPU work in rendering the
             // scene.
-            var rand = new Random();
             const int NMushrooms = 20; //200
             for (int i = 0; i < NMushrooms; i++)
             {
                 var mushroom = scene.CreateChild("Mushroom");
-                mushroom.Position = new Vector3(rand.Next(90) - 45, 0, rand.Next(90) - 45);
-                mushroom.Rotation = new Quaternion(0, rand.Next(360), 0);
-                mushroom.SetScale(0.5f + rand.Next(20000) / 10000.0f);
+                mushroom.Position = new Vector3(random.Next(90) - 45, 0, random.Next(90) - 45);
+                mushroom.Rotation = new Quaternion(0, random.Next(360), 0);
+                mushroom.SetScale(0.5f + random.Next(20000) / 10000.0f);
                 var mushroomObject = mushroom.CreateComponent<StaticModel>();
                 mushroomObject.Model = ResourceCache.GetModel("Models/Mushroom.mdl");
                 mushroomObject.SetMaterial(ResourceCache.GetMaterial("Materials/Mushroom.xml"));
@@ -329,13 +330,23 @@ namespace AvaloniaSample
         }
 
 
-        #region "-- First camera and viewport --"
         private void MushroomSceneMainCameraSettings(Node cameraPositionNode)
         {
-            // Set an initial position (for the camera node(s)) above the plane
+            // Set an initial position (for the camera node(s)) above the plane.
             cameraPositionNode.Position = new Vector3(0, 5, 0);
         }
 
+        private void WaterSceneMainCameraSettings(Node cameraPositionNode, Camera camera)
+        {
+            camera.FarClip = 750.0f;
+            // Set an initial position (for the camera scene node) above the plane.
+            //cameraPositionNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
+            CameraNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
+        }
+        #endregion
+
+
+        #region "-- First camera and viewport --"
         /// <summary>
         /// When two viewports, sets CameraWorldBaseNode.
         /// </summary>
@@ -373,12 +384,6 @@ namespace AvaloniaSample
             }
         }
 
-        private void WaterSceneMainCameraSettings(Node cameraPositionNode, Camera camera)
-        {
-            camera.FarClip = 750.0f;
-            // Set an initial position for the camera scene node above the plane
-            cameraPositionNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
-        }
 
         void SetupOneViewport()
         {
