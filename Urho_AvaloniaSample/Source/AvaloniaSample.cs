@@ -374,7 +374,13 @@ namespace AvaloniaSample
             {
                 CameraWorldBaseNode = Scene.CreateChild("cameraBase");
 
-                parentOfMainCameraNode = CameraWorldBaseNode;
+                if (MovementIgnoresPitch)
+                {
+                    CameraYawNode = CameraWorldBaseNode.CreateChild("cameraYaw");
+                    parentOfMainCameraNode = CameraYawNode;
+                }
+                else
+                    parentOfMainCameraNode = CameraWorldBaseNode;
             }
             else
             {   // One camera - create it directly in the scene.

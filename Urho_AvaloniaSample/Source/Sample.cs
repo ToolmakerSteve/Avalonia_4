@@ -40,20 +40,25 @@ namespace AvaloniaSample
 
         protected const bool ShowTwoViewports = true;//true;   // TMS
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
+        protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
 
         protected const float TouchSensitivity = 2;
 		protected float Yaw { get; set; }
 		protected float Pitch { get; set; }
 		protected bool TouchEnabled { get; set; }
+
+        protected Node CameraNode { get; set; }
+        protected Node CameraNode2 { get; set; }
         /// <summary>
         /// Only used when two cameras (two viewports).
         /// So can move both cameras in world coords, instead of relative to camera orientation.
         /// </summary>
         protected Node CameraWorldBaseNode { get; set; }
-        // Set to the node that is positioned by keys. When one camera, is CameraNode. When two cameras, is CameraWorldBaseNode.
+        // When MovementIgnoresPitch, Camera1 WASD applied to this node.
+        protected Node CameraYawNode;
+        // Set to the node that is positioned by keys. When one camera, is CameraNode.
+        // When two cameras, is CameraWorldBaseNode or CameraYawNode.
         protected Node CameraPositionNode;
-        protected Node CameraNode { get; set; }
-        protected Node CameraNode2 { get; set; }
 
         protected MonoDebugHud MonoDebugHud { get; set; }
 
@@ -236,10 +241,17 @@ namespace AvaloniaSample
                     {
                         // Find the equivalent world-move of this camera-oriented move.
                         var worldPositionBefore = CameraNode.WorldPosition;
-                        CameraNode.Translate(allAxesMove * moveMult);
+                        //CameraNode.Translate(allAxesMove * moveMult);
+                        Node cameraPlaneNode = MovementIgnoresPitch ? CameraYawNode : CameraNode;
+                        cameraPlaneNode.Translate(cameraPlaneMove * moveMult);
+                        if (altitudeMove.HasValue)
+                            CameraNode.Translate(altitudeMove.Value * moveMult);
                         var worldPositionAfter = CameraNode.WorldPosition;
                         // Undo the move. Will instead apply equivalent to CameraPositionNode.
-                        CameraNode.Translate(allAxesMove * -moveMult);
+                        //CameraNode.Translate(allAxesMove * -moveMult);
+                        cameraPlaneNode.Translate(cameraPlaneMove * -moveMult);
+                        if (altitudeMove.HasValue)
+                            CameraNode.Translate(altitudeMove.Value * -moveMult);
 
                         var worldDelta = worldPositionAfter - worldPositionBefore;
                         //var altitudeAfter = worldPositionAfter.Y;
@@ -284,11 +296,22 @@ namespace AvaloniaSample
                 Pitch += mouseSensitivity * mouseMove.Y;
                 Pitch = MathHelper.Clamp(Pitch, -90, 90);
 
-                CameraNode.Rotation = new Quaternion(Pitch, Yaw, 0);
+                ApplyPitchYawToCamera();
             }
-		}
+        }
 
-		protected void MoveCameraByTouches (float timeStep)
+        private void ApplyPitchYawToCamera()
+        {
+            if (MovementIgnoresPitch)
+            {
+                CameraYawNode.Rotation = new Quaternion(0, Yaw, 0);
+                CameraNode.Rotation = new Quaternion(Pitch, 0, 0);
+            }
+            else
+                CameraNode.Rotation = new Quaternion(Pitch, Yaw, 0);
+        }
+
+        protected void MoveCameraByTouches (float timeStep)
 		{
 			if (!TouchEnabled || CameraNode == null)
 				return;
@@ -309,9 +332,9 @@ namespace AvaloniaSample
 					var graphics = Graphics;
 					Yaw += TouchSensitivity * camera.Fov / graphics.Height * state.Delta.X;
 					Pitch += TouchSensitivity * camera.Fov / graphics.Height * state.Delta.Y;
-					CameraNode.Rotation = new Quaternion(Pitch, Yaw, 0);
-				}
-				else
+                    ApplyPitchYawToCamera();
+                }
+                else
 				{
 					var cursor = UI.Cursor;
 					if (cursor != null && cursor.Visible)
