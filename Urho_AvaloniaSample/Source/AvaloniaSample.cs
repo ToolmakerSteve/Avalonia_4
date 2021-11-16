@@ -15,13 +15,16 @@ namespace AvaloniaSample
 	{
         const bool UseWaterScene = true;//true;   // TMS
         const bool IncludeAvaloniaLayer = false;//true;   // TMS
+        const bool ShowWireframe = false;//false;   // TMS
 
-		Camera Camera = null;
+        Camera Camera = null;
 		Scene Scene;
         Viewport Viewport2;
         // Used by Water Scene.
-        Node waterNode;
-        Node reflectionCameraNode;
+        Node WaterNode;
+        Node ReflectionCameraNode;
+        // Used when showing wireframe.
+        Material WireframeMaterial;
 
 
         private AvaloniaUrhoContext avaloniaContext;
@@ -54,6 +57,8 @@ namespace AvaloniaSample
             // Can override camera's default settings later. (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
             CameraNode = parentOfCamera.CreateChild("camera");
             Camera = CameraNode.CreateComponent<Camera>();
+            //if (ShowWireframe)
+            //    Camera.FillMode = FillMode.Wireframe;
             SetCameraPositionNode();
 
             if (UseWaterScene)
@@ -84,11 +89,16 @@ namespace AvaloniaSample
             }
         }
 
-        protected override void OnUpdate(float timeStep)
-		{
-			base.OnUpdate(timeStep);
+        uint startTime = 0;
+        uint lastTime = 0;
 
-            var reflectionCamera = reflectionCameraNode?.GetComponent<Camera>();
+        protected override void OnUpdate(float timeStep)
+        {
+            base.OnUpdate(timeStep);
+
+            OnUpdate_Wireframe();
+
+            var reflectionCamera = ReflectionCameraNode?.GetComponent<Camera>();
             if (reflectionCamera != null)
                 reflectionCamera.AspectRatio = (float)Graphics.Width / Graphics.Height;
 
@@ -107,7 +117,29 @@ namespace AvaloniaSample
 
             if (Camera != null)
                 SimpleMoveCamera3D(timeStep, 10.0f, overViewport2);
-		}
+        }
+
+        private void OnUpdate_Wireframe()
+        {
+            if (ShowWireframe)
+            {
+                int liveMillis = 0;
+                uint now = Time.SystemTime;
+                if (startTime > 0)
+                    liveMillis = (int)(now - startTime);
+                else
+                    startTime = now;
+
+                int flashesPerSecond = 6;
+                // "1.0f" to have wireframe stay visible; lesser values to flash on and off.
+                float fractionOn = 1.0f; //0.7f; //0.3f;
+                int millisPerFlash = (int)Math.Round(1000.0 / flashesPerSecond);
+                int millisOn = (int)Math.Round(millisPerFlash * fractionOn);
+
+                bool asWireframe = (liveMillis % millisPerFlash) < millisOn;
+                SetWireframeVisibility(asWireframe);
+            }
+        }
 
         private void CreateWindow(Func<Avalonia.Controls.Window> createMethod)
         {
@@ -262,7 +294,9 @@ namespace AvaloniaSample
             var zone = zoneNode.CreateComponent<Zone>();
             zone.SetBoundingBox(new BoundingBox(-1000.0f, 1000.0f));
             zone.AmbientColor = new Color(0.15f, 0.15f, 0.15f);
-            zone.FogColor = new Color(1.0f, 1.0f, 1.0f);
+            //float fogBrightness = ShowWireframe ? 0.2f : 1.0f;   // TMS
+            float fogBrightness = ShowWireframe ? 0.0f : 1.0f;
+            zone.FogColor = new Color(fogBrightness, fogBrightness, fogBrightness);
             zone.FogStart = 500.0f;
             zone.FogEnd = 750.0f;
 
@@ -278,14 +312,17 @@ namespace AvaloniaSample
             // Apply slightly overbright lighting to match the skybox
             light.Color = new Color(1.2f, 1.2f, 1.2f);
 
-            // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
-            // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
-            // generate the necessary 3D texture coordinates for cube mapping
-            var skyNode = scene.CreateChild("Sky");
-            skyNode.SetScale(500.0f); // The scale actually does not matter
-            var skybox = skyNode.CreateComponent<Skybox>();
-            skybox.Model = cache.GetModel("Models/Box.mdl");
-            skybox.SetMaterial(cache.GetMaterial("Materials/Skybox.xml"));
+            if (!ShowWireframe)
+            {
+                // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
+                // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
+                // generate the necessary 3D texture coordinates for cube mapping
+                var skyNode = scene.CreateChild("Sky");
+                skyNode.SetScale(500.0f); // The scale actually does not matter
+                var skybox = skyNode.CreateComponent<Skybox>();
+                skybox.Model = cache.GetModel("Models/Box.mdl");
+                skybox.SetMaterial(cache.GetMaterial("Materials/Skybox.xml"));
+            }
 
             // Create heightmap terrain
             var terrainNode = scene.CreateChild("Terrain");
@@ -299,6 +336,9 @@ namespace AvaloniaSample
             // The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
             // terrain patches and other objects behind it
             terrain.Occluder = true;
+            if (ShowWireframe)
+                WireframeMaterial = terrain.Material;
+
 
             // Have some different color boxes, so can tell them apart (somewhat).
             var colors = new Color[] {
@@ -333,16 +373,37 @@ namespace AvaloniaSample
             }
 
             // Create a water plane object that is as large as the terrain
-            waterNode = scene.CreateChild("Water");
-            waterNode.Scale = new Vector3(2048.0f, 1.0f, 2048.0f);
-            waterNode.Position = new Vector3(0.0f, 5.0f, 0.0f);
-            var water = waterNode.CreateComponent<StaticModel>();
+            WaterNode = scene.CreateChild("Water");
+            WaterNode.Scale = new Vector3(2048.0f, 1.0f, 2048.0f);
+            WaterNode.Position = new Vector3(0.0f, 5.0f, 0.0f);
+            var water = WaterNode.CreateComponent<StaticModel>();
             water.Model = cache.GetModel("Models/Plane.mdl");
             water.SetMaterial(cache.GetMaterial("Materials/Water.xml"));
             // Set a different viewmask on the water plane to be able to hide it from the reflection camera
             water.ViewMask = 0x80000000;
 
             WaterSceneMainCameraSettings(CameraPositionNode, Camera);
+        }
+
+        bool _wasVisible = false;
+
+        void SetWireframeVisibility(bool visible)
+        {
+            if (visible && !_wasVisible)
+            {
+                WireframeMaterial.FillMode = FillMode.Wireframe;
+                // Water exists over large area (not just where above the surface); remove it when terrain is wireframe.
+                //Scene.RemoveChild(WaterNode);
+                WaterNode.Enabled = false;
+            }
+            else if (!visible && _wasVisible)
+            {
+                WireframeMaterial.FillMode = FillMode.Solid;
+                //MEMORY_CRASH Scene.AddChild(WaterNode);
+                ///WaterNode.Enabled = true;
+            }
+
+            _wasVisible = visible;
         }
 
 
@@ -422,15 +483,15 @@ namespace AvaloniaSample
         {
             // Create a mathematical plane to represent the water in calculations
 
-            Plane waterPlane = new Plane(waterNode.WorldRotation * new Vector3(0.0f, 1.0f, 0.0f), waterNode.WorldPosition);
+            Plane waterPlane = new Plane(WaterNode.WorldRotation * new Vector3(0.0f, 1.0f, 0.0f), WaterNode.WorldPosition);
             // Create a downward biased plane for reflection view clipping. Biasing is necessary to avoid too aggressive clipping
-            Plane waterClipPlane = new Plane(waterNode.WorldRotation * new Vector3(0.0f, 1.0f, 0.0f), waterNode.WorldPosition - new Vector3(0.0f, 0.1f, 0.0f));
+            Plane waterClipPlane = new Plane(WaterNode.WorldRotation * new Vector3(0.0f, 1.0f, 0.0f), WaterNode.WorldPosition - new Vector3(0.0f, 0.1f, 0.0f));
 
             // Create camera for water reflection
             // It will have the same farclip and position as the main viewport camera, but uses a reflection plane to modify
             // its position when rendering
-            reflectionCameraNode = CameraNode.CreateChild();
-            var reflectionCamera = reflectionCameraNode.CreateComponent<Camera>();
+            ReflectionCameraNode = CameraNode.CreateChild();
+            var reflectionCamera = ReflectionCameraNode.CreateComponent<Camera>();
             reflectionCamera.FarClip = 750.0f;
             reflectionCamera.ViewMask = 0x7fffffff; // Hide objects with only bit 31 in the viewmask (the water plane)
             reflectionCamera.AutoAspectRatio = false;
@@ -506,20 +567,23 @@ namespace AvaloniaSample
             var rect = RectBySize(halfWidth, 0, halfWidth, Graphics.Height);
             Renderer.SetViewport(0, new Viewport(Context, Scene, CameraNode.GetComponent<Camera>(), rect, null));
 
-            // Clone the default render path so that we do not interfere with the other viewport, then add
-            // bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
-            // for example with the effect name to allow easy toggling on and off. We start with the effects
-            // disabled.
             var cache = ResourceCache;
-            RenderPath effectRenderPath = viewport.RenderPath.Clone();
-            effectRenderPath.Append(cache.GetXmlFile("PostProcess/Bloom.xml"));
-            effectRenderPath.Append(cache.GetXmlFile("PostProcess/FXAA2.xml"));
-            // Make the bloom mixing parameter more pronounced
-            effectRenderPath.SetShaderParameter("BloomMix", new Vector2(0.9f, 0.6f));
+            if (false)   // TMS "false": Disable Render PostProcessing not important for this demo.
+            {
+                // Clone the default render path so that we do not interfere with the other viewport, then add
+                // bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
+                // for example with the effect name to allow easy toggling on and off. We start with the effects
+                // disabled.
+                RenderPath effectRenderPath = viewport.RenderPath.Clone();
+                effectRenderPath.Append(cache.GetXmlFile("PostProcess/Bloom.xml"));
+                effectRenderPath.Append(cache.GetXmlFile("PostProcess/FXAA2.xml"));
+                // Make the bloom mixing parameter more pronounced
+                effectRenderPath.SetShaderParameter("BloomMix", new Vector2(0.9f, 0.6f));
 
-            effectRenderPath.SetEnabled("Bloom", false);
-            effectRenderPath.SetEnabled("FXAA2", false);
-            viewport.RenderPath = effectRenderPath;
+                effectRenderPath.SetEnabled("Bloom", false);
+                effectRenderPath.SetEnabled("FXAA2", false);
+                viewport.RenderPath = effectRenderPath;
+            }
 
             // Set up the second camera viewport as left-hand pane (half of screen width).
             rect = RectBySize(0, 0, halfWidth, graphics.Height);
