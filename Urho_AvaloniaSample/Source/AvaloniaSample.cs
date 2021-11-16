@@ -7,6 +7,7 @@ using Avalonia.Styling;
 using Avalonia.Markup.Xaml.Styling;
 using AC = Avalonia.Controls;
 using Urho.Urho2D;
+using System.Collections.Generic;
 
 namespace AvaloniaSample
 {
@@ -299,9 +300,22 @@ namespace AvaloniaSample
             // terrain patches and other objects behind it
             terrain.Occluder = true;
 
+            // Have some different color boxes, so can tell them apart (somewhat).
+            var colors = new Color[] {
+                    Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta,
+                    Color.White, Color.Black
+            };
+            List<Material> materials = new List<Material>();
+            foreach (var color in colors)
+            {
+                var material = cache.GetMaterial("Materials/Stone.xml").Clone();
+                material.SetShaderParameter("AmbientColor", color);
+                materials.Add(material);
+            }
+
             // Create 1000 boxes in the terrain. Always face outward along the terrain normal
-            uint numObjects = 1000;
-            for (uint i = 0; i < numObjects; ++i)
+            int numObjects = 1000;
+            for (int i = 0; i < numObjects; ++i)
             {
                 var objectNode = scene.CreateChild("Box");
                 Vector3 position = new Vector3(NextRandom(2000.0f) - 1000.0f, 0.0f, NextRandom(2000.0f) - 1000.0f);
@@ -310,10 +324,12 @@ namespace AvaloniaSample
                 // Create a rotation quaternion from up vector to terrain normal
                 objectNode.Rotation = Quaternion.FromRotationTo(new Vector3(0.0f, 1.0f, 0.0f), terrain.GetNormal(position));
                 objectNode.SetScale(5.0f);
-                var obj = objectNode.CreateComponent<StaticModel>();
+                StaticModel obj = objectNode.CreateComponent<StaticModel>();
                 obj.Model = cache.GetModel("Models/Box.mdl");
-                obj.SetMaterial(cache.GetMaterial("Materials/Stone.xml"));
                 obj.CastShadows = true;
+
+                // Make the boxes different.
+                obj.SetMaterial(materials[i % colors.Length]);   // TMS
             }
 
             // Create a water plane object that is as large as the terrain
