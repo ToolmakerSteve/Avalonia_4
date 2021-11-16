@@ -22,6 +22,7 @@ namespace AvaloniaSample
 		Scene Scene;
         Viewport Viewport2;
         // Used by Water Scene.
+        Terrain Terrain;
         Node WaterNode;
         Node ReflectionCameraNode;
         // Used when showing wireframe.
@@ -164,10 +165,12 @@ namespace AvaloniaSample
         }
         #endregion
 
+
         #region "-- OnUpdate --"
         uint _startTime = 0;
-        bool WallDrawStarted;
+        bool WallDrawStarted;   // TMS
         Vector2 LastWallPosition2D;
+        const float MinWallSegmentLength = 1;   // TBD: Good value.
 
 
         protected override void OnUpdate(float timeStep)
@@ -195,9 +198,9 @@ namespace AvaloniaSample
 
             if (Camera != null)
             {
-                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && overViewport2 && StoneWallTest1)
+                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && StoneWallTest1)
                 {
-                    if (Input.GetMouseButtonDown(MouseButton.Left))
+                    if (Input.GetMouseButtonDown(MouseButton.Right))
                     {
                         OnUpdate_DrawWall();
                     }
@@ -230,15 +233,37 @@ namespace AvaloniaSample
 
         private void OnUpdate_DrawWall()
         {
-
+            Vector2 penPosition2D = InGroundPlane(CameraPositionNode.Position);
+            bool doAddPoint = false;
             if (!WallDrawStarted)
             {
-                WallDrawStarted = true;
+                doAddPoint = true;
             }
             else
             {
-
+                var length = Vector2.Subtract(penPosition2D, LastWallPosition2D).Length;
+                if (length > MinWallSegmentLength)
+                    doAddPoint = true;
             }
+
+            if (doAddPoint)
+            {
+                // HACK: Put a box at this point.
+                // TODO: Orient the box along direction of path.
+                // TODO: Create or Extend a path, and a corresponding extruded model.
+                AddBoxAt(penPosition2D);
+
+                LastWallPosition2D = penPosition2D;
+                WallDrawStarted = true;
+            }
+        }
+
+        private void AddBoxAt(Vector2 penPosition2D)
+        {
+            //float boxScale = MinWallSegmentLength / 2;
+            // "- small-value": Deliberate gap to see segments.
+            float boxScale = MinWallSegmentLength - 0.1f;
+            AddBoxToScene(Scene, FromGroundPlane(penPosition2D), boxScale);
         }
         #endregion
 
@@ -348,17 +373,17 @@ namespace AvaloniaSample
             // Create heightmap terrain
             var terrainNode = scene.CreateChild("Terrain");
             terrainNode.Position = new Vector3(0.0f, 0.0f, 0.0f);
-            var terrain = terrainNode.CreateComponent<Terrain>();
-            terrain.PatchSize = 64;
-            terrain.Spacing = new Vector3(2.0f, 0.5f, 2.0f); // Spacing between vertices and vertical resolution of the height map
-            terrain.Smoothing = true;
-            terrain.SetHeightMap(cache.GetImage("Textures/HeightMap.png"));
-            terrain.Material = cache.GetMaterial("Materials/Terrain.xml");
+            Terrain = terrainNode.CreateComponent<Terrain>();
+            Terrain.PatchSize = 64;
+            Terrain.Spacing = new Vector3(2.0f, 0.5f, 2.0f); // Spacing between vertices and vertical resolution of the height map
+            Terrain.Smoothing = true;
+            Terrain.SetHeightMap(cache.GetImage("Textures/HeightMap.png"));
+            Terrain.Material = cache.GetMaterial("Materials/Terrain.xml");
             // The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
             // terrain patches and other objects behind it
-            terrain.Occluder = true;
+            Terrain.Occluder = true;
             if (ShowWireframe)
-                WireframeMaterial = terrain.Material;
+                WireframeMaterial = Terrain.Material;
 
 
             // Have some different color boxes, so can tell them apart (somewhat).
@@ -376,21 +401,15 @@ namespace AvaloniaSample
 
             // Create 1000 boxes in the terrain. Always face outward along the terrain normal
             int numObjects = 1000;
+            float boxScale = 5.0f;
             for (int i = 0; i < numObjects; ++i)
             {
-                var objectNode = scene.CreateChild("Box");
                 Vector3 position = new Vector3(NextRandom(2000.0f) - 1000.0f, 0.0f, NextRandom(2000.0f) - 1000.0f);
-                position.Y = terrain.GetHeight(position) + 2.25f;
-                objectNode.Position = position;
-                // Create a rotation quaternion from up vector to terrain normal
-                objectNode.Rotation = Quaternion.FromRotationTo(new Vector3(0.0f, 1.0f, 0.0f), terrain.GetNormal(position));
-                objectNode.SetScale(5.0f);
-                StaticModel obj = objectNode.CreateComponent<StaticModel>();
-                obj.Model = cache.GetModel("Models/Box.mdl");
-                obj.CastShadows = true;
 
-                // Make the boxes different.
-                obj.SetMaterial(materials[i % colors.Length]);   // TMS
+                // TMS: Make the boxes different.
+                Material boxMaterial = materials[i % colors.Length];
+
+                AddBoxToScene(scene, position, boxScale, boxMaterial, cache);
             }
 
             // Create a water plane object that is as large as the terrain
@@ -405,6 +424,37 @@ namespace AvaloniaSample
 
             WaterSceneMainCameraSettings(CameraPositionNode, Camera);
         }
+
+        private void AddBoxToScene(Scene scene, Vector3 position, float boxScale,
+                                   Material boxMaterial = null, Urho.Resources.ResourceCache cache = null)
+        {
+            if (cache == null)
+                cache = ResourceCache;
+            // AFTER set cache.
+            if (boxMaterial == null)
+            {
+                boxMaterial = cache.GetMaterial("Materials/Stone.xml");
+            }
+
+            var objectNode = scene.CreateChild("Box");
+
+            // "boxScale/2": box's position is center; want its bottom to touch ground.
+            // "- small-value": slightly underground so no gap due to uneven ground height. TBD: Proportional to box size?
+            //   TBD: proportional to angle between normal and vertical axis?
+            position.Y = Terrain.GetHeight(position) + boxScale/2 - 0.1f; //2.25f;
+            objectNode.Position = position;
+
+            // Create a rotation quaternion from up vector to terrain normal
+            objectNode.Rotation = Quaternion.FromRotationTo(new Vector3(0.0f, 1.0f, 0.0f), Terrain.GetNormal(position));
+
+            objectNode.SetScale(boxScale);
+
+            StaticModel obj = objectNode.CreateComponent<StaticModel>();
+            obj.Model = cache.GetModel("Models/Box.mdl");
+            obj.CastShadows = true;
+            obj.SetMaterial(boxMaterial);
+        }
+
 
         bool _wasVisible = false;
 
@@ -632,6 +682,28 @@ namespace AvaloniaSample
         public static IntRect RectBySize(int xLeft, int yTop, int width, int height)
         {
             return new IntRect(xLeft, yTop, xLeft + width, yTop + height);
+        }
+
+        /// <summary>
+        /// Our 3D altitude is "Y", so XZ is position in ground plane.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public static Vector2 InGroundPlane(Vector3 position)
+        {
+            // Our 3D altitude is "Y", so XZ is position in ground plane.
+            return new Vector2(position.X, position.Z);
+        }
+
+        /// <summary>
+        /// Our 3D altitude is "Y", so the position goes to X and Z.
+        /// </summary>
+        /// <param name="position2D"></param>
+        /// <returns></returns>
+        public static Vector3 FromGroundPlane(Vector2 position2D)
+        {
+            // Our 3D altitude is "Y", so the position goes to X and Z.
+            return new Vector3(position2D.X, 0, position2D.Y);
         }
         #endregion
     }

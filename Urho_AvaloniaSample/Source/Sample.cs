@@ -266,7 +266,7 @@ namespace AvaloniaSample
                         //Debug.WriteLine($"--- {allAxesMove} -> {worldPositionAfter}, worldDelta {worldDelta}, altitude {altitudeAfter} ---");
 
                         // HACK: I don't know why the camera moves so slowly when change world position to world Translate.
-                        moveMult *= 10;
+                        moveMult *= 30;
 
                         // Move both cameras in world coords.
                         // TODO: Why so much slower than when apply directly to either CameraNode?
@@ -282,11 +282,12 @@ namespace AvaloniaSample
             }
 
 
+            // TMS TODO: Should either of these sometimes intercept mouse button?
             if (UI.FocusElement != null)
                 return didMove;
             else
                 _HandleUserInput(timeStep, moveSpeed);
-            return false;
+            return didMove;
         }
 
         private void _HandleUserInput()// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
