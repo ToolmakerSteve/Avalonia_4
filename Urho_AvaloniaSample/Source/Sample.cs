@@ -38,7 +38,8 @@ namespace AvaloniaSample
 		Sprite logoSprite;
 		UI ui;
 
-        protected const bool ShowTwoViewports = true;//true;   TMS
+        protected const bool ShowTwoViewports = true;//true;   // TMS
+        protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
 
         protected const float TouchSensitivity = 2;
 		protected float Yaw { get; set; }
@@ -198,13 +199,31 @@ namespace AvaloniaSample
             if (movingInPlane || altitudeMove.HasValue)
             {
                 var moveMult = moveSpeed * timeStep;
+                if (GroundSpeedMultByAltitude)
+                {
+                    var altitude = CameraPositionNode.Position.Y;
+                    if (overViewport2)
+                        altitude += CameraNode2.Position.Y;
+                    else
+                        altitude += CameraNode.Position.Y;
+                    float beginHighAltitude = overViewport2 ? 60 : 20;
+                    if (altitude > beginHighAltitude)
+                    {
+                        // Move faster at high altitudes.
+                        if (overViewport2)
+                            moveMult *= altitude / beginHighAltitude;
+                        else
+                            moveMult *= (float)Math.Sqrt(altitude / beginHighAltitude);
+                    }
+                }
                 //Debug.WriteLine($"--- deltaTime={deltaTime}, mult={moveMult}, elapsed={Time.ElapsedTime}, step={Time.TimeStep}, over2={overViewport2} ---");
-                if (ShowTwoViewports)
+
+                if (ShowTwoViewports && CameraPositionNode != null)
                 {
                     if (overViewport2)
                     {
                         // This moves both cameras in world ground plane.
-                        CameraPositionNode?.Translate(cameraPlaneMove * moveMult);
+                        CameraPositionNode.Translate(cameraPlaneMove * moveMult);
                         if (altitudeMove.HasValue)
                         {
                             // Move camera2 in Altitude, which is Y above;
