@@ -13,6 +13,8 @@ namespace AvaloniaSample
 {
 	public class AvaloniaSample : Sample
 	{
+        public static Sample It;   // TMS
+
         const bool UseWaterScene = true;//true;   // TMS
         const bool IncludeAvaloniaLayer = false;//true;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
@@ -34,9 +36,19 @@ namespace AvaloniaSample
 
 		// private SampleAvaloniaWindow _window;
         [Preserve]
-		public AvaloniaSample() : base(new ApplicationOptions(assetsFolder: "Data;CoreData"){ResizableWindow = true}) { }
+        public AvaloniaSample() : base(
+            new ApplicationOptions(assetsFolder: "Data;CoreData")
+            {
+                ResizableWindow = true
+            })
+        {
+            It = this;
+        }
 
-		public AvaloniaSample(ApplicationOptions options):base(options){}
+        public AvaloniaSample(ApplicationOptions options) : base(options)
+        {
+            It = this;
+        }
 
 
         #region "-- Setup, Start --"
