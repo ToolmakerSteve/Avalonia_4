@@ -264,6 +264,9 @@ namespace AvaloniaSample.LineLayer3D
 			Model.Model = model;
 		}
 
+        /// <summary>
+        /// Two triangles forming a quad for a line segment.
+        /// </summary>
 		private int[] _indicesSegment = new int[] { 0, 2, 3, 3, 1, 0 };
 
 		private void _AddVertices(Vector3 prevPos, Vector3 nextPos, ref uint vertexCount, List<float> vtxData, List<int> idxData)

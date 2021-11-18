@@ -195,4 +195,7 @@
         <HintPath>References\UrhoDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ModelFrom2DShape\" />
+  </ItemGroup>
 </Project>
