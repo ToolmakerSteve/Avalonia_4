@@ -1,39 +1,35 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Global;
 
-namespace Global
+namespace Geo
 {
     /// <summary>
-    /// A compact representation of a set of values with the same unit.
+    /// A compact representation of a set of points with the same IGeoContext.
     /// </summary>
-    public class Lengths : IList<Length>
+    public class GeoPoint2Ds<TGeo, TPoint> : IList<GeoPoint2D> where TGeo : IGeoPoint where TPoint : IPoint
     {
         #region "-- data --"
-        public readonly List<double> Values = new List<double>();
-        public readonly ELengthUnit Unit;
-        /// <summary>
-        /// Convenience (performance): based on "Unit".
-        /// </summary>
-        public readonly LengthUnit OurUnit;
+        IGeoContext Context;
+        public readonly List<Point2D> Values = new List<Point2D>();
         #endregion
 
 
         #region "-- new --"
-        public Lengths(ELengthUnit unit)
+        public GeoPoint2Ds(IGeoContext context)
         {
-            Unit = unit;
-            OurUnit = LengthUnit.AsLengthUnit(unit);
+            Context = context;
         }
         #endregion
 
 
-        #region "-- IEnumerable<Length> --"
-        public IEnumerator<Length> GetEnumerator()
+        #region "-- IEnumerable<GeoPoint2D> --"
+        public IEnumerator<GeoPoint2D> GetEnumerator()
         {
             foreach (var value in Values)
             {
-                yield return new Length(value, Unit);
+                yield return new GeoPoint2D(value, Context);
             }
         }
 
@@ -44,20 +40,20 @@ namespace Global
         #endregion
 
 
-        #region "-- IList<Length> --"
-        public Length this[int index]
+        #region "-- IList<GeoPoint2D> --"
+        public GeoPoint2D this[int index]
         {
-            get => new Length(Values[index], Unit);
-            set => Values[index] = ToOurUnits(value);
+            get => new GeoPoint2D(Values[index], Context);
+            set => Values[index] = ToOurContext(value);
         }
 
         public int Count => Values.Count;
 
         public bool IsReadOnly => false;
 
-        public void Add(Length item)
+        public void Add(GeoPoint2D item)
         {
-            Values.Add(ToOurUnits(item));
+            Values.Add(ToOurContext(item));
         }
 
         public void Clear()
@@ -71,13 +67,13 @@ namespace Global
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Contains(Length item)
+        public bool Contains(GeoPoint2D item)
         {
-            double value = ToOurUnits(item);
+            Point2D value = ToOurContext(item);
             return Values.Contains(value);
         }
 
-        public void CopyTo(Length[] array, int arrayIndex)
+        public void CopyTo(GeoPoint2D[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
@@ -88,15 +84,15 @@ namespace Global
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public int IndexOf(Length item)
+        public int IndexOf(GeoPoint2D item)
         {
-            double value = ToOurUnits(item);
+            Point2D value = ToOurContext(item);
             return Values.IndexOf(value);
         }
 
-        public void Insert(int index, Length item)
+        public void Insert(int index, GeoPoint2D item)
         {
-            Values.Insert(index, ToOurUnits(item));
+            Values.Insert(index, ToOurContext(item));
         }
 
         /// <summary>
@@ -105,9 +101,9 @@ namespace Global
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Remove(Length item)
+        public bool Remove(GeoPoint2D item)
         {
-            double value = ToOurUnits(item);
+            Point2D value = ToOurContext(item);
             return Values.Remove(value);
         }
 
@@ -119,12 +115,13 @@ namespace Global
 
 
         #region "-- public methods --"
-        public double ToOurUnits(Length value)
+        public Point2D ToOurContext(GeoPoint2D value)
         {
-            double finalValue = value.Value;
-            if (value.Unit != Unit)
-            {   // Convert to our Unit.
-                finalValue = OurUnit.FromMeters(value.AsMeters);
+            Point2D finalValue = value.Pt;
+            if (value.Context != Context)
+            {   // Convert to our Context.
+                throw new NotImplementedException("Point2D.ToOurContext with different Context.");
+                //TODO finalValue = OurUnit.FromMeters(value.AsMeters);
             }
 
             return finalValue;

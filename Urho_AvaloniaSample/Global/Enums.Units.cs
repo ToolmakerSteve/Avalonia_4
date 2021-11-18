@@ -6,11 +6,11 @@ namespace Global
 {
     public enum EUnitType
     {
-        Length,   // Uses ELengthUnit.
+        Length,   // Uses ELengthUnit; LengthUnit instances.
     }
 
     /// <summary>
-    /// 1:1 with "Unit.LengthMults".
+    /// 1:1 with "LengthUnit.LengthMults".
     /// </summary>
     public enum ELengthUnit
     {

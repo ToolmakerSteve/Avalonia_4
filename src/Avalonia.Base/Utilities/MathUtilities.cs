@@ -27,7 +27,7 @@ namespace Avalonia.Utilities
             if (value1 == value2) return true;
             double eps = (Math.Abs(value1) + Math.Abs(value2) + 10.0) * DoubleEpsilon;
             double delta = value1 - value2;
-            return (-eps < delta) && (eps > delta);
+            return (-eps < delta) && (delta < eps);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Avalonia.Utilities
             //in case they are Infinities (then epsilon check does not work)
             if (value1 == value2) return true;
             double delta = value1 - value2;
-            return (-eps < delta) && (eps > delta);
+            return (-eps < delta) && (delta < eps);
         }
 
         /// <summary>
@@ -57,13 +57,14 @@ namespace Avalonia.Utilities
             if (value1 == value2) return true;
             float eps = (Math.Abs(value1) + Math.Abs(value2) + 10.0f) * FloatEpsilon;
             float delta = value1 - value2;
-            return (-eps < delta) && (eps > delta);
+            return (-eps < delta) && (delta < eps);
         }
 
         /// <summary>
         /// LessThan - Returns whether or not the first double is less than the second double.
         /// That is, whether or not the first is strictly less than *and* not within epsilon of
         /// the other number.
+        /// TMS: "SafeLessThan" might be a better name. "LessThanAndNotClose"? too long.
         /// </summary>
         /// <param name="value1"> The first double to compare. </param>
         /// <param name="value2"> The second double to compare. </param>

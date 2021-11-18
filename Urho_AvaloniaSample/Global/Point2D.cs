@@ -7,7 +7,7 @@ using static Global.Utils;
 
 namespace Global
 {
-    public struct Point2D : IEquatable<Point2D>
+    public struct Point2D : IPoint, IEquatable<Point2D>
     {
         public static Point2D[] OneElementArray(Point2D point)
         {
@@ -27,38 +27,42 @@ namespace Global
         }
 
 
-        public double X;
-        public double Y;
+        #region "-- data --"
+        public double X { get; set; }
+        public double Y { get; set; }
+
+        public Type ValueType => typeof(Point2D);
+        #endregion
 
 
         public Point2D(PointF ptfPoint)
         {
-            this.X = ptfPoint.X;
-            this.Y = ptfPoint.Y;
+            X = ptfPoint.X;
+            Y = ptfPoint.Y;
         }
 
         public Point2D(Point3D ptdPoint)
         {
-            this.X = ptdPoint.X;
-            this.Y = ptdPoint.Y;
+            X = ptdPoint.X;
+            Y = ptdPoint.Y;
         }
 
         public Point2D(double dblValue)
         {
-            this.X = dblValue;
-            this.Y = dblValue;
+            X = dblValue;
+            Y = dblValue;
         }
 
         public Point2D(double dblX, double dblY)
         {
-            this.X = dblX;
-            this.Y = dblY;
+            X = dblX;
+            Y = dblY;
         }
 
         public Point2D(Vector2 v2)
         {
-            this.X = v2.X;
-            this.Y = v2.Y;
+            X = v2.X;
+            Y = v2.Y;
         }
 
 
@@ -100,6 +104,25 @@ namespace Global
             }
         }
 
+
+
+        /// <summary>
+        /// TBD: Is this necessary for a "struct"? Isn't it built in?
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Point2D other)
+        {
+            return (X == other.X) && (Y == other.Y);
+        }
+
+        // Compare two Point2D's for "equal within a tolerance".
+        public bool NearlyEquals(Point2D p2, double tolerance = EpsilonForOne)
+        {
+            return X.NearlyEquals(p2.X, tolerance) && Y.NearlyEquals(p2.Y, tolerance);
+        }
+
+
         // When geo coords are stored in a point, X is EW, Y is NS.
         public double LongitudeEW
         {
@@ -138,7 +161,7 @@ namespace Global
         {
             get
             {
-                double len = this.Length;
+                double len = Length;
                 if (len == 0)
                     return this;
                 return this / len;
@@ -148,28 +171,28 @@ namespace Global
 
         public PointF ToPointF()
         {
-            if (this.X == double.MaxValue)
+            if (X == double.MaxValue)
                 return new PointF(float.MaxValue, float.MaxValue);
-            return new PointF(System.Convert.ToSingle(this.X), System.Convert.ToSingle(this.Y));
+            return new PointF(System.Convert.ToSingle(X), System.Convert.ToSingle(Y));
         }
 
         public Point3D ToPoint3D()
         {
-            return new Point3D(this.X, this.Y);
+            return new Point3D(X, Y);
         }
 
         public Point ToPoint()
         {
-            if (this.X == double.MaxValue)
+            if (X == double.MaxValue)
                 return new Point(int.MaxValue, int.MaxValue);
-            return new Point(System.Convert.ToInt32(this.X), System.Convert.ToInt32(this.Y));
+            return new Point(System.Convert.ToInt32(X), System.Convert.ToInt32(Y));
         }
 
         public Vector2 ToVector2()
         {
-            if (this.X == double.MaxValue)
+            if (X == double.MaxValue)
                 return new Vector2(float.MaxValue, float.MaxValue);
-            return new Vector2(System.Convert.ToSingle(this.X), System.Convert.ToSingle(this.Y));
+            return new Vector2(System.Convert.ToSingle(X), System.Convert.ToSingle(Y));
         }
 
 
@@ -178,32 +201,28 @@ namespace Global
             return new Point2D(Y, X);
         }
 
-        public new bool Equals(Point2D other)
-        {
-            return (this.X == other.X) && (this.Y == other.Y);
-        }
-
         public override string ToString()
         {
-            return "{" + Round4or6(this.X) + ", " + Round4or6(this.Y) + "}";
+            return "{" + Round4or6(X) + ", " + Round4or6(Y) + "}";
         }
 
         public string ToShortString
         {
             get
             {
-                return "{" + ShortString(this.X) + ", " + ShortString(this.Y) + "}";
+                return "{" + ShortString(X) + ", " + ShortString(Y) + "}";
             }
         }
 
+
         public string ToAbbrevString()
         {
-            return "{" + AbbrevString(this.X) + ", " + AbbrevString(this.Y) + "}";
+            return "{" + AbbrevString(X) + ", " + AbbrevString(Y) + "}";
         }
 
         public string ToFractionString()
         {
-            return "{" + FractionString(this.X) + ", " + FractionString(this.Y) + "}";
+            return "{" + FractionString(X) + ", " + FractionString(Y) + "}";
         }
 
         public string ToF1String()
@@ -221,35 +240,35 @@ namespace Global
 
         public void Add(Point2D ptdPoint)
         {
-            this.X += ptdPoint.X;
-            this.Y += ptdPoint.Y;
+            X += ptdPoint.X;
+            Y += ptdPoint.Y;
         }
 
         public void Add(PointF ptfPoint)
         {
-            this.X += ptfPoint.X;
-            this.Y += ptfPoint.Y;
+            X += ptfPoint.X;
+            Y += ptfPoint.Y;
         }
 
         public Point2D Round(int digits)
         {
-            return new Point2D(Math.Round(this.X, digits), Math.Round(this.Y, digits));
+            return new Point2D(Math.Round(X, digits), Math.Round(Y, digits));
         }
 
         public Point2D Map(UnaryDeleg action)
         {
-            return new Point2D(action(this.X), action(this.Y));
+            return new Point2D(action(X), action(Y));
         }
 
         public double Cross(Point2D p1, Point2D p2)
         {
-            return (p1.Y - this.Y) * (p2.X - this.X) - (p1.X - this.X) * (p2.Y - this.Y);
+            return (p1.Y - Y) * (p2.X - X) - (p1.X - X) * (p2.Y - Y);
         }
 
         // Return Normal to segment between Me and p2.
         public Point2D SegmentNormal(Point2D p2)
         {
-            Point2D normal1 = new Point2D(-(p2.Y - this.Y), p2.X - this.X);
+            Point2D normal1 = new Point2D(-(p2.Y - Y), p2.X - X);
             normal1 = normal1.Normalize;
             return normal1;
         }
@@ -315,7 +334,7 @@ namespace Global
         // "Dot Product"
         public double Dot(Point2D b)
         {
-            return (this.X * b.X) + (this.Y * b.Y);
+            return (X * b.X) + (Y * b.Y);
         }
 
         // Q: When is this meaningful?
@@ -394,7 +413,7 @@ namespace Global
         // Just check one coordinate.
         public bool NotNanQuick()
         {
-            return !double.IsNaN(this.X);
+            return !double.IsNaN(X);
         }
 
         public Point2D Abs()
@@ -405,30 +424,18 @@ namespace Global
         // Return Min of (each coordinate of) Me and p2.
         public Point2D Min(Point2D p2)
         {
-            return new Point2D(Math.Min(this.X, p2.X), Math.Min(this.Y, p2.Y));
+            return new Point2D(Math.Min(X, p2.X), Math.Min(Y, p2.Y));
         }
         // Return Max of (each coordinate of) Me and p2.
         public Point2D Max(Point2D p2)
         {
-            return new Point2D(Math.Max(this.X, p2.X), Math.Max(this.Y, p2.Y));
-        }
-
-        // Compare two Point2D's for "equal within a tolerance".
-        public bool NearlyEquals(Point2D p2)
-        {
-            return this.X.NearlyEquals(p2.X) && this.Y.NearlyEquals(p2.Y);
-        }
-
-        // Compare two Point2D's for "equal within a tolerance".
-        public bool NearlyEquals(Point2D p2, double tolerance)
-        {
-            return this.X.NearlyEquals(p2.X, tolerance) && this.Y.NearlyEquals(p2.Y, tolerance);
+            return new Point2D(Math.Max(X, p2.X), Math.Max(Y, p2.Y));
         }
 
 
         public RectangleF Mult(RectangleF rect)
         {
-            return new RectangleF(System.Convert.ToSingle(this.X * rect.Left), System.Convert.ToSingle(this.Y * rect.Top), System.Convert.ToSingle(this.X * rect.Width), System.Convert.ToSingle(this.Y * rect.Height));
+            return new RectangleF(System.Convert.ToSingle(X * rect.Left), System.Convert.ToSingle(Y * rect.Top), System.Convert.ToSingle(X * rect.Width), System.Convert.ToSingle(Y * rect.Height));
         }
 
 

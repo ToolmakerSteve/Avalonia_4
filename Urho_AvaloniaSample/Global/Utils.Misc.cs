@@ -28,6 +28,7 @@ namespace Global
         public delegate Point3D TwoDWithZ_P3DDelegate(Point2D xy, double z);
         public delegate Point2D ThreeD_P2DDelegate(Point3D xyz);
 
+
         public static bool Exists(object ob)
         {
             return (ob != null);
@@ -1052,11 +1053,15 @@ namespace Global
 
         public static float Average(float a, float b)
         {
-            return Lerp(a, b, 0.5F);
+            // Equivalent.
+            return (a + b) / 0.5f;
+            //return Lerp(a, b, 0.5f);
         }
         public static double Average(double a, double b)
         {
-            return Lerp(a, b, 0.5);
+            // Equivalent.
+            return (a + b) / 0.5;
+            //return Lerp(a, b, 0.5);
         }
         public static Vector3 Average(Vector3 a, Vector3 b)
         {
@@ -1068,7 +1073,7 @@ namespace Global
         }
         public static Point2D Average(Point2D a, Point2D b)
         {
-            return Lerp(a, b, 0.5F);
+            return Lerp(a, b, 0.5);
         }
         public static Point3D Average(Point3D a, Point3D b)
         {

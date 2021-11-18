@@ -5,7 +5,7 @@ using static Global.Utils;
 
 namespace Global
 {
-    public struct Point3D : IEquatable<Point3D>
+    public struct Point3D : IPoint, IEquatable<Point3D>
     {
         #region "-- static --"
         // E.g. Maya ground plane in XZ, plus altitude above ground.
@@ -24,6 +24,13 @@ namespace Global
         #endregion
 
 
+        #region "-- data --"
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
+
+        public Type ValueType => typeof(Point3D);
+        #endregion
 
 
         #region "-- new --"
@@ -47,13 +54,6 @@ namespace Global
 
 
         public bool IsValid => Point2D.CoordIsValid(X) && Point2D.CoordIsValid(Y) && Point2D.CoordIsValid(Z);
-
-
-        public double X { get; set; }
-
-        public double Y { get; set; }
-
-        public double Z { get; set; }
 
 
         public bool IsNaN => (double.IsNaN(X) || double.IsNaN(Y) || double.IsNaN(Z));

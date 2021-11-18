@@ -5,7 +5,7 @@ using System.Text;
 namespace Global
 {
     /// <summary>
-    /// Math functions.
+    /// Math functions.  TODO: Move to here from Utils.Misc.cs.
     /// </summary>
     public static partial class Utils
     {
