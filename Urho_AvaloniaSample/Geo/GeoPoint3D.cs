@@ -7,7 +7,15 @@ namespace Geo
     public class GeoPoint3D : IGeoPoint
     {
         public Point3D Pt { get; private set; }
-        public IGeoContext Context { get; private set; }
+        public IGeoContext Context { get; set; }
+        public IPoint IValue
+        {
+            get => Pt;
+            set
+            {
+                Pt = (Point3D)value;
+            }
+        }
 
         public Type ValueType => typeof(Point3D);
 

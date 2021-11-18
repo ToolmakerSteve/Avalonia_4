@@ -8,28 +8,29 @@ namespace Geo
     /// <summary>
     /// A compact representation of a set of points with the same IGeoContext.
     /// </summary>
-    public class GeoPoint2Ds<TGeo, TPoint> : IList<GeoPoint2D> where TGeo : IGeoPoint where TPoint : IPoint
+    public class GeoPoints<TGeo, TPoint> : IList<TGeo>
+            where TGeo : IGeoPoint, new() where TPoint : IPoint, new()
     {
         #region "-- data --"
         IGeoContext Context;
-        public readonly List<Point2D> Values = new List<Point2D>();
+        public readonly List<TPoint> Values = new List<TPoint>();
         #endregion
 
 
         #region "-- new --"
-        public GeoPoint2Ds(IGeoContext context)
+        public GeoPoints(IGeoContext context)
         {
             Context = context;
         }
         #endregion
 
 
-        #region "-- IEnumerable<GeoPoint2D> --"
-        public IEnumerator<GeoPoint2D> GetEnumerator()
+        #region "-- IEnumerable<TGeo> --"
+        public IEnumerator<TGeo> GetEnumerator()
         {
             foreach (var value in Values)
             {
-                yield return new GeoPoint2D(value, Context);
+                yield return new TGeo() { IValue = value, Context = Context };
             }
         }
 
@@ -40,10 +41,10 @@ namespace Geo
         #endregion
 
 
-        #region "-- IList<GeoPoint2D> --"
-        public GeoPoint2D this[int index]
+        #region "-- IList<TGeo> --"
+        public TGeo this[int index]
         {
-            get => new GeoPoint2D(Values[index], Context);
+            get => new TGeo() { IValue = Values[index], Context = Context };
             set => Values[index] = ToOurContext(value);
         }
 
@@ -51,7 +52,7 @@ namespace Geo
 
         public bool IsReadOnly => false;
 
-        public void Add(GeoPoint2D item)
+        public void Add(TGeo item)
         {
             Values.Add(ToOurContext(item));
         }
@@ -67,13 +68,13 @@ namespace Geo
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Contains(GeoPoint2D item)
+        public bool Contains(TGeo item)
         {
-            Point2D value = ToOurContext(item);
+            TPoint value = ToOurContext(item);
             return Values.Contains(value);
         }
 
-        public void CopyTo(GeoPoint2D[] array, int arrayIndex)
+        public void CopyTo(TGeo[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
@@ -84,13 +85,13 @@ namespace Geo
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public int IndexOf(GeoPoint2D item)
+        public int IndexOf(TGeo item)
         {
-            Point2D value = ToOurContext(item);
+            TPoint value = ToOurContext(item);
             return Values.IndexOf(value);
         }
 
-        public void Insert(int index, GeoPoint2D item)
+        public void Insert(int index, TGeo item)
         {
             Values.Insert(index, ToOurContext(item));
         }
@@ -101,9 +102,9 @@ namespace Geo
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Remove(GeoPoint2D item)
+        public bool Remove(TGeo item)
         {
-            Point2D value = ToOurContext(item);
+            TPoint value = ToOurContext(item);
             return Values.Remove(value);
         }
 
@@ -115,12 +116,12 @@ namespace Geo
 
 
         #region "-- public methods --"
-        public Point2D ToOurContext(GeoPoint2D value)
+        public TPoint ToOurContext(TGeo value)
         {
-            Point2D finalValue = value.Pt;
+            TPoint finalValue = (TPoint)value.IValue;
             if (value.Context != Context)
             {   // Convert to our Context.
-                throw new NotImplementedException("Point2D.ToOurContext with different Context.");
+                throw new NotImplementedException("TPoint.ToOurContext with different Context.");
                 //TODO finalValue = OurUnit.FromMeters(value.AsMeters);
             }
 
