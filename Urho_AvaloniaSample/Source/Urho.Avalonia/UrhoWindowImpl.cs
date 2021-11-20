@@ -81,7 +81,10 @@ namespace Urho.Avalonia
         
         public virtual void SetTitle(string title)
         {
-            UrhoUIElement.SetTitle(title);    
+            if (_systemDecorations == SystemDecorations.Full)
+            {
+                UrhoUIElement.SetTitle(title);
+            }
         }
 
         public virtual void SetParent(IWindowImpl parent)
