@@ -81,7 +81,7 @@ namespace Urho.Avalonia
         
         public virtual void SetTitle(string title)
         {
-            if (_systemDecorations == SystemDecorations.Full)
+            if (_systemDecorations == SystemDecorations.Full) // najak-bugfix:added check here, to prevent Setting Title of not "Full Decor" mode.
             {
                 UrhoUIElement.SetTitle(title);
             }
