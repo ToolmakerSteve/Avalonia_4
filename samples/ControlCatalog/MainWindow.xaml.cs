@@ -80,6 +80,7 @@ namespace ControlCatalog
                 var theme = new Avalonia.Themes.Default.DefaultTheme();
                 theme.TryGetResource("Button", out _);
             }
+            this.SystemDecorations = SystemDecorations.BorderOnly;
             AvaloniaXamlLoader.Load(this);
         }
     }
