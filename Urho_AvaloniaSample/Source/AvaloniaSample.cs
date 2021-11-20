@@ -16,7 +16,7 @@ namespace AvaloniaSample
         public static Sample It;   // TMS
 
         const bool UseWaterScene = true;//true;   // TMS
-        const bool IncludeAvaloniaLayer = false;//true;   // TMS
+        const bool IncludeAvaloniaLayer = false;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
         const bool StoneWallTest1 = true && UseWaterScene;   // TMS
 
@@ -99,33 +99,58 @@ namespace AvaloniaSample
 
             if (IncludeAvaloniaLayer)
             {
-                //CreateWindow(InitializeAvaloniaControlCatalogDemo);
-                CreateWindow(InitializeTopHUD);
+                avaloniaContext = Context.ConfigureAvalonia<ControlCatalog.App>();
+                avaloniaContext.RenderScaling = 1.0;
+
+                _topHUD = CreateWindow(InitializeTopHUD, _DockWindowTop);
+                //_btmHUD =  CreateWindow(InitializeAvaloniaControlCatalogDemo, _DockWindowBottom);
                 //CreateWindow(InitializeRenderDemo);
+                _DockWindows();
             }
         }
 
 
-        private void CreateWindow(Func<Avalonia.Controls.Window> createMethod)
+        private AC.Window CreateWindow(Func<AC.Window> createMethod, Action<AC.Window> dockWindowMethod)
         {
-            var mainWindow = createMethod();
-
-            mainWindow.Width = this.Graphics.Width / 2;
-            mainWindow.Height = (this.Graphics.Height / 8);
-            mainWindow.Position = new Avalonia.PixelPoint(0, 0);   // TMS
+            var window = createMethod();
+            dockWindowMethod(window);
 
             // najak - Needed to make Window Default Background be Transparent, rather than solid-white!
-            var avRoot = Avalonia.VisualTree.VisualExtensions.GetVisualRoot(mainWindow) as global::Avalonia.Controls.TopLevel;
+            var avRoot = Avalonia.VisualTree.VisualExtensions.GetVisualRoot(window) as global::Avalonia.Controls.TopLevel;
             avRoot.TransparencyBackgroundFallback = Avalonia.Media.Brushes.Transparent;
 
-            AvaloniaUrhoContext.MainWindow = mainWindow;
-            mainWindow.Show(UI.Root);
+            AvaloniaUrhoContext.MainWindow = window;
+            window.Show(UI.Root);
+
+            return window;
+        }
+
+        private AC.Window _topHUD;
+        private AC.Window _btmHUD;
+
+        private void _DockWindows()
+        {
+            if (_topHUD != null)
+                _DockWindowTop(_topHUD);
+            if (_btmHUD != null)
+                _DockWindowBottom(_btmHUD);
+        }
+
+        private void _DockWindowTop(AC.Window window)
+        {
+            window.Width = this.Graphics.Width;
+            window.Height = (this.Graphics.Height / 4);
+            window.Position = new Avalonia.PixelPoint(0, 0);   // TMS
+        }
+        private void _DockWindowBottom(AC.Window window)
+        {
+            window.Width = this.Graphics.Width;
+            window.Height = (this.Graphics.Height / 4);
+            window.Position = new Avalonia.PixelPoint(0, (int)(Graphics.Height - window.Height));   // TMS
         }
 
         Avalonia.Controls.Window InitializeTopHUD()
         {
-            avaloniaContext = Context.ConfigureAvalonia<TopHUD.App>();
-            avaloniaContext.RenderScaling = 2.0;
             var window = new TopHUD.MainWindow();
 
             //var panel = new AC.Panel();
@@ -145,18 +170,14 @@ namespace AvaloniaSample
 
         Avalonia.Controls.Window InitializeAvaloniaControlCatalogDemo()
         {
-            avaloniaContext = Context.ConfigureAvalonia<ControlCatalog.App>();
-            avaloniaContext.RenderScaling = 2.0;
-
-            return new ControlCatalog.MainWindow();
-
+            var mainWindow = new ControlCatalog.MainWindow();
             //// najak - Needed to make Window Default Background be Transparent, rather than solid-white!
             //var avRoot = Avalonia.VisualTree.VisualExtensions.GetVisualRoot(mainWindow) as global::Avalonia.Controls.TopLevel;
             //avRoot.TransparencyBackgroundFallback = Avalonia.Media.Brushes.Transparent;
 
-            //var content = mainWindow.Content;
+            var content = mainWindow.Content;
 
-            //AvaloniaUrhoContext.MainWindow = mainWindow;
+            AvaloniaUrhoContext.MainWindow = mainWindow;
             //mainWindow.Show(UI.Root);
 
             ////mainWindow.Position = new Avalonia.PixelPoint(100, 100);
@@ -174,6 +195,9 @@ namespace AvaloniaSample
             //    mainWindow.Width = (int)ToDIUnits(Graphics.Width);
             //    mainWindow.Height = (int)ToDIUnits(Graphics.Height);
             //}
+
+            return new ControlCatalog.MainWindow();
+
         }
         #endregion
 
@@ -184,9 +208,16 @@ namespace AvaloniaSample
         Vector2 LastWallPosition2D;
         const float MinWallSegmentLength = 1;   // TBD: Good value.
 
+        private IntVector2 _lastScreenSize;
 
         protected override void OnUpdate(float timeStep)
         {
+            if (Graphics.Size != _lastScreenSize)
+            {
+                _lastScreenSize = Graphics.Size;
+                _DockWindows();
+            }
+
             base.OnUpdate(timeStep);
 
             OnUpdate_Wireframe();
