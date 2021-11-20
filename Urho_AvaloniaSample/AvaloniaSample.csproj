@@ -197,6 +197,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ModelFrom2DShape\" />
-    <Folder Include="SceneSource\" />
   </ItemGroup>
 </Project>
