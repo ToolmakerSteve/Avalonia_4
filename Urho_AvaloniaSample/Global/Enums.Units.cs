@@ -6,14 +6,15 @@ namespace Global
 {
     public enum EUnitType
     {
-        Length,   // Uses ELengthUnit; LengthUnit instances.
+        Length,   // Uses EDistanceUnit; DistanceUnit instances.
     }
 
     /// <summary>
-    /// 1:1 with "LengthUnit.LengthMults".
+    /// 1:1 with "DistanceUnit.MeterMults".
     /// </summary>
-    public enum ELengthUnit
+    public enum EDistanceUnit
     {
+        Default = -1,   // Equivalent to current Distance.DefaultEUnit.
         Meter = 0,
         Yard,
         Foot,

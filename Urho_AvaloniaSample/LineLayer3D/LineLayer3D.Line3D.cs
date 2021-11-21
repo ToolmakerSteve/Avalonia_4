@@ -4,7 +4,7 @@ using Urho;
 using Urho.Gui;
 using PointF = System.Drawing.PointF;
 
-namespace AvaloniaSample.LineLayer3D
+namespace LineLayer3D
 {
 	public partial class LineLayer3D
 	{

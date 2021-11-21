@@ -6,7 +6,7 @@
 //using Urho.Resources;
 //using PointF = System.Drawing.PointF;
 
-//namespace AvaloniaSample.LineLayer3D
+//namespace LineLayer3D
 //{
 //	public class LineBatchLayerConfig : LayerConfig
 //	{

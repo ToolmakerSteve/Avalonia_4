@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AvaloniaSample.LineLayer3D
+namespace LineLayer3D
 {
     /// <summary>
     /// STUB

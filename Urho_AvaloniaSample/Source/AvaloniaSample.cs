@@ -1,19 +1,16 @@
-using Urho;
 using System;
-using Urho.Gui;
-using Urho.Avalonia;
-using Urho.IO;
-using Avalonia.Styling;
-using Avalonia.Markup.Xaml.Styling;
-using AC = Avalonia.Controls;
-using Urho.Urho2D;
 using System.Collections.Generic;
+using Urho;
+using Urho.Avalonia;
+using Urho.Gui;
+using Urho.IO;
+using Urho.Urho2D;
 
 namespace AvaloniaSample
 {
 	public partial class AvaloniaSample : Sample
 	{
-        public static Sample It;   // TMS
+        public static AvaloniaSample It;   // TMS
 
         const bool UseWaterScene = true;//true;   // TMS
         const bool IncludeAvaloniaLayer = false;   // TMS
@@ -24,7 +21,7 @@ namespace AvaloniaSample
 		Scene Scene;
         Viewport Viewport2;
         // Used by Water Scene.
-        Terrain Terrain;
+        public Terrain Terrain;
         Node WaterNode;
         Node ReflectionCameraNode;
         // Used when showing wireframe.
@@ -89,7 +86,7 @@ namespace AvaloniaSample
 
 
             UI.Root.SetDefaultStyle(ResourceCache.GetXmlFile("UI/DefaultStyle.xml"));
-			
+
 			Input.SetMouseVisible(true);
 			Input.SetMouseMode(MouseMode.Free);
 

@@ -6,7 +6,7 @@ using Urho.Gui;
 using Urho.Resources;
 using PointF = System.Drawing.PointF;
 
-namespace AvaloniaSample.LineLayer3D
+namespace LineLayer3D
 {
 	public class LineLayerConfig //: LayerConfig
 	{
@@ -35,12 +35,14 @@ namespace AvaloniaSample.LineLayer3D
         { }
 	}
 
+
+
 	public partial class LineLayer3D //: MapLayer3D
 	{
 		public readonly LineLayer3D.Manager Mgr;
         //public ISceneView View { get { return Mgr.View; } }
         public View3D View { get { return Mgr.View; } }
-        private LineLayerConfig _config;
+        protected LineLayerConfig _config;
 
 		public View3D SceneView { get { return Mgr.View; } }
 
@@ -50,7 +52,7 @@ namespace AvaloniaSample.LineLayer3D
 		public float YPos;
         //public iFly.Data.ISpatialDatabase<GeoShape> Database;
 
-        public ResourceCache Resources => AvaloniaSample.It.ResourceCache; //TMS_TODO //View.Resources;
+        public ResourceCache Resources => AvaloniaSample.AvaloniaSample.It.ResourceCache; //TMS_TODO //View.Resources;
 
         public float WidthFactor;
 		public float AlphaFactor;
@@ -190,7 +192,7 @@ namespace AvaloniaSample.LineLayer3D
 
 			}
 		}
-		private float _lgShift = 0;
+		protected float _lgShift = 0;
 
 
 		//public override void UpdateContent(GeoRectangle area, Coordinate1 areaMaxDim, uint lod)
@@ -231,7 +233,7 @@ namespace AvaloniaSample.LineLayer3D
 		//	}
 		//}
 
-		private void _ProcessLine(Vector2 curEP, Vector2 nextEP, float w2, out Vector2 nextDelta, out Vector2 nextDir, out Vector2 nextPerp)
+		protected void _ProcessLine(Vector2 curEP, Vector2 nextEP, float w2, out Vector2 nextDelta, out Vector2 nextDir, out Vector2 nextPerp)
 		{
 			nextDelta = nextEP - curEP;
 			nextDir = nextDelta;
@@ -241,7 +243,7 @@ namespace AvaloniaSample.LineLayer3D
 			nextPerp = w2 * nextPerpDir;
 		}
 
-		private void _OnCreatePolyLine()
+		protected void _OnCreatePolyLine()
 		{
 			if (IndexDataSize > 0)
 			{
@@ -267,9 +269,9 @@ namespace AvaloniaSample.LineLayer3D
         /// <summary>
         /// Two triangles forming a quad for a line segment.
         /// </summary>
-		private int[] _indicesSegment = new int[] { 0, 2, 3, 3, 1, 0 };
+		protected int[] _indicesSegment = new int[] { 0, 2, 3, 3, 1, 0 };
 
-		private void _AddVertices(Vector3 prevPos, Vector3 nextPos, ref uint vertexCount, List<float> vtxData, List<int> idxData)
+		protected void _AddVertices(Vector3 prevPos, Vector3 nextPos, ref uint vertexCount, List<float> vtxData, List<int> idxData)
 		{
 			int baseIndexOffset = (int)vertexCount;
 			vertexCount += 4;
@@ -316,7 +318,7 @@ namespace AvaloniaSample.LineLayer3D
 			}
 		}
 
-		private void _AppendPolyLine(Line3D line) //  ref uint nextLowIndex, out uint vertexCount, float[] vertexData, uint[] indexData)
+		protected void _AppendPolyLine(Line3D line) //  ref uint nextLowIndex, out uint vertexCount, float[] vertexData, uint[] indexData)
 		{
 			if (line.VertexData == null)
 				return; // nothing to add
@@ -386,7 +388,7 @@ namespace AvaloniaSample.LineLayer3D
 		//static public string ConfigFilepath = Constants.UserDir + "lines.config";
 
 		// kludge - TO HELP US optimize the Vertex/Index Buffer array sizes.
-		private void _DumpMaximums()
+		protected void _DumpMaximums()
 		{
 
 			//System.IO.StreamWriter writer = new System.IO.StreamWriter(ConfigFilepath);
@@ -405,7 +407,7 @@ namespace AvaloniaSample.LineLayer3D
 		static public Dictionary<string, int> RRRRRRRRRRRoverflow2 = new Dictionary<string, int>();
 
 
-		private Line3D _CreatePolyLine(float y, float width, List<Vector3> posList, ref int nextLowIndex, out uint vertexCount, List<float> vertexData, List<int> indexData)
+		protected Line3D _CreatePolyLine(float y, float width, List<Vector3> posList, ref int nextLowIndex, out uint vertexCount, List<float> vertexData, List<int> indexData)
 		{
 			LineLayer3D.Line3D line = new LineLayer3D.Line3D();
 			vertexCount = 0;
@@ -429,14 +431,14 @@ namespace AvaloniaSample.LineLayer3D
 			return line;
 		}
 
-		static private List<Vector3> s_Pos3DList = new List<Vector3>();
-		static private List<float> s_vertexData = new List<float>();
-		static private List<int> s_indexData = new List<int>();
+		static protected List<Vector3> s_Pos3DList = new List<Vector3>();
+		static protected List<float> s_vertexData = new List<float>();
+		static protected List<int> s_indexData = new List<int>();
 
 		public int LinesLoaded;
 		public int CacheHits;
 
-		//private void _ConvertToRectangle(GeoShape shape)
+		//protected void _ConvertToRectangle(GeoShape shape)
 		//{
 		//	var bb = shape.Box;
 		//	Coordinate p0 = bb.MinCoordinate;
@@ -448,7 +450,7 @@ namespace AvaloniaSample.LineLayer3D
 
 		//public Func<LineLayer3D, GeoRectangle> QueryAreaGetter = null;
 
-		//private void _CreateShapePoints(GeoRectangle geoArea, Projection3D proj, ref List<GeoShape> data)
+		//protected void _CreateShapePoints(GeoRectangle geoArea, Projection3D proj, ref List<GeoShape> data)
 		//{
 		//	iFly.Data.ISpatialDatabase<GeoShape> db = Database;
 
@@ -480,10 +482,10 @@ namespace AvaloniaSample.LineLayer3D
 		//	}
 		//}
 
-		//private GeoShape.LongitudeWrapResult LgWrapResult;
+		//protected GeoShape.LongitudeWrapResult LgWrapResult;
 
-		//static private Elevations.ElevationMap s_ElevMap = Elevations.ElevationService.Instance.GetOrCreateMap(0, false);
-		//static private BiasParameters s_BiasParameters = UrhoUtil.CreateDepthBias(-0.00012f);
+		//static protected Elevations.ElevationMap s_ElevMap = Elevations.ElevationService.Instance.GetOrCreateMap(0, false);
+		//static protected BiasParameters s_BiasParameters = UrhoUtil.CreateDepthBias(-0.00012f);
 
 		//public void CreateShapePoints(List<GeoShape> data, Projection3D proj)
 		//{

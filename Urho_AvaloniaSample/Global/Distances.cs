@@ -7,33 +7,33 @@ namespace Global
     /// <summary>
     /// A compact representation of a set of values with the same unit.
     /// </summary>
-    public class Lengths : IList<Length>
+    public class Distances : IList<Distance>
     {
         #region "-- data --"
         public readonly List<double> Values = new List<double>();
-        public readonly ELengthUnit Unit;
+        public readonly EDistanceUnit Unit;
         /// <summary>
         /// Convenience (performance): based on "Unit".
         /// </summary>
-        public readonly LengthUnit OurUnit;
+        public readonly DistanceUnit OurUnit;
         #endregion
 
 
         #region "-- new --"
-        public Lengths(ELengthUnit unit)
+        public Distances(EDistanceUnit unit)
         {
             Unit = unit;
-            OurUnit = LengthUnit.AsLengthUnit(unit);
+            OurUnit = DistanceUnit.AsDistanceUnit(unit);
         }
         #endregion
 
 
         #region "-- IEnumerable<Length> --"
-        public IEnumerator<Length> GetEnumerator()
+        public IEnumerator<Distance> GetEnumerator()
         {
             foreach (var value in Values)
             {
-                yield return new Length(value, Unit);
+                yield return new Distance(value);
             }
         }
 
@@ -45,9 +45,9 @@ namespace Global
 
 
         #region "-- IList<Length> --"
-        public Length this[int index]
+        public Distance this[int index]
         {
-            get => new Length(Values[index], Unit);
+            get => new Distance(Values[index], Unit);
             set => Values[index] = ToOurUnits(value);
         }
 
@@ -55,7 +55,7 @@ namespace Global
 
         public bool IsReadOnly => false;
 
-        public void Add(Length item)
+        public void Add(Distance item)
         {
             Values.Add(ToOurUnits(item));
         }
@@ -71,13 +71,13 @@ namespace Global
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Contains(Length item)
+        public bool Contains(Distance item)
         {
             double value = ToOurUnits(item);
             return Values.Contains(value);
         }
 
-        public void CopyTo(Length[] array, int arrayIndex)
+        public void CopyTo(Distance[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
@@ -88,13 +88,13 @@ namespace Global
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public int IndexOf(Length item)
+        public int IndexOf(Distance item)
         {
             double value = ToOurUnits(item);
             return Values.IndexOf(value);
         }
 
-        public void Insert(int index, Length item)
+        public void Insert(int index, Distance item)
         {
             Values.Insert(index, ToOurUnits(item));
         }
@@ -105,7 +105,7 @@ namespace Global
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Remove(Length item)
+        public bool Remove(Distance item)
         {
             double value = ToOurUnits(item);
             return Values.Remove(value);
@@ -119,17 +119,16 @@ namespace Global
 
 
         #region "-- public methods --"
-        public double ToOurUnits(Length value)
+        public double ToOurUnits(Distance value)
         {
             double finalValue = value.Value;
             if (value.Unit != Unit)
             {   // Convert to our Unit.
-                finalValue = OurUnit.FromMeters(value.AsMeters);
+                finalValue = OurUnit.FromMeters(value.ToMeters);
             }
 
             return finalValue;
         }
         #endregion
-
     }
 }

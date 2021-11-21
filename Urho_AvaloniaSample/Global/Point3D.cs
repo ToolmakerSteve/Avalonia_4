@@ -109,6 +109,10 @@ namespace Global
             return new PointF(Convert.ToSingle(X), Convert.ToSingle(Y));
         }
 
+        /// <summary>
+        /// CAUTION: If altitude is in Y, use "XZ" instead.
+        /// </summary>
+        /// <returns></returns>
         public Point2D To2D()
         {
             return new Point2D(X, Y);

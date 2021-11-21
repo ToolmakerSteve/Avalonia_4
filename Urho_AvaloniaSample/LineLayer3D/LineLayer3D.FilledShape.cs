@@ -10,7 +10,7 @@
 //using Resources = Urho.Resources;
 //using FilledShape3D = iFly.Vision3D.FilledShape3D;
 
-//namespace AvaloniaSample.LineLayer3D
+//namespace LineLayer3D
 //{
 //	public partial class LineLayer3D
 //	{
