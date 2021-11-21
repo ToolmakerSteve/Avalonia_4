@@ -8,7 +8,7 @@
         /// without any conversion. Most code doesn't need to be written to handle it.
         /// OR handle by duplicating the UnitDesc for the default?
         /// </summary>
-        public partial struct EUnits
+        public partial class EUnits
         {
             static public EUnits _DEFAULT; // will equate to Meters
             static public EUnits Centimeters;

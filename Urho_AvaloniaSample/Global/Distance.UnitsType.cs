@@ -12,7 +12,7 @@ namespace Global
         /// without any conversion. Most code doesn't need to be written to handle it.
         /// OR handle by duplicating the UnitDesc for the default?
         /// </summary>
-        public partial struct EUnits : IComparable, IComparable<EUnits>
+        public partial class EUnits : IComparable, IComparable<EUnits>
         {
             static EUnits()
             {
