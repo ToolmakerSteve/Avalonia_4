@@ -15,7 +15,7 @@ namespace Global
         /// <summary>
         /// Convenience (performance): based on "Unit".
         /// </summary>
-        public readonly DistanceUnit OurUnit;
+        public readonly DistanceUnitDesc OurUnit;
         #endregion
 
 
@@ -23,7 +23,7 @@ namespace Global
         public Distances(EDistanceUnit unit)
         {
             Unit = unit;
-            OurUnit = DistanceUnit.AsDistanceUnit(unit);
+            OurUnit = DistanceUnitDesc.AsDistanceUnit(unit);
         }
         #endregion
 
@@ -124,7 +124,7 @@ namespace Global
             double finalValue = value.Value;
             if (value.Unit != Unit)
             {   // Convert to our Unit.
-                finalValue = OurUnit.FromMeters(value.ToMeters);
+                finalValue = OurUnit.FromMeters(value.Meters);
             }
 
             return finalValue;

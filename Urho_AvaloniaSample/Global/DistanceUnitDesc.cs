@@ -4,16 +4,16 @@ using System.Text;
 
 namespace Global
 {
-    public class DistanceUnit
+    public class DistanceUnitDesc
     {
         /// <summary>
         /// 1:1 with "EDistanceUnit".
         /// </summary>
-        public static List<DistanceUnit> All;
+        public static List<DistanceUnitDesc> All;
 
-        public static DistanceUnit Meter => All[(int)EDistanceUnit.Meter];
+        public static DistanceUnitDesc Meter => All[(int)EDistanceUnit.Meter];
 
-        public static DistanceUnit AsDistanceUnit(EDistanceUnit unit)
+        public static DistanceUnitDesc AsDistanceUnit(EDistanceUnit unit)
         {
             return All[(int)unit];
         }
@@ -63,12 +63,12 @@ namespace Global
         /// <summary>
         /// static - one time work.
         /// </summary>
-        static DistanceUnit()
+        static DistanceUnitDesc()
         {
-            All = new List<DistanceUnit>(MeterMults.Length);
+            All = new List<DistanceUnitDesc>(MeterMults.Length);
             foreach (double mult in MeterMults)
             {
-                All.Add(new DistanceUnit(mult));
+                All.Add(new DistanceUnitDesc(mult));
             }
         }
 
@@ -79,7 +79,7 @@ namespace Global
         /// "private" because REQUIRE 1:1 with ELengthUnit.
         /// </summary>
         /// <param name="meterMultiplier">aka "in meters": one of this DistanceUnit is this many meters.</param>
-        private DistanceUnit(double meterMultiplier)
+        private DistanceUnitDesc(double meterMultiplier)
         {
             Mult = meterMultiplier;
         }

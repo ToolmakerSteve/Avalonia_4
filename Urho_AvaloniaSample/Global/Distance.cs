@@ -4,22 +4,41 @@ using System.Text;
 
 namespace Global
 {
-    public class Distance
+    public struct Distance
     {
         #region "-- static --"
         // TBD: Replace "const" with "static", if allow it to change at run-time.
         // HOWEVER, such a change would have to be done at a moment when NO data is in memory.
-        public const EDistanceUnit DefaultEUnit = EDistanceUnit.Meter;
-        public readonly static DistanceUnit DefaultUnit = DistanceUnit.Meter;
+        static public EDistanceUnit DefaultEUnit { get; private set; }
+        static public DistanceUnitDesc DefaultUnit { get; private set; }
 
-        public readonly static Meters Zero = new Meters(0);
+        static public readonly Meters Zero = new Meters(0);
+
+
+        static private bool s_initialized = false;
+
+        static public void SetDefaultUnit(EDistanceUnit unit)
+        {
+            if (s_initialized)
+                throw new InvalidProgramException("Distance.SetDefaultUnit called twice");
+            s_initialized = true;
+
+            DefaultEUnit = unit;
+            DefaultUnit = DistanceUnitDesc.AsDistanceUnit(unit);
+        }
+
+        static Distance()
+        {
+            DefaultEUnit = EDistanceUnit.Meter;
+            DefaultUnit = DistanceUnitDesc.AsDistanceUnit(EDistanceUnit.Meter);
+        }
         #endregion
 
 
         #region "-- data, new --"
         public double Value;
         public EDistanceUnit Unit;
-        public DistanceUnit UnitOb => DistanceUnit.AsDistanceUnit(Unit);
+        public DistanceUnitDesc UnitOb => DistanceUnitDesc.AsDistanceUnit(Unit);
 
 
         public Distance(double value, EDistanceUnit unit = EDistanceUnit.Default)
@@ -30,21 +49,23 @@ namespace Global
         #endregion
 
 
-        public double ToMeters => DistanceUnit.ToMeters(Value, Unit);
+        public Meters ToMeters => new Meters(Meters);
+        public double Meters => DistanceUnitDesc.ToMeters(Value, Unit);
 
-        public double ToDefaultUnits => DistanceUnit.ToDefaultUnits(Value, Unit);
+        public double ToDefaultUnits => DistanceUnitDesc.ToDefaultUnits(Value, Unit);
 
         public double ToUnits(EDistanceUnit dstUnit)
         {
-            return DistanceUnit.ConvertUnits(Value, Unit, dstUnit);
+            return DistanceUnitDesc.ConvertUnits(Value, Unit, dstUnit);
         }
 
         public void SetFrom(Distance d)
         {
-            if (Unit == d.Unit)
+            if (Unit == d.Unit) {
                 Value = d.Value;
-            else
-                Value = DistanceUnit.ConvertUnits(d.Value, d.Unit, Unit);
+            } else {
+                Value = DistanceUnitDesc.ConvertUnits(d.Value, d.Unit, Unit);
+            }
         }
 
         public void SetFromMeters(double m)
