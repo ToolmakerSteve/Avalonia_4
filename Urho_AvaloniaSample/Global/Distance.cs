@@ -34,10 +34,10 @@ namespace Global
 
             if (DefaultUnits != units)
 			{
+                DefaultUnits = units;
+
                 if (s_NumInstancesConstructed != 0)
                     throw new InvalidProgramException("SetDefaultUnit called after Distance instances have already been created!  Call this first: " + s_NumInstancesConstructed);
-
-                DefaultUnits = units;
             }
         }
         static private bool s_initialized = false;
