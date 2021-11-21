@@ -66,14 +66,9 @@ namespace Global
         public UnitDesc UnitOb => DefaultUnitDesc;
 
 
-        /// <summary>
-        /// Exact must specify.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="units"></param>
         public Distance(double value, EUnit units)
         {
-            Value = units == DefaultUnits ? value : S_ToDefaultUnits(value, units);
+            Value = units == DefaultUnits|| units == EUnit.Default ? value : S_ToDefaultUnits(value, units);
         }
         #endregion
 

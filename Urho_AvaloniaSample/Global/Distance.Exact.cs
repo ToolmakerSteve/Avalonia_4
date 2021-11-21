@@ -14,12 +14,7 @@ namespace Global
             public UnitDesc UnitOb => UnitDesc.AsDistanceUnit(Units);
 
 
-            /// <summary>
-            /// Exact must specify.
-            /// </summary>
-            /// <param name="value"></param>
-            /// <param name="units"></param>
-            public Exact(double value, EUnit units = EUnit.Default)
+            public Exact(double value, EUnit units)
             {
                 Value = value;
                 Units = units == EUnit.Default ? DefaultUnits : units;

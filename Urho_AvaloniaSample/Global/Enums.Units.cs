@@ -18,6 +18,9 @@ namespace Global
     {
         /// <summary>
         /// 1:1 with "DistanceUnit.MeterMults".
+        /// "Default" is a special case. Used for test cases where we want data to use the current default unit,
+        /// without any conversion. Most code doesn't need to be written to handle it.
+        /// OR handle by duplicating the UnitDesc for the default?
         /// </summary>
         public enum EUnit
         {
