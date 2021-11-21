@@ -12,16 +12,6 @@ namespace Global
         /// without any conversion. Most code doesn't need to be written to handle it.
         /// OR handle by duplicating the UnitDesc for the default?
         /// </summary>
-        public enum zEUnits
-        {
-            Default = -1,   // Equivalent to current Distance.DefaultEUnit.
-            Meters = 0,
-            Yards,
-            Feet,
-            Inches,
-            Centimeters
-        }
-
         public partial struct EUnits : IComparable, IComparable<EUnits>
         {
             static EUnits()
