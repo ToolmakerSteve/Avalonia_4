@@ -4,21 +4,29 @@ using System.Text;
 
 namespace Global
 {
+    /// <summary>
+    /// TBD: So someday there can be generic "<T>" classes as base to "Distance".
+    /// </summary>
     public enum EUnitType
     {
-        Length,   // Uses EDistanceUnit; DistanceUnit instances.
+        Distance,   // Uses Distance.EUnit; DistanceUnit instances.
     }
 
-    /// <summary>
-    /// 1:1 with "DistanceUnit.MeterMults".
-    /// </summary>
-    public enum EDistanceUnit
+
+
+    public partial struct Distance
     {
-        Default = -1,   // Equivalent to current Distance.DefaultEUnit.
-        Meter = 0,
-        Yard,
-        Foot,
-        Inch,
-        Centimeter
+        /// <summary>
+        /// 1:1 with "DistanceUnit.MeterMults".
+        /// </summary>
+        public enum EUnit
+        {
+            Default = -1,   // Equivalent to current Distance.DefaultEUnit.
+            Meter = 0,
+            Yard,
+            Foot,
+            Inch,
+            Centimeter
+        }
     }
 }

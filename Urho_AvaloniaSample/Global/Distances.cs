@@ -11,19 +11,19 @@ namespace Global
     {
         #region "-- data --"
         public readonly List<double> Values = new List<double>();
-        public readonly EDistanceUnit Unit;
+        public readonly Distance.EUnit Unit;
         /// <summary>
         /// Convenience (performance): based on "Unit".
         /// </summary>
-        public readonly DistanceUnitDesc OurUnit;
+        public readonly Distance.UnitDesc OurUnit;
         #endregion
 
 
         #region "-- new --"
-        public Distances(EDistanceUnit unit)
+        public Distances(Distance.EUnit unit)
         {
             Unit = unit;
-            OurUnit = DistanceUnitDesc.AsDistanceUnit(unit);
+            OurUnit = Distance.UnitDesc.AsDistanceUnit(unit);
         }
         #endregion
 
@@ -33,7 +33,7 @@ namespace Global
         {
             foreach (var value in Values)
             {
-                yield return new Distance(value);
+                yield return new Distance(value, Unit);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Global
         public double ToOurUnits(Distance value)
         {
             double finalValue = value.Value;
-            if (value.Unit != Unit)
+            if (value.Units != Unit)
             {   // Convert to our Unit.
                 finalValue = OurUnit.FromMeters(value.Meters);
             }
