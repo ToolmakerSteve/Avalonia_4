@@ -136,35 +136,44 @@ namespace SceneSource
                 pt1 = pt2CenterLine;
             }
         }
-
-        /// <summary>
-        /// Returns a units vector, perpendicular to pa--pb, and lying in ground plane.
-        /// </summary>
-        /// <param name="pa"></param>
-        /// <param name="pb"></param>
-        /// <returns></returns>
-        ////private Vector2 CalcPerpendicular2D(Vector3 pa, Vector3 pb)
-        ////{
-        ////    // CAUTION: Altitude is in Y.
-        ////    Vector2 pa2 = pa.XZ();
-        ////    Vector2 pb2 = pb.XZ();
-
-        ////}
-
-
-        //private U.Pair<Vector3> WallPerpendicularOnTerrain(
-        //            Vector3 wallCenter, float wallWidth, Vector2 perpendicular, Terrain terrain)
-        //{
-        //    float halfWidth = wallWidth / 2.0f;
-        //    Vector3 first;
-        //    Vector3 second;
-
-        //    return new U.Pair<Vector3>(first, second);
-        //}
         #endregion
 
 
         #region "-- private methods --"
+        /// <summary>
+        /// Returns a unit vector, perpendicular to pa--pb, and lying in ground plane.
+        /// </summary>
+        /// <param name="pa"></param>
+        /// <param name="pb"></param>
+        /// <returns></returns>
+        //private Vector2 CalcPerpendicular2D(Vector3 pa, Vector3 pb)
+        //{
+        //    // CAUTION: Altitude is in Y.
+        //    Vector2 pa2 = pa.XZ();
+        //    Vector2 pb2 = pb.XZ();
+
+        //}
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="wallCenter"></param>
+        /// <param name="wallWidth"></param>
+        /// <param name="perpendicularUnit">REQUIRE LENGTH=1</param>
+        /// <param name="terrain"></param>
+        /// <returns>Two points on terrain, perpendicular to wall center, "wallWidth" apart.</returns>
+        private U.Pair<Vector3> WallPerpendicularOnTerrain(
+                    Vector3 wallCenter, float wallWidth, Vector2 perpendicularUnit, Terrain terrain)
+        {
+            float halfWidth = wallWidth / 2.0f;
+            Vector3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
+            Vector3 first = wallCenter - halfPerp;
+            Vector3 second = wallCenter + halfPerp;
+            first.Y = terrain.GetHeight(first);
+            second.Y = terrain.GetHeight(second);
+
+            return new U.Pair<Vector3>(first, second);
+        }
         #endregion
 
     }

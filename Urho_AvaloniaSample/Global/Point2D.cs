@@ -16,6 +16,11 @@ namespace Global
             return points;
         }
 
+        internal static double Distance(Point2D cornerTL, Point2D cornerTR)
+        {
+            return (cornerTR - cornerTL).Length;
+        }
+
         public static Point2D Average(Point2D p0, Point2D p1)
         {
             return new Point2D(Utils.Average(p0.X, p1.X), Utils.Average(p0.Y, p1.Y));
@@ -34,6 +39,17 @@ namespace Global
         public Type ValueType => typeof(Point2D);
         #endregion
 
+
+        /// <summary>
+        /// To make it clear that we are cloning.
+        /// (Doesn't matter for a "struct" - could just "=".)
+        /// </summary>
+        /// <param name="ptdPoint"></param>
+        public Point2D(Point2D ptdPoint)
+        {
+            X = ptdPoint.X;
+            Y = ptdPoint.Y;
+        }
 
         public Point2D(PointF ptfPoint)
         {

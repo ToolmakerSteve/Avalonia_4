@@ -29,6 +29,55 @@ namespace Global
         public delegate Point2D ThreeD_P2DDelegate(Point3D xyz);
 
 
+        #region "-- debug functions --"
+        // (aka "NoOp"): Indicates deliberate absence of action.
+        public static void DoNothing()
+        {
+        }
+        // Used during testing, to add a line where a breakpoint can be set.
+        public static void Test()
+        {
+        }
+        // Test point that we hope to reach - good to get here.
+        public static void Good()
+        {
+        }
+        // Test point that represents a possible problem.
+        public static void Dubious()
+        {
+            Dubious("unspecified");
+        }
+        // Test point that represents a definite problem.
+        public static void Trouble(string msg = "")
+        {
+            Debug.WriteLine("***** Trouble: " + msg + " *****");
+        }
+        // Indicates code needs to be written.
+        public static void TODO()
+        {
+        }
+        public static void Trouble()
+        {
+            Trouble("unspecified");
+        }
+
+        public static void Trouble(string msg_or_format, params object[] args)
+        {
+            string msg = args.Count() > 0 ? string.Format(msg_or_format, args) : msg_or_format;
+            Trouble(msg);
+        }
+
+
+        // Convenience: Set breakpoint here to find places that likely need code work.
+        public static void TODO(string msg = "")
+        {
+            if (!HasContents(msg))
+                msg = "(Unspecified)";
+            Dubious("TODO: " + msg);
+        }
+        #endregion
+
+
         public static bool Exists(object ob)
         {
             return (ob != null);
@@ -143,7 +192,7 @@ namespace Global
             return iEnd - iStart + 1;
         }
 
-        public static int LastIndex<T>(T[] a)
+        public static int LastIndex<T>(this T[] a)
         {
             return a.Length - 1;
         }
@@ -152,27 +201,27 @@ namespace Global
         ///     ''' </summary>
         ///     ''' <param name="a"></param>
         ///     ''' <returns></returns>
-        public static int LastIndex(Array a)
+        public static int LastIndex(this Array a)
         {
             return a.Length - 1;
         }
-        public static int LastIndex<T>(List<T> a)
+        public static int LastIndex<T>(this List<T> a)
         {
             return a.Count - 1;
         }
-        public static int LastIndex<T>(IList<T> a)
+        public static int LastIndex<T>(this IList<T> a)
         {
             return a.Count - 1;
         }
-        public static int LastIndex<T>(ICollection<T> a)
+        public static int LastIndex<T>(this ICollection<T> a)
         {
             return a.Count - 1;
         }
-        public static int LastIndex(ICollection a)
+        public static int LastIndex(this ICollection a)
         {
             return a.Count - 1;
         }
-        public static int LastIndex(string a)
+        public static int LastIndex(this string a)
         {
             return a.Length - 1;
         }
@@ -562,14 +611,9 @@ namespace Global
         public const float MaxFloatBelowOne = 0.9999999F;    // Float can't represent this exactly, so will be slightly different.
 
         public const float NearOne = MaxFloatBelowOne;
-        public const double NearZero = 0.00000012;    // 1 - 0.99999988  ~=  "1 - NearOne"; slightly larger.
-                                                             // In case the error is slightly larger than float precision error.
         public const double NearZeroX2 = 2 * NearZero;  // 0.0000024
         /// <summary> For situations (such as matrix compose/decompose) where errors may be significantly larger than last bit.</summary>
         public const double NearZeroX10 = 10 * NearZero;  // 0.0000012
-        public const double VerySmall = 0.00001; // = ~ 100 * NearZero
-        public const float VerySmallF = (float)VerySmall; // = ~ 100 * NearZero
-        public const double OneThousandth = 0.001;
 
         public const float NearNegativeOne = -NearOne;
         public const float NearNegativeZero = (float)-NearZero;
@@ -3243,51 +3287,7 @@ namespace Global
                 list.Remove(item);
         }
 
-        public static void Trouble()
-        {
-            Trouble("unspecified");
-        }
 
-        public static void Trouble(string msg_or_format, params object[] args)
-        {
-            string msg = args.Count() > 0 ? string.Format(msg_or_format, args) : msg_or_format;
-            Trouble(msg);
-        }
-
-        public static void Trouble(string msg)
-        {
-            Debug.WriteLine("***** Trouble: " + msg + " *****");
-        }
-
-
-        public static void Dubious()
-        {
-            Dubious("unspecified");
-        }
-
-        // Represents a branch that does nothing, and that is OK.
-        public static void DoNothing()
-        {
-        }
-
-        // Convenience: Does nothing; used to add place that is easy to set breakpoint on.
-        public static void Test()
-        {
-        }
-
-        // Convenience: Does nothing; used to add place that is easy to set breakpoint on.
-        // Represents a branch that does nothing, and that is OK.
-        public static void Good()
-        {
-        }
-
-        // Convenience: Set breakpoint here to find places that likely need code work.
-        public static void TODO(string msg = "")
-        {
-            if (!HasContents(msg))
-                msg = "(Unspecified)";
-            Dubious("TODO: " + msg);
-        }
 
         private readonly static HashSet<string> s_dubiousSeen = new HashSet<string>();
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
-using System.Numerics;
+//using System.Numerics;
+using Urho;
 using static Global.Utils;
 
 namespace Global
@@ -20,6 +21,20 @@ namespace Global
             Point3D[] points = new Point3D[1];
             points[0] = point;
             return points;
+        }
+
+        /// <summary>
+        /// Distance in ground plane.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double Distance2D(Point3D p1, Point3D p2, bool yIsAltitude = false)
+        {
+            if (yIsAltitude)
+                return (p2.XZ() - p1.XZ()).Length;
+            else
+                return (p2.To2D() - p1.To2D()).Length;
         }
         #endregion
 
