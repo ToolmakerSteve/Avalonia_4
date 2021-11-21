@@ -32,10 +32,13 @@ namespace Global
                 throw new InvalidProgramException("SetDefaultUnit called twice");
             s_initialized = true;
 
-            if (s_NumInstancesConstructed != 0)
-                throw new InvalidProgramException("SetDefaultUnit called after Distance instances have already been created!  Call this first: " + s_NumInstancesConstructed);
+            if (DefaultUnits != units)
+			{
+                if (s_NumInstancesConstructed != 0)
+                    throw new InvalidProgramException("SetDefaultUnit called after Distance instances have already been created!  Call this first: " + s_NumInstancesConstructed);
 
-            DefaultUnits = units;
+                DefaultUnits = units;
+            }
         }
         static private bool s_initialized = false;
         static private long s_NumInstancesConstructed = 0;
