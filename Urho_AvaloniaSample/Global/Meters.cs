@@ -5,8 +5,8 @@ using System.Text;
 namespace Global
 {
     /// <summary>
-    /// A physical value that includes a length units.
-    /// E.g. "Value=3, Units=Yards" means "3 Yards".
+    /// A physical distance whose Units is Meters.
+    /// E.g. "Value=3" means "3 Meters".
     /// </summary>
     public struct Meters
     {

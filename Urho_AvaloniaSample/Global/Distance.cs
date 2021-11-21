@@ -4,6 +4,10 @@ using System.Text;
 
 namespace Global
 {
+    /// <summary>
+    /// A physical distance that includes units.
+    /// E.g. "Value=3, Units=Yards" means "3 Yards".
+    /// </summary>
     public partial struct Distance
     {
         #region "-- static --"
