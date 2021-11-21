@@ -512,7 +512,7 @@ namespace AvaloniaSample
             //reflectionCamera.ViewOverrideFlags = ViewOverrideFlags.DisableShadows;
 
             // Create a texture and setup viewport for water reflection. Assign the reflection texture to the diffuse
-            // texture unit of the water material
+            // texture units of the water material
             int texSize = 1024;
             Texture2D renderTexture = new Texture2D();
             renderTexture.SetSize(texSize, texSize, Graphics.RGBFormat, TextureUsage.Rendertarget);

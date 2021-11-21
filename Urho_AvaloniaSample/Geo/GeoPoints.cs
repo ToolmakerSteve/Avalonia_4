@@ -64,7 +64,7 @@ namespace Geo
 
         /// <summary>
         /// TBD: Should this use "NearlyEquals" value comparison?
-        /// A: Yes, if any unit conversion might have occurred.
+        /// A: Yes, if any units conversion might have occurred.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
@@ -81,7 +81,7 @@ namespace Geo
 
         /// <summary>
         /// TBD: Should this use "NearlyEquals" value comparison?
-        /// A: Yes, if any unit conversion might have occurred.
+        /// A: Yes, if any units conversion might have occurred.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>

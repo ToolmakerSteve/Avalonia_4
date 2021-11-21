@@ -138,7 +138,7 @@ namespace SceneSource
         }
 
         /// <summary>
-        /// Returns a unit vector, perpendicular to pa--pb, and lying in ground plane.
+        /// Returns a units vector, perpendicular to pa--pb, and lying in ground plane.
         /// </summary>
         /// <param name="pa"></param>
         /// <param name="pb"></param>

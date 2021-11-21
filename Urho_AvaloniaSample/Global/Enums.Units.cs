@@ -5,9 +5,9 @@ using System.Text;
 namespace Global
 {
     /// <summary>
-    /// TBD: So someday there can be generic "<T>" classes as base to "Distance".
+    /// TBD: Someday there can be generic "PhysicalUnitType<T>" class as base to "Distance".
     /// </summary>
-    public enum EUnitType
+    public enum EPhysicalUnitType
     {
         Distance,   // Uses Distance.EUnit; DistanceUnit instances.
     }
@@ -18,18 +18,18 @@ namespace Global
     {
         /// <summary>
         /// 1:1 with "DistanceUnit.MeterMults".
-        /// "Default" is a special case. Used for test cases where we want data to use the current default unit,
+        /// "Default" is a special case. Used for test cases where we want data to use the current default units,
         /// without any conversion. Most code doesn't need to be written to handle it.
         /// OR handle by duplicating the UnitDesc for the default?
         /// </summary>
-        public enum EUnit
+        public enum EUnits
         {
             Default = -1,   // Equivalent to current Distance.DefaultEUnit.
-            Meter = 0,
-            Yard,
-            Foot,
-            Inch,
-            Centimeter
+            Meters = 0,
+            Yards,
+            Feet,
+            Inches,
+            Centimeters
         }
     }
 }

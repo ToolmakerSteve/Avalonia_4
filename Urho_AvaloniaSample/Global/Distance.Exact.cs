@@ -10,14 +10,14 @@ namespace Global
         {
             #region "-- data, new --"
             public double Value;
-            public EUnit Units;
+            public EUnits Units;
             public UnitDesc UnitOb => UnitDesc.AsDistanceUnit(Units);
 
 
-            public Exact(double value, EUnit units)
+            public Exact(double value, EUnits units)
             {
                 Value = value;
-                Units = units == EUnit.Default ? DefaultUnits : units;
+                Units = units == EUnits.Default ? DefaultUnits : units;
             }
             #endregion
 
@@ -27,7 +27,7 @@ namespace Global
 
             public double ToDefaultUnits => S_ToDefaultUnits(Value, Units);
 
-            public double ToUnits(EUnit dstUnit)
+            public double ToUnits(EUnits dstUnit)
             {
                 return UnitDesc.ConvertUnits(Value, Units, dstUnit);
             }
@@ -46,7 +46,7 @@ namespace Global
 
             public void SetFromMeters(double m)
             {
-                if (Units == EUnit.Meter)
+                if (Units == EUnits.Meters)
                     Value = m;
                 else
                     Value = UnitOb.FromMeters(m);

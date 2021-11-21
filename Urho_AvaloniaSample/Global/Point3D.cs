@@ -65,7 +65,7 @@ namespace Global
 
         public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
 
-        // Return point with unit length (or zero, if Me is zero).
+        // Return point with units length (or zero, if Me is zero).
         public Point3D Normalize
         {
             get

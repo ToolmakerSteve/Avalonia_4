@@ -9,7 +9,7 @@ namespace Global
         #region "-- static --"
         // TBD: Replace "const" with "static", if allow it to change at run-time.
         // HOWEVER, such a change would have to be done at a moment when NO data is in memory.
-        static public EUnit DefaultUnits { get; private set; }
+        static public EUnits DefaultUnits { get; private set; }
         static public UnitDesc DefaultUnitDesc { get; private set; }
 
         static public readonly Distance Zero = new Distance();
@@ -17,44 +17,44 @@ namespace Global
 
         static private bool s_initialized = false;
 
-        static public void SetDefaultUnit(EUnit unit)
+        static public void SetDefaultUnit(EUnits units)
         {
             if (s_initialized)
                 throw new InvalidProgramException("SetDefaultUnit called twice");
             s_initialized = true;
 
-            DefaultUnits = unit;
-            DefaultUnitDesc = UnitDesc.AsDistanceUnit(unit);
+            DefaultUnits = units;
+            DefaultUnitDesc = UnitDesc.AsDistanceUnit(units);
         }
 
 
 
-        public static double S_ToMeters(double value, EUnit unit)
+        public static double S_ToMeters(double value, EUnits units)
         {
-            return UnitDesc.All[(int)unit].ToMeters(value);
+            return UnitDesc.All[(int)units].ToMeters(value);
         }
 
         /// <summary>
-        /// Equivalent to "ConvertUnits(value, unit, DefaultEUnit)".
+        /// Equivalent to "ConvertUnits(value, units, DefaultEUnit)".
         /// Slightly better performance if DefaultEUnit is "const".
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="unit"></param>
+        /// <param name="units"></param>
         /// <returns></returns>
-        public static double S_ToDefaultUnits(double value, EUnit unit)
+        public static double S_ToDefaultUnits(double value, EUnits units)
         {
-            if (unit == DefaultUnits)
+            if (units == DefaultUnits)
                 return value;
 
-            double meters = unit == EUnit.Meter ? value : UnitDesc.AsDistanceUnit(unit).ToMeters(value);
-            return DefaultUnits == EUnit.Meter ? meters : DefaultUnitDesc.FromMeters(meters);
+            double meters = units == EUnits.Meters ? value : UnitDesc.AsDistanceUnit(units).ToMeters(value);
+            return DefaultUnits == EUnits.Meters ? meters : DefaultUnitDesc.FromMeters(meters);
         }
 
 
         static Distance()
         {
-            DefaultUnits = EUnit.Meter;
-            DefaultUnitDesc = UnitDesc.AsDistanceUnit(EUnit.Meter);
+            DefaultUnits = EUnits.Meters;
+            DefaultUnitDesc = UnitDesc.AsDistanceUnit(EUnits.Meters);
         }
         #endregion
 
@@ -62,13 +62,13 @@ namespace Global
         #region "-- data, new --"
         public double Value;
 
-        public EUnit Units => DefaultUnits;
+        public EUnits Units => DefaultUnits;
         public UnitDesc UnitOb => DefaultUnitDesc;
 
 
-        public Distance(double value, EUnit units)
+        public Distance(double value, EUnits units)
         {
-            Value = units == DefaultUnits|| units == EUnit.Default ? value : S_ToDefaultUnits(value, units);
+            Value = units == DefaultUnits|| units == EUnits.Default ? value : S_ToDefaultUnits(value, units);
         }
         #endregion
 
@@ -78,7 +78,7 @@ namespace Global
 
         public double ToDefaultUnits => S_ToDefaultUnits(Value, Units);
 
-        public double ToUnits(EUnit dstUnit)
+        public double ToUnits(EUnits dstUnit)
         {
             return UnitDesc.ConvertUnits(Value, Units, dstUnit);
         }
@@ -94,7 +94,7 @@ namespace Global
 
         public void SetFromMeters(double m)
         {
-            if (Units == EUnit.Meter)
+            if (Units == EUnits.Meters)
                 Value = m;
             else
                 Value = UnitOb.FromMeters(m);

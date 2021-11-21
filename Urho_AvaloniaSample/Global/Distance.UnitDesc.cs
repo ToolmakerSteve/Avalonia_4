@@ -13,25 +13,25 @@ namespace Global
             /// </summary>
             public static List<UnitDesc> All;
 
-            public static UnitDesc Meter => All[(int)EUnit.Meter];
+            public static UnitDesc Meters => All[(int)EUnits.Meters];
 
-            public static UnitDesc AsDistanceUnit(EUnit unit)
+            public static UnitDesc AsDistanceUnit(EUnits units)
             {
-                return All[(int)unit];
+                return All[(int)units];
             }
 
-            public static double ConvertUnits(double value, EUnit srcUnit, EUnit dstUnit)
+            public static double ConvertUnits(double value, EUnits srcUnit, EUnits dstUnit)
             {
                 if (srcUnit == dstUnit)
                     return value;
 
-                double meters = srcUnit == EUnit.Meter ? value : AsDistanceUnit(srcUnit).ToMeters(value);
-                return dstUnit == EUnit.Meter ? meters : AsDistanceUnit(dstUnit).FromMeters(meters);
+                double meters = srcUnit == EUnits.Meters ? value : AsDistanceUnit(srcUnit).ToMeters(value);
+                return dstUnit == EUnits.Meters ? meters : AsDistanceUnit(dstUnit).FromMeters(meters);
             }
 
             /// <summary>
             /// 1:1 with "EUnit".
-            /// Each one is the number of meters for the corresponding unit.
+            /// Each one is the number of meters for the corresponding units.
             /// </summary>
             public static double[] MeterMults = new double[] {
             1, //Meter = 0,
@@ -90,7 +90,7 @@ namespace Global
 
             public double ToDefaultUnits(double n)
             {
-                if (DefaultUnits == EUnit.Meter)
+                if (DefaultUnits == EUnits.Meters)
                     return Mult * n;
 
                 return Mult * n / DefaultUnitDesc.Mult;
@@ -98,7 +98,7 @@ namespace Global
 
             public double FromDefaultUnits(double nDefault)
             {
-                if (DefaultUnits == EUnit.Meter)
+                if (DefaultUnits == EUnits.Meters)
                     return nDefault / Mult;
 
                 return DefaultUnitDesc.Mult * nDefault / Mult;

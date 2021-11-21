@@ -156,7 +156,7 @@ namespace Global
             }
         }
 
-        // Return point with unit length (or zero, if Me is zero).
+        // Return point with units length (or zero, if Me is zero).
         public Point2D Normalize
         {
             get

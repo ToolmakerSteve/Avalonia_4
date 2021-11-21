@@ -5,25 +5,25 @@ using System.Collections.Generic;
 namespace Global
 {
     /// <summary>
-    /// A compact representation of a set of values with the same unit.
+    /// A compact representation of a set of values with the same units.
     /// </summary>
     public class Distances : IList<Distance>
     {
         #region "-- data --"
         public readonly List<double> Values = new List<double>();
-        public readonly Distance.EUnit Unit;
+        public readonly Distance.EUnits Units;
         /// <summary>
-        /// Convenience (performance): based on "Unit".
+        /// Convenience (performance): based on "Units".
         /// </summary>
         public readonly Distance.UnitDesc OurUnit;
         #endregion
 
 
         #region "-- new --"
-        public Distances(Distance.EUnit unit)
+        public Distances(Distance.EUnits units)
         {
-            Unit = unit;
-            OurUnit = Distance.UnitDesc.AsDistanceUnit(unit);
+            Units = units;
+            OurUnit = Distance.UnitDesc.AsDistanceUnit(units);
         }
         #endregion
 
@@ -33,7 +33,7 @@ namespace Global
         {
             foreach (var value in Values)
             {
-                yield return new Distance(value, Unit);
+                yield return new Distance(value, Units);
             }
         }
 
@@ -47,7 +47,7 @@ namespace Global
         #region "-- IList<Length> --"
         public Distance this[int index]
         {
-            get => new Distance(Values[index], Unit);
+            get => new Distance(Values[index], Units);
             set => Values[index] = ToOurUnits(value);
         }
 
@@ -67,7 +67,7 @@ namespace Global
 
         /// <summary>
         /// TBD: Should this use "NearlyEquals" value comparison?
-        /// A: Yes, if any unit conversion might have occurred.
+        /// A: Yes, if any units conversion might have occurred.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
@@ -84,7 +84,7 @@ namespace Global
 
         /// <summary>
         /// TBD: Should this use "NearlyEquals" value comparison?
-        /// A: Yes, if any unit conversion might have occurred.
+        /// A: Yes, if any units conversion might have occurred.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
@@ -122,8 +122,8 @@ namespace Global
         public double ToOurUnits(Distance value)
         {
             double finalValue = value.Value;
-            if (value.Units != Unit)
-            {   // Convert to our Unit.
+            if (value.Units != Units)
+            {   // Convert to our Units.
                 finalValue = OurUnit.FromMeters(value.Meters);
             }
 

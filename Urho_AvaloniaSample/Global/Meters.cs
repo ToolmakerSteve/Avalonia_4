@@ -5,14 +5,14 @@ using System.Text;
 namespace Global
 {
     /// <summary>
-    /// A physical value that includes a length unit.
-    /// E.g. "Value=3, Unit=Yard" means "3 Yards".
+    /// A physical value that includes a length units.
+    /// E.g. "Value=3, Units=Yards" means "3 Yards".
     /// </summary>
     public struct Meters
     {
         #region "-- static --"
-        public const Distance.EUnit DefaultEUnit = Distance.EUnit.Meter;
-        public readonly static Distance.UnitDesc DefaultUnit = Distance.UnitDesc.Meter;
+        public const Distance.EUnits DefaultEUnit = Distance.EUnits.Meters;
+        public readonly static Distance.UnitDesc DefaultUnit = Distance.UnitDesc.Meters;
 
         public readonly static Meters Zero = new Meters(0);
         #endregion
@@ -31,11 +31,11 @@ namespace Global
 
         public double AsMeters => Value;
 
-        public Distance ToDistance => new Distance(Value, Distance.EUnit.Meter);
+        public Distance ToDistance => new Distance(Value, Distance.EUnits.Meters);
 
 
 
-        public double AsDefaultUnits => Distance.DefaultUnits == Distance.EUnit.Meter ? Value : Distance.DefaultUnitDesc.FromMeters(Value);
+        public double AsDefaultUnits => Distance.DefaultUnits == Distance.EUnits.Meters ? Value : Distance.DefaultUnitDesc.FromMeters(Value);
         // Alternative version, if we usually have a DefaultUnit that is not meters.
         //public double AsDefaultUnits => Distance.DefaultUnit.FromMeters(Value);
     }
