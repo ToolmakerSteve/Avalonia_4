@@ -126,7 +126,7 @@ namespace Global
                     UnitsType other = (UnitsType)obj;
                     return TypeIndex.CompareTo(other.TypeIndex);
                 }
-                throw new ArgumentException("EUnits.CompareTo() with wrong object type.");
+                throw new ArgumentException("UnitsType.CompareTo() with wrong object type.");
             }
 
             static public bool operator ==(UnitsType left, UnitsType right)

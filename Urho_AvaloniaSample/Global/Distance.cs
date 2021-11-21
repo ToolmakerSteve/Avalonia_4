@@ -111,7 +111,7 @@ namespace Global
             if (srcUnit == dstUnit)
                 return srcValue;
 
-            double destValue = srcValue * srcUnit.MetersPerUnit * dstUnit.UnitsPerMeter; //  EUnits.Meters ? meters : AsDistanceUnit(dstUnit).FromMeters(meters);
+            double destValue = srcValue * srcUnit.MetersPerUnit * dstUnit.UnitsPerMeter;
             return destValue;
         }
 
