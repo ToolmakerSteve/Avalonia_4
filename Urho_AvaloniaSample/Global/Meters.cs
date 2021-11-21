@@ -10,34 +10,26 @@ namespace Global
     /// </summary>
     public struct Meters
     {
-        #region "-- static --"
-        public const Distance.EUnits DefaultEUnit = Distance.EUnits.Meters;
-        public readonly static Distance.UnitDesc DefaultUnit = Distance.UnitDesc.Meters;
-
         public readonly static Meters Zero = new Meters(0);
-        #endregion
-
+        static private Distance.EUnits s_Units = Distance.EUnits.Meters;
 
         #region "-- data, new --"
         public double Value;
-
+        public Distance.EUnits Units => s_Units;
 
         public Meters(double value)
         {
             Value = value;
         }
+        public override string ToString()
+        {
+            return "Meters = " + Value;
+        }
         #endregion
 
-
         public double AsMeters => Value;
-
-        public Distance ToDistance => new Distance(Value, Distance.EUnits.Meters);
-
-
-
-        public double AsDefaultUnits => Distance.DefaultUnits == Distance.EUnits.Meters ? Value : Distance.DefaultUnitDesc.FromMeters(Value);
-        // Alternative version, if we usually have a DefaultUnit that is not meters.
-        //public double AsDefaultUnits => Distance.DefaultUnit.FromMeters(Value);
+        public Distance ToDistance => Distance.FromMeters(Value);
+        public double AsDefaultUnits => Distance.ConvertUnits(Value, Distance.EUnits.Meters, Distance.DefaultUnits);
     }
 
 }

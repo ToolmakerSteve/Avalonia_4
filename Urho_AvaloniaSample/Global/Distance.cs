@@ -11,105 +11,108 @@ namespace Global
     public partial struct Distance
     {
         #region "-- static --"
-        // TBD: Replace "const" with "static", if allow it to change at run-time.
-        // HOWEVER, such a change would have to be done at a moment when NO data is in memory.
         static public EUnits DefaultUnits { get; private set; }
-        static public UnitDesc DefaultUnitDesc { get; private set; }
+
+        // These two values are set for efficiency, assuming that Meters is our preferred/optimized unit (most common).
+        //    Note, that this same efficiency can be added for other types as need arises.
+        static private double _metersPerDefaultUnit;
+        static private double _defaultUnitsPerMeter;
 
         static public readonly Distance Zero = new Distance();
 
-
-        static private bool s_initialized = false;
-
+        static Distance()
+        {
+            DefaultUnits = EUnits.Meters;
+            _metersPerDefaultUnit = DefaultUnits.MetersPerUnit;
+            _defaultUnitsPerMeter = DefaultUnits.UnitsPerMeter;
+        }
         static public void SetDefaultUnit(EUnits units)
         {
             if (s_initialized)
                 throw new InvalidProgramException("SetDefaultUnit called twice");
             s_initialized = true;
 
+            if (s_NumInstancesConstructed != 0)
+                throw new InvalidProgramException("SetDefaultUnit called after Distance instances have already been created!  Call this first: " + s_NumInstancesConstructed);
+
             DefaultUnits = units;
-            DefaultUnitDesc = UnitDesc.AsDistanceUnit(units);
         }
+        static private bool s_initialized = false;
+        static private long s_NumInstancesConstructed = 0;
 
-
-
-        public static double S_ToMeters(double value, EUnits units)
-        {
-            return UnitDesc.All[(int)units].ToMeters(value);
-        }
-
-        /// <summary>
-        /// Equivalent to "ConvertUnits(value, units, DefaultEUnit)".
-        /// Slightly better performance if DefaultEUnit is "const".
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="units"></param>
-        /// <returns></returns>
-        public static double S_ToDefaultUnits(double value, EUnits units)
-        {
-            if (units == DefaultUnits)
-                return value;
-
-            double meters = units == EUnits.Meters ? value : UnitDesc.AsDistanceUnit(units).ToMeters(value);
-            return DefaultUnits == EUnits.Meters ? meters : DefaultUnitDesc.FromMeters(meters);
-        }
-
-
-        static Distance()
-        {
-            DefaultUnits = EUnits.Meters;
-            DefaultUnitDesc = UnitDesc.AsDistanceUnit(EUnits.Meters);
-        }
         #endregion
 
 
-        #region "-- data, new --"
+        #region "--- Instance Members ---"
+
+        /// <summary>The value of this distance, in terms of 'Units'.</summary>
         public double Value;
 
+        /// <summary>The 'Units' of this distance instance.</summary>
+        /// <remarks>Note, these Units always match Distance.DefaultUnits, set by "SetDefaultUnit()" at App Startup.</remarks>
         public EUnits Units => DefaultUnits;
-        public UnitDesc UnitOb => DefaultUnitDesc;
 
-
-        public Distance(double value, EUnits units)
+        private Distance(double value)
         {
-            Value = units == DefaultUnits|| units == EUnits.Default ? value : S_ToDefaultUnits(value, units);
+            Value = value;
+            s_NumInstancesConstructed++;
         }
-        #endregion
-
+        public override string ToString()
+        {
+            return "Dist = " + Value + " (" + Units.Abbreviation + ")";
+        }
 
         public Meters ToMeters => new Meters(Meters);
-        public double Meters => S_ToMeters(Value, Units);
+        public double Meters => (_metersPerDefaultUnit * Value);
 
-        public double ToDefaultUnits => S_ToDefaultUnits(Value, Units);
-
-        public double ToUnits(EUnits dstUnit)
+        public double ToUnits(EUnits dstUnits)
         {
-            return UnitDesc.ConvertUnits(Value, Units, dstUnit);
+            return ConvertUnits(Value, Units, dstUnits);
+        }
+        public double ToUnitsRounded(EUnits dstUnits)
+        {
+            double convertedValue = ConvertUnits(Value, Units, dstUnits);
+            return Math.Round(convertedValue, 9);
         }
 
         public void SetFrom(Distance d)
         {
-            if (Units == d.Units) {
-                Value = d.Value;
-            } else {
-                Value = UnitDesc.ConvertUnits(d.Value, d.Units, Units);
-            }
+            Value = ConvertUnits(d.Value, d.Units, Units);
         }
 
-        public void SetFromMeters(double m)
+        public void SetFromMeters(double meters)
         {
-            if (Units == EUnits.Meters)
-                Value = m;
-            else
-                Value = UnitOb.FromMeters(m);
+            Value = _defaultUnitsPerMeter * meters;
         }
 
-        public void SetFromDefaultUnits(double nDefault)
+        #endregion "--- Instance Members ---"
+
+        #region === Static Conversion/Create Methods ===============================================
+
+        static public Distance FromMeters(double meters)
         {
-            if (Units == DefaultUnits)
-                Value = nDefault;
-            else
-                Value = UnitOb.FromDefaultUnits(nDefault);
+            return new Distance(_defaultUnitsPerMeter * meters);
         }
+        static public Distance FromDefaultUnits(double value)
+        {
+            return new Distance(value);
+        }
+        static public Distance FromSpecifiedUnits(double value, EUnits units)
+        {
+            double valueInDefaultUnits = ConvertUnits(value, units, DefaultUnits);
+            return new Distance(valueInDefaultUnits);
+        }
+
+        static public double ConvertUnits(double srcValue, EUnits srcUnit, EUnits dstUnit)
+        {
+            if (srcUnit == dstUnit)
+                return srcValue;
+
+            double destValue = srcValue * srcUnit.MetersPerUnit * dstUnit.UnitsPerMeter; //  EUnits.Meters ? meters : AsDistanceUnit(dstUnit).FromMeters(meters);
+            return destValue;
+        }
+
+        #endregion === Static Conversion/Create Methods ===============================================
+
     }
 }

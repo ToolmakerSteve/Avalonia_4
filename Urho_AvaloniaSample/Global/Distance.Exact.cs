@@ -10,54 +10,38 @@ namespace Global
         {
             #region "-- data, new --"
             public double Value;
-            public EUnits Units;
-            public UnitDesc UnitOb => UnitDesc.AsDistanceUnit(Units);
-
+            private int _unitTypeIndex;
+            public EUnits Units { get { return EUnits.__GetByIndex(_unitTypeIndex); } }
 
             public Exact(double value, EUnits units)
             {
                 Value = value;
-                Units = units == EUnits.Default ? DefaultUnits : units;
+                _unitTypeIndex = units.TypeIndex;
             }
             #endregion
 
-
             public Meters ToMeters => new Meters(Meters);
-            public double Meters => S_ToMeters(Value, Units);
-
-            public double ToDefaultUnits => S_ToDefaultUnits(Value, Units);
+            public double Meters => ConvertUnits(Value, Units, EUnits.Meters);
+            public double ToDefaultUnits => ConvertUnits(Value, Units, DefaultUnits);
 
             public double ToUnits(EUnits dstUnit)
             {
-                return UnitDesc.ConvertUnits(Value, Units, dstUnit);
+                return ConvertUnits(Value, Units, dstUnit);
             }
 
             public void SetFrom(Distance d)
             {
-                if (Units == d.Units)
-                {
-                    Value = d.Value;
-                }
-                else
-                {
-                    Value = UnitDesc.ConvertUnits(d.Value, d.Units, Units);
-                }
+                Value = ConvertUnits(d.Value, d.Units, Units);
             }
 
-            public void SetFromMeters(double m)
+            public void SetFromMeters(double meters)
             {
-                if (Units == EUnits.Meters)
-                    Value = m;
-                else
-                    Value = UnitOb.FromMeters(m);
+                Value = ConvertUnits(meters, EUnits.Meters, Units);
             }
 
-            public void SetFromDefaultUnits(double nDefault)
+            public void SetFromDefaultUnits(double defaultUnits)
             {
-                if (Units == DefaultUnits)
-                    Value = nDefault;
-                else
-                    Value = UnitOb.FromDefaultUnits(nDefault);
+                Value = ConvertUnits(defaultUnits, DefaultUnits, Units);
             }
         }
     }
