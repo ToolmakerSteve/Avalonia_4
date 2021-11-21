@@ -11,7 +11,7 @@ namespace Global
     public partial struct Distance
     {
         #region "-- static --"
-        static public EUnits DefaultUnits { get; private set; }
+        static public UnitsType DefaultUnits { get; private set; }
 
         // These two values are set for efficiency, assuming that Meters is our preferred/optimized unit (most common).
         //    Note, that this same efficiency can be added for other types as need arises.
@@ -22,11 +22,11 @@ namespace Global
 
         static Distance()
         {
-            DefaultUnits = EUnits.Meters;
+            DefaultUnits = UnitsType.Meters;
             _metersPerDefaultUnit = DefaultUnits.MetersPerUnit;
             _defaultUnitsPerMeter = DefaultUnits.UnitsPerMeter;
         }
-        static public void SetDefaultUnit(EUnits units)
+        static public void SetDefaultUnit(UnitsType units)
         {
             if (s_initialized)
                 throw new InvalidProgramException("SetDefaultUnit called twice");
@@ -50,7 +50,7 @@ namespace Global
 
         /// <summary>The 'Units' of this distance instance.</summary>
         /// <remarks>Note, these Units always match Distance.DefaultUnits, set by "SetDefaultUnit()" at App Startup.</remarks>
-        public EUnits Units => DefaultUnits;
+        public UnitsType Units => DefaultUnits;
 
         private Distance(double value)
         {
@@ -65,11 +65,11 @@ namespace Global
         public Meters ToMeters => new Meters(Meters);
         public double Meters => (_metersPerDefaultUnit * Value);
 
-        public double ToUnits(EUnits dstUnits)
+        public double ToUnits(UnitsType dstUnits)
         {
             return ConvertUnits(Value, Units, dstUnits);
         }
-        public double ToUnitsRounded(EUnits dstUnits)
+        public double ToUnitsRounded(UnitsType dstUnits)
         {
             double convertedValue = ConvertUnits(Value, Units, dstUnits);
             return Math.Round(convertedValue, 9);
@@ -97,13 +97,13 @@ namespace Global
         {
             return new Distance(value);
         }
-        static public Distance FromSpecifiedUnits(double value, EUnits units)
+        static public Distance FromSpecifiedUnits(double value, UnitsType units)
         {
             double valueInDefaultUnits = ConvertUnits(value, units, DefaultUnits);
             return new Distance(valueInDefaultUnits);
         }
 
-        static public double ConvertUnits(double srcValue, EUnits srcUnit, EUnits dstUnit)
+        static public double ConvertUnits(double srcValue, UnitsType srcUnit, UnitsType dstUnit)
         {
             if (srcUnit == dstUnit)
                 return srcValue;

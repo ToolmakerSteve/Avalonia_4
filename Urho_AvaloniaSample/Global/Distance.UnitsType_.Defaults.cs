@@ -8,17 +8,17 @@
         /// without any conversion. Most code doesn't need to be written to handle it.
         /// OR handle by duplicating the UnitDesc for the default?
         /// </summary>
-        public partial class EUnits
+        public partial class UnitsType
         {
-            static public EUnits _DEFAULT; // will equate to Meters
-            static public EUnits Centimeters;
-            static public EUnits Meters;
-            static public EUnits Kilometers;
-            static public EUnits Inches;
-            static public EUnits Feet;
-            static public EUnits Yards;
-            static public EUnits Miles;
-            static public EUnits NauticalMiles;
+            static public UnitsType _DEFAULT; // will equate to Meters
+            static public UnitsType Centimeters;
+            static public UnitsType Meters;
+            static public UnitsType Kilometers;
+            static public UnitsType Inches;
+            static public UnitsType Feet;
+            static public UnitsType Yards;
+            static public UnitsType Miles;
+            static public UnitsType NauticalMiles;
 
             static private void _InitializeDefaults()
             {

@@ -11,9 +11,9 @@ namespace Global
             #region "-- data, new --"
             public double Value;
             private int _unitTypeIndex;
-            public EUnits Units { get { return EUnits.__GetByIndex(_unitTypeIndex); } }
+            public UnitsType Units { get { return UnitsType.__GetByIndex(_unitTypeIndex); } }
 
-            public Exact(double value, EUnits units)
+            public Exact(double value, UnitsType units)
             {
                 Value = value;
                 _unitTypeIndex = units.TypeIndex;
@@ -21,10 +21,10 @@ namespace Global
             #endregion
 
             public Meters ToMeters => new Meters(Meters);
-            public double Meters => ConvertUnits(Value, Units, EUnits.Meters);
+            public double Meters => ConvertUnits(Value, Units, UnitsType.Meters);
             public double ToDefaultUnits => ConvertUnits(Value, Units, DefaultUnits);
 
-            public double ToUnits(EUnits dstUnit)
+            public double ToUnits(UnitsType dstUnit)
             {
                 return ConvertUnits(Value, Units, dstUnit);
             }
@@ -36,7 +36,7 @@ namespace Global
 
             public void SetFromMeters(double meters)
             {
-                Value = ConvertUnits(meters, EUnits.Meters, Units);
+                Value = ConvertUnits(meters, UnitsType.Meters, Units);
             }
 
             public void SetFromDefaultUnits(double defaultUnits)

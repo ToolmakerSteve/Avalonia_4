@@ -12,9 +12,9 @@ namespace Global
         /// without any conversion. Most code doesn't need to be written to handle it.
         /// OR handle by duplicating the UnitDesc for the default?
         /// </summary>
-        public partial class EUnits : IComparable, IComparable<EUnits>
+        public partial class UnitsType : IComparable, IComparable<UnitsType>
         {
-            static EUnits()
+            static UnitsType()
             {
                 _InitializeDefaults();
             }
@@ -27,9 +27,9 @@ namespace Global
 
             public override string ToString() { return "UnitsType<" + Name + ">"; }
 
-            static public EUnits __RegisterType(string typeName, string typeAbbrev, double metersPerUnit)
+            static public UnitsType __RegisterType(string typeName, string typeAbbrev, double metersPerUnit)
             {
-                EUnits unitsType;
+                UnitsType unitsType;
                 int index;
 
                 lock (s_AllNameLookup)
@@ -51,19 +51,19 @@ namespace Global
                 return __RegisterType(__InstanceCount, typeName, typeAbbrev, metersPerUnit);
             }
 
-            static public EUnits __RegisterType(int index, string typeName, string typeAbbrev, double metersPerUnit)
+            static public UnitsType __RegisterType(int index, string typeName, string typeAbbrev, double metersPerUnit)
             {
                 if (s_NumInstancesConstructed != 0)
                     throw new InvalidOperationException("Distance.UnitType.__RegisterType() - called AFTER Distances have been constructed: " + s_NumInstancesConstructed);
 
-                EUnits unitsType = new EUnits(index, typeName, typeAbbrev, metersPerUnit);
+                UnitsType unitsType = new UnitsType(index, typeName, typeAbbrev, metersPerUnit);
 
                 __AllInstances[index] = unitsType;
                 s_AllNameLookup[typeName] = unitsType;
 
                 return unitsType;
             }
-            private EUnits(int index, string typeName, string typeAbbrev, double metersPerUnit)
+            private UnitsType(int index, string typeName, string typeAbbrev, double metersPerUnit)
             {
                 TypeIndex = index;
                 Name = typeName;
@@ -72,13 +72,13 @@ namespace Global
                 UnitsPerMeter = 1.0 / metersPerUnit;
             }
 
-            static public EUnits __GetByName(string typeName)
+            static public UnitsType __GetByName(string typeName)
             {
-                EUnits unitsType;
+                UnitsType unitsType;
                 if (!s_AllNameLookup.TryGetValue(typeName, out unitsType))
                 {
                     // NOTE/TODO: Log Error!
-                    unitsType = EUnits._DEFAULT;
+                    unitsType = UnitsType._DEFAULT;
                 }
                 return unitsType;
             }
@@ -86,15 +86,15 @@ namespace Global
             public const int __MAX_NAMES = 255;
             static public int __InstanceCount { get; private set; }
 
-            static private Dictionary<string, EUnits> s_AllNameLookup = new Dictionary<string, EUnits>(__MAX_NAMES);
-            static private EUnits[] __AllInstances = new EUnits[__MAX_NAMES];
+            static private Dictionary<string, UnitsType> s_AllNameLookup = new Dictionary<string, UnitsType>(__MAX_NAMES);
+            static private UnitsType[] __AllInstances = new UnitsType[__MAX_NAMES];
 
-            static public EUnits __GetByIndex(int typeIndex)
+            static public UnitsType __GetByIndex(int typeIndex)
             {
                 return __AllInstances[typeIndex];
             }
 
-            static public IEnumerable<EUnits> __GetAllInstances()
+            static public IEnumerable<UnitsType> __GetAllInstances()
             {
                 for (int i = 0; i < __InstanceCount; i++)
                     yield return __AllInstances[i];
@@ -106,34 +106,34 @@ namespace Global
             }
             public override bool Equals(object obj)
             {
-                if (obj == null || !(obj is EUnits))
+                if (obj == null || !(obj is UnitsType))
                 {
                     return false;
                 }
-                EUnits other = (EUnits)obj;
+                UnitsType other = (UnitsType)obj;
                 return TypeIndex == other.TypeIndex;
             }
 
-            int IComparable<EUnits>.CompareTo(EUnits other)
+            int IComparable<UnitsType>.CompareTo(UnitsType other)
             {
                 return TypeIndex.CompareTo(other.TypeIndex);
             }
 
             int IComparable.CompareTo(object obj)
             {
-                if (obj is EUnits)
+                if (obj is UnitsType)
                 {
-                    EUnits other = (EUnits)obj;
+                    UnitsType other = (UnitsType)obj;
                     return TypeIndex.CompareTo(other.TypeIndex);
                 }
                 throw new ArgumentException("EUnits.CompareTo() with wrong object type.");
             }
 
-            static public bool operator ==(EUnits left, EUnits right)
+            static public bool operator ==(UnitsType left, UnitsType right)
             {
                 return left.TypeIndex == right.TypeIndex;
             }
-            static public bool operator !=(EUnits left, EUnits right)
+            static public bool operator !=(UnitsType left, UnitsType right)
             {
                 return left.TypeIndex != right.TypeIndex;
             }

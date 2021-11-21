@@ -11,11 +11,11 @@ namespace Global
     public struct Meters
     {
         public readonly static Meters Zero = new Meters(0);
-        static private Distance.EUnits s_Units = Distance.EUnits.Meters;
+        static private Distance.UnitsType s_Units = Distance.UnitsType.Meters;
 
         #region "-- data, new --"
         public double Value;
-        public Distance.EUnits Units => s_Units;
+        public Distance.UnitsType Units => s_Units;
 
         public Meters(double value)
         {
@@ -29,7 +29,7 @@ namespace Global
 
         public double AsMeters => Value;
         public Distance ToDistance => Distance.FromMeters(Value);
-        public double AsDefaultUnits => Distance.ConvertUnits(Value, Distance.EUnits.Meters, Distance.DefaultUnits);
+        public double AsDefaultUnits => Distance.ConvertUnits(Value, Distance.UnitsType.Meters, Distance.DefaultUnits);
     }
 
 }
