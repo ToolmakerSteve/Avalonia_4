@@ -22,10 +22,9 @@ namespace Global
 
         /// <summary>Converts from Distance2D, which drops the units and spatial-context.</summary>
         /// <remarks>For situations where the units of X and Y "cancel out" (e.g. a ratio, or scalar value).</remarks>
-        public double2(Distance2D pt)
+        public double2 FromDistance(Distance2D pt)
         {
-            X = pt.X.Value;
-            Y = pt.Y.Value;
+            return new double2(pt.X.Value, pt.Y.Value);
         }
         #endregion
     }
