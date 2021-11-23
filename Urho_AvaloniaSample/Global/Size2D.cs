@@ -55,7 +55,7 @@ namespace Global
 
         //    // Verify isZigZag.  Top-Left to Bottom-Right diagonal should be greater than height.
         //    Point2D cornerBR = isZigZag ? corners[ZigZagIndex.BottomRight] : corners[CornerIndex.BottomRight];
-        //    double diagonalLength = Distance2D(corners[CornerIndex.TopLeft], cornerBR);
+        //    double diagonalLength = CalcDistance2D(corners[CornerIndex.TopLeft], cornerBR);
         //    if (diagonalLength < this.Height)
         //        throw new InvalidProgramException("Size2D.New from corners -- Incorrect ordering of corners");
         //}

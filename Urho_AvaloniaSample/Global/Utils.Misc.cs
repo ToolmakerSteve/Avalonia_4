@@ -993,23 +993,23 @@ namespace Global
             var dy = y2 - y1;
             return (dx * dx) + (dy * dy);
         }
-        public static double Distance2D(double x1, double y1, double x2, double y2)
+        public static double CalcDistance2D(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt(DistanceSquared2D(x1, y1, x2, y2));
         }
-        public static Distance Distance2D(Distance x1, Distance y1, Distance x2, Distance y2)
+        public static Distance CalcDistance2D(Distance x1, Distance y1, Distance x2, Distance y2)
         {
             return DistanceSquared2D(x1, y1, x2, y2).Sqrt();
         }
 
-        public static Distance Distance2D(Point2D p1, Point2D p2)
+        public static Distance CalcDistance2D(Point2D p1, Point2D p2)
         {
             return DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y).Sqrt();
         }
 
-        public static Distance Distance2D(Point3D p1, Point3D p2)
+        public static Distance CalcDistance2D(Point3D p1, Point3D p2)
         {
-            return Distance2D(p1.X, p1.Y, p2.X, p2.Y);
+            return CalcDistance2D(p1.X, p1.Y, p2.X, p2.Y);
         }
 
 
@@ -1318,10 +1318,10 @@ namespace Global
         //    // Verify
         //    Point2D xy_verify = Lerp2D(xyWgt, X0Y0, X1Y0, X0Y1, X1Y1);
 
-        //    double newError = Distance2D(xy, xy_verify);
+        //    double newError = CalcDistance2D(xy, xy_verify);
         //    // Made it more accurate, for the case where it is oscillating between an x-error and a y-error.
         //    // This forces more passes. TODO: Find a way to converge more quickly.
-        //    double tolerance = Distance2D(X0Y0, X1Y1) * 0.00005; // 0.0001 ' 0.0002
+        //    double tolerance = CalcDistance2D(X0Y0, X1Y1) * 0.00005; // 0.0001 ' 0.0002
         //                                                         // ' COMMENTED OUT: Always do second pass, for best accuracy.
         //                                                         // If error1 <= tolerance Then
         //                                                         // ' Good
@@ -1337,7 +1337,7 @@ namespace Global
         //        // ----> Main Work, Pass N <----
         //        xyWgt = _InverseLerp2D_PassN(xyWgt, xy, X0Y0, X1Y0, X0Y1, X1Y1);
         //        xy_verify = Lerp2D(xyWgt, X0Y0, X1Y0, X0Y1, X1Y1);
-        //        newError = Distance2D(xy, xy_verify);
+        //        newError = CalcDistance2D(xy, xy_verify);
         //        if (newError <= tolerance)
         //            // Good
         //            return xyWgt;
@@ -1392,8 +1392,8 @@ namespace Global
         //    // y params => xWgt2 ("x" is not a typo).
         //    Point2D Yguess_closest = ClosestPointOnLine2D_AndT(xy, X0Yguess, X1Yguess, xWgt2);
 
-        //    // Dim Xguess_error As Double = Distance2D(xy, Xguess_closest)
-        //    // Dim Yguess_error As Double = Distance2D(xy, Yguess_closest)
+        //    // Dim Xguess_error As Double = CalcDistance2D(xy, Xguess_closest)
+        //    // Dim Yguess_error As Double = CalcDistance2D(xy, Yguess_closest)
 
         //    // Improved guess.
         //    return new Point2D(xWgt2, yWgt2);

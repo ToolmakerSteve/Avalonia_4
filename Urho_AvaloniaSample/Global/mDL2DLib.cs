@@ -824,7 +824,7 @@
 //    {
 //        // Dim ptdRet As Point3D
 //        // Dim dblCurrentAngle As Double = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y)
-//        // Dim dblDI As Double = m2DLib.Distance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y)
+//        // Dim dblDI As Double = m2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y)
 
 //        // ptdRet.X = ptdOrigo.X + dblDI * Math.Cos(((dblCurrentAngle - dblAngleDegrees) / 180) * Math.PI)
 //        // ptdRet.Y = ptdOrigo.Y + dblDI * Math.Sin(((dblCurrentAngle - dblAngleDegrees) / 180) * Math.PI)
@@ -847,7 +847,7 @@
 //    {
 //        Point2D ptdRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
-//        double dblDI = mDL2DLib.Distance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
+//        double dblDI = mDL2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 
 //        // If dblAngleDegrees > 360 Then dblAngleDegrees -= 360
 //        // If dblAngleDegrees < 0 Then dblAngleDegrees = 360 + dblAngleDegrees
@@ -863,7 +863,7 @@
 //    {
 //        PointF ptfRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptfOrigo.X, ptfOrigo.Y, ptfPoint.X, ptfPoint.Y);
-//        double dblDI = mDL2DLib.Distance2D(ptfOrigo.X, ptfOrigo.Y, ptfPoint.X, ptfPoint.Y);
+//        double dblDI = mDL2DLib.CalcDistance2D(ptfOrigo.X, ptfOrigo.Y, ptfPoint.X, ptfPoint.Y);
 
 //        ptfRet.X = System.Convert.ToSingle(ptfOrigo.X + dblDI * Math.Cos(((dblCurrentAngle - dblAngleDegrees) / 180) * Math.PI));
 //        ptfRet.Y = System.Convert.ToSingle(ptfOrigo.Y + dblDI * Math.Sin(((dblCurrentAngle - dblAngleDegrees) / 180) * Math.PI));
@@ -875,7 +875,7 @@
 //    {
 //        Point3D ptdRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
-//        double dblDI = mDL2DLib.Distance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
+//        double dblDI = mDL2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 
 //        ptdRet.X = ptdOrigo.X + dblDI * Math.Cos(((dblCurrentAngle) / 180) * Math.PI - dblAngleRadians);
 //        ptdRet.Y = ptdOrigo.Y + dblDI * Math.Sin(((dblCurrentAngle) / 180) * Math.PI - dblAngleRadians);
@@ -888,7 +888,7 @@
 //    {
 //        Point2D ptdRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
-//        double dblDI = mDL2DLib.Distance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
+//        double dblDI = mDL2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 
 //        ptdRet.X = ptdOrigo.X + dblDI * Math.Cos(((dblCurrentAngle) / 180) * Math.PI - dblAngleRadians);
 //        ptdRet.Y = ptdOrigo.Y + dblDI * Math.Sin(((dblCurrentAngle) / 180) * Math.PI - dblAngleRadians);
@@ -900,7 +900,7 @@
 //    {
 //        PointF ptfRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptfOrigo.X, ptfOrigo.Y, ptfPoint.X, ptfPoint.Y);
-//        double dblDI = mDL2DLib.Distance2D(ptfOrigo.X, ptfOrigo.Y, ptfPoint.X, ptfPoint.Y);
+//        double dblDI = mDL2DLib.CalcDistance2D(ptfOrigo.X, ptfOrigo.Y, ptfPoint.X, ptfPoint.Y);
 
 //        ptfRet.X = System.Convert.ToSingle(ptfOrigo.X + dblDI * Math.Cos(((dblCurrentAngle) / 180) * Math.PI - dblAngleRadians));
 //        ptfRet.Y = System.Convert.ToSingle(ptfOrigo.Y + dblDI * Math.Sin(((dblCurrentAngle) / 180) * Math.PI - dblAngleRadians));
@@ -1033,42 +1033,42 @@
 //    }
 
 
-//    public static double Distance2D(double dblDeltaX, double dblDeltaY)
+//    public static double CalcDistance2D(double dblDeltaX, double dblDeltaY)
 //    {
 //        return Math.Sqrt(dblDeltaX * dblDeltaX + dblDeltaY * dblDeltaY);
 //    }
 
-//    public static double Distance2D(double dblX1, double dblY1, double dblX2, double dblY2)
+//    public static double CalcDistance2D(double dblX1, double dblY1, double dblX2, double dblY2)
 //    {
 //        return Math.Sqrt(DistanceSquared2D(dblX1, dblY1, dblX2, dblY2));
 //    }
 
-//    public static float Distance2D(float sngX1, float sngY1, float sngX2, float sngY2)
+//    public static float CalcDistance2D(float sngX1, float sngY1, float sngX2, float sngY2)
 //    {
 //        return System.Convert.ToSingle(Math.Sqrt(DistanceSquared2D(sngX1, sngY1, sngX2, sngY2)));
 //    }
 
-//    public static double Distance2D(Point2D ptdP1, Point2D ptdP2)
+//    public static double CalcDistance2D(Point2D ptdP1, Point2D ptdP2)
 //    {
 //        return Math.Sqrt(DistanceSquared2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y));
 //    }
 
-//    public static double Distance2D(Point3D ptdP1, Point3D ptdP2)
+//    public static double CalcDistance2D(Point3D ptdP1, Point3D ptdP2)
 //    {
-//        return Distance2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
+//        return CalcDistance2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
 //    }
 
-//    public static double Distance2D(PointF ptfP1, PointF ptfP2)
+//    public static double CalcDistance2D(PointF ptfP1, PointF ptfP2)
 //    {
-//        return Distance2D(ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
+//        return CalcDistance2D(ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
 //    }
 
-//    public static double Distance2D(PointF3D p1, PointF3D p2)
+//    public static double CalcDistance2D(PointF3D p1, PointF3D p2)
 //    {
-//        return Distance2D(p1.X, p1.Y, p2.X, p2.Y);
+//        return CalcDistance2D(p1.X, p1.Y, p2.X, p2.Y);
 //    }
 
-//    public static double Distance2D(Point2D[] pts)
+//    public static double CalcDistance2D(Point2D[] pts)
 //    {
 //        if (!Exists(pts))
 //            return -1;
@@ -1076,7 +1076,7 @@
 //        double tot = 0;
 
 //        for (int i = 1; i <= pts.Length - 1; i++)
-//            tot += Distance2D(pts[i - 1], pts[i]);
+//            tot += CalcDistance2D(pts[i - 1], pts[i]);
 
 //        return tot;
 //    }
@@ -1084,7 +1084,7 @@
 //    // 2D distance calculation, in X and Z.
 //    public static double DistanceXZ(Point3D ptdP1, Point3D ptdP2)
 //    {
-//        return Distance2D(ptdP1.X, ptdP1.Z, ptdP2.X, ptdP2.Z);
+//        return CalcDistance2D(ptdP1.X, ptdP1.Z, ptdP2.X, ptdP2.Z);
 //    }
 
 
@@ -3922,7 +3922,7 @@
 
 //        for (int intIdx = 0; intIdx <= 3; intIdx++)
 //        {
-//            double dblDI = Distance2D(ptfPoint, ptfRec[intIdx]);
+//            double dblDI = CalcDistance2D(ptfPoint, ptfRec[intIdx]);
 
 //            if (dblDI > dblFurthestDI)
 //                dblFurthestDI = dblDI;
@@ -3940,7 +3940,7 @@
 
 //        for (int intIdx = 0; intIdx <= 3; intIdx++)
 //        {
-//            double dblDI = Distance2D(ptdPoint, ptdRec[intIdx]);
+//            double dblDI = CalcDistance2D(ptdPoint, ptdRec[intIdx]);
 
 //            if (dblDI > dblFurthestDI)
 //                dblFurthestDI = dblDI;
@@ -3958,7 +3958,7 @@
 
 //        for (int intIdx = 0; intIdx <= 3; intIdx++)
 //        {
-//            double dblDI = Distance2D(ptdPoint, ptdRec[intIdx]);
+//            double dblDI = CalcDistance2D(ptdPoint, ptdRec[intIdx]);
 
 //            if (dblDI > dblFurthestDI)
 //                dblFurthestDI = dblDI;
@@ -4006,8 +4006,8 @@
 
 //    public static PointF PointFurthestToLine(PointF point, PointF p1, PointF p2, out double di)
 //    {
-//        double di1 = Distance2D(point, p1);
-//        double di2 = Distance2D(point, p2);
+//        double di1 = CalcDistance2D(point, p1);
+//        double di2 = CalcDistance2D(point, p2);
 
 //        if (di1 > di2)
 //        {
@@ -4114,7 +4114,7 @@
 //        ptfDelta = Delta2D(ptfP1, ptfP2);
 
 //        if (ptfDelta.X == 0 & ptfDelta.Y == 0)
-//            return mDL2DLib.Distance2D(ptfPoint, ptfP1);
+//            return mDL2DLib.CalcDistance2D(ptfPoint, ptfP1);
 
 //        // Calculate the t that minimizes the Distance.
 //        t = ((ptfPoint.X - ptfP1.X) * ptfDelta.X + (ptfPoint.Y - ptfP1.Y) * ptfDelta.Y) / (double)(ptfDelta.X * ptfDelta.X + ptfDelta.Y * ptfDelta.Y);
@@ -4143,7 +4143,7 @@
 //            ptfDelta.Y = ptfPoint.Y - ptfClosest.Y;
 //        }
 
-//        return mDL2DLib.Distance2D(ptfPoint, ptfClosest);
+//        return mDL2DLib.CalcDistance2D(ptfPoint, ptfClosest);
 //    }
 //    // Performance: Avoids Sqrt.
 //    public static double PointDistanceSquaredToLine2D(PointF point, PointF p1, PointF p2)
@@ -4264,7 +4264,7 @@
 //    public static double PointDistanceToLine2D_AndT(Point2D point, Point2D p1, Point2D p2, out double t)
 //    {
 //        Point2D closest = ClosestPointOnLine2D_AndT(point, p1, p2, ref t);
-//        return mDL2DLib.Distance2D(point, closest);
+//        return mDL2DLib.CalcDistance2D(point, closest);
 //    }
 
 //    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
@@ -4566,7 +4566,7 @@
 //    // ptdDelta = Delta2D(ptdP1, ptdP2)
 
 //    // If ptdDelta.X = 0 And ptdDelta.Y = 0 Then _
-//    // Return m2DLib.Distance2D(ptdPoint, ptdP1)
+//    // Return m2DLib.CalcDistance2D(ptdPoint, ptdP1)
 
 //    // ' Calculate the t that minimizes the Distance.
 //    // t = ((ptdPoint.X - ptdP1.X) * ptdDelta.X + (ptdPoint.Y - ptdP1.Y) * ptdDelta.Y) / (ptdDelta.X * ptdDelta.X + ptdDelta.Y * _
@@ -4591,7 +4591,7 @@
 //    // ptdDelta.Y = ptdPoint.Y - ptdClosest.Y
 //    // End If
 
-//    // Return m2DLib.Distance2D(ptdPoint, ptdClosest)
+//    // Return m2DLib.CalcDistance2D(ptdPoint, ptdClosest)
 //    // End Function
 
 //    public static double PointDistanceToLine2D(double dblPointX, double dblPointY, double dblP1X, double dblP1Y, double dblP2X, double dblP2Y)
@@ -4603,7 +4603,7 @@
 //        ptdDelta = Delta2D(dblP1X, dblP1Y, dblP2X, dblP2Y);
 
 //        if (ptdDelta.X == 0 & ptdDelta.Y == 0)
-//            return mDL2DLib.Distance2D(dblPointX, dblPointY, dblP1X, dblP1Y);
+//            return mDL2DLib.CalcDistance2D(dblPointX, dblPointY, dblP1X, dblP1Y);
 
 //        // Calculate the t that minimizes the Distance.
 //        t = ((dblPointX - dblP1X) * ptdDelta.X + (dblPointY - dblP1Y) * ptdDelta.Y) / (ptdDelta.X * ptdDelta.X + ptdDelta.Y * ptdDelta.Y);
@@ -4626,7 +4626,7 @@
 //            ptdClosest.Y = dblP1Y + t * ptdDelta.Y;
 //        }
 
-//        return mDL2DLib.Distance2D(dblPointX, dblPointY, ptdClosest.X, ptdClosest.Y);
+//        return mDL2DLib.CalcDistance2D(dblPointX, dblPointY, ptdClosest.X, ptdClosest.Y);
 //    }
 
 //    public static double PointDistanceToLine2D(Point3D ptdPoint, Point3D ptdP1, Point3D ptdP2)
@@ -4638,7 +4638,7 @@
 //        ptdDelta = Delta2D(ptdP1, ptdP2);
 
 //        if (ptdDelta.X == 0 & ptdDelta.Y == 0)
-//            return mDL2DLib.Distance2D(ptdPoint, ptdP1);
+//            return mDL2DLib.CalcDistance2D(ptdPoint, ptdP1);
 
 //        // Calculate the t that minimizes the Distance.
 //        t = ((ptdPoint.X - ptdP1.X) * ptdDelta.X + (ptdPoint.Y - ptdP1.Y) * ptdDelta.Y) / (double)(ptdDelta.X * ptdDelta.X + ptdDelta.Y * ptdDelta.Y);
@@ -4667,7 +4667,7 @@
 //            ptdDelta.Y = ptdPoint.Y - ptdClosest.Y;
 //        }
 
-//        return mDL2DLib.Distance2D(ptdPoint, ptdClosest);
+//        return mDL2DLib.CalcDistance2D(ptdPoint, ptdClosest);
 //    }
 
 
@@ -4774,7 +4774,7 @@
 //        while (endILeg < LastIndex(pts))
 //        {
 //            // Move along the segment.
-//            double legDistance = Distance2D(pts[endILeg], pts[endILeg + 1]);
+//            double legDistance = CalcDistance2D(pts[endILeg], pts[endILeg + 1]);
 //            // The current point is this distance along the start leg.
 //            // ("endT" will be 0, except on start leg.)
 //            double tDistance = endT * legDistance;
@@ -4837,7 +4837,7 @@
 //        Point2D closestPtOnSequence = ClosestPointOnPointSequence(startLocation, lopPts, out startILeg, out startT);
 
 //        Point2D guessPt = closestPtOnSequence;
-//        double guessDistance = Distance2D(startLocation, guessPt);
+//        double guessDistance = CalcDistance2D(startLocation, guessPt);
 
 //        // If we are > landingDistance from LOP, then the best answer is to hit straight towards LOP.
 //        // NOTE: This won't happen in golf, because we would be way out of bounds,
@@ -4854,7 +4854,7 @@
 //        while (endILeg <= LastIndex(lopPts))
 //        {
 //            longPt = lopPts[endILeg];
-//            longDistance = Distance2D(startLocation, longPt);
+//            longDistance = CalcDistance2D(startLocation, longPt);
 //            // This leg has a point at desired distance.
 //            if (longDistance >= landingDistance)
 //                break;
@@ -4869,11 +4869,11 @@
 
 //        // There is some point along this leg that is at landingDistance.
 //        Point2D shortPt = lopPts[endILeg - 1];
-//        double shortDistance = Distance2D(startLocation, shortPt);
+//        double shortDistance = CalcDistance2D(startLocation, shortPt);
 
 //        double t;
 //        Point2D closestPtOnLeg = ClosestPointOnLine2D_AndT(startLocation, shortPt, longPt, ref t);
-//        double closestPtOnLegDistance = Distance2D(startLocation, closestPtOnLeg);
+//        double closestPtOnLegDistance = CalcDistance2D(startLocation, closestPtOnLeg);
 //        if (closestPtOnLegDistance < landingDistance)
 //        {
 //            // The usual case: closest point on leg falls short.
@@ -4897,7 +4897,7 @@
 //        // Point along the leg.
 //        // CAUTION: Not exact, because distance calculation from startPoint isn't a linear function along the segment.
 //        guessPt = Lerp(shortPt, longPt, wgt);
-//        guessDistance = Distance2D(startLocation, guessPt);
+//        guessDistance = CalcDistance2D(startLocation, guessPt);
 
 //        // Iterate to get more accurate answer.
 //        int nMore = 5;
@@ -4923,7 +4923,7 @@
 //            nMore -= 1;
 //            wgt = WgtFromResult(shortDistance, longDistance, landingDistance);
 //            guessPt = Lerp(shortPt, longPt, wgt);
-//            guessDistance = Distance2D(startLocation, guessPt);
+//            guessDistance = CalcDistance2D(startLocation, guessPt);
 //        }
 
 //        return guessPt;
@@ -5396,7 +5396,7 @@
 
 //    public static Point2D ExtendLine2D(Point2D ptdP1, Point2D ptdP2, double dblDistance)
 //    {
-//        double dblTotalDistance = mDL2DLib.Distance2D(ptdP1, ptdP2) + dblDistance;
+//        double dblTotalDistance = mDL2DLib.CalcDistance2D(ptdP1, ptdP2) + dblDistance;
 //        double dblDAngle = GetAngleDegrees2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
 
 //        return new Point2D(ptdP1.X + dblTotalDistance * Math.Cos((dblDAngle / 180) * Math.PI), ptdP1.Y + dblTotalDistance * Math.Sin((dblDAngle / 180) * Math.PI));
@@ -5404,7 +5404,7 @@
 
 //    public static PointF ExtendLine2D(PointF ptfP1, PointF ptfP2, float sngDistance)
 //    {
-//        double dblTotalDistance = mDL2DLib.Distance2D(ptfP1, ptfP2) + sngDistance;
+//        double dblTotalDistance = mDL2DLib.CalcDistance2D(ptfP1, ptfP2) + sngDistance;
 //        double dblDAngle = GetAngleDegrees2D(ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
 
 //        return new PointF(System.Convert.ToSingle(ptfP1.X + dblTotalDistance * Math.Cos((dblDAngle / 180) * Math.PI)), System.Convert.ToSingle(ptfP1.Y + dblTotalDistance * Math.Sin((dblDAngle / 180) * Math.PI)));
@@ -5738,7 +5738,7 @@
 //            if (ptdPolygon[intIdx].Y < dblMaxY)
 //                dblMaxY = ptdPolygon[intIdx].Y;
 
-//            double dblDistance = Distance2D(ptdOrigo, ptdPolygon[intIdx]);
+//            double dblDistance = CalcDistance2D(ptdOrigo, ptdPolygon[intIdx]);
 
 //            if (dblDistance > dblFurthest)
 //                dblFurthest = dblDistance;
@@ -5792,7 +5792,7 @@
 
 //            for (int intIdx = 0; intIdx <= ptdHits.Length - 1; intIdx++)
 //            {
-//                double dblDistance = Distance2D(ptdOrigo, ptdHits[intIdx]);
+//                double dblDistance = CalcDistance2D(ptdOrigo, ptdHits[intIdx]);
 
 //                if (double.IsInfinity(dblClosestDI) || dblDistance < dblClosestDI)
 //                {
@@ -6287,13 +6287,13 @@
 //        {
 //            Point2D p1 = pts[i];
 //            Point2D p2 = pts[i + 1];
-//            double segmentLength = Distance2D(p1, p2);
+//            double segmentLength = CalcDistance2D(p1, p2);
 //            result += segmentLength;
 //        }
 
 //        if (autoClose)
 //        {
-//            double segmentLength = Distance2D(LastElement(pts), FirstElement(pts));
+//            double segmentLength = CalcDistance2D(LastElement(pts), FirstElement(pts));
 //            result += segmentLength;
 //        }
 
@@ -6608,16 +6608,16 @@
 //            // Backup Code with New lineIntersect..
 //            // For i As Integer = 1 To ptdPolyPts1.Length - 1
 //            // If m2DLib.LinesIntersects2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i)) Then
-//            // If m2DLib.Distance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i))) > tmpDistance Then
-//            // tmpDistance = m2DLib.Distance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i)))
+//            // If m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i))) > tmpDistance Then
+//            // tmpDistance = m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i)))
 //            // tmpP2 = m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i))
 //            // End If
 //            // End If
 //            // Next
 //            // For j As Integer = 1 To ptdPolyPts2.Length - 1
 //            // If m2DLib.LinesIntersects2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)) Then
-//            // If m2DLib.Distance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j))) > tmpDistance Then
-//            // tmpDistance = m2DLib.Distance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)))
+//            // If m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j))) > tmpDistance Then
+//            // tmpDistance = m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)))
 //            // tmpP2 = m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)) 
 //            // End If
 //            // End If
@@ -6628,9 +6628,9 @@
 //            {
 //                if (mDL2DLib.IS_OldLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]))
 //                {
-//                    if (mDL2DLib.Distance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i])) > tmpDistance)
+//                    if (mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i])) > tmpDistance)
 //                    {
-//                        tmpDistance = mDL2DLib.Distance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]));
+//                        tmpDistance = mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]));
 //                        tmpP2 = mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]);
 //                    }
 //                }
@@ -6641,9 +6641,9 @@
 //            {
 //                if (mDL2DLib.IS_OldLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]) == true)
 //                {
-//                    if (mDL2DLib.Distance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j])) > tmpDistance)
+//                    if (mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j])) > tmpDistance)
 //                    {
-//                        tmpDistance = mDL2DLib.Distance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]));
+//                        tmpDistance = mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]));
 //                        tmpP2 = mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]);
 //                    }
 //                }
@@ -8558,7 +8558,7 @@
 
 //    public static bool CirclesIntersects2D(Point2D ptdP1, Point2D ptdP2, double dblR1, double dblR2)
 //    {
-//        double dblDI = Distance2D(ptdP1, ptdP2);
+//        double dblDI = CalcDistance2D(ptdP1, ptdP2);
 
 //        if (dblDI > dblR1 + dblR2)
 //            return false;
@@ -8568,7 +8568,7 @@
 
 //    public static Point2D[] CirclesIntersectsAt2D(Point2D ptdP1, Point2D ptdP2, double dblR1, double dblR2)
 //    {
-//        double dblDI = Distance2D(ptdP1, ptdP2);
+//        double dblDI = CalcDistance2D(ptdP1, ptdP2);
 
 //        if (dblDI > dblR1 + dblR2)
 //            return null;
@@ -8989,7 +8989,7 @@
 //        for (int i = 0; i <= LastIndex(pts); i++)
 //            mDL2DLib.AccumMinMax(pts[i], ref minPt, ref maxPt);
 
-//        double shapeSize = Distance2D(minPt, maxPt);
+//        double shapeSize = CalcDistance2D(minPt, maxPt);
 //        // Don't have scale above 1 - only affect tolerance when coordinates are tiny.
 //        double unitScale = Math.Min(1.0, shapeSize);
 
@@ -9147,7 +9147,7 @@
 //            {
 //                Point2D pt0 = outPts[iPt - 1];
 //                Point2D pt1 = outPts[iPt];
-//                outDistances.Add(System.Convert.ToSingle(Distance2D(pt0, pt1)));
+//                outDistances.Add(System.Convert.ToSingle(CalcDistance2D(pt0, pt1)));
 //            }
 
 //            for (int iAngle = 0; iAngle <= nWrap - 1; iAngle++)

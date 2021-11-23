@@ -1334,8 +1334,8 @@ namespace Global
         //            // y params => xWgt2 ("x" is not a typo).
         //            closestPointOnLine_AndT(xy, X0Yguess, X1Yguess, out double xWgt2, true);
 
-        //            // double Xguess_error = Distance2D(xy, Xguess_closest)
-        //            // double Yguess_error = Distance2D(xy, Yguess_closest)
+        //            // double Xguess_error = CalcDistance2D(xy, Xguess_closest)
+        //            // double Yguess_error = CalcDistance2D(xy, Yguess_closest)
 
         //            // Improved guess.
         //            return new Point2D(xWgt2, yWgt2);
@@ -1649,7 +1649,7 @@ namespace Global
         //            IGeoContext context;
         //            Point3D mayaStartLocation = context.FromWGS84(geoStartLocation);
         //            Point3D mayaEndLocation = context.FromWGS84(geoEndLocation);
-        //            double endDistance = Point3D.Distance2D(mayaStartLocation, mayaEndLocation);
+        //            double endDistance = Point3D.CalcDistance2D(mayaStartLocation, mayaEndLocation);
 
         //            // Can reach endLocation, without exceeding maxDistance (ignoring altitude change).
         //            if (endDistance <= maxDistance)

@@ -201,7 +201,7 @@
 //        //        // The corners passed in represent a rectangle that is y-flipped, then rotated.
 //        //        yFlip2 = true;
 
-//        //    Size2D size = new Size2D(Distance2D(TL, TR), Distance2D(TL, BL));
+//        //    Size2D size = new Size2D(CalcDistance2D(TL, TR), CalcDistance2D(TL, BL));
 
 //        //    if (yFlip2)
 //        //    {

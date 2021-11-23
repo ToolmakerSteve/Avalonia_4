@@ -29,7 +29,7 @@ namespace Global
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <returns></returns>
-        public static Distance Distance2D(Point3D p1, Point3D p2, bool yIsAltitude = false)
+        public static Distance CalcDistance2D(Point3D p1, Point3D p2, bool yIsAltitude = false)
         {
             if (yIsAltitude)
                 return (p2.XZ() - p1.XZ()).Length;
@@ -307,11 +307,11 @@ namespace Global
         /// <param name="pt1"></param>
         /// <param name="pt2"></param>
         /// <returns></returns>
-        public static Point3D operator *(Point3D pt1, Unitless3D pt2)
+        public static Point3D operator *(Point3D pt1, double3 pt2)
         {
             return new Point3D(pt1.X * pt2.X, pt1.Y * pt2.Y, pt1.Z * pt2.Z);
         }
-        public static Point3D operator *(Unitless3D pt1, Point3D pt2)
+        public static Point3D operator *(double3 pt1, Point3D pt2)
         {
             return new Point3D(pt1.X * pt2.X, pt1.Y * pt2.Y, pt1.Z * pt2.Z);
         }
@@ -345,7 +345,7 @@ namespace Global
 
 
 
-        public static Point3D operator /(Point3D ptd1, Unitless3D ptd2)
+        public static Point3D operator /(Point3D ptd1, double3 ptd2)
         {
             return new Point3D(ptd1.X / ptd2.X, ptd1.Y / ptd2.Y, ptd1.Z / ptd2.Z);
         }
@@ -375,9 +375,9 @@ namespace Global
         /// <param name="numerator"></param>
         /// <param name="p2"></param>
         /// <returns></returns>
-        public static Unitless3D operator /(Distance numerator, Point3D p2)
+        public static double3 operator /(Distance numerator, Point3D p2)
         {
-            return new Unitless3D(numerator / p2.X, numerator / p2.Y, numerator / p2.Z);
+            return new double3(numerator / p2.X, numerator / p2.Y, numerator / p2.Z);
         }
 
 
