@@ -14,6 +14,7 @@ namespace Global
 {
     /// <summary>
     /// Miscellaneous functions.
+    /// TODO: Change function names to PascalCase (capitalize first letter).
     /// </summary>
     public static partial class Utils
     {
@@ -29,7 +30,7 @@ namespace Global
         public delegate Point2D ThreeD_P2DDelegate(Point3D xyz);
 
 
-        #region "-- debug functions --"
+        #region --- debug functions ----------------------------------------
         // (aka "NoOp"): Indicates deliberate absence of action.
         public static void DoNothing()
         {
@@ -626,24 +627,6 @@ namespace Global
         public const double EpsilonForOne = NearZeroX10;    // Small relative to 1.0. For double, could use even smaller value.
         public const float EpsilonForOneF = (float)NearZeroX10;   // Small relative to 1.0
 
-        /// <summary> CAUTION: Uses an absolute tolerance, not a scaled error term,
-        ///     ''' so be careful, when values might be large, that tolerance is large enough
-        ///     ''' to be distinguishable when added to one of the values. (More of an issue for Single than for Double.)
-        ///     ''' </summary>
-        public static bool NearlyEquals(this double number, double target, double tolerance)
-        {
-            return (Math.Abs(number - target) <= tolerance);
-        }
-        /// <summary> CAUTION: Uses an absolute (unscaled) tolerance, not a scaled toleranceFraction,
-        ///     ''' so be careful, when values might be large, that tolerance is large enough
-        ///     ''' to be distinguishable within a float value.
-        ///     ''' E.g. "tolerance=NearZero" is only good when values are in range (-1, 1);
-        ///     ''' larger values should use larger tolerance.
-        ///     ''' </summary>
-        public static bool NearlyEquals(this float number, float target, float tolerance)
-        {
-            return (Math.Abs(number - target) <= tolerance);
-        }
         // scaled tolerance wouldn't make sense for Integer, so this is an absolute (unscaled) tolerance.
         public static bool NearlyEquals_Integer(this int number, int target, int tolerance)
         {
@@ -671,37 +654,8 @@ namespace Global
         // A reasonable "toleranceFraction" is ScaledToleranceDouble. Larger if multiple operations may accumulate error.
         public static bool NearlyEquals_ScaledTolerance(this Point2D p1, Point2D p2, double toleranceFraction)
         {
-            return (p1.X.NearlyEquals_ScaledTolerance(p2.X, toleranceFraction) && p1.Y.NearlyEquals(p2.Y, toleranceFraction));
-        }
-
-        // Single math can easily exceed NearZero error, and after several steps might exceed NearZeroX10,
-        // so using VerySmall as a (lenient) toleranceFraction.
-        public static bool NearlyEquals(this float number, float target)
-        {
-            return number.NearlyEquals(target, VerySmallF);
-        }
-        public static bool NearlyEquals(this double number, double target)
-        {
-            return number.NearlyEquals(target, EpsilonForOne);
-        }
-        public static bool NearlyEquals(this Point2D p1, Point2D p2)
-        {
-            return (p1.X.NearlyEquals(p2.X) && p1.Y.NearlyEquals(p2.Y));
-        }
-        public static bool NearlyEquals(this Point2D p1, Point2D p2, double tolerance)
-        {
-            return (p1.X.NearlyEquals(p2.X, tolerance) && p1.Y.NearlyEquals(p2.Y, tolerance));
-        }
-        public static bool NearlyEquals(this PointF p1, PointF p2, float tolerance)
-        {
-            return (p1.X.NearlyEquals(p2.X, tolerance) && p1.Y.NearlyEquals(p2.Y, tolerance));
-        }
-        // TBD: If make this a compiler extension AND name it "NearlyEquals",
-        // then Poly2Tri.TriangulationPoint gets compiler error, because it can't resolve Vector3,
-        // to determine which "NearlyEquals" is most applicable.
-        public static bool NearlyEquals3(this Vector3 p1, Vector3 p2, float tolerance = (float)NearZeroX10)
-        {
-            return (p1.X.NearlyEquals(p2.X, tolerance) && p1.Y.NearlyEquals(p2.Y, tolerance) && p1.Z.NearlyEquals(p2.Z, tolerance));
+            return (p1.X.Value.NearlyEquals_ScaledTolerance(p2.X.Value, toleranceFraction) &&
+                    p1.Y.NearlyEquals(p2.Y, toleranceFraction));
         }
 
         // If within tolerance, is considered equal.
@@ -1032,14 +986,21 @@ namespace Global
             var dy = y2 - y1;
             return (dx * dx) + (dy * dy);
         }
+        // PERFORMANCE: Quicker than Distance, because does not need SQRT.
+        public static Distance.Squared DistanceSquared2D(Distance x1, Distance y1, Distance x2, Distance y2)
+        {
+            var dx = x2 - x1;
+            var dy = y2 - y1;
+            return (dx * dx) + (dy * dy);
+        }
         public static double Distance2D(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt(DistanceSquared2D(x1, y1, x2, y2));
         }
 
-        public static double Distance2D(Point2D p1, Point2D p2)
+        public static Distance Distance2D(Point2D p1, Point2D p2)
             {
-                return Math.Sqrt(DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y));
+                return DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y).Sqrt();
             }
 
         public static double Distance2D(Point3D p1, Point3D p2)
@@ -1105,6 +1066,12 @@ namespace Global
         {
             // Equivalent.
             return (a + b) / 0.5;
+            //return Lerp(a, b, 0.5);
+        }
+        public static Distance Average(Distance a, Distance b)
+        {
+            // Equivalent.
+            return Distance.FromDefaultUnits(a.Value + b.Value) / 0.5;
             //return Lerp(a, b, 0.5);
         }
         public static Vector3 Average(Vector3 a, Vector3 b)
@@ -1901,6 +1868,11 @@ namespace Global
             return ((a + b + c) / 3);
         }
 
+        public static Distance Average3(Distance a, Distance b, Distance c)
+        {
+            return Distance.FromDefaultUnits(Average3(a.Value, b.Value, c.Value));
+        }
+
 
         public const double Pi = 3.1415926535897931;  // NOTE: Double precision rounds final "2" to "1"
         public const double PiOver2 = Pi / 2;
@@ -1941,7 +1913,7 @@ namespace Global
                 return result;
             }
 
-            public PolarPoint(Point2D pt) : this(pt.X, pt.Y)
+            public PolarPoint(Point2D pt) : this(pt.X.Value, pt.Y.Value)
             {
             }
 
@@ -1981,7 +1953,8 @@ namespace Global
 
             public Point2D AsPoint2D()
             {
-                Point2D pt = new Point2D(Length * Math.Cos(Angle), Length * Math.Sin(Angle));
+                // TODO: How will GeoContext deal with units?
+                Point2D pt = new Point2D(Length * Math.Cos(Angle), Length * Math.Sin(Angle), null);
                 return pt;
             }
         }

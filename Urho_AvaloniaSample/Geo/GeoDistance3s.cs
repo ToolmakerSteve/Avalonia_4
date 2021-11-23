@@ -117,7 +117,7 @@ namespace Geo
         #region --- public methods ----------------------------------------
         public Point3D ToOurContext(GeoPoint3D value)
         {
-            Point3D finalValue = (Point3D)value.IValue;
+            Point3D finalValue = (Point3D)value.Pt;
             if (value.Context != Context)
             {   // Convert to our Context.
                 throw new NotImplementedException("Point3D.ToOurContext with different Context.");

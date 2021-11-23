@@ -54,24 +54,31 @@ namespace Global
         }
 
         // Preserves negative extents:  if minY > maxY, will have negative height.
+        // TODO: Units.
         public static Rectangle2D FromMinMax(Point2D minP, Point2D maxP)
         {
-            return FromMinMax(minP.X, minP.Y, maxP.X, maxP.Y);
+            return FromMinMax(minP.X.Value, minP.Y.Value, maxP.X.Value, maxP.Y.Value);
         }
 
         // If "preserveNegativeExtents = True", then corner1 => TopLeft, corner2 => BottomRight; Width and Height allowed to be negative.
+        // TODO: Units.
         public static Rectangle2D FromOppositeCorners(Point2D corner1, Point2D corner2, bool preserveNegativeExtents = false)
         {
             if (preserveNegativeExtents)
                 // corner1 => TopLeft, corner2 => BottomRight; Width and Height allowed to be negative.
                 // Equivalent to calling FromMinMax(corner1.X, corner1.Y, corner2.X, corner2.Y).
-                return new Rectangle2D(corner1, new Size2D(corner2.X - corner1.X, corner2.Y - corner1.Y));
+                return new Rectangle2D(corner1,
+                            new Size2D(corner2.X.Value - corner1.X.Value, corner2.Y.Value - corner1.Y.Value));
             else
-                return FromMinMax(Math.Min(corner1.X, corner2.X), Math.Min(corner1.Y, corner2.Y), Math.Max(corner1.X, corner2.X), Math.Max(corner1.Y, corner2.Y));
+                return FromMinMax(Math.Min(corner1.X.Value, corner2.X.Value),
+                                  Math.Min(corner1.Y.Value, corner2.Y.Value),
+                                  Math.Max(corner1.X.Value, corner2.X.Value),
+                                  Math.Max(corner1.Y.Value, corner2.Y.Value));
         }
 
         // rectPoints is 4-point-polygon (4 corners, clockwise or zig-zag).
         // Preserves flip in x or y (width/height may be negative).
+        // TODO: Units.
         public static Rectangle2D FromRectAsPoints_AssumeNoRotation_PreserveFlip(Point2D[] rectPoints)
         {
             // TopLeft, TopRight.
@@ -79,12 +86,12 @@ namespace Global
             Point2D TR = rectPoints[1];
 
             // ASSUME No Rotation.
-            double left = TL.X;
-            double right = TR.X;
-            double top = TL.Y;
+            double left = TL.X.Value;
+            double right = TR.X.Value;
+            double top = TL.Y.Value;
             // when not rotated, same Y on both (2) and (3), so can use either -
             // regardless of whether clockwise or zigzag indices.
-            double bottom = rectPoints[2].Y;
+            double bottom = rectPoints[2].Y.Value;
             // Preserves flip in x or y (width/height may be negative).
             return new Rectangle2D(left, top, right - left, bottom - top);
         }

@@ -31,8 +31,8 @@ namespace SceneSource
         /// </summary>
         public List<Vector2> Points { get; private set; }
 
-        private float WidthMetersF => (float)Width.AsMeters;
-        private float HeightMetersF => (float)Height.AsMeters;
+        private float WidthMetersF => (float)Width.Value;
+        private float HeightMetersF => (float)Height.Value;
 
 
         public GroundLine() : this(Meters.Zero, Meters.Zero, NoGeoContext.It)
@@ -83,7 +83,7 @@ namespace SceneSource
 
             var pt = geoPt.Pt;
             // Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Point2D.
-            AddPoint(new Vector2((float)pt.X, (float)pt.Y));
+            AddPoint(new Vector2((float)pt.X.Value, (float)pt.Y.Value));
         }
 
         public StaticModel AsModelIn(Scene scene, Terrain terrain)
