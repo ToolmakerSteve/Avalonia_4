@@ -32,10 +32,22 @@ namespace Global
         }
         #endregion
 
-
-        public double AsMeters => Value;
+        static public Meters FromDistance(Distance dist) { return new Meters(dist.Meters); }
+        public double InMeters => Value;
         public Distance ToDistance => Distance.FromMeters(Value);
         public double AsDefaultUnits => Distance.ConvertUnits(Value, Distance.UnitsType.Meters, Distance.DefaultUnits);
+
+        #region === Implicit Conversion ===============================================
+        static public implicit operator Distance(Meters meters)
+        {
+            return meters.ToDistance;
+        }
+        static public implicit operator Meters(Distance dist)
+        {
+            return FromDistance(dist);
+        }
+        #endregion === Implicit Conversion ===============================================
+
     }
 
 }

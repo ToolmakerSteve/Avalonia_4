@@ -33,7 +33,6 @@ namespace Global
             _defaultUnitsPerMeter = DefaultUnits.UnitsPerMeter;
         }
 
-
         static public void SetDefaultUnit(UnitsType units)
         {
             if (s_initialized)
@@ -51,10 +50,9 @@ namespace Global
 
 
         static private bool s_initialized = false;
-        // TMS: I don't like maintaining an incrementing counter, given that its only a minor debugging aid. Personal preference.
-        //static private long s_NumInstancesConstructed = 0;
         static private bool s_InstancesHaveBeenConstructed = false;
-        #endregion
+
+        #endregion "-- static --"
 
 
 
@@ -85,10 +83,12 @@ namespace Global
         {
             return ConvertUnits(Value, Units, dstUnits);
         }
+        /// <summary>This is same as 'ToUnits' but will eliminate the chance of getting odd-looking results, such as "yards = 39.0000000001", or 38.99999999.
+        /// It rounds to the nearest 7 decimal places, which should handle nearly all double-conversion rounding errors.</summary>
         public double ToUnitsRounded(UnitsType dstUnits)
         {
             double convertedValue = ConvertUnits(Value, Units, dstUnits);
-            return Math.Round(convertedValue, 9);
+            return Math.Round(convertedValue, 7);
         }
 
         public void SetFrom(Distance d)

@@ -53,9 +53,8 @@ namespace Global
 
             static public UnitsType __RegisterType(int index, string typeName, string typeAbbrev, double metersPerUnit)
             {
-                // NO, its only an error to set "DefaultUnits" when "s_InstancesHaveBeenConstructed".
-                //if (s_InstancesHaveBeenConstructed)
-                //    throw new InvalidOperationException("Distance.UnitType.__RegisterType() - called AFTER Distances have been constructed: " + s_NumInstancesConstructed);
+                // NOTE - it is OK for this to be called after Distance Instances have been created (since everything is converted at construction to the Default Units.
+                //   This allows add-on libraries to define New UnitsTypes after the base libraries may have already created instances of pre-exsiting UnitsTypes.
 
                 UnitsType unitsType = new UnitsType(index, typeName, typeAbbrev, metersPerUnit);
 
