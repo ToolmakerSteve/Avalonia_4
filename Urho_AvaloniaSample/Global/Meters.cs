@@ -16,7 +16,7 @@ namespace Global
         static private Distance.UnitsType s_Units = Distance.UnitsType.Meters;
 
 
-        #region "-- data, new --"
+        #region --- data, new ----------------------------------------
         public double Value;
         public Distance.UnitsType Units => s_Units;
 

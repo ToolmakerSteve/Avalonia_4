@@ -13,7 +13,7 @@ namespace Global
         /// </summary>
         public struct Squared
         {
-            #region "--- static methods ---"
+            #region --- static methods -----------------------------------------
             public static Squared FromDefaultUnitsSquared(double value)
             {
                 return new Squared(value);
@@ -21,13 +21,13 @@ namespace Global
             #endregion
 
 
-            #region "--- data ---"
+            #region --- data -----------------------------------------
             /// <summary>Has Units "Distance.DefaultUnit SQUARED"</summary>
             public double Value;
             #endregion
 
 
-            #region "--- new ---"
+            #region --- new -----------------------------------------
             /// <summary>
             /// private: Instead call static "FromDefaultUnitsSquared".
             /// </summary>
@@ -39,7 +39,7 @@ namespace Global
             #endregion
 
 
-            #region "--- operators ---"
+            #region --- operators -----------------------------------------
             static public Squared operator +(Squared a, Squared b)
             {
                 return FromDefaultUnitsSquared(a.Value + b.Value);
@@ -79,7 +79,7 @@ namespace Global
             #endregion
 
 
-            #region "--- public methods ---"
+            #region --- public methods -----------------------------------------
             public Distance Sqrt()
             {
                 return Distance.FromDefaultUnits(Math.Sqrt(Value));

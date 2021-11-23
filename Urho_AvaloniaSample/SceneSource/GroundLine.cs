@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using Geo;
 using Global;
@@ -19,7 +20,7 @@ namespace SceneSource
         const float DrawOffsetAboveTerrain = 0.1f;
 
 
-        #region "-- data, new --"
+        #region --- data, new ----------------------------------------
         public Meters Width { get; set; }
         public Meters Height { get; set; }
         public Meters BaseAltitude { get; set; }
@@ -29,6 +30,9 @@ namespace SceneSource
         /// Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Point2D.
         /// </summary>
         public List<Vector2> Points { get; private set; }
+
+        private float WidthMetersF => (float)Width.AsMeters;
+        private float HeightMetersF => (float)Height.AsMeters;
 
 
         public GroundLine() : this(Meters.Zero, Meters.Zero, NoGeoContext.It)
@@ -62,7 +66,7 @@ namespace SceneSource
         #endregion
 
 
-        #region "-- public methods --"
+        #region --- public methods ----------------------------------------
         /// <summary>
         /// ASSUMES in same Context.
         /// </summary>
@@ -109,50 +113,78 @@ namespace SceneSource
             bool firstPoint = true;
             bool firstPerpendicular = true;
             // Initial values not used; avoid uninitialized warning.
-            Vector3 pt0 = new Vector3();
-            Vector3 pt1 = new Vector3();
-            Vector3 perp1 = new Vector3();
-            foreach (var srcPt in Points)
+            // These are on wall's center line.
+            Vector3 cl0 = new Vector3();
+            Vector3 cl1 = new Vector3();
+            Vector2 perp0 = new Vector2();
+            Vector2 perp1 = new Vector2();
+            foreach (Vector2 srcPt in Points)
             {
-                Vector3 pt2CenterLine = U.PlaceOnTerrain(terrain, srcPt);
+                // On wall's center line.
+                Vector3 cl2 = U.PlaceOnTerrain(terrain, srcPt);
                 if (firstPoint)
                 {
-                    pt1 = pt2CenterLine;
+                    cl1 = cl2;
                     // TODO: Can't calc normal yet.
                     firstPoint = false;
                 }
                 else
                 {
-                    // Make quad between pt0 and pt1.
+                    // Make quad between cl0 and cl1.
                     if (firstPerpendicular)
                     {
-                        // We had no way to compute perpendicular at first pt0; now we can.
+                        // We had no way to compute perpendicular at pt0; now we can.
                         // TODO: Perpendicular endpoints need to also land on terrain!
                         firstPerpendicular = false;
+                        perp0 = CalcPerpendicularXZ(cl0, cl1);
                     }
+
+                    // GUESS that a good perpendicular at cl1 is tangent to the neighboring points.
+                    // TBD: Adjust for relative distances to those points?
+                    perp1 = CalcPerpendicularXZ(cl0, cl2);
+
+                    AddQuad(poly, cl0, cl1, perp0, perp1, terrain);
                 }
 
-                pt0 = pt1;
-                pt1 = pt2CenterLine;
+                cl0 = cl1;
+                cl1 = cl2;
+                perp0 = perp1;
             }
+        }
+
+        private void AddQuad(Poly3D poly, Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain)
+        {
+            U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, HeightMetersF, terrain);
+            U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, HeightMetersF, terrain);
+            AddQuad(poly, wallPair0, wallPair1);
+        }
+
+        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1)
+        {
+            Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
+            //throw new NotImplementedException();
         }
         #endregion
 
 
-        #region "-- private methods --"
+        #region --- private methods ----------------------------------------
         /// <summary>
         /// Returns a unit vector, perpendicular to pa--pb, and lying in ground plane.
         /// </summary>
         /// <param name="pa"></param>
         /// <param name="pb"></param>
         /// <returns></returns>
-        //private Vector2 CalcPerpendicular2D(Vector3 pa, Vector3 pb)
-        //{
-        //    // CAUTION: Altitude is in Y.
-        //    Vector2 pa2 = pa.XZ();
-        //    Vector2 pb2 = pb.XZ();
+        private Vector2 CalcPerpendicularXZ(Vector3 pa, Vector3 pb)
+        {
+            // CAUTION: Altitude is in Y.
+            Vector2 pa2 = pa.XZ();
+            Vector2 pb2 = pb.XZ();
 
-        //}
+            Vector2 delta = pb2 - pa2;
+            Vector2 perpendicularUnit = U.RotateByDegrees(delta, 90);
+            perpendicularUnit.Normalize();
+            return perpendicularUnit;
+        }
 
 
         /// <summary>
@@ -160,17 +192,18 @@ namespace SceneSource
         /// <param name="wallCenter"></param>
         /// <param name="wallWidth"></param>
         /// <param name="perpendicularUnit">REQUIRE LENGTH=1</param>
+        /// <param name="wallHeight">Distance above terrain</param>
         /// <param name="terrain"></param>
-        /// <returns>Two points on terrain, perpendicular to wall center, "wallWidth" apart.</returns>
+        /// <returns>Two points above terrain, perpendicular to wall center, "wallWidth" apart.</returns>
         private U.Pair<Vector3> WallPerpendicularOnTerrain(
-                    Vector3 wallCenter, float wallWidth, Vector2 perpendicularUnit, Terrain terrain)
+                    Vector3 wallCenter, float wallWidth, Vector2 perpendicularUnit, float wallHeight, Terrain terrain)
         {
             float halfWidth = wallWidth / 2.0f;
             Vector3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
             Vector3 first = wallCenter - halfPerp;
             Vector3 second = wallCenter + halfPerp;
-            first.Y = terrain.GetHeight(first);
-            second.Y = terrain.GetHeight(second);
+            first.Y = terrain.GetHeight(first) + wallHeight;
+            second.Y = terrain.GetHeight(second) + wallHeight;
 
             return new U.Pair<Vector3>(first, second);
         }

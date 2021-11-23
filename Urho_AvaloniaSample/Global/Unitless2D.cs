@@ -10,13 +10,13 @@ namespace Global
     /// </summary>
     public struct Unitless2D
     {
-        #region "-- data --"
+        #region --- data ----------------------------------------
         public double X;
         public double Y;
         #endregion
 
 
-        #region "-- new --"
+        #region --- new ----------------------------------------
         public Unitless2D(double x, double y)
         {
             X = x;

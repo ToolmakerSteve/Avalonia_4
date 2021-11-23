@@ -44,7 +44,7 @@ namespace AvaloniaSample
         }
 
 
-        #region "-- Setup, Start --"
+        #region --- Setup, Start ----------------------------------------
         protected override void Setup()
         {
             base.Setup();
@@ -95,7 +95,7 @@ namespace AvaloniaSample
         }
         #endregion
 
-        #region "-- OnUpdate --"
+        #region --- OnUpdate ----------------------------------------
         uint _startTime = 0;
         bool WallDrawStarted;   // TMS
         Vector2 LastWallPosition2D;
@@ -204,7 +204,7 @@ namespace AvaloniaSample
         #endregion
 
 
-        #region "-- scene specifics --"
+        #region --- scene specifics ----------------------------------------
         void CreateMushroomScene(Scene scene)
         {
             // Create the Octree component to the scene. This is required before adding any drawable components, or else nothing will
@@ -430,7 +430,7 @@ namespace AvaloniaSample
         #endregion
 
 
-        #region "-- First camera and viewport --"
+        #region --- First camera and viewport ----------------------------------------
         /// <summary>
         /// When two viewports, sets CameraWorldBaseNode.
         /// </summary>
@@ -526,7 +526,7 @@ namespace AvaloniaSample
         #endregion
 
 
-        #region "-- Two viewports (and two cameras) --"
+        #region --- Two viewports (and two cameras) ----------------------------------------
         void SetupSecondCamera()
         {
             if (false)
@@ -601,7 +601,7 @@ namespace AvaloniaSample
         #endregion
 
 
-        #region "-- local Helpers --"
+        #region --- local Helpers ----------------------------------------
         /// <summary>
         /// Convert pixels to Avalonia Device-Independent Units.
         /// </summary>
@@ -614,7 +614,7 @@ namespace AvaloniaSample
         #endregion
 
 
-        #region "-- Graphic Helpers (move to a static class) --"
+        #region --- Graphic Helpers (move to a static class) ----------------------------------------
         public static IntRect RectBySize(int xLeft, int yTop, int width, int height)
         {
             return new IntRect(xLeft, yTop, xLeft + width, yTop + height);

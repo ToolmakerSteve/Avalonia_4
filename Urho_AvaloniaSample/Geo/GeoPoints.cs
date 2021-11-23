@@ -11,13 +11,13 @@ namespace Geo
     public class GeoPoints<TGeo, TPoint> : IList<TGeo>
             where TGeo : IGeoPoint, new() where TPoint : IPoint, new()
     {
-        #region "-- data --"
+        #region --- data ----------------------------------------
         IGeoContext Context;
         public readonly List<TPoint> Values = new List<TPoint>();
         #endregion
 
 
-        #region "-- new --"
+        #region --- new ----------------------------------------
         public GeoPoints(IGeoContext context)
         {
             Context = context;
@@ -25,7 +25,7 @@ namespace Geo
         #endregion
 
 
-        #region "-- IEnumerable<TGeo> --"
+        #region --- IEnumerable<TGeo> ----------------------------------------
         public IEnumerator<TGeo> GetEnumerator()
         {
             foreach (var value in Values)
@@ -41,7 +41,7 @@ namespace Geo
         #endregion
 
 
-        #region "-- IList<TGeo> --"
+        #region --- IList<TGeo> ----------------------------------------
         public TGeo this[int index]
         {
             get => new TGeo() { IValue = Values[index], Context = Context };
@@ -115,7 +115,7 @@ namespace Geo
         #endregion
 
 
-        #region "-- public methods --"
+        #region --- public methods ----------------------------------------
         public TPoint ToOurContext(TGeo value)
         {
             TPoint finalValue = (TPoint)value.IValue;

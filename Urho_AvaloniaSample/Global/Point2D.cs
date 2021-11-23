@@ -7,7 +7,7 @@ using static Global.Utils;
 
 namespace Global
 {
-    public struct Point2D : IPoint, IEquatable<Point2D>
+    public struct Point2D : IEquatable<Point2D>
     {
         public static Point2D[] OneElementArray(Point2D point)
         {
@@ -32,7 +32,7 @@ namespace Global
         }
 
 
-        #region "-- data --"
+        #region --- data ----------------------------------------
         public Distance X { get; set; }
         public Distance Y { get; set; }
 
@@ -40,7 +40,7 @@ namespace Global
         #endregion
 
 
-        #region "-- new --"
+        #region --- new ----------------------------------------
         public Point2D(Distance x, Distance y)
         {
             X = x;

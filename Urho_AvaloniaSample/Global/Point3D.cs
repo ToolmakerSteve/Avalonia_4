@@ -6,9 +6,9 @@ using static Global.Utils;
 
 namespace Global
 {
-    public struct Point3D : IPoint, IEquatable<Point3D>
+    public struct Point3D : IEquatable<Point3D>
     {
-        #region "-- static --"
+        #region --- static ----------------------------------------
         // E.g. Maya ground plane in XZ, plus altitude above ground.
         public static Point3D FromXZ(Point2D xz, Distance altitude)
         {
@@ -39,7 +39,7 @@ namespace Global
         #endregion
 
 
-        #region "-- data --"
+        #region --- data ----------------------------------------
         public Distance X { get; set; }
         public Distance Y { get; set; }
         public Distance Z { get; set; }
@@ -48,7 +48,7 @@ namespace Global
         #endregion
 
 
-        #region "-- new --"
+        #region --- new ----------------------------------------
         public Point3D(Distance x, Distance y, Distance z)
         {
             X = x;

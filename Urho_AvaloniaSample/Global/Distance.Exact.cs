@@ -8,7 +8,7 @@ namespace Global
     {
         public struct Exact
         {
-            #region "-- data, new --"
+            #region --- data, new ----------------------------------------
             public double Value;
             private int _unitTypeIndex;
             public UnitsType Units { get { return UnitsType.__GetByIndex(_unitTypeIndex); } }

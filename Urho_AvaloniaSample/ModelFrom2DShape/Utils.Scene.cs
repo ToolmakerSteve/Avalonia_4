@@ -24,7 +24,7 @@ namespace Global
         }
 
 
-        #region "-- terrain in XZ plane --"
+        #region --- terrain in XZ plane ----------------------------------------
         /// <summary>
         /// 
         /// </summary>

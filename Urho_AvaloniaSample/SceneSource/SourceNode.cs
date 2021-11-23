@@ -8,7 +8,7 @@ namespace SceneSource
     /// </summary>
     public class SourceNode : SourceItem
     {
-        #region "-- data, new --"
+        #region --- data, new ----------------------------------------
         public override bool CanHaveChildren => true;
 
         public override bool HasChildren => Children.Count > 0;
@@ -22,7 +22,7 @@ namespace SceneSource
         #endregion
 
 
-        #region "-- public methods --"
+        #region --- public methods ----------------------------------------
         public void Add(SourceItem child)
         {
             Children.Add(child);

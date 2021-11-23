@@ -12,7 +12,7 @@ namespace SceneSource
     /// </summary>
     public class SourceItem : ISourceItem
     {
-        #region "-- data, new --"
+        #region --- data, new ----------------------------------------
         public virtual bool CanHaveChildren => false;
 
         public virtual bool HasChildren => false;
@@ -26,7 +26,7 @@ namespace SceneSource
         #endregion
 
 
-        #region "-- public methods --"
+        #region --- public methods ----------------------------------------
         /// <summary>
         /// Returns self.
         /// </summary>
