@@ -8,7 +8,7 @@ namespace Global
     /// "unitless" multipliers that may be different in the three axes.
     /// See usage in Point2D.
     /// </summary>
-    public struct Unitless2D
+    public struct double2
     {
         #region --- data ----------------------------------------
         public double X;
@@ -17,7 +17,7 @@ namespace Global
 
 
         #region --- new ----------------------------------------
-        public Unitless2D(double x, double y)
+        public double2(double x, double y)
         {
             X = x;
             Y = y;
@@ -30,7 +30,7 @@ namespace Global
         /// Be careful to only use where valid to do so.
         /// </summary>
         /// <param name="pt"></param>
-        public Unitless2D(Point2D pt)
+        public double2(Point2D pt)
         {
             X = pt.X.Value;
             Y = pt.Y.Value;

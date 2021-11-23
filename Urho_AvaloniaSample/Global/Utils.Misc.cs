@@ -1238,7 +1238,7 @@ namespace Global
 
 
         // Interpolate, with separate weights in X and Y.
-        public static Point2D LerpXY(Point2D a, Point2D b, Unitless2D wgtB)
+        public static Point2D LerpXY(Point2D a, Point2D b, double2 wgtB)
         {
             return new Point2D(Lerp(a.X, b.X, wgtB.X), Lerp(a.Y, b.Y, wgtB.Y));
         }
@@ -1254,7 +1254,7 @@ namespace Global
         // The result is GPS coord corresponding to xyWgt.
         // E.g. given (0.5, 0.5), the result will be the GPS coord at center of image.
         // NOTE: corners are ZIGZAG (not clockwise).
-        public static Point2D Lerp2D(Unitless2D xyWgt, Point2D X0Y0, Point2D X1Y0, Point2D X0Y1, Point2D X1Y1)
+        public static Point2D Lerp2D(double2 xyWgt, Point2D X0Y0, Point2D X1Y0, Point2D X0Y1, Point2D X1Y1)
         {
             Point2D xY0 = Lerp(X0Y0, X1Y0, xyWgt.X);
             Point2D xY1 = Lerp(X0Y1, X1Y1, xyWgt.X);
@@ -1286,7 +1286,7 @@ namespace Global
         // and the ZAtXnYn values are altitudes at the 4 corners of the image,
         // The result is altitude corresponding to xyWgt.
         // E.g. given (0.5, 0.5), the result will be the altitude at center of image.
-        public static double Lerp2D(Unitless2D xyWgt, double ZAtX0Y0, double ZAtX1Y0, double ZAtX0Y1, double ZAtX1Y1)
+        public static double Lerp2D(double2 xyWgt, double ZAtX0Y0, double ZAtX1Y0, double ZAtX0Y1, double ZAtX1Y1)
         {
             double zAt_xY0 = Lerp(ZAtX0Y0, ZAtX1Y0, xyWgt.X);
             double zAt_xY1 = Lerp(ZAtX0Y1, ZAtX1Y1, xyWgt.X);

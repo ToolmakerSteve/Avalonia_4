@@ -94,7 +94,7 @@ namespace Global
 
         public void ResizeProportionalByWidth(double dblWidth)
         {
-            Unitless2D ptdFactor = new Unitless2D(this.Width / this.Height, this.Height / this.Width);
+            double2 ptdFactor = new double2(this.Width / this.Height, this.Height / this.Width);
 
             this.Width = dblWidth;
             this.Height = dblWidth * ptdFactor.Y;
@@ -102,7 +102,7 @@ namespace Global
 
         public void ResizeProportionalByHeight(double dblHeight)
         {
-            Unitless2D ptdFactor = new Unitless2D(this.Width / this.Height, this.Height / this.Width);
+            double2 ptdFactor = new double2(this.Width / this.Height, this.Height / this.Width);
 
             this.Width = dblHeight * ptdFactor.X;
             this.Height = dblHeight;

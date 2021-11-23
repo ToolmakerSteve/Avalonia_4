@@ -393,11 +393,11 @@ namespace Global
         /// <param name="ptd1"></param>
         /// <param name="ptd2"></param>
         /// <returns></returns>
-        public static Point2D operator *(Point2D ptd1, Unitless2D ptd2)
+        public static Point2D operator *(Point2D ptd1, double2 ptd2)
         {
             return new Point2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
         }
-        public static Point2D operator *(Unitless2D ptd1, Point2D ptd2)
+        public static Point2D operator *(double2 ptd1, Point2D ptd2)
         {
             return new Point2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
         }
@@ -424,7 +424,7 @@ namespace Global
         }
 
 
-        public static Point2D operator /(Point2D p1, Unitless2D p2)
+        public static Point2D operator /(Point2D p1, double2 p2)
         {
             return new Point2D(p1.X / p2.X, p1.Y / p2.Y);
         }
@@ -451,9 +451,9 @@ namespace Global
         /// <param name="dbl1"></param>
         /// <param name="p2"></param>
         /// <returns></returns>
-        public static Unitless2D operator /(Distance dbl1, Point2D p2)
+        public static double2 operator /(Distance dbl1, Point2D p2)
         {
-            return new Unitless2D(dbl1 / p2.X, dbl1 / p2.Y);
+            return new double2(dbl1 / p2.X, dbl1 / p2.Y);
         }
 
 
