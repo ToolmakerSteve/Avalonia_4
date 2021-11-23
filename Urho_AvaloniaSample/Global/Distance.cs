@@ -57,6 +57,7 @@ namespace Global
         #endregion
 
 
+
         #region "--- Instance Members ---"
 
         /// <summary>The value of this distance, in terms of 'Units'.</summary>
@@ -101,6 +102,7 @@ namespace Global
         }
 
         #endregion "--- Instance Members ---"
+
 
         #region === Static Conversion/Create Methods ===============================================
 
