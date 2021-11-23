@@ -76,8 +76,8 @@ namespace Global
             return "Dist = " + Value + " (" + Units.Abbreviation + ")";
         }
 
-        public Meters ToMeters => new Meters(Meters);
-        public double Meters => (_metersPerDefaultUnit * Value);
+        public Meters ToMeters => new Meters(InMeters);
+        public double InMeters => (_metersPerDefaultUnit * Value);
 
         public double ToUnits(UnitsType dstUnits)
         {

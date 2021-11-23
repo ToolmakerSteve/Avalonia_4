@@ -32,7 +32,7 @@ namespace Global
         }
         #endregion
 
-        static public Meters FromDistance(Distance dist) { return new Meters(dist.Meters); }
+        static public Meters FromDistance(Distance dist) { return new Meters(dist.InMeters); }
         public double InMeters => Value;
         public Distance ToDistance => Distance.FromMeters(Value);
         public double AsDefaultUnits => Distance.ConvertUnits(Value, Distance.UnitsType.Meters, Distance.DefaultUnits);
