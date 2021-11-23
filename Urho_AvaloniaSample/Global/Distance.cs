@@ -7,6 +7,11 @@ namespace Global
     /// <summary>
     /// A physical distance that includes units.
     /// E.g. "Value=3, Units=Yards" means "3 Yards".
+    /// IMPORTANT: All "Distance" instances are now in "DefaultUnits".
+    /// Incoming values in OTHER units are CONVERTED to "DefaultUnits".
+    /// REASON: MEMORY: Allows them to be a struct with a single field (instead of having a Units field on every instance).
+    /// If you need to retain an EXACT value (or remember what units they were in), use type "Distance.Exact" -
+    /// this has a settable "Units" property.
     /// </summary>
     public partial struct Distance
     {
@@ -20,12 +25,15 @@ namespace Global
 
         static public readonly Distance Zero = new Distance();
 
+        // static constructor.
         static Distance()
         {
             DefaultUnits = UnitsType.Meters;
             _metersPerDefaultUnit = DefaultUnits.MetersPerUnit;
             _defaultUnitsPerMeter = DefaultUnits.UnitsPerMeter;
         }
+
+
         static public void SetDefaultUnit(UnitsType units)
         {
             if (s_initialized)
@@ -36,13 +44,16 @@ namespace Global
 			{
                 DefaultUnits = units;
 
-                if (s_NumInstancesConstructed != 0)
-                    throw new InvalidProgramException("SetDefaultUnit called after Distance instances have already been created!  Call this first: " + s_NumInstancesConstructed);
+                if (s_InstancesHaveBeenConstructed)
+                    throw new InvalidProgramException("SetDefaultUnit called after Distance instances have already been created!  Call this first.");
             }
         }
-        static private bool s_initialized = false;
-        static private long s_NumInstancesConstructed = 0;
 
+
+        static private bool s_initialized = false;
+        // TMS: I don't like maintaining an incrementing counter, given that its only a minor debugging aid. Personal preference.
+        //static private long s_NumInstancesConstructed = 0;
+        static private bool s_InstancesHaveBeenConstructed = false;
         #endregion
 
 
@@ -58,7 +69,8 @@ namespace Global
         private Distance(double value)
         {
             Value = value;
-            s_NumInstancesConstructed++;
+            //s_NumInstancesConstructed++;
+            s_InstancesHaveBeenConstructed = true;
         }
         public override string ToString()
         {

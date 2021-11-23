@@ -48,13 +48,14 @@ namespace Global
                         index = unitsType.TypeIndex;
                     }
                 }
-                return __RegisterType(__InstanceCount, typeName, typeAbbrev, metersPerUnit);
+                return __RegisterType(index, typeName, typeAbbrev, metersPerUnit);
             }
 
             static public UnitsType __RegisterType(int index, string typeName, string typeAbbrev, double metersPerUnit)
             {
-                if (s_NumInstancesConstructed != 0)
-                    throw new InvalidOperationException("Distance.UnitType.__RegisterType() - called AFTER Distances have been constructed: " + s_NumInstancesConstructed);
+                // NO, its only an error to set "DefaultUnits" when "s_InstancesHaveBeenConstructed".
+                //if (s_InstancesHaveBeenConstructed)
+                //    throw new InvalidOperationException("Distance.UnitType.__RegisterType() - called AFTER Distances have been constructed: " + s_NumInstancesConstructed);
 
                 UnitsType unitsType = new UnitsType(index, typeName, typeAbbrev, metersPerUnit);
 
