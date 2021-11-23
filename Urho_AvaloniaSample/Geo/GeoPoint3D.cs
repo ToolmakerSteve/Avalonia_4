@@ -19,9 +19,9 @@ namespace Geo
 
         public Type ValueType => typeof(Point3D);
 
-        public double X { get => Pt.X; }
-        public double Y { get => Pt.Y; }
-        public double Z { get => Pt.Z; }
+        public Distance X { get => Pt.X; }
+        public Distance Y { get => Pt.Y; }
+        public Distance Z { get => Pt.Z; }
 
 
         public GeoPoint3D(Point3D pt, IGeoContext context)
@@ -32,7 +32,8 @@ namespace Geo
 
         public GeoPoint3D(double x, double y, double z, IGeoContext context)
         {
-            Pt = new Point3D(x, y, z);
+            // TODO: How will GeoContext deal with units?
+            Pt = new Point3D(x, y, z, null);
             Context = context;
         }
 

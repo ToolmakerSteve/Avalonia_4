@@ -13,8 +13,8 @@ namespace Geo
 
         public IPoint IValue { get; set; }
 
-        public double X { get; }
-        public double Y { get; }
+        public Distance X { get; }
+        public Distance Y { get; }
 
     }
 }

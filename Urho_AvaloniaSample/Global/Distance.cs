@@ -15,7 +15,8 @@ namespace Global
     /// </summary>
     public partial struct Distance
     {
-        #region "-- static --"
+        #region --- static -------------------------------------
+
         static public UnitsType DefaultUnits { get; private set; }
 
         // These two values are set for efficiency, assuming that Meters is our preferred/optimized unit (most common).
@@ -24,13 +25,18 @@ namespace Global
         static private double _defaultUnitsPerMeter;
 
         static public readonly Distance Zero = new Distance();
+        static public Distance OneDefaultUnit { get; private set; }
+
 
         // static constructor.
         static Distance()
         {
-            DefaultUnits = UnitsType.Meters;
-            _metersPerDefaultUnit = DefaultUnits.MetersPerUnit;
-            _defaultUnitsPerMeter = DefaultUnits.UnitsPerMeter;
+            //DefaultUnits = UnitsType.Meters;
+            //_metersPerDefaultUnit = DefaultUnits.MetersPerUnit;
+            //_defaultUnitsPerMeter = DefaultUnits.UnitsPerMeter;
+            //OneDefaultUnit = Distance.FromDefaultUnits(1);
+
+            _SetDefaultUnit(UnitsType.Meters);
         }
 
         static public void SetDefaultUnit(UnitsType units)
@@ -40,22 +46,40 @@ namespace Global
             s_initialized = true;
 
             if (DefaultUnits != units)
-			{
-                DefaultUnits = units;
+            {
+                _SetDefaultUnit(units);
 
                 if (s_InstancesHaveBeenConstructed)
                     throw new InvalidProgramException("SetDefaultUnit called after Distance instances have already been created!  Call this first.");
             }
         }
 
+        static private void _SetDefaultUnit(UnitsType units)
+        {
+            DefaultUnits = units;
+            _metersPerDefaultUnit = units.MetersPerUnit;
+            _defaultUnitsPerMeter = units.UnitsPerMeter;
+            OneDefaultUnit = FromDefaultUnits(1);
+        }
 
         static private bool s_initialized = false;
         static private bool s_InstancesHaveBeenConstructed = false;
 
-        #endregion "-- static --"
+
+        static public Distance Min(Distance a, Distance b)
+        {
+            return Distance.FromDefaultUnits(Math.Min(a.Value, b.Value));
+        }
+
+        static public Distance Max(Distance a, Distance b)
+        {
+            return Distance.FromDefaultUnits(Math.Max(a.Value, b.Value));
+        }
+
+        #endregion --- static -------------------------------------
 
 
-        #region "--- Instance Members ---"
+        #region --- Instance Members -------------------------------------
 
         /// <summary>The value of this distance, in terms of 'Units'.</summary>
         public double Value;
@@ -64,16 +88,19 @@ namespace Global
         /// <remarks>Note, these Units always match Distance.DefaultUnits, set by "SetDefaultUnit()" at App Startup.</remarks>
         public UnitsType Units => DefaultUnits;
 
+
         private Distance(double value)
         {
             Value = value;
             //s_NumInstancesConstructed++;
             s_InstancesHaveBeenConstructed = true;
         }
+
         public override string ToString()
         {
             return "Dist = " + Value + " (" + Units.Abbreviation + ")";
         }
+
 
         public Meters ToMeters => new Meters(InMeters);
         public double InMeters => (_metersPerDefaultUnit * Value);
@@ -100,7 +127,12 @@ namespace Global
             Value = _defaultUnitsPerMeter * meters;
         }
 
-        #endregion "--- Instance Members ---"
+        public Distance Abs()
+        {
+            return FromDefaultUnits(Math.Abs(Value));
+        }
+
+        #endregion --- Instance Members -------------------------------------
 
 
         #region === Static Conversion/Create Methods ===============================================
@@ -131,7 +163,18 @@ namespace Global
         #endregion === Static Conversion/Create Methods ===============================================
 
 
-        #region "-- static operators --"
+        #region --- static operators -------------------------------------
+
+        static public bool operator ==(Distance a, Distance b)
+        {
+            return a.Value == b.Value;
+        }
+
+        static public bool operator !=(Distance a, Distance b)
+        {
+            return a.Value != b.Value;
+        }
+
         static public Distance operator +(Distance a, Distance b)
         {
             return FromDefaultUnits(a.Value + b.Value);
@@ -188,6 +231,6 @@ namespace Global
             return (a.Value / b.Value);
         }
 
-        #endregion
+        #endregion --- static operators -------------------------------------
     }
 }

@@ -19,8 +19,8 @@ namespace Geo
 
         public Type ValueType => typeof(Point2D);
 
-        public double X { get => Pt.X; }
-        public double Y { get => Pt.Y; }
+        public Distance X { get => Pt.X; }
+        public Distance Y { get => Pt.Y; }
 
         public GeoPoint2D(Point2D pt, IGeoContext context)
         {
@@ -30,7 +30,8 @@ namespace Geo
 
         public GeoPoint2D(double x, double y, IGeoContext context)
         {
-            Pt = new Point2D(x, y);
+            // TODO: How will GeoContext deal with units?
+            Pt = new Point2D(x, y, null);
             Context = context;
         }
 

@@ -25,10 +25,14 @@ namespace Global
             this.Height = szfSize.Height;
         }
 
+        /// <summary>
+        /// Implicitly has units Distance.DefaultUnits.
+        /// </summary>
+        /// <param name="point"></param>
         public Size2D(Point2D point)
         {
-            this.Width = point.X;
-            this.Height = point.Y;
+            this.Width = point.X.Value;
+            this.Height = point.Y.Value;
         }
 
         public Size2D(double dblWidth, double dblHeight)
@@ -40,8 +44,8 @@ namespace Global
         // Size of rotated rectangle. Top-Left, Top-Right, Bottom-Left corners.
         public Size2D(Point2D cornerTL, Point2D cornerTR, Point2D cornerBL)
         {
-            this.Width = Point2D.Distance(cornerTL, cornerTR);
-            this.Height = Point2D.Distance(cornerTL, cornerBL);
+            this.Width = Point2D.DistanceBetween(cornerTL, cornerTR).Value;
+            this.Height = Point2D.DistanceBetween(cornerTL, cornerBL).Value;
         }
 
         //// Size of rotated rectangle. "corners" hold 4 corners of rectangle.

@@ -10,7 +10,7 @@ namespace Global
     {
         #region "-- static --"
         // E.g. Maya ground plane in XZ, plus altitude above ground.
-        public static Point3D FromXZ(Point2D xz, double altitude)
+        public static Point3D FromXZ(Point2D xz, Distance altitude)
         {
             // NOTE: "xz.Y" is actually "Z".
             return new Point3D(xz.X, altitude, xz.Y);
@@ -29,7 +29,7 @@ namespace Global
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <returns></returns>
-        public static double Distance2D(Point3D p1, Point3D p2, bool yIsAltitude = false)
+        public static Distance Distance2D(Point3D p1, Point3D p2, bool yIsAltitude = false)
         {
             if (yIsAltitude)
                 return (p2.XZ() - p1.XZ()).Length;
@@ -40,52 +40,95 @@ namespace Global
 
 
         #region "-- data --"
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
+        public Distance X { get; set; }
+        public Distance Y { get; set; }
+        public Distance Z { get; set; }
 
         public Type ValueType => typeof(Point3D);
         #endregion
 
 
         #region "-- new --"
-        public Point3D(double x = 0, double y = 0, double z = 0)
+        public Point3D(Distance x, Distance y, Distance z)
         {
             X = x;
             Y = y;
             Z = z;
         }
 
+        public Point3D(double x, double y, double z, Distance.UnitsType units)
+        {
+            if (units == null)
+            {
+                X = Global.Distance.FromDefaultUnits(x);
+                Y = Global.Distance.FromDefaultUnits(y);
+                Z = Global.Distance.FromDefaultUnits(z);
+            }
+            else
+            {
+                X = Global.Distance.FromSpecifiedUnits(x, units);
+                Y = Global.Distance.FromSpecifiedUnits(y, units);
+                Z = Global.Distance.FromSpecifiedUnits(z, units);
+            }
+        }
+
+        public Point3D(Distance x, Distance y)
+        {
+            X = x;
+            Y = y;
+            Z = Distance.Zero;
+        }
+
+        public Point3D(double x, double y, Distance.UnitsType units)
+        {
+            if (units == null)
+            {
+                X = Global.Distance.FromDefaultUnits(x);
+                Y = Global.Distance.FromDefaultUnits(y);
+                Z = Distance.Zero;
+            }
+            else
+            {
+                X = Global.Distance.FromSpecifiedUnits(x, units);
+                Y = Global.Distance.FromSpecifiedUnits(y, units);
+                Z = Global.Distance.FromSpecifiedUnits(0, units);
+            }
+        }
+
         public Point3D(Point2D pt) : this(pt.X, pt.Y) { }
 
-        public Point3D(Point2D pt, double z) : this(pt.X, pt.Y, z) { }
+        public Point3D(Point2D pt, Distance z) : this(pt.X, pt.Y, z) { }
 
-        public Point3D(PointF pt) : this(pt.X, pt.Y) { }
+        public Point3D(PointF pt, Distance.UnitsType units) : this(pt.X, pt.Y, units) { }
 
-        public Point3D(Vector3 pt) : this(pt.X, pt.Y, pt.Z) { }
+        public Point3D(Vector3 pt, Distance.UnitsType units) : this(pt.X, pt.Y, pt.Z, units) { }
 
-        public Point3D(double value) : this(value, value, value) { }
+        public Point3D(double value, Distance.UnitsType units) : this(value, value, value, units) { }
         #endregion
 
 
         public bool IsValid => Point2D.CoordIsValid(X) && Point2D.CoordIsValid(Y) && Point2D.CoordIsValid(Z);
 
 
-        public bool IsNaN => (double.IsNaN(X) || double.IsNaN(Y) || double.IsNaN(Z));
+        public bool IsNaN => (double.IsNaN(X.Value) || double.IsNaN(Y.Value) || double.IsNaN(Z.Value));
 
-        public bool IsZero => (X == 0) && (Y == 0) && (Z == 0);
+        public bool IsZero => (X.Value == 0) && (Y.Value == 0) && (Z.Value == 0);
 
-        // Quicker than "Length" - avoids Sqrt.
-        public double LengthSquared => (X * X + Y * Y + Z * Z);
+        /// <summary>
+        /// Quicker than "Length" - avoids Sqrt.
+        /// HACK CAUTION: Result is in units "Distance.DefaultUnits SQUARED".
+        /// It is no longer a DISTANCE.
+        /// </summary>
+        public double LengthSquared => (X.Value * X.Value + Y.Value * Y.Value + Z.Value * Z.Value);
 
-        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
+        public Distance Length => Distance.FromDefaultUnits(Math.Sqrt(X.Value * X.Value + Y.Value * Y.Value + Z.Value * Z.Value));
 
         // Return point with units length (or zero, if Me is zero).
         public Point3D Normalize
         {
             get
             {
-                double len = this.Length;
+                double len = this.Length.Value;
                 return len == 0 ? this : this / len;
             }
         }
@@ -110,18 +153,23 @@ namespace Global
 
         public bool Equals(Point3D other)
         {
-            return (X == other.X) && (Y == other.Y) && (Z == other.Z);
+            return (X.Value == other.X.Value) && (Y.Value == other.Y.Value) && (Z.Value == other.Z.Value);
         }
 
-
+        /// <summary>
+        /// </summary>
+        /// <returns>Implicitly has units Distance.DefaultUnits.</returns>
         public Vector3 ToVector3()
         {
-            return new Vector3(Convert.ToSingle(X), Convert.ToSingle(Y), Convert.ToSingle(Z));
+            return new Vector3(Convert.ToSingle(X.Value), Convert.ToSingle(Y.Value), Convert.ToSingle(Z.Value));
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>Implicitly has units Distance.DefaultUnits.</returns>
         public PointF ToPointF()
         {
-            return new PointF(Convert.ToSingle(X), Convert.ToSingle(Y));
+            return new PointF(Convert.ToSingle(X.Value), Convert.ToSingle(Y.Value));
         }
 
         /// <summary>
@@ -139,22 +187,25 @@ namespace Global
             return new Point2D(X, Z);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>Implicitly has units Distance.DefaultUnits.</returns>
         public Point ToPoint()
         {
-            return new Point(X.RoundInt(), Y.RoundInt());
+            return new Point(X.Value.RoundInt(), Y.Value.RoundInt());
         }
 
 
         public override string ToString()
         {
-            return "{" + Utils.Round4or6(X) + ", " + Utils.Round4or6(Y) + ", " + Utils.Round3(Z) + "}";
+            return "{" + Utils.Round4or6(X.Value) + ", " + Utils.Round4or6(Y.Value) + ", " + Utils.Round3(Z.Value) + "}";
         }
 
         public string ToShortString
         {
             get
             {
-                return "{" + ShortString(this.X) + ", " + ShortString(this.Y) + ", " + ShortString(this.Z) + "}";
+                return "{" + ShortString(X.Value) + ", " + ShortString(Y.Value) + ", " + ShortString(Z.Value) + "}";
             }
         }
 
@@ -167,23 +218,31 @@ namespace Global
         // Public Shared Operator <>(ByVal left As PointD, ByVal right As PointD) As PointD
         // End Operator
 
-        public void Add(Point3D ptdPoint)
+        public void Add(Point3D pt2)
         {
-            this.X += ptdPoint.X;
-            this.Y += ptdPoint.Y;
-            this.Z += ptdPoint.Z;
+            this.X += pt2.X;
+            this.Y += pt2.Y;
+            this.Z += pt2.Z;
         }
 
-        public void Add(Point2D ptdPoint)
+        public void Add(Point2D pt)
         {
-            this.X += ptdPoint.X;
-            this.Y += ptdPoint.Y;
+            this.X += pt.X;
+            this.Y += pt.Y;
         }
 
-        public void Add(PointF ptfPoint)
+        public void Add(PointF pt, Distance.UnitsType units)
         {
-            this.X += ptfPoint.X;
-            this.Y += ptfPoint.Y;
+            if (units == null)
+            {
+                X = Distance.FromDefaultUnits(X.Value + pt.X);
+                Y = Distance.FromDefaultUnits(Y.Value + pt.Y);
+            }
+            else
+            {
+                X = X + Distance.FromSpecifiedUnits(pt.X, units);
+                Y = Y + Distance.FromSpecifiedUnits(pt.Y, units);
+            }
         }
 
         public static bool operator ==(Point3D ptd1, Point3D ptd2)
@@ -202,34 +261,21 @@ namespace Global
             return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z + ptd2.Z);
         }
 
-        public static Point3D operator +(Point3D ptd1, Vector3 ptd2)
-        {
-            return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z + ptd2.Z);
-        }
+        //// TODO: Not valid without a third parameter to specify Units.
+        //public static Point3D operator +(Point3D ptd1, Vector3 ptd2)
+        //{
+        //    return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z + ptd2.Z);
+        //}
 
-        public static Point3D operator +(Vector3 ptd1, Point3D ptd2)
-        {
-            return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z + ptd2.Z);
-        }
+        //// TODO: Not valid without a third parameter to specify Units.
+        //public static Point3D operator +(Vector3 ptd1, Point3D ptd2)
+        //{
+        //    return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z + ptd2.Z);
+        //}
 
         public static Point3D operator +(Point3D ptd1, Point2D ptd2)
         {
             return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z);
-        }
-
-        public static Point3D operator +(Point3D ptd1, int int2)
-        {
-            return new Point3D(ptd1.X + int2, ptd1.Y + int2, ptd1.Z + int2);
-        }
-
-        public static Point3D operator +(Point3D ptd1, float sng2)
-        {
-            return new Point3D(ptd1.X + sng2, ptd1.Y + sng2, ptd1.Z + sng2);
-        }
-
-        public static Point3D operator +(Point3D ptd1, double dbl2)
-        {
-            return new Point3D(ptd1.X + dbl2, ptd1.Y + dbl2, ptd1.Z + dbl2);
         }
 
         // Negate
@@ -244,57 +290,44 @@ namespace Global
             return new Point3D(ptd1.X - ptd2.X, ptd1.Y - ptd2.Y, ptd1.Z - ptd2.Z);
         }
 
-        public static Point3D operator -(Point3D ptd1, Vector3 ptd2)
-        {
-            return new Point3D(ptd1.X - ptd2.X, ptd1.Y - ptd2.Y, ptd1.Z - ptd2.Z);
-        }
-
-        public static Point3D operator -(Vector3 ptd1, Point3D ptd2)
-        {
-            return new Point3D(ptd1.X - ptd2.X, ptd1.Y - ptd2.Y, ptd1.Z - ptd2.Z);
-        }
+        //// TBD: Not valid without a third parameter to specify Units.
+        //public static Point3D operator -(Point3D ptd1, Vector3 ptd2)
+        //{
+        //    return new Point3D(ptd1.X - ptd2.X, ptd1.Y - ptd2.Y, ptd1.Z - ptd2.Z);
+        //}
 
         public static Point3D operator -(Point3D ptd1, Point2D ptd2)
         {
             return new Point3D(ptd1.X - ptd2.X, ptd1.Y - ptd2.Y, ptd1.Z);
         }
 
-        public static Point3D operator -(Point3D ptd1, int int2)
+
+        /// <summary>
+        /// Scale the axes by independent "unitless" multipliers.
+        /// CAUTION: This is NOT the "dot product" of two vectors; see "DotProduct".
+        /// </summary>
+        /// <param name="pt1"></param>
+        /// <param name="pt2"></param>
+        /// <returns></returns>
+        public static Point3D operator *(Point3D pt1, Unitless3D pt2)
         {
-            return new Point3D(ptd1.X - int2, ptd1.Y - int2, ptd1.Z - int2);
+            return new Point3D(pt1.X * pt2.X, pt1.Y * pt2.Y, pt1.Z * pt2.Z);
         }
-
-        public static Point3D operator -(Point3D ptd1, float sng2)
-        {
-            return new Point3D(ptd1.X - sng2, ptd1.Y - sng2, ptd1.Z - sng2);
-        }
-
-        public static Point3D operator -(Point3D ptd1, double dbl2)
-        {
-            return new Point3D(ptd1.X - dbl2, ptd1.Y - dbl2, ptd1.Z - dbl2);
-        }
-
-
-        // CAUTION: This is NOT the "dot product" of the two vectors; see "DotProduct".
-        public static Point3D operator *(Point3D pt1, Point3D pt2)
+        public static Point3D operator *(Unitless3D pt1, Point3D pt2)
         {
             return new Point3D(pt1.X * pt2.X, pt1.Y * pt2.Y, pt1.Z * pt2.Z);
         }
 
-        public static Point3D operator *(Point3D pt1, Point2D pt2)
-        {
-            return new Point3D(pt1.X * pt2.X, pt1.Y * pt2.Y, pt1.Z);
-        }
+        // -- commented out; I think its okay to automatically promote to the "double" version. --
+        //public static Point3D operator *(Point3D pt, int n)
+        //{
+        //    return new Point3D(pt.X * n, pt.Y * n, pt.Z * n);
+        //}
 
-        public static Point3D operator *(Point3D pt, int n)
-        {
-            return new Point3D(pt.X * n, pt.Y * n, pt.Z * n);
-        }
-
-        public static Point3D operator *(Point3D pt, float n)
-        {
-            return new Point3D(pt.X * n, pt.Y * n, pt.Z * n);
-        }
+        //public static Point3D operator *(Point3D pt, float n)
+        //{
+        //    return new Point3D(pt.X * n, pt.Y * n, pt.Z * n);
+        //}
 
         public static Point3D operator *(Point3D pt, double n)
         {
@@ -307,36 +340,46 @@ namespace Global
         }
 
 
-        public double DotProduct(Point3D p2)
+        public Distance DotProduct(Point3D p2)
         {
-            return this.X * p2.X + this.Y * p2.Y + this.Z * p2.Z;
+            return Distance.FromDefaultUnits(X.Value * p2.X.Value + Y.Value * p2.Y.Value + Z.Value * p2.Z.Value);
         }
 
 
 
-        public static Point3D operator /(Point3D ptd1, Point3D ptd2)
+        public static Point3D operator /(Point3D ptd1, Unitless3D ptd2)
         {
             return new Point3D(ptd1.X / ptd2.X, ptd1.Y / ptd2.Y, ptd1.Z / ptd2.Z);
         }
 
-        public static Point3D operator /(Point3D ptd1, Point2D ptd2)
-        {
-            return new Point3D(ptd1.X / ptd2.X, ptd1.Y / ptd2.Y, ptd1.Z);
-        }
+        // -- commented out; I think its okay to automatically promote to the "double" version. --
+        //public static Point3D operator /(Point3D ptd1, int int2)
+        //{
+        //    return new Point3D(ptd1.X / int2, ptd1.Y / int2, ptd1.Z / int2);
+        //}
 
-        public static Point3D operator /(Point3D ptd1, int int2)
-        {
-            return new Point3D(ptd1.X / int2, ptd1.Y / int2, ptd1.Z / int2);
-        }
-
-        public static Point3D operator /(Point3D ptd1, float sng2)
-        {
-            return new Point3D(ptd1.X / sng2, ptd1.Y / sng2, ptd1.Z / sng2);
-        }
+        //public static Point3D operator /(Point3D ptd1, float sng2)
+        //{
+        //    return new Point3D(ptd1.X / sng2, ptd1.Y / sng2, ptd1.Z / sng2);
+        //}
 
         public static Point3D operator /(Point3D ptd1, double dbl2)
         {
             return new Point3D(ptd1.X / dbl2, ptd1.Y / dbl2, ptd1.Z / dbl2);
+        }
+
+        /// <summary>
+        /// Used for "inverse"; usage: "OneDefaultUnit / point".
+        /// HOWEVER note that that it is w.r.t. "1 DefaultUnit".
+        /// The concept of "inverse" isn't strictly meaningful when discussing a Distance;
+        /// Inverse is a "unitless" concept.
+        /// </summary>
+        /// <param name="numerator"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static Unitless3D operator /(Distance numerator, Point3D p2)
+        {
+            return new Unitless3D(numerator / p2.X, numerator / p2.Y, numerator / p2.Z);
         }
 
 
@@ -354,11 +397,11 @@ namespace Global
 
         public Point3D Round2()
         {
-            return new Point3D(Utils.Round2(this.X), Utils.Round2(this.Y), Utils.Round2(this.Z));
+            return new Point3D(Utils.Round2(this.X.Value), Utils.Round2(this.Y.Value), Utils.Round2(this.Z.Value), null);
         }
         public Point3D Round3()
         {
-            return new Point3D(Utils.Round3(this.X), Utils.Round3(this.Y), Utils.Round3(this.Z));
+            return new Point3D(Utils.Round3(this.X.Value), Utils.Round3(this.Y.Value), Utils.Round3(this.Z.Value), null);
         }
 
         public Point3D SwapYZ()
@@ -373,13 +416,16 @@ namespace Global
 
         public static Point3D NaN()
         {
-            return new Point3D(double.NaN, double.NaN, double.NaN);
+            return new Point3D(double.NaN, double.NaN, double.NaN, null);
         }
 
-        public static readonly Point3D MinValue = new Point3D(double.MinValue, double.MinValue, double.MinValue);
-        public static readonly Point3D MaxValue = new Point3D(double.MaxValue, double.MaxValue, double.MaxValue);
-        public static readonly Point3D UnitY = new Point3D(0, 1, 0);
-        public static readonly Point3D UnitZ = new Point3D(0, 0, 1);
+        public static readonly Point3D MinValue = new Point3D(double.MinValue, double.MinValue, double.MinValue, null);
+        public static readonly Point3D MaxValue = new Point3D(double.MaxValue, double.MaxValue, double.MaxValue, null);
+        /// <summary>
+        /// CAUTION: ASSUMES DefaultUnit is desired. Technically, this should probably be a "Unitless3D".
+        /// </summary>
+        public static readonly Point3D UnitY = new Point3D(0, 1, 0, null);
+        public static readonly Point3D UnitZ = new Point3D(0, 0, 1, null);
 
         public static Point3D[] ListFromPoint2Ds(ref Point2D[] Point2Ds)
         {
@@ -395,12 +441,12 @@ namespace Global
         // Usage: IList(Of Point3D).Sort(AddressOf Point3D.IncreasingX))
         public static int IncreasingX(Point3D p1, Point3D p2)
         {
-            return p1.X.CompareTo(p2.X);
+            return p1.X.Value.CompareTo(p2.X.Value);
         }
         // Usage: IList(Of Point3D).Sort(AddressOf Point3D.IncreasingY))
         public static int IncreasingY(Point3D p1, Point3D p2)
         {
-            return p1.Y.CompareTo(p2.Y);
+            return p1.Y.Value.CompareTo(p2.Y.Value);
         }
     }
     /* TODO ERROR: Skipped EndIfDirectiveTrivia */
