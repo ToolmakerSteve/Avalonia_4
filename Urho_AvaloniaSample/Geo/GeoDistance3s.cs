@@ -8,29 +8,28 @@ namespace Geo
     /// <summary>
     /// A compact representation of a set of points with the same IGeoContext.
     /// </summary>
-    public class GeoPoints<TGeo, TPoint> : IList<TGeo>
-            where TGeo : IGeoPoint, new() where TPoint : IPoint, new()
+    public class GeoDistance3s : IList<GeoPoint3D>
     {
         #region --- data ----------------------------------------
         IGeoContext Context;
-        public readonly List<TPoint> Values = new List<TPoint>();
+        public readonly List<Point3D> Values = new List<Point3D>();
         #endregion
 
 
         #region --- new ----------------------------------------
-        public GeoPoints(IGeoContext context)
+        public GeoDistance3s(IGeoContext context)
         {
             Context = context;
         }
         #endregion
 
 
-        #region --- IEnumerable<TGeo> ----------------------------------------
-        public IEnumerator<TGeo> GetEnumerator()
+        #region --- IEnumerable<GeoPoint3D> ----------------------------------------
+        public IEnumerator<GeoPoint3D> GetEnumerator()
         {
             foreach (var value in Values)
             {
-                yield return new TGeo() { IValue = value, Context = Context };
+                yield return new GeoPoint3D(value, Context);
             }
         }
 
@@ -41,10 +40,10 @@ namespace Geo
         #endregion
 
 
-        #region --- IList<TGeo> ----------------------------------------
-        public TGeo this[int index]
+        #region --- IList<GeoPoint3D> ----------------------------------------
+        public GeoPoint3D this[int index]
         {
-            get => new TGeo() { IValue = Values[index], Context = Context };
+            get => new GeoPoint3D(Values[index], Context);
             set => Values[index] = ToOurContext(value);
         }
 
@@ -52,7 +51,7 @@ namespace Geo
 
         public bool IsReadOnly => false;
 
-        public void Add(TGeo item)
+        public void Add(GeoPoint3D item)
         {
             Values.Add(ToOurContext(item));
         }
@@ -68,13 +67,13 @@ namespace Geo
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Contains(TGeo item)
+        public bool Contains(GeoPoint3D item)
         {
-            TPoint value = ToOurContext(item);
+            Point3D value = ToOurContext(item);
             return Values.Contains(value);
         }
 
-        public void CopyTo(TGeo[] array, int arrayIndex)
+        public void CopyTo(GeoPoint3D[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
@@ -85,13 +84,13 @@ namespace Geo
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public int IndexOf(TGeo item)
+        public int IndexOf(GeoPoint3D item)
         {
-            TPoint value = ToOurContext(item);
+            Point3D value = ToOurContext(item);
             return Values.IndexOf(value);
         }
 
-        public void Insert(int index, TGeo item)
+        public void Insert(int index, GeoPoint3D item)
         {
             Values.Insert(index, ToOurContext(item));
         }
@@ -102,9 +101,9 @@ namespace Geo
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool Remove(TGeo item)
+        public bool Remove(GeoPoint3D item)
         {
-            TPoint value = ToOurContext(item);
+            Point3D value = ToOurContext(item);
             return Values.Remove(value);
         }
 
@@ -116,12 +115,12 @@ namespace Geo
 
 
         #region --- public methods ----------------------------------------
-        public TPoint ToOurContext(TGeo value)
+        public Point3D ToOurContext(GeoPoint3D value)
         {
-            TPoint finalValue = (TPoint)value.IValue;
+            Point3D finalValue = (Point3D)value.IValue;
             if (value.Context != Context)
             {   // Convert to our Context.
-                throw new NotImplementedException("TPoint.ToOurContext with different Context.");
+                throw new NotImplementedException("Point3D.ToOurContext with different Context.");
                 //TODO finalValue = OurUnit.FromMeters(value.AsMeters);
             }
 

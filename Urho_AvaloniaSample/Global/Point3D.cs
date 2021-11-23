@@ -43,8 +43,6 @@ namespace Global
         public Distance X { get; set; }
         public Distance Y { get; set; }
         public Distance Z { get; set; }
-
-        public Type ValueType => typeof(Point3D);
         #endregion
 
 

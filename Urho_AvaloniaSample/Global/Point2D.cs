@@ -35,8 +35,6 @@ namespace Global
         #region --- data ----------------------------------------
         public Distance X { get; set; }
         public Distance Y { get; set; }
-
-        public Type ValueType => typeof(Point2D);
         #endregion
 
 

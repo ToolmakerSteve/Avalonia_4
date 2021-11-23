@@ -4,20 +4,10 @@ using Global;
 
 namespace Geo
 {
-    public class GeoPoint3D : IGeoPoint
+    public class GeoPoint3D
     {
         public Point3D Pt { get; private set; }
         public IGeoContext Context { get; set; }
-        public IPoint IValue
-        {
-            get => Pt;
-            set
-            {
-                Pt = (Point3D)value;
-            }
-        }
-
-        public Type ValueType => typeof(Point3D);
 
         public Distance X { get => Pt.X; }
         public Distance Y { get => Pt.Y; }
