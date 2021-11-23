@@ -624,7 +624,7 @@ namespace Global
         //        }
 
         //        // Ignores origin.Z.
-        //        public static Distance2D moveOnAngleRadians(Point3D origin, float angleRadians, double distance)
+        //        public static Distance2D moveOnAngleRadians(Distance3D origin, float angleRadians, double distance)
         //        {
         //            Distance2D heading = angleRadiansAsHeading(angleRadians);
         //            return moveOnHeading(new Distance2D(origin.X, origin.Y), heading, distance);
@@ -670,7 +670,7 @@ namespace Global
         //                return 0.941246 * absDX + 0.41 * absDY;
         //        }
 
-        //        public static double distance2D(Point3D p1, Point3D p2)
+        //        public static double distance2D(Distance3D p1, Distance3D p2)
         //        {
         //            double dX = p2.X - p1.X;
         //            double dY = p2.Y - p1.Y;
@@ -694,7 +694,7 @@ namespace Global
         //            return (double)(dX * dX) + (double)(dY * dY);
         //        }
 
-        //        public static double distanceSquared(Point3D p1, Point3D p2)
+        //        public static double distanceSquared(Distance3D p1, Distance3D p2)
         //        {
         //            double dX = p2.X - p1.X;
         //            double dY = p2.Y - p1.Y;
@@ -721,7 +721,7 @@ namespace Global
         //        }
 
         //        // x=longitude, y= latitude.
-        //        public static double calculateDistanceDD_AED(Point3D p1, Point3D p2, bool approximate = false)
+        //        public static double calculateDistanceDD_AED(Distance3D p1, Distance3D p2, bool approximate = false)
         //        {
         //            if (p1 == null || p2 == null)
         //                return double.MaxValue;
@@ -1052,9 +1052,9 @@ namespace Global
         //            return lerpXY(xY0, xY1, xyWgt.Y);
         //        }
 
-        //        public static Point3D lerp3D(Point3D a, Point3D b, double wgtB)
+        //        public static Distance3D lerp3D(Distance3D a, Distance3D b, double wgtB)
         //        {
-        //            return new Point3D(lerp(a.X, b.X, wgtB), lerp(a.Y, b.Y, wgtB), lerp(a.Z, b.Z, wgtB));
+        //            return new Distance3D(lerp(a.X, b.X, wgtB), lerp(a.Y, b.Y, wgtB), lerp(a.Z, b.Z, wgtB));
         //        }
 
 
@@ -1405,18 +1405,18 @@ namespace Global
 
         //        // closest is measured using 2D distances.
         //        // pts in Cartesian coords (not geo coords).
-        //        public static Point3D closestPointOnLine_AndT(Point3D pt, Point3D p1, Point3D p2, out double t)
+        //        public static Distance3D closestPointOnLine_AndT(Distance3D pt, Distance3D p1, Distance3D p2, out double t)
         //        {
         //            bool allowExtendedT = false;
         //            Distance2D pt2 = closestPointOnLine_AndT(pt.X, pt.Y, p1.X, p1.Y, p2.X, p2.Y, out t, allowExtendedT);
 
 
-        //            return new Point3D(pt2.X, pt2.Y, lerp(p1.Z, p2.Z, t));
+        //            return new Distance3D(pt2.X, pt2.Y, lerp(p1.Z, p2.Z, t));
         //        }
 
         //        // closest is measured using 2D distances.
         //        // pts in geo coords.
-        //        public static Point3D closestPointOnLine_AndT_geo(Point3D geoPt, Point3D geoP1, Point3D geoP2, double[] t)
+        //        public static Distance3D closestPointOnLine_AndT_geo(Distance3D geoPt, Distance3D geoP1, Distance3D geoP2, double[] t)
         //        {
         //            bool allowExtendedT = false;
         //            // TODO: How pick an appropriate orthographic coordinate system?
@@ -1431,7 +1431,7 @@ namespace Global
         //            t[0] = t0;
 
         //            Distance2D geoClosest = context.ToWGS84(mayaClosest);
-        //            return new Point3D(geoClosest.X, geoClosest.Y, lerp(geoP1.Z, geoP2.Z, t0));
+        //            return new Distance3D(geoClosest.X, geoClosest.Y, lerp(geoP1.Z, geoP2.Z, t0));
         //        }
 
         //        public static Distance2D closestPointOnLine_AndT_geo(Distance2D geoPt, Distance2D geoP1, Distance2D geoP2, double[] t)
@@ -1465,7 +1465,7 @@ namespace Global
 
         //        // From "startLocation", moves to closest point along sequence of "pts", then moves along that sequence by "moveDistance".
         //        // "pts" are geo coords, so uses AED distance calc.
-        //        public static Point3D pointAheadOnPointSequence(Point3D startGeo, Point3D[] ptsGeo, double moveDistanceGeo)
+        //        public static Distance3D pointAheadOnPointSequence(Distance3D startGeo, Distance3D[] ptsGeo, double moveDistanceGeo)
         //        {
         //            // When no points, we can't move anywhere.
         //            if (ptsGeo == null)
@@ -1485,7 +1485,7 @@ namespace Global
         //            endILeg[0] = 0;
         //            endT[0] = 0.0;
 
-        //            Point3D endPt = moveAlongPointSequence(startILeg[0], startT[0], moveDistanceGeo, ptsGeo, endILeg, endT);
+        //            Distance3D endPt = moveAlongPointSequence(startILeg[0], startT[0], moveDistanceGeo, ptsGeo, endILeg, endT);
 
         //            return endPt;
         //        }
@@ -1496,12 +1496,12 @@ namespace Global
         //        // Won't go beyond end of sequence.
         //        // "endILeg" is the START of the final leg that is used. (But if reach very end, it will be the final point.)
         //        // "pts" are geo coords, so uses AED distance calc.
-        //        public static Point3D moveAlongPointSequence(int startILeg, double startT, double moveDistanceMaya, Point3D[] pts, int[] endILeg, double[] endT)
+        //        public static Distance3D moveAlongPointSequence(int startILeg, double startT, double moveDistanceMaya, Distance3D[] pts, int[] endILeg, double[] endT)
         //        {
         //            endILeg[0] = startILeg;
         //            endT[0] = startT;
         //            double remainingMoveDI = moveDistanceMaya;
-        //            Point3D endPt = pts[startILeg];
+        //            Distance3D endPt = pts[startILeg];
 
         //            if (startILeg == pts.Length - 1)
         //                return endPt;
@@ -1509,7 +1509,7 @@ namespace Global
         //            while (endILeg[0] < pts.Length - 1)
         //            {
         //                throw new NotImplementedException("moveAlongPointSequence");
-        //                double legDI;//TODO = Point3D.calculateDistanceDD_AED_2D(pts[endILeg[0]], pts[endILeg[0] + 1]);
+        //                double legDI;//TODO = Distance3D.calculateDistanceDD_AED_2D(pts[endILeg[0]], pts[endILeg[0] + 1]);
         //                double tDI = endT[0] * legDI;
         //                double remainingDistanceOnLeg = legDI - tDI;
 
@@ -1537,7 +1537,7 @@ namespace Global
 
 
         //        // Interpolates between points.
-        //        public static Point3D closestPointOnPointSequence(Point3D loc, Point3D[] linePts)
+        //        public static Distance3D closestPointOnPointSequence(Distance3D loc, Distance3D[] linePts)
         //        {
         //            int[] startILeg = new int[1];
         //            double[] legT = new double[1];
@@ -1555,20 +1555,20 @@ namespace Global
         //        //   = pts(closestILeg)
         //        //   = LastElement(pts)
         //        // "pts" are geo coords, so uses AED distance calc.
-        //        public static Point3D closestPointOnPointSequence(Point3D loc, IList<Point3D> pts, int[] closestILeg, double[] closestT)
+        //        public static Distance3D closestPointOnPointSequence(Distance3D loc, IList<Distance3D> pts, int[] closestILeg, double[] closestT)
         //        {
-        //            Point3D ret = new Point3D();
+        //            Distance3D ret = new Distance3D();
         //            closestILeg[0] = 0;
         //            closestT[0] = 0;
         //            double minDistanceSq = double.MaxValue;
 
         //            for (int iLeg = 0; iLeg < pts.Count - 1; iLeg++)
         //            {
-        //                Point3D p1 = pts[iLeg];
-        //                Point3D p2 = pts[iLeg + 1];
+        //                Distance3D p1 = pts[iLeg];
+        //                Distance3D p2 = pts[iLeg + 1];
         //                double[] t = new double[1];
 
-        //                Point3D closestPt1 = closestPointOnLine_AndT_geo(loc, p1, p2, t);
+        //                Distance3D closestPt1 = closestPointOnLine_AndT_geo(loc, p1, p2, t);
         //                double distanceSq1 = distanceSquared(loc, closestPt1);
 
         //                if (distanceSq1 < minDistanceSq)
@@ -1642,20 +1642,20 @@ namespace Global
         //        }
 
 
-        //        public static Point3D pointAlongLine_AED(Point3D geoStartLocation, Point3D geoEndLocation, double maxDistance)
+        //        public static Distance3D pointAlongLine_AED(Distance3D geoStartLocation, Distance3D geoEndLocation, double maxDistance)
         //        {
         //            // TODO: How pick an appropriate orthographic coordinate system?
         //            throw new NotImplementedException("pointAlongLine_AED");
         //            IGeoContext context;
-        //            Point3D mayaStartLocation = context.FromWGS84(geoStartLocation);
-        //            Point3D mayaEndLocation = context.FromWGS84(geoEndLocation);
-        //            double endDistance = Point3D.CalcDistance2D(mayaStartLocation, mayaEndLocation);
+        //            Distance3D mayaStartLocation = context.FromWGS84(geoStartLocation);
+        //            Distance3D mayaEndLocation = context.FromWGS84(geoEndLocation);
+        //            double endDistance = Distance3D.CalcDistance2D(mayaStartLocation, mayaEndLocation);
 
         //            // Can reach endLocation, without exceeding maxDistance (ignoring altitude change).
         //            if (endDistance <= maxDistance)
         //                return geoEndLocation;
 
-        //            Point3D mayaReachedPt = Lerp(mayaStartLocation, mayaEndLocation, maxDistance / endDistance);
+        //            Distance3D mayaReachedPt = Lerp(mayaStartLocation, mayaEndLocation, maxDistance / endDistance);
         //            return context.ToWGS84(mayaReachedPt);
         //        }
 
@@ -1664,13 +1664,13 @@ namespace Global
         //        // From "startLocation", moves to closest point along sequence of "lopPts",
         //        // then moves along that sequence until we are "landingDistance" from startLocation.
         //        // This is different than "PointAheadOnPointSequence", in that the distance is calculated from startLocation, rather than measuring along LOP.
-        //        public static Point3D hitLineOfPlayAtDistance(Point3D startLocation, Point3D[] lopPts, double landingDistance)
+        //        public static Distance3D hitLineOfPlayAtDistance(Distance3D startLocation, Distance3D[] lopPts, double landingDistance)
         //        {
         //            int[] startILeg = new int[1];
         //            double[] startT = new double[1];
-        //            Point3D startPtOnSequence = closestPointOnPointSequence(startLocation, lopPts, startILeg, startT);
+        //            Distance3D startPtOnSequence = closestPointOnPointSequence(startLocation, lopPts, startILeg, startT);
 
-        //            Point3D guessPt = startPtOnSequence;
+        //            Distance3D guessPt = startPtOnSequence;
         //            double guessDistance = calculateDistanceDD_AED(startLocation, guessPt);
 
         //            double verifyDistance = 0.0;
@@ -1690,7 +1690,7 @@ namespace Global
 
         //            // Examine each point on LOP, until find one that is farther than landingDistance.
         //            // The answer will be on the leg leading to that point.
-        //            Point3D longPt = guessPt;
+        //            Distance3D longPt = guessPt;
         //            double longDistance = guessDistance;
         //            int[] endILeg = new int[1];
         //            endILeg[0] = startILeg[0] + 1;
@@ -1715,11 +1715,11 @@ namespace Global
         //            }
 
         //            // There is some point along this leg that is at landingDistance.
-        //            Point3D shortPt = lopPts[endILeg[0] - 1];
+        //            Distance3D shortPt = lopPts[endILeg[0] - 1];
         //            double shortDistance = calculateDistanceDD_AED(startLocation, shortPt);
 
         //            double[] t = new double[1];
-        //            Point3D closestPtOnLeg = closestPointOnLine_AndT_geo(startLocation, shortPt, longPt, t);
+        //            Distance3D closestPtOnLeg = closestPointOnLine_AndT_geo(startLocation, shortPt, longPt, t);
         //            double closestPtOnLegDistance = calculateDistanceDD_AED(startLocation, closestPtOnLeg);
         //            if (closestPtOnLegDistance < landingDistance)
         //                // The usual case: closest point on leg falls short.
@@ -1879,17 +1879,17 @@ namespace Global
         //            return new Vector4(x, y, z, w);
         //        }
 
-        //        public static Vector4 newGLVector(Point3D v)
+        //        public static Vector4 newGLVector(Distance3D v)
         //        {
         //            return newGLVector((float)v.X, (float)v.Y, (float)v.Z);
         //        }
 
 
         //        // NOTE: glVec is only single-precision, so we don't have double precision accuracy.
-        //        public static Point3D asDouble3(Vector4 glVec)
+        //        public static Distance3D asDouble3(Vector4 glVec)
         //        {
         //            // REQUIRE: glVec.W==1.
-        //            return new Point3D(glVec.X, glVec.Y, glVec.Z);
+        //            return new Distance3D(glVec.X, glVec.Y, glVec.Z);
         //        }
 
 
@@ -1904,7 +1904,7 @@ namespace Global
         //        }
 
         //        // NOTE: OpenGL math is only single-precision, so we no longer have double precision accuracy.
-        //        public static Point3D glMultiplyMV(Matrix4 lhsMat, Point3D rhsVec)
+        //        public static Distance3D glMultiplyMV(Matrix4 lhsMat, Distance3D rhsVec)
         //        {
         //            return asDouble3(glMultiplyMV(lhsMat, newGLVector(rhsVec)));
         //        }
@@ -1948,7 +1948,7 @@ namespace Global
 
         //        // CAUTION: This applies the translation AFTER the existing rotations.
         //        // SIDE-EFFECT: changes m's elements.
-        //        public static void translateGLMatrix(ref Matrix4 m, Point3D translation)
+        //        public static void translateGLMatrix(ref Matrix4 m, Distance3D translation)
         //        {
         //            Matrix4 m2 = Matrix4.CreateTranslation(translation.ToVector3());
         //            // TODO: Is parameter order correct?
@@ -1957,7 +1957,7 @@ namespace Global
 
         //        //		// HACK: stuffs values into translation elements, effectively applying them before the rotations.
         //        //		// SIDE-EFFECT: changes m's elements.
-        //        //		public static void preTranslateGLMatrix(float[] m, Point3D translation) {
+        //        //		public static void preTranslateGLMatrix(float[] m, Distance3D translation) {
         //        //			m[12] += (float)translation.X;
         //        //			m[13] += (float)translation.Y;
         //        //			m[14] += (float)translation.Z;
@@ -1967,19 +1967,19 @@ namespace Global
 
         //        // The desired view space will be camera at origin, pointing down z-axis,
         //        // with up-vector along positive y axis.
-        //        public static Matrix4 glViewTransformForTwoPointUprightCamera(Point3D cameraPt, Point3D aimPt)
+        //        public static Matrix4 glViewTransformForTwoPointUprightCamera(Distance3D cameraPt, Distance3D aimPt)
         //        {
         //            // Start with world coords, and identity matrix.
         //            Matrix4 m = Matrix4.Identity;
 
         //            // 1. Rotate around z-axis, until camera and aim have same x.
-        //            Point3D d3Aim = aimPt - cameraPt;
+        //            Distance3D d3Aim = aimPt - cameraPt;
         //            Distance2D aimHeadingXY = d3Aim.To2D();
         //            float aimAngleRadiansXY = headingAsAngleRadians2D(aimHeadingXY);
         //            float zRotation = ((float)degreesToRadians(90) - aimAngleRadiansXY);
         //            rotateGLMatrixAroundZ(ref m, zRotation);
         //            // Verify: x should be 0 w/i (+-1e-4) float accuracy.
-        //            Point3D d3Aim_step1 = glMultiplyMV(m, d3Aim);
+        //            Distance3D d3Aim_step1 = glMultiplyMV(m, d3Aim);
 
         //            // 2. Rotate around (new) x-axis, until camera and aim (also) have same y,
         //            //    and aim has a more negative z than camera.
@@ -1997,7 +1997,7 @@ namespace Global
 
         //            // Verify: x & y should be 0 (+-1e-4) float accuracy.
         //            // TODO: If z is positive instead of negative, then what?
-        //            Point3D d3Aim_step2 = glMultiplyMV(m, d3Aim);
+        //            Distance3D d3Aim_step2 = glMultiplyMV(m, d3Aim);
         //            // If z is positive, rotate another 180 degrees.
         //            if (d3Aim_step2.Z > 0)
         //            {
@@ -2013,8 +2013,8 @@ namespace Global
         //            // 2b. translate camera to origin.
         //            //		//     This needs to be done before the matrix-multiplies.
         //            //		m = newGLIdentityMatrix();
-        //            //		preTranslateGLMatrix(m, Point3D.negate(cameraPt));
-        //            //		Point3D verifyOrigin = glMultiplyMV(m, cameraPt);
+        //            //		preTranslateGLMatrix(m, Distance3D.negate(cameraPt));
+        //            //		Distance3D verifyOrigin = glMultiplyMV(m, cameraPt);
         //            //		rotateGLMatrixAroundX(m, xRotation);
         //            //		verifyOrigin = glMultiplyMV(m, cameraPt);
         //            //		rotateGLMatrixAroundZ(m, zRotation);
@@ -2031,20 +2031,20 @@ namespace Global
         //            //    "* 1 / (y/x)" => "* (x/y)".  Remember to multiply this by scale from (3).
 
         //            // camera should transform to origin.
-        //            Point3D verifyOrigin = glMultiplyMV(m, cameraPt);
+        //            Distance3D verifyOrigin = glMultiplyMV(m, cameraPt);
 
         //            // Now we can test the aimPt (not just a delta).
         //            // verify: should be (0, 0, -something)
-        //            Point3D verifyDownZN = glMultiplyMV(m, aimPt);
+        //            Distance3D verifyDownZN = glMultiplyMV(m, aimPt);
 
         //            // Verify that camera is upright: two points that differ only in z should have same x.
-        //            Point3D verifyAboveAimZeroX = glMultiplyMV(m, aimPt + new Point3D(0, 0, 100));
+        //            Distance3D verifyAboveAimZeroX = glMultiplyMV(m, aimPt + new Distance3D(0, 0, 100));
 
         //            // Some different point.
-        //            Point3D otherPt = new Point3D(aimPt.Y, aimPt.X, aimPt.Z);
-        //            Point3D viewOtherPt = glMultiplyMV(m, otherPt);
+        //            Distance3D otherPt = new Distance3D(aimPt.Y, aimPt.X, aimPt.Z);
+        //            Distance3D viewOtherPt = glMultiplyMV(m, otherPt);
         //            // Should have same x as viewOtherPt.
-        //            Point3D viewOtherPtSameX = glMultiplyMV(m, otherPt + new Point3D(0, 0, 100));
+        //            Distance3D viewOtherPtSameX = glMultiplyMV(m, otherPt + new Distance3D(0, 0, 100));
 
         //            return m;
         //        }
@@ -2311,7 +2311,7 @@ namespace Global
         //            return minDistance;
         //        }
 
-        //        public static double pointDistanceToLines(Point3D goalPt, Point3D[] polygon)
+        //        public static double pointDistanceToLines(Distance3D goalPt, Distance3D[] polygon)
         //        {
         //            double minDistance = double.MaxValue;
         //            int len = polygon.Length - 1;
@@ -2335,7 +2335,7 @@ namespace Global
 
         //        // Perhaps default should be "approximate=true": This is a LOT slower if ask for accurate calculation,
         //        // for little gain (for distances less than 1 km).
-        //        public static double pointDistanceToLines_AED(Point3D goalGeo, Point3D[] polyGeo, bool approximate, double cosLat)
+        //        public static double pointDistanceToLines_AED(Distance3D goalGeo, Distance3D[] polyGeo, bool approximate, double cosLat)
         //        {
         //            double maxValue = double.MaxValue;
         //            int len = polyGeo.Length - 1;
@@ -2356,13 +2356,13 @@ namespace Global
         //            return maxValue;
         //        }
 
-        //        public static double polygonDistanceToPolygon(Point3D[] shape1, Point3D[] shape2)
+        //        public static double polygonDistanceToPolygon(Distance3D[] shape1, Distance3D[] shape2)
         //        {
         //            double diClosest = double.MaxValue;
 
         //            for (int i = 0; i < shape1.Length; i++)
         //            {
-        //                Point3D p = shape1[i - 1];
+        //                Distance3D p = shape1[i - 1];
 
         //                double di = pointDistanceToLines(p, shape2);
 
@@ -2392,13 +2392,13 @@ namespace Global
 
         //        //// This should probably ALWAYS be called with "approximate=true": Otherwise it is a LOT slower calculation,
         //        ////   for little benefit.
-        //        //public static double polygonDistanceToPolygon_AED(Point3D[] shape1, Point3D[] shape2, bool approximate)
+        //        //public static double polygonDistanceToPolygon_AED(Distance3D[] shape1, Distance3D[] shape2, bool approximate)
         //        //{
         //        //    double diClosest = double.MaxValue;
 
         //        //    // TBD: ASSUMES measuring on ActiveCourse.
         //        //    double cosLat = AppState.ActiveCourse.CosSiteCenterLatitude();
-        //        //    foreach (Point3D geoPt in shape1)
+        //        //    foreach (Distance3D geoPt in shape1)
         //        //    {
         //        //        double di = pointDistanceToLines_AED(geoPt, shape2, approximate, cosLat);
         //        //        if (di < diClosest)
@@ -2428,7 +2428,7 @@ namespace Global
         //            return diClosest;
         //        }
 
-        //        //public static double pointDistanceToLine_AED(Point3D ptdPoint, Point3D[] ptdPol)
+        //        //public static double pointDistanceToLine_AED(Distance3D ptdPoint, Distance3D[] ptdPol)
         //        //{
         //        //    double maxValue = double.MaxValue;
         //        //    int len = ptdPol.Length - 1;
@@ -3190,17 +3190,17 @@ namespace Global
         //        }
 
         //        // Find position along "lop", that is "fraction" of the total distance.
-        //        public static Point3D calculateFractionOnLines(Point3D[] lop, float fraction)
+        //        public static Distance3D calculateFractionOnLines(Distance3D[] lop, float fraction)
         //        {
         //            if (lop == null)
-        //                return new Point3D();
+        //                return new Distance3D();
 
         //            double diTotal = TotalLengthLines(lop);
         //            return pointAheadOnPointSequence(lop[0], lop, diTotal * fraction);
         //        }
 
         //        // PERFORMANCE: Can pass in pre-calculated diTotal.
-        //        public static double CalculateFractionFromGeo(Point3D[] lop, Point3D geo, double diTotal = 0)
+        //        public static double CalculateFractionFromGeo(Distance3D[] lop, Distance3D geo, double diTotal = 0)
         //        {
         //            if (lop == null)
         //                return 0;
@@ -3210,9 +3210,9 @@ namespace Global
 
         //            double fracClosest = 0;
         //            double minDist = double.MaxValue;
-        //            Point3D prevPt = new Point3D();
+        //            Distance3D prevPt = new Distance3D();
         //            double diPartial = 0.0f;
-        //            foreach (Point3D pt in lop)
+        //            foreach (Distance3D pt in lop)
         //            {
         //                if (prevPt == null)
         //                {   // First point.
@@ -3244,12 +3244,12 @@ namespace Global
         //            return fracClosest;
         //        }
 
-        //        private static double TotalLengthLines(Point3D[] lop)
+        //        private static double TotalLengthLines(Distance3D[] lop)
         //        {
-        //            Point3D prevPt = new Point3D();
+        //            Distance3D prevPt = new Distance3D();
         //            double diTotal = 0.0f;
 
-        //            foreach (Point3D pt in lop)
+        //            foreach (Distance3D pt in lop)
         //            {
         //                if (prevPt == null)
         //                {
@@ -3388,7 +3388,7 @@ namespace Global
 
         //        // ========== interpolateThreePoints ==========
 
-        //        public static double interpolateThreePoints(Point3D[] closestGeos, double[] minDists)
+        //        public static double interpolateThreePoints(Distance3D[] closestGeos, double[] minDists)
         //        {
         //            if (closestGeos[0] == null)
         //                // Arbitrary - no data.
@@ -3397,7 +3397,7 @@ namespace Global
         //                return closestGeos[0].Z;
         //            if (closestGeos[2] == null)
         //            {
-        //                Tuple<Point3D, double> geoWithDistOnly2 = interpolate2(closestGeos[0], minDists[0], closestGeos[1], minDists[1], true);
+        //                Tuple<Distance3D, double> geoWithDistOnly2 = interpolate2(closestGeos[0], minDists[0], closestGeos[1], minDists[1], true);
         //                if (geoWithDistOnly2?.Item1 == null)
         //                    // Weights must be bad; average the 2 data that exist.
         //                    return average(closestGeos[0].Z, closestGeos[1].Z);
@@ -3407,12 +3407,12 @@ namespace Global
         //            // --- interpolate between the three points. ---
         //            // If no points exist, return NaN.
         //            // Interpolate the CLOSEST 2 of the 3, then interpolate result with farthest.
-        //            Tuple<Point3D, double> geoWithDist2a = interpolate2(closestGeos[0], minDists[0], closestGeos[1], minDists[1], true);
-        //            Tuple<Point3D, double> geoWithDist2b = interpolate2(geoWithDist2a.Item1, geoWithDist2a.Item2, closestGeos[2], minDists[2], true);
+        //            Tuple<Distance3D, double> geoWithDist2a = interpolate2(closestGeos[0], minDists[0], closestGeos[1], minDists[1], true);
+        //            Tuple<Distance3D, double> geoWithDist2b = interpolate2(geoWithDist2a.Item1, geoWithDist2a.Item2, closestGeos[2], minDists[2], true);
         //            // --- alternative --
         //            // Interpolate the FARTHEST 2 of the 3, then interpolate result with closest.
-        //            Tuple<Point3D, double> geoWithDist1a = interpolate2(closestGeos[2], minDists[2], closestGeos[1], minDists[1], true);
-        //            Tuple<Point3D, double> geoWithDist1b = interpolate2(geoWithDist1a.Item1, geoWithDist1a.Item2, closestGeos[0], minDists[0], true);
+        //            Tuple<Distance3D, double> geoWithDist1a = interpolate2(closestGeos[2], minDists[2], closestGeos[1], minDists[1], true);
+        //            Tuple<Distance3D, double> geoWithDist1b = interpolate2(geoWithDist1a.Item1, geoWithDist1a.Item2, closestGeos[0], minDists[0], true);
         //            // Average the two approaches. TODO: Is either approach "better"; just do that?
         //            if (geoWithDist1b?.Item1 == null || geoWithDist2b?.Item1 == null)
         //                // Weights must be bad; average the data directly.
@@ -3420,26 +3420,26 @@ namespace Global
         //            return Average(geoWithDist2b.Item1.Z, geoWithDist1b.Item1.Z);
         //        }
 
-        //        private static double interpolate2_getZ(Point3D closest1Geo, double minDistanceOrSq1, Point3D closest2Geo, double minDistanceOrSq2, bool areDistanceSquareds)
+        //        private static double interpolate2_getZ(Distance3D closest1Geo, double minDistanceOrSq1, Distance3D closest2Geo, double minDistanceOrSq2, bool areDistanceSquareds)
         //        {
-        //            Tuple<Point3D, double> geoWithDist = interpolate2(closest1Geo, minDistanceOrSq1, closest2Geo, minDistanceOrSq2, areDistanceSquareds);
+        //            Tuple<Distance3D, double> geoWithDist = interpolate2(closest1Geo, minDistanceOrSq1, closest2Geo, minDistanceOrSq2, areDistanceSquareds);
         //            return geoWithDist.Item1.Z;
         //        }
 
         //        // When areDistanceSquareds, "minDistanceOrSq1/2" are "minDistanceSq"s,
         //        // when false, .. are "minDistance"s.
-        //        // Return Pair<Point3D, Double>(resultGeo, resultDist).
+        //        // Return Pair<Distance3D, Double>(resultGeo, resultDist).
         //        // If no points exist, return NaN.
         //        // NOTE: Despite "geo" in param names, is doing interpolation as if in
         //        //   an orthogonal coordinate system.
-        //        private static Tuple<Point3D, double> interpolate2(Point3D closest1Geo, double minDistanceOrSq1, Point3D closest2Geo, double minDistanceOrSq2, bool areDistanceSquareds)
+        //        private static Tuple<Distance3D, double> interpolate2(Distance3D closest1Geo, double minDistanceOrSq1, Distance3D closest2Geo, double minDistanceOrSq2, bool areDistanceSquareds)
         //        {
         //            if ((closest1Geo == null) && (closest2Geo == null))
-        //                return new Tuple<Point3D, double>(new Point3D(), double.NaN);
+        //                return new Tuple<Distance3D, double>(new Distance3D(), double.NaN);
         //            else if ((closest2Geo == null) || (minDistanceOrSq1 == 0.0D))
-        //                return new Tuple<Point3D, double>(closest1Geo, minDistanceOrSq1);
+        //                return new Tuple<Distance3D, double>(closest1Geo, minDistanceOrSq1);
         //            else if ((closest1Geo == null) || (minDistanceOrSq2 == 0.0))
-        //                return new Tuple<Point3D, double>(closest2Geo, minDistanceOrSq2);
+        //                return new Tuple<Distance3D, double>(closest2Geo, minDistanceOrSq2);
         //            else
         //            {
         //                // Interpolate between the two geos, based on distance.
@@ -3470,12 +3470,12 @@ namespace Global
         //                //
         //                //			if (!MathHelper.nearlyEquals(wgt2xNorm, wgt2norm, MathHelper.NearZero))
         //                //				Dubious();
-        //                Point3D resultGeo = Lerp(closest1Geo, closest2Geo, wgt2norm);
+        //                Distance3D resultGeo = Lerp(closest1Geo, closest2Geo, wgt2norm);
         //                // TODO: Is this valid?  If not, when 3 points, need to work with all 3 at once.
         //                double resultDist = Lerp(distance1, distance2, wgt2norm);
         //                if (areDistanceSquareds)
         //                    resultDist = resultDist * resultDist;
-        //                return new Tuple<Point3D, double>(resultGeo, resultDist);
+        //                return new Tuple<Distance3D, double>(resultGeo, resultDist);
         //            }
         //        }
 
@@ -3488,7 +3488,7 @@ namespace Global
 
         //        //}
 
-        //        public static bool IsInsideTriangle(Point3D pt, Point3D a, Point3D b, Point3D c)
+        //        public static bool IsInsideTriangle(Distance3D pt, Distance3D a, Distance3D b, Distance3D c)
         //        {
         //            return IsInsideTriangle(pt.To2D(), a.To2D(), b.To2D(), c.To2D());
         //        }

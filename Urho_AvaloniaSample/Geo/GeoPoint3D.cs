@@ -6,7 +6,7 @@ namespace Geo
 {
     public class GeoPoint3D
     {
-        public Point3D Pt { get; private set; }
+        public Distance3D Pt { get; private set; }
         public IGeoContext Context { get; set; }
 
         public Distance X { get => Pt.X; }
@@ -14,7 +14,7 @@ namespace Geo
         public Distance Z { get => Pt.Z; }
 
 
-        public GeoPoint3D(Point3D pt, IGeoContext context)
+        public GeoPoint3D(Distance3D pt, IGeoContext context)
         {
             Pt = pt;
             Context = context;
@@ -23,7 +23,7 @@ namespace Geo
         public GeoPoint3D(double x, double y, double z, IGeoContext context)
         {
             // TODO: How will GeoContext deal with units?
-            Pt = new Point3D(x, y, z, null);
+            Pt = new Distance3D(x, y, z, null);
             Context = context;
         }
 

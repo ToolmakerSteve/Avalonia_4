@@ -9,11 +9,11 @@ namespace Geo
 
         public abstract Distance2D FromWGS84(Distance2D geoPt);
 
-        public abstract Point3D FromWGS84(Point3D geoPt);
+        public abstract Distance3D FromWGS84(Distance3D geoPt);
 
         public abstract Distance2D ToWGS84(Distance2D pt);
 
-        public abstract Point3D ToWGS84(Point3D pt);
+        public abstract Distance3D ToWGS84(Distance3D pt);
     }
 
 
@@ -35,7 +35,7 @@ namespace Geo
             throw new NotImplementedException();
         }
 
-        public override Point3D FromWGS84(Point3D geoPt)
+        public override Distance3D FromWGS84(Distance3D geoPt)
         {
             throw new NotImplementedException();
         }
@@ -45,7 +45,7 @@ namespace Geo
             throw new NotImplementedException();
         }
 
-        public override Point3D ToWGS84(Point3D pt)
+        public override Distance3D ToWGS84(Distance3D pt)
         {
             throw new NotImplementedException();
         }

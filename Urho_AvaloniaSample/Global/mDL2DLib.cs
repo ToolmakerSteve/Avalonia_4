@@ -126,7 +126,7 @@
 //            this.Y = ptfPoint.Y;
 //        }
 
-//        public Distance2D(Point3D ptdPoint)
+//        public Distance2D(Distance3D ptdPoint)
 //        {
 //            this.X = ptdPoint.X;
 //            this.Y = ptdPoint.Y;
@@ -254,9 +254,9 @@
 //            return new PointF(System.Convert.ToSingle(this.X), System.Convert.ToSingle(this.Y));
 //        }
 
-//        public Point3D ToPoint3D()
+//        public Distance3D ToPoint3D()
 //        {
-//            return new Point3D(this.X, this.Y);
+//            return new Distance3D(this.X, this.Y);
 //        }
 
 //        public Drawing.Point ToPoint()
@@ -561,7 +561,7 @@
 //        }
 
 //        // NOTE: "point3Ds" might be List or Array.
-//        public static Distance2D[] ListFromPoint3Ds(IList<Point3D> point3Ds)
+//        public static Distance2D[] ListFromPoint3Ds(IList<Distance3D> point3Ds)
 //        {
 //            int nPoints = point3Ds.Count;
 //            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
@@ -573,7 +573,7 @@
 //        }
 
 //        // NOTE: "point3Ds" might be List or Array.
-//        public static Distance2D[] ListFromPointXZs(IList<Point3D> point3Ds)
+//        public static Distance2D[] ListFromPointXZs(IList<Distance3D> point3Ds)
 //        {
 //            int nPoints = point3Ds.Count;
 //            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
@@ -820,9 +820,9 @@
 //        return !rotationDegrees.NearlyEquals(0.0);
 //    }
 
-//    public static Point3D RotateAtByDegrees2D(Point3D ptdOrigo, Point3D ptdPoint, double dblAngleDegrees)
+//    public static Distance3D RotateAtByDegrees2D(Distance3D ptdOrigo, Distance3D ptdPoint, double dblAngleDegrees)
 //    {
-//        // Dim ptdRet As Point3D
+//        // Dim ptdRet As Distance3D
 //        // Dim dblCurrentAngle As Double = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y)
 //        // Dim dblDI As Double = m2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y)
 
@@ -832,7 +832,7 @@
 
 //        // Return ptdRet
 
-//        Point3D ptdRet = ptdOrigo;
+//        Distance3D ptdRet = ptdOrigo;
 //        float dblAngle = System.Convert.ToSingle(dblAngleDegrees * Math.PI / 180);
 
 //        ptdRet.X += (ptdPoint.X - ptdOrigo.X) * Math.Cos(dblAngle) - (ptdPoint.Y - ptdOrigo.Y) * Math.Sin(dblAngle);
@@ -871,9 +871,9 @@
 //        return ptfRet;
 //    }
 
-//    public static Point3D RotateAtByRadians2D(Point3D ptdOrigo, Point3D ptdPoint, double dblAngleRadians)
+//    public static Distance3D RotateAtByRadians2D(Distance3D ptdOrigo, Distance3D ptdPoint, double dblAngleRadians)
 //    {
-//        Point3D ptdRet;
+//        Distance3D ptdRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 //        double dblDI = mDL2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 
@@ -918,9 +918,9 @@
 //        return new Distance2D(ptdPoint.X - ptdOrigon.X, ptdPoint.Y - ptdOrigon.Y);
 //    }
 
-//    public static Point3D Delta2D(Point3D ptdOrigon, Point3D ptdPoint)
+//    public static Distance3D Delta2D(Distance3D ptdOrigon, Distance3D ptdPoint)
 //    {
-//        return new Point3D(ptdPoint.X - ptdOrigon.X, ptdPoint.Y - ptdOrigon.Y, 0);
+//        return new Distance3D(ptdPoint.X - ptdOrigon.X, ptdPoint.Y - ptdOrigon.Y, 0);
 //    }
 
 //    public static Distance2D Delta2D(double dblOrigonX, double dblOrigonY, double dblPointX, double dblPointY)
@@ -938,7 +938,7 @@
 //        return ptdPoint.X - ptdOrigon.X;
 //    }
 
-//    public static double DeltaX2D(Point3D ptdOrigon, Point3D ptdPoint)
+//    public static double DeltaX2D(Distance3D ptdOrigon, Distance3D ptdPoint)
 //    {
 //        return ptdPoint.X - ptdOrigon.X;
 //    }
@@ -958,7 +958,7 @@
 //        return ptdPoint.Y - ptdOrigon.Y;
 //    }
 
-//    public static double DeltaY2D(Point3D ptdOrigon, Point3D ptdPoint)
+//    public static double DeltaY2D(Distance3D ptdOrigon, Distance3D ptdPoint)
 //    {
 //        return ptdPoint.Y - ptdOrigon.Y;
 //    }
@@ -986,7 +986,7 @@
 //    }
 
 //    // PERFORMANCE: Quicker than Distance, because does not need SQRT.
-//    public static double DistanceSquared3D(Point3D p1, Point3D p2)
+//    public static double DistanceSquared3D(Distance3D p1, Distance3D p2)
 //    {
 //        return DistanceSquared3D(p1.X, p1.Y, p1.Z, p2.X, p2.Y, p2.Z);
 //    }
@@ -1027,7 +1027,7 @@
 //    }
 
 //    // PERFORMANCE: Quicker than Distance, because does not need SQRT.
-//    public static double DistanceSquared2D(Point3D p1, Point3D p2)
+//    public static double DistanceSquared2D(Distance3D p1, Distance3D p2)
 //    {
 //        return DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y);
 //    }
@@ -1053,7 +1053,7 @@
 //        return Math.Sqrt(DistanceSquared2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y));
 //    }
 
-//    public static double CalcDistance2D(Point3D ptdP1, Point3D ptdP2)
+//    public static double CalcDistance2D(Distance3D ptdP1, Distance3D ptdP2)
 //    {
 //        return CalcDistance2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
 //    }
@@ -1082,7 +1082,7 @@
 //    }
 
 //    // 2D distance calculation, in X and Z.
-//    public static double DistanceXZ(Point3D ptdP1, Point3D ptdP2)
+//    public static double DistanceXZ(Distance3D ptdP1, Distance3D ptdP2)
 //    {
 //        return CalcDistance2D(ptdP1.X, ptdP1.Z, ptdP2.X, ptdP2.Z);
 //    }
@@ -1178,7 +1178,7 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangle2D(Point3D ptdPoint, RectangleF rcfRectangle)
+//    public static bool PointInsideRectangle2D(Distance3D ptdPoint, RectangleF rcfRectangle)
 //    {
 //        FixRectangle(rcfRectangle);
 
@@ -1257,13 +1257,13 @@
 //    }
 
 //    // NOTE: "Strict": Excludes boundary points of rectangle. ("<" not "<=")
-//    public static bool PointInsideRectangle2D_Strict(Point3D point, Rectangle2D rectangle)
+//    public static bool PointInsideRectangle2D_Strict(Distance3D point, Rectangle2D rectangle)
 //    {
 //        return PointInsideRectangle2D_Strict(point.ToPoint2D(), rectangle);
 //    }
 
 //    // TODO: Appears to be incomplete (doesn't have logic for ptdOrigoVector < 0).
-//    public static bool PointInsideRectangle2D(double dblX, double dblY, Rectangle2D rcdRectangle, Point3D ptdOrigoVector)
+//    public static bool PointInsideRectangle2D(double dblX, double dblY, Rectangle2D rcdRectangle, Distance3D ptdOrigoVector)
 //    {
 //        FixRectangle(ref rcdRectangle);
 
@@ -1295,7 +1295,7 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangleX2D(Point3D ptdPoint, RectangleF rcfRectangle)
+//    public static bool PointInsideRectangleX2D(Distance3D ptdPoint, RectangleF rcfRectangle)
 //    {
 //        FixRectangle(rcfRectangle);
 
@@ -1400,9 +1400,9 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangle2D(Point3D ptdPoint, Point3D[] ptdRectangle)
+//    public static bool PointInsideRectangle2D(Distance3D ptdPoint, Distance3D[] ptdRectangle)
 //    {
-//        Point3D[] ptdBounds = (Point3D[])ptdRectangle.Clone();
+//        Distance3D[] ptdBounds = (Distance3D[])ptdRectangle.Clone();
 
 //        if (ptdBounds == null)
 //            return false;
@@ -1410,7 +1410,7 @@
 //        if (!ptdBounds[0].Y == ptdBounds[1].Y | !ptdBounds[1].X == ptdBounds[2].X)
 //        {
 //            double dblAngle = GetAngleDegrees2D(ptdBounds[0], ptdBounds[1]);
-//            Point3D ptdOrigon;
+//            Distance3D ptdOrigon;
 
 //            ptdOrigon = ptdBounds[0];
 //            ptdPoint = Delta2D(ptdOrigon, ptdPoint);
@@ -1808,7 +1808,7 @@
 //    // True if 2 rectangles intersect.
 //    // REQUIRES: NON-ROTATED rectangles!
 //    // Low Performance.
-//    public static bool RectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Point3D ptdOrigoVector)
+//    public static bool RectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Distance3D ptdOrigoVector)
 //    {
 //        Distance2D[] ptdRect1 = new Distance2D[4];
 //        Distance2D[] ptdRect2 = new Distance2D[4];
@@ -1933,7 +1933,7 @@
 //    }
 
 //    // TODO FIXA DENNA ASAP
-//    // Public Function RectanglesIntersects2D(ByVal ptdRec1() As Point3D, ByVal ptdRec2() As Point3D) As Boolean
+//    // Public Function RectanglesIntersects2D(ByVal ptdRec1() As Distance3D, ByVal ptdRec2() As Distance3D) As Boolean
 //    // If ptdRec1 Is Nothing Or ptdRec2 Is Nothing Then Return False
 //    // If ptdRec1.Length < 3 Or ptdRec2.Length < 3 Then Return False
 
@@ -2091,7 +2091,7 @@
 //    }
 
 //    // True if segment(p1, p2) intersects segment(p3, p4)
-//    public static bool LinesIntersects2D(Point3D p1, Point3D p2, Point3D p3, Point3D p4)
+//    public static bool LinesIntersects2D(Distance3D p1, Distance3D p2, Distance3D p3, Distance3D p4)
 //    {
 //        Distance2D p2Isect;
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref p2Isect);
@@ -2105,11 +2105,11 @@
 
 
 //    // Z coords ignored; Returned z is zero.
-//    public static bool LinesIntersects2D(Point3D p1, Point3D p2, Point3D p3, Point3D p4, out Point3D pIsect)
+//    public static bool LinesIntersects2D(Distance3D p1, Distance3D p2, Distance3D p3, Distance3D p4, out Distance3D pIsect)
 //    {
 //        Distance2D p2Isect;
 //        bool result = LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref p2Isect);
-//        pIsect = new Point3D(p2Isect.X, p2Isect.Y);
+//        pIsect = new Distance3D(p2Isect.X, p2Isect.Y);
 //        return result;
 //    }
 
@@ -2798,7 +2798,7 @@
 //    }
 
 //    // True if both endpoints common. They might be swapped.
-//    public static bool LinesIdentical2D(Point3D ptdP1, Point3D ptdP2, Point3D ptdP3, Point3D ptdP4)
+//    public static bool LinesIdentical2D(Distance3D ptdP1, Distance3D ptdP2, Distance3D ptdP3, Distance3D ptdP4)
 //    {
 //        return LinesIdentical2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y, ptdP3.X, ptdP3.Y, ptdP4.X, ptdP4.Y);
 //    }
@@ -3417,7 +3417,7 @@
 //        RotateByRadians2D(ref point, DegreesToRadians(degrees));
 //    }
 
-//    public static void RotateByDegrees2D(ref Point3D point, double degrees)
+//    public static void RotateByDegrees2D(ref Distance3D point, double degrees)
 //    {
 //        if (degrees == 0)
 //            return;
@@ -3468,7 +3468,7 @@
 //        point.X = tx; point.Y = ty;
 //    }
 
-//    public static void RotateByRadians2D(ref Point3D point, double radians)
+//    public static void RotateByRadians2D(ref Distance3D point, double radians)
 //    {
 //        if (radians == 0)
 //            return;
@@ -3611,7 +3611,7 @@
 //    // Return RadiansToDegrees(Math.Asin(sinA))
 //    // End Function
 
-//    public static double GetAngleDegrees2D(Point3D ptdOrigo, Point3D ptdHeading)
+//    public static double GetAngleDegrees2D(Distance3D ptdOrigo, Distance3D ptdHeading)
 //    {
 //        return GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdHeading.X, ptdHeading.Y);
 //    }
@@ -3793,7 +3793,7 @@
 //    // NOTE: Negative distance => move towards "origin".
 //    public static Distance2D MoveFartherOnHeading(Distance2D origin, Distance2D currentPt, double distance)
 //    {
-//        // NOTE: Alternative implementation would be similar to code in "Point3D" version.
+//        // NOTE: Alternative implementation would be similar to code in "Distance3D" version.
 
 //        Distance2D delta = currentPt - origin;
 //        return MoveOnHeading_GivenDelta(currentPt, delta, distance);
@@ -3802,7 +3802,7 @@
 //    // Move away from origin, starting at currentPt, by specified distance.
 //    // The result is on the line from origin through currentPt, but farther away by "distance".
 //    // NOTE: Negative distance => move towards "origin".
-//    public static Point3D MoveFartherOnHeading(Point3D origin, Point3D currentPt, double distance)
+//    public static Distance3D MoveFartherOnHeading(Distance3D origin, Distance3D currentPt, double distance)
 //    {
 //        double totalDistance = Distance3D(origin, currentPt) + distance;
 //        return MoveOnHeading(origin, currentPt, totalDistance);
@@ -3866,14 +3866,14 @@
 
 //    // Move in direction of secondPoint, specified distance from origin.
 //    // (Put in 2D lib, next to 2D version, so callers don't have to specify which module to reference.)
-//    public static Point3D MoveOnHeading(Point3D origin, Point3D secondPoint, double distance)
+//    public static Distance3D MoveOnHeading(Distance3D origin, Distance3D secondPoint, double distance)
 //    {
-//        Point3D delta = secondPoint - origin;
+//        Distance3D delta = secondPoint - origin;
 //        double deltaLength = delta.Length;
 //        if (deltaLength == 0)
 //            return origin; // Cannot determine direction to move, so don't.
 
-//        Point3D result = origin + delta * (distance / deltaLength);
+//        Distance3D result = origin + delta * (distance / deltaLength);
 //        // ' test - verify
 //        // Dim verify As Double = DistanceSquared2D(result, origin)
 //        // If Not verify.NearlyEquals(distance * distance) Then
@@ -3949,7 +3949,7 @@
 //        return dblFurthestDI;
 //    }
 
-//    public static double PointFurthestDistanceToRectangle2D(Point3D ptdPoint, Point3D[] ptdRec)
+//    public static double PointFurthestDistanceToRectangle2D(Distance3D ptdPoint, Distance3D[] ptdRec)
 //    {
 //        if (ptdRec == null)
 //            return -1;
@@ -4077,7 +4077,7 @@
 //        return dblClosestDI;
 //    }
 
-//    public static double PointDistanceToRectangle2D(Point3D ptdPoint, Point3D[] ptdRec)
+//    public static double PointDistanceToRectangle2D(Distance3D ptdPoint, Distance3D[] ptdRec)
 //    {
 //        if (ptdRec == null)
 //            return -1;
@@ -4086,8 +4086,8 @@
 
 //        for (int intIdx = 0; intIdx <= 3; intIdx++)
 //        {
-//            Point3D ptdP1;
-//            Point3D ptdP2 = ptdRec[intIdx];
+//            Distance3D ptdP1;
+//            Distance3D ptdP2 = ptdRec[intIdx];
 
 //            if (intIdx == 0)
 //                ptdP1 = ptdRec[3];
@@ -4327,7 +4327,7 @@
 //    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
 //    // "t" is "weight" of point on line that is closest to "point";
 //    // it is 0 at p1, 1 at p2.
-//    public static Point3D ClosestPointOnLine2D_AndT(Distance2D point, Point3D p1, Point3D p2, out double t)
+//    public static Distance3D ClosestPointOnLine2D_AndT(Distance2D point, Distance3D p1, Distance3D p2, out double t)
 //    {
 //        Distance2D p1Flat = p1.ToPoint2D();
 //        Distance2D p2Flat = p2.ToPoint2D();
@@ -4351,7 +4351,7 @@
 //        // See if "t" represents one of the segment's end points, or a point in-between.
 //        // NOTE: Alternative implementation would be t = Clamp(t, 0, 1), then always use t * delta.
 //        // However, that would have a (small) numerical error at t=1.
-//        Point3D closest;
+//        Distance3D closest;
 //        if (t <= 0)
 //        {
 //            t = 0;
@@ -4629,10 +4629,10 @@
 //        return mDL2DLib.CalcDistance2D(dblPointX, dblPointY, ptdClosest.X, ptdClosest.Y);
 //    }
 
-//    public static double PointDistanceToLine2D(Point3D ptdPoint, Point3D ptdP1, Point3D ptdP2)
+//    public static double PointDistanceToLine2D(Distance3D ptdPoint, Distance3D ptdP1, Distance3D ptdP2)
 //    {
-//        Point3D ptdDelta;
-//        Point3D ptdClosest;
+//        Distance3D ptdDelta;
+//        Distance3D ptdClosest;
 //        double t;
 
 //        ptdDelta = Delta2D(ptdP1, ptdP2);
@@ -4962,7 +4962,7 @@
 //        return false;
 //    }
 
-//    public static bool IsPointCloseToLine2D(Point3D ptdPt, Point3D[] ptdPoints, double dblErr)
+//    public static bool IsPointCloseToLine2D(Distance3D ptdPt, Distance3D[] ptdPoints, double dblErr)
 //    {
 //        if (ptdPoints == null)
 //            return false;
@@ -5151,7 +5151,7 @@
 //        return odd;
 //    }
 
-//    public static bool IsPointWithinPolygon2D(Point3D[] ptdPolygon, Point3D point)
+//    public static bool IsPointWithinPolygon2D(Distance3D[] ptdPolygon, Distance3D point)
 //    {
 //        // http://alienryderflex.com/ptdPolygon/
 
@@ -5189,7 +5189,7 @@
 //        return odd;
 //    }
 
-//    public static bool IsPointWithinPolygon2D_Test_If_Faster(ref Point3D[] ptdPolygon, Point3D point, int intStartIdx, int intEndIdx)
+//    public static bool IsPointWithinPolygon2D_Test_If_Faster(ref Distance3D[] ptdPolygon, Distance3D point, int intStartIdx, int intEndIdx)
 //    {
 //        // http://alienryderflex.com/ptdPolygon/
 
@@ -5257,7 +5257,7 @@
 //        return false;
 //    }
 
-//    public static bool IsPointsWithinRectangle2D(Point3D[] ptdRec, Point3D[] ptdPts)
+//    public static bool IsPointsWithinRectangle2D(Distance3D[] ptdRec, Distance3D[] ptdPts)
 //    {
 //        if (ptdRec == null)
 //            return false;
@@ -5354,7 +5354,7 @@
 
 //    // VERY SLOW.
 //    // CAUTION: Won't detect case where one polygon completely encloses the other one.
-//    public static bool PolygonsIntersects2D(Point3D[] ptdPoly1, Point3D[] ptdPoly2)
+//    public static bool PolygonsIntersects2D(Distance3D[] ptdPoly1, Distance3D[] ptdPoly2)
 //    {
 //        if (ptdPoly1 == null | ptdPoly2 == null)
 //            return false;
@@ -5501,7 +5501,7 @@
 //        return intPtsCtr;
 //    }
 
-//    public static int PointsCountInRectangle2D(Point3D[] ptdRec, Point3D[] ptdPts)
+//    public static int PointsCountInRectangle2D(Distance3D[] ptdRec, Distance3D[] ptdPts)
 //    {
 //        if (ptdRec == null)
 //            return -1;
@@ -5551,7 +5551,7 @@
 //        return intPtsCtr;
 //    }
 
-//    public static int PointsCountInRectangle2D(RectangleF rcfRec, Point3D[] ptdPts)
+//    public static int PointsCountInRectangle2D(RectangleF rcfRec, Distance3D[] ptdPts)
 //    {
 //        if (ptdPts == null)
 //            return -1;
@@ -5621,20 +5621,20 @@
 //        return intPtsCtr;
 //    }
 
-//    public static int PointsCountInRectangle2D(Point3D[] ptdRec, RectangleF rcfPts)
+//    public static int PointsCountInRectangle2D(Distance3D[] ptdRec, RectangleF rcfPts)
 //    {
 //        if (ptdRec == null)
 //            return -1;
 
 //        int intPtsCtr = 0;
 
-//        if (PointInsideRectangle2D(new Point3D(rcfPts.X, rcfPts.Y), ptdRec))
+//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X, rcfPts.Y), ptdRec))
 //            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Point3D(rcfPts.X + rcfPts.Width, rcfPts.Y), ptdRec))
+//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X + rcfPts.Width, rcfPts.Y), ptdRec))
 //            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Point3D(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptdRec))
+//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptdRec))
 //            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Point3D(rcfPts.X, rcfPts.Y + rcfPts.Height), ptdRec))
+//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X, rcfPts.Y + rcfPts.Height), ptdRec))
 //            intPtsCtr += 1;
 
 //        return intPtsCtr;
@@ -5854,7 +5854,7 @@
 //    // Return dblDi
 //    // End Function
 
-//    // Public Function DistanceBetweenRectangles2D(ByVal ptdRec1() As Point3D, ByVal ptdRec2() As Point3D) As Double
+//    // Public Function DistanceBetweenRectangles2D(ByVal ptdRec1() As Distance3D, ByVal ptdRec2() As Distance3D) As Double
 //    // If ptdRec1 Is Nothing Then Return -1
 //    // If ptdRec2 Is Nothing Then Return -1
 
@@ -6260,7 +6260,7 @@
 //        return Math.Abs(area);
 //    }
 
-//    public static double CalculatePolygonArea2D(Point3D[] ptdPts)
+//    public static double CalculatePolygonArea2D(Distance3D[] ptdPts)
 //    {
 //        if (ptdPts == null)
 //            return -1;
@@ -8665,13 +8665,13 @@
 
 
 
-//    public static Point3D[] Calculate_Convex_Hull(ref Point3D[] ptdVertices)
+//    public static Distance3D[] Calculate_Convex_Hull(ref Distance3D[] ptdVertices)
 //    {
 //        // The Convex Hull will be the current points (unless there are three co-linear points and OnBorder = False... we will ignore this case) 
 //        if (ptdVertices.Length <= 3)
-//            return (Point3D[])ptdVertices.Clone();
+//            return (Distance3D[])ptdVertices.Clone();
 
-//        Point3D[] ptdRet = null;
+//        Distance3D[] ptdRet = null;
 //        int intIXNAStart = 0;
 //        bool bolOnBorder = false;
 //        // Find the starting index of the hull by finding the leftmost point in the polygon 
@@ -8733,11 +8733,11 @@
 
 //            // Add the point 
 //            if (ptdRet == null)
-//                ptdRet = new Point3D[1];
+//                ptdRet = new Distance3D[1];
 //            else
 //            {
 //                var oldPtdRet = ptdRet;
-//                ptdRet = new Point3D[ptdRet.Length + 1];
+//                ptdRet = new Distance3D[ptdRet.Length + 1];
 //                if (oldPtdRet != null)
 //                    Array.Copy(oldPtdRet, ptdRet, Math.Min(ptdRet.Length + 1, oldPtdRet.Length));
 //            }
@@ -8755,21 +8755,21 @@
 //    }
 
 //    // NOTE: See mDL3DLib for "CrossProduct3D".
-//    public static double CrossProduct2D(Point3D Origin, Point3D A, Point3D B)
+//    public static double CrossProduct2D(Distance3D Origin, Distance3D A, Distance3D B)
 //    {
 //        return (A.X - Origin.X) * (B.Y - Origin.Y) - (B.X - Origin.X) * (A.Y - Origin.Y);
 //    }
 
-//    public static double DotProduct2D(Point3D Origin, Point3D A, Point3D B)
+//    public static double DotProduct2D(Distance3D Origin, Distance3D A, Distance3D B)
 //    {
 //        return (A.X - Origin.X) * (B.X - Origin.X) + (A.Y - Origin.Y) * (B.Y - Origin.Y);
 //    }
 
 
 
-//    public static bool Is_Vertex_Inside_Triangle2D(Point3D ptdPt, Point3D ptdA, Point3D ptdB, Point3D ptdC)
+//    public static bool Is_Vertex_Inside_Triangle2D(Distance3D ptdPt, Distance3D ptdA, Distance3D ptdB, Distance3D ptdC)
 //    {
-//        Point3D e0, e1, e2;
+//        Distance3D e0, e1, e2;
 //        double a1, a2, a3, b1, b2;
 //        double det;
 //        double c1, c2;
@@ -8798,13 +8798,13 @@
 //        return (c1 >= 0.0) && (c1 <= 1.0) && (c2 >= 0) && (c2 <= 1);
 //    }
 
-//    public static double Calculate_ZValue_Inside_Triangle(Point3D ptdPt, Point3D ptdA, Point3D ptdB, Point3D ptdC)
+//    public static double Calculate_ZValue_Inside_Triangle(Distance3D ptdPt, Distance3D ptdA, Distance3D ptdB, Distance3D ptdC)
 //    {
-//        Point3D v1, v2, n;
+//        Distance3D v1, v2, n;
 //        double d, e;
 
-//        v1 = new Point3D(ptdB.X - ptdA.X, ptdB.Y - ptdA.Y, ptdB.Z - ptdA.Z); // v1 = ptdB - ptdA
-//        v2 = new Point3D(ptdC.X - ptdA.X, ptdC.Y - ptdA.Y, ptdC.Z - ptdA.Z); // v2 = ptdC - ptdA
+//        v1 = new Distance3D(ptdB.X - ptdA.X, ptdB.Y - ptdA.Y, ptdB.Z - ptdA.Z); // v1 = ptdB - ptdA
+//        v2 = new Distance3D(ptdC.X - ptdA.X, ptdC.Y - ptdA.Y, ptdC.Z - ptdA.Z); // v2 = ptdC - ptdA
 
 //        n.X = v1.Y * v2.Z - v1.Z * v2.Y;
 //        n.Y = v1.Z * v2.X - v1.X * v2.Z;
@@ -8857,7 +8857,7 @@
 //    }
 
 
-//    public static bool NewRectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Point3D ptdOrigoVector)
+//    public static bool NewRectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Distance3D ptdOrigoVector)
 //    {
 //        Distance2D[] ptdRect1 = new Distance2D[4];
 //        Distance2D[] ptdRect2 = new Distance2D[4];

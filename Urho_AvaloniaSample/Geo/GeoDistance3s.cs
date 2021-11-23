@@ -12,7 +12,7 @@ namespace Geo
     {
         #region --- data ----------------------------------------
         IGeoContext Context;
-        public readonly List<Point3D> Values = new List<Point3D>();
+        public readonly List<Distance3D> Values = new List<Distance3D>();
         #endregion
 
 
@@ -69,7 +69,7 @@ namespace Geo
         /// <returns></returns>
         public bool Contains(GeoPoint3D item)
         {
-            Point3D value = ToOurContext(item);
+            Distance3D value = ToOurContext(item);
             return Values.Contains(value);
         }
 
@@ -86,7 +86,7 @@ namespace Geo
         /// <returns></returns>
         public int IndexOf(GeoPoint3D item)
         {
-            Point3D value = ToOurContext(item);
+            Distance3D value = ToOurContext(item);
             return Values.IndexOf(value);
         }
 
@@ -103,7 +103,7 @@ namespace Geo
         /// <returns></returns>
         public bool Remove(GeoPoint3D item)
         {
-            Point3D value = ToOurContext(item);
+            Distance3D value = ToOurContext(item);
             return Values.Remove(value);
         }
 
@@ -115,12 +115,12 @@ namespace Geo
 
 
         #region --- public methods ----------------------------------------
-        public Point3D ToOurContext(GeoPoint3D value)
+        public Distance3D ToOurContext(GeoPoint3D value)
         {
-            Point3D finalValue = (Point3D)value.Pt;
+            Distance3D finalValue = (Distance3D)value.Pt;
             if (value.Context != Context)
             {   // Convert to our Context.
-                throw new NotImplementedException("Point3D.ToOurContext with different Context.");
+                throw new NotImplementedException("Distance3D.ToOurContext with different Context.");
                 //TODO finalValue = OurUnit.FromMeters(value.AsMeters);
             }
 

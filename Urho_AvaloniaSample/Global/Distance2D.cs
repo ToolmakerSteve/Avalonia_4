@@ -56,7 +56,7 @@ namespace Global
             Y = pt.Y;
         }
 
-        public Distance2D(Point3D pt)
+        public Distance2D(Distance3D pt)
         {
             X = pt.X;
             Y = pt.Y;
@@ -224,9 +224,9 @@ namespace Global
             return new PointF(System.Convert.ToSingle(X), System.Convert.ToSingle(Y));
         }
 
-        public Point3D ToPoint3D()
+        public Distance3D ToPoint3D()
         {
-            return new Point3D(X, Y);
+            return new Distance3D(X, Y);
         }
 
         /// <summary>
@@ -532,7 +532,7 @@ namespace Global
         }
 
         // NOTE: "point3Ds" might be List or Array.
-        public static Distance2D[] ListFromPoint3Ds(IList<Point3D> point3Ds)
+        public static Distance2D[] ListFromPoint3Ds(IList<Distance3D> point3Ds)
         {
             int nPoints = point3Ds.Count;
             Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
@@ -544,7 +544,7 @@ namespace Global
         }
 
         // NOTE: "point3Ds" might be List or Array.
-        public static Distance2D[] ListFromPointXZs(IList<Point3D> point3Ds)
+        public static Distance2D[] ListFromPointXZs(IList<Distance3D> point3Ds)
         {
             int nPoints = point3Ds.Count;
             Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];

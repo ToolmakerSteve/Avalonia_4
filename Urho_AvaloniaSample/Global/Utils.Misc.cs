@@ -26,8 +26,8 @@ namespace Global
         public delegate bool DelegateMatchTyped<T>(T Value);
         public delegate bool DelegateMatchData(object Value, object UserData);
         public delegate bool DelegateMatchDataTyped<T>(T Value, T UserData);
-        public delegate Point3D TwoDWithZ_P3DDelegate(Distance2D xy, double z);
-        public delegate Distance2D ThreeD_P2DDelegate(Point3D xyz);
+        public delegate Distance3D TwoDWithZ_P3DDelegate(Distance2D xy, double z);
+        public delegate Distance2D ThreeD_P2DDelegate(Distance3D xyz);
 
 
         //        #region --- debug functions ----------------------------------------
@@ -735,9 +735,9 @@ namespace Global
         //            ptdSecond = tmp;
         //        }
 
-        //        public static void Swap(ref Point3D ptdFirst, ref Point3D ptdSecond)
+        //        public static void Swap(ref Distance3D ptdFirst, ref Distance3D ptdSecond)
         //        {
-        //            Point3D tmp = ptdFirst;
+        //            Distance3D tmp = ptdFirst;
         //            ptdFirst = ptdSecond;
         //            ptdSecond = tmp;
         //        }
@@ -1007,7 +1007,7 @@ namespace Global
             return DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y).Sqrt();
         }
 
-        public static Distance CalcDistance2D(Point3D p1, Point3D p2)
+        public static Distance CalcDistance2D(Distance3D p1, Distance3D p2)
         {
             return CalcDistance2D(p1.X, p1.Y, p2.X, p2.Y);
         }
@@ -1051,9 +1051,9 @@ namespace Global
         {
             return new Distance2D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
         }
-        public static Point3D Lerp(Point3D a, Point3D b, double wgtB)
+        public static Distance3D Lerp(Distance3D a, Distance3D b, double wgtB)
         {
-            return new Point3D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB), Lerp(a.Z, b.Z, wgtB));
+            return new Distance3D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB), Lerp(a.Z, b.Z, wgtB));
         }
         public static Vector3 Lerp(Vector3 a, Vector3 b, float wgtB)
         {
@@ -1094,7 +1094,7 @@ namespace Global
         {
             return Lerp(a, b, 0.5);
         }
-        public static Point3D Average(Point3D a, Point3D b)
+        public static Distance3D Average(Distance3D a, Distance3D b)
         {
             return Lerp(a, b, 0.5);
         }
