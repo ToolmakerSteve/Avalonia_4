@@ -7,7 +7,8 @@ namespace Global
     /// <summary>
     /// A physical distance whose Units is Meters.
     /// E.g. "Value=3" means "3 Meters".
-    /// NOTE: If Distance.DefaultUnit = Meters, can use Distance instead of Meters.
+    /// NOTE: If Distance.DefaultUnit = Meters, can use class Distance instead of class Meters.
+    /// Therefore, most libraries will probably create "Distance"s, for generality.
     /// </summary>
     public struct Meters
     {

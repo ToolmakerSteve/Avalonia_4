@@ -55,7 +55,6 @@ namespace Global
         #endregion "-- static --"
 
 
-
         #region "--- Instance Members ---"
 
         /// <summary>The value of this distance, in terms of 'Units'.</summary>
@@ -131,5 +130,64 @@ namespace Global
 
         #endregion === Static Conversion/Create Methods ===============================================
 
+
+        #region "-- static operators --"
+        static public Distance operator +(Distance a, Distance b)
+        {
+            return FromDefaultUnits(a.Value + b.Value);
+        }
+
+        static public Distance operator -(Distance a, Distance b)
+        {
+            return FromDefaultUnits(a.Value - b.Value);
+        }
+
+        static public Distance operator -(Distance a)
+        {
+            return FromDefaultUnits(-a.Value);
+        }
+
+        static public Distance operator *(Distance a, double b)
+        {
+            return FromDefaultUnits(a.Value * b);
+        }
+
+        static public Distance operator *(double a, Distance b)
+        {
+            return FromDefaultUnits(a * b.Value);
+        }
+
+        static public Squared operator *(Distance a, Distance b)
+        {
+            return Squared.FromDefaultUnitsSquared(a.Value * b.Value);
+        }
+
+
+        /// <summary>
+        /// NOTE: the raw numeric value must be the divisor b (not the numerator a);
+        /// it would not be meaningful to return a "Distance" for (a / (b meters)),
+        /// because the result would be "inverse-meters" NOT "meters".
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        static public Distance operator /(Distance a, double b)
+        {
+            return FromDefaultUnits(a.Value / b);
+        }
+
+        /// <summary>
+        /// aka "ratio" between two distances.
+        /// IMPORTANT: The result is NOT A DISTANCE; it is a raw numeric value.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>the ratio between a and b</returns>
+        static public double operator /(Distance a, Distance b)
+        {
+            return (a.Value / b.Value);
+        }
+
+        #endregion
     }
 }
