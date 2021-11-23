@@ -27,7 +27,7 @@ namespace SceneSource
 
         public IGeoContext Context { get; set; }
         /// <summary>
-        /// Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Point2D.
+        /// Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Distance2D.
         /// </summary>
         public List<Vector2> Points { get; private set; }
 
@@ -82,7 +82,7 @@ namespace SceneSource
                 throw new NotImplementedException("AddPoint from a different Context");
 
             var pt = geoPt.Pt;
-            // Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Point2D.
+            // Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Distance2D.
             AddPoint(new Vector2((float)pt.X.Value, (float)pt.Y.Value));
         }
 

@@ -6,7 +6,7 @@ namespace Global
 {
     /// <summary>
     /// "unitless" multipliers that may be different in the three axes.
-    /// See usage in Point2D.
+    /// See usage in Distance2D.
     /// </summary>
     public struct double2
     {
@@ -30,7 +30,7 @@ namespace Global
         /// Be careful to only use where valid to do so.
         /// </summary>
         /// <param name="pt"></param>
-        public double2(Point2D pt)
+        public double2(Distance2D pt)
         {
             X = pt.X.Value;
             Y = pt.Y.Value;

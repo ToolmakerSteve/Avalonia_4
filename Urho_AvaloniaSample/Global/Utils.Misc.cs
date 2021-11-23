@@ -26,8 +26,8 @@ namespace Global
         public delegate bool DelegateMatchTyped<T>(T Value);
         public delegate bool DelegateMatchData(object Value, object UserData);
         public delegate bool DelegateMatchDataTyped<T>(T Value, T UserData);
-        public delegate Point3D TwoDWithZ_P3DDelegate(Point2D xy, double z);
-        public delegate Point2D ThreeD_P2DDelegate(Point3D xyz);
+        public delegate Point3D TwoDWithZ_P3DDelegate(Distance2D xy, double z);
+        public delegate Distance2D ThreeD_P2DDelegate(Point3D xyz);
 
 
         //        #region --- debug functions ----------------------------------------
@@ -566,7 +566,7 @@ namespace Global
         //        ///     ''' <param name="previousT"></param>
         //        ///     ''' <param name="tolerance"></param>
         //        ///     ''' <returns></returns>
-        //        public static IEnumerable<Point2D> BackwardsNoDup(this IList<Point2D> list1, Point2D? previousT, double tolerance = EpsilonForOne)
+        //        public static IEnumerable<Distance2D> BackwardsNoDup(this IList<Distance2D> list1, Distance2D? previousT, double tolerance = EpsilonForOne)
         //        {
         //            int iLast = LastIndex(list1);
         //            for (int i = iLast; i >= FIRST_INDEX; i += -1)
@@ -588,7 +588,7 @@ namespace Global
         //        ///     ''' <param name="previousT"></param>
         //        ///     ''' <param name="tolerance"></param>
         //        ///     ''' <returns></returns>
-        //        public static IEnumerable<Point2D> ForwardNoDup(this IList<Point2D> list1, Point2D? previousT, double tolerance = EpsilonForOne)
+        //        public static IEnumerable<Distance2D> ForwardNoDup(this IList<Distance2D> list1, Distance2D? previousT, double tolerance = EpsilonForOne)
         //        {
         //            int iLast = LastIndex(list1);
         //            for (int i = FIRST_INDEX; i <= iLast; i++)
@@ -652,7 +652,7 @@ namespace Global
         //            return number.NearlyEquals(target, tolerance);
         //        }
         //        // A reasonable "toleranceFraction" is ScaledToleranceDouble. Larger if multiple operations may accumulate error.
-        //        public static bool NearlyEquals_ScaledTolerance(this Point2D p1, Point2D p2, double toleranceFraction)
+        //        public static bool NearlyEquals_ScaledTolerance(this Distance2D p1, Distance2D p2, double toleranceFraction)
         //        {
         //            return (p1.X.Value.NearlyEquals_ScaledTolerance(p2.X.Value, toleranceFraction) &&
         //                    p1.Y.NearlyEquals(p2.Y, toleranceFraction));
@@ -728,9 +728,9 @@ namespace Global
         //            ptfSecond = tmp;
         //        }
 
-        //        public static void Swap(ref Point2D ptdFirst, ref Point2D ptdSecond)
+        //        public static void Swap(ref Distance2D ptdFirst, ref Distance2D ptdSecond)
         //        {
-        //            Point2D tmp = ptdFirst;
+        //            Distance2D tmp = ptdFirst;
         //            ptdFirst = ptdSecond;
         //            ptdSecond = tmp;
         //        }
@@ -1002,7 +1002,7 @@ namespace Global
             return DistanceSquared2D(x1, y1, x2, y2).Sqrt();
         }
 
-        public static Distance CalcDistance2D(Point2D p1, Point2D p2)
+        public static Distance CalcDistance2D(Distance2D p1, Distance2D p2)
         {
             return DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y).Sqrt();
         }
@@ -1047,9 +1047,9 @@ namespace Global
         {
             return new PointF(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
         }
-        public static Point2D Lerp(Point2D a, Point2D b, double wgtB)
+        public static Distance2D Lerp(Distance2D a, Distance2D b, double wgtB)
         {
-            return new Point2D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
+            return new Distance2D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
         }
         public static Point3D Lerp(Point3D a, Point3D b, double wgtB)
         {
@@ -1090,7 +1090,7 @@ namespace Global
         {
             return Lerp(a, b, 0.5F);
         }
-        public static Point2D Average(Point2D a, Point2D b)
+        public static Distance2D Average(Distance2D a, Distance2D b)
         {
             return Lerp(a, b, 0.5);
         }
@@ -1099,13 +1099,13 @@ namespace Global
             return Lerp(a, b, 0.5);
         }
 
-        public static Point2D Average(IList<Point2D> points)
+        public static Distance2D Average(IList<Distance2D> points)
         {
             var count = 0;
             Distance sumX = Distance.Zero;
             Distance sumY = Distance.Zero;
 
-            foreach (Point2D point in points)
+            foreach (Distance2D point in points)
             {
                 count += 1;
                 sumX += point.X;
@@ -1113,9 +1113,9 @@ namespace Global
             }
 
             if (count == 0)
-                return new Point2D(Distance.Zero, Distance.Zero);
+                return new Distance2D(Distance.Zero, Distance.Zero);
             else
-                return new Point2D(sumX / count, sumY / count);
+                return new Distance2D(sumX / count, sumY / count);
         }
 
         // Geometric Average.
@@ -1189,10 +1189,10 @@ namespace Global
         }
 
         // Only meaningful if points are (nearly) colinear, and resultPt and pB are both in same direction from pA.
-        public static double WgtFromResult(Point2D pA, Point2D pB, Point2D resultPt)
+        public static double WgtFromResult(Distance2D pA, Distance2D pB, Distance2D resultPt)
         {
-            Point2D dB = pB - pA;
-            Point2D dResult = resultPt - pA;
+            Distance2D dB = pB - pA;
+            Distance2D dResult = resultPt - pA;
             Distance lengthB = dB.Length;
             Distance lengthResult = dResult.Length;
             return lengthResult / lengthB;
@@ -1211,7 +1211,7 @@ namespace Global
         // Find analogous interpolated value.
         // inNear:inGoal:inFar corresponds to outNear:outGoal:outFar.
         // CAUTION: "inGoal" - maybe it should have been FIRST parameter, but it isn't.
-        public static Point2D MatchingLerp(double inNear, double inFar, double inGoal, Point2D outNear, Point2D outFar)
+        public static Distance2D MatchingLerp(double inNear, double inFar, double inGoal, Distance2D outNear, Distance2D outFar)
         {
             double wgt = WgtFromResult(inNear, inFar, inGoal);
             // outGoal
@@ -1238,9 +1238,9 @@ namespace Global
 
 
         // Interpolate, with separate weights in X and Y.
-        public static Point2D LerpXY(Point2D a, Point2D b, double2 wgtB)
+        public static Distance2D LerpXY(Distance2D a, Distance2D b, double2 wgtB)
         {
-            return new Point2D(Lerp(a.X, b.X, wgtB.X), Lerp(a.Y, b.Y, wgtB.Y));
+            return new Distance2D(Lerp(a.X, b.X, wgtB.X), Lerp(a.Y, b.Y, wgtB.Y));
         }
         public static SizeF LerpXY(SizeF a, SizeF b, SizeF wgtB)
         {
@@ -1254,12 +1254,12 @@ namespace Global
         // The result is GPS coord corresponding to xyWgt.
         // E.g. given (0.5, 0.5), the result will be the GPS coord at center of image.
         // NOTE: corners are ZIGZAG (not clockwise).
-        public static Point2D Lerp2D(double2 xyWgt, Point2D X0Y0, Point2D X1Y0, Point2D X0Y1, Point2D X1Y1)
+        public static Distance2D Lerp2D(double2 xyWgt, Distance2D X0Y0, Distance2D X1Y0, Distance2D X0Y1, Distance2D X1Y1)
         {
-            Point2D xY0 = Lerp(X0Y0, X1Y0, xyWgt.X);
-            Point2D xY1 = Lerp(X0Y1, X1Y1, xyWgt.X);
+            Distance2D xY0 = Lerp(X0Y0, X1Y0, xyWgt.X);
+            Distance2D xY1 = Lerp(X0Y1, X1Y1, xyWgt.X);
 
-            Point2D xy = Lerp(xY0, xY1, xyWgt.Y);
+            Distance2D xy = Lerp(xY0, xY1, xyWgt.Y);
             return xy;
         }
 
@@ -1310,13 +1310,13 @@ namespace Global
         //// For example, if 4 corners are GPS coordinates in corners of an image, and pass in a GPS coordinate,
         //// return tells relative location within the image.
         //// InverseLerp2D is essentially a 2-D version of WgtFromResult. (The implementation is different, because in 2-D the situation is non-linear.)
-        //public static Point2D InverseLerp2D(Point2D xy, Point2D X0Y0, Point2D X1Y0, Point2D X0Y1, Point2D X1Y1)
+        //public static Distance2D InverseLerp2D(Distance2D xy, Distance2D X0Y0, Distance2D X1Y0, Distance2D X0Y1, Distance2D X1Y1)
         //{
         //    // ----> Main Work, Pass 1 <----
-        //    Point2D xyWgt = _InverseLerp2D_Pass1(xy, X0Y0, X1Y0, X0Y1, X1Y1);
+        //    Distance2D xyWgt = _InverseLerp2D_Pass1(xy, X0Y0, X1Y0, X0Y1, X1Y1);
 
         //    // Verify
-        //    Point2D xy_verify = Lerp2D(xyWgt, X0Y0, X1Y0, X0Y1, X1Y1);
+        //    Distance2D xy_verify = Lerp2D(xyWgt, X0Y0, X1Y0, X0Y1, X1Y1);
 
         //    double newError = CalcDistance2D(xy, xy_verify);
         //    // Made it more accurate, for the case where it is oscillating between an x-error and a y-error.
@@ -1331,7 +1331,7 @@ namespace Global
         //    int nMorePasses = 12; // 8
         //    do
         //    {
-        //        Point2D oldXyWgt = xyWgt;
+        //        Distance2D oldXyWgt = xyWgt;
         //        double oldError = newError;
         //        // --- Another pass. Project to lines near the point (according to prior pass). ---
         //        // ----> Main Work, Pass N <----
@@ -1359,14 +1359,14 @@ namespace Global
 
         //// A pass of InverseLerp2D algorithm.
         //// Each pass improves upon the previous estimate (guess) "xyWgt1".
-        //private static Point2D _InverseLerp2D_PassN(Point2D xyWgt1, Point2D xy, Point2D X0Y0, Point2D X1Y0, Point2D X0Y1, Point2D X1Y1)
+        //private static Distance2D _InverseLerp2D_PassN(Distance2D xyWgt1, Distance2D xy, Distance2D X0Y0, Distance2D X1Y0, Distance2D X0Y1, Distance2D X1Y1)
         //{
 
         //    // NOTE: the "x-guess" line yields an improved approximation to yWgt (yWgt2);
         //    // the "y-guess" line yields improved xWgt.
         //    double xWgt = xyWgt1.X;
-        //    Point2D XguessY0 = Lerp(X0Y0, X1Y0, xWgt);
-        //    Point2D XguessY1 = Lerp(X0Y1, X1Y1, xWgt);
+        //    Distance2D XguessY0 = Lerp(X0Y0, X1Y0, xWgt);
+        //    Distance2D XguessY1 = Lerp(X0Y1, X1Y1, xWgt);
         //    double yWgt2;
         //    // "t" along the X-guess line is adjusted yWgt.
         //    // EXPLAIN: each "constant xWgt" line is drawn from yWgt=0 at one end, to yWgt=1 at other end.
@@ -1383,24 +1383,24 @@ namespace Global
         //    // InverseLerp2D is essentially a 2-D version of WgtFromResult. (The implementation is different, because in 2-D the situation is non-linear.)
         //    // 
         //    // x params => yWgt2 ("y" is not a typo).
-        //    Point2D Xguess_closest = ClosestPointOnLine2D_AndT(xy, XguessY0, XguessY1, yWgt2);
+        //    Distance2D Xguess_closest = ClosestPointOnLine2D_AndT(xy, XguessY0, XguessY1, yWgt2);
 
         //    double yWgt = xyWgt1.Y;
-        //    Point2D X0Yguess = Lerp(X0Y0, X0Y1, yWgt);
-        //    Point2D X1Yguess = Lerp(X1Y0, X1Y1, yWgt);
+        //    Distance2D X0Yguess = Lerp(X0Y0, X0Y1, yWgt);
+        //    Distance2D X1Yguess = Lerp(X1Y0, X1Y1, yWgt);
         //    double xWgt2;
         //    // y params => xWgt2 ("x" is not a typo).
-        //    Point2D Yguess_closest = ClosestPointOnLine2D_AndT(xy, X0Yguess, X1Yguess, xWgt2);
+        //    Distance2D Yguess_closest = ClosestPointOnLine2D_AndT(xy, X0Yguess, X1Yguess, xWgt2);
 
         //    // Dim Xguess_error As Double = CalcDistance2D(xy, Xguess_closest)
         //    // Dim Yguess_error As Double = CalcDistance2D(xy, Yguess_closest)
 
         //    // Improved guess.
-        //    return new Point2D(xWgt2, yWgt2);
+        //    return new Distance2D(xWgt2, yWgt2);
         //}
 
         //// Approximate algorithm. 
-        //private static Point2D _InverseLerp2D_Pass1(Point2D xy, Point2D X0Y0, Point2D X1Y0, Point2D X0Y1, Point2D X1Y1)
+        //private static Distance2D _InverseLerp2D_Pass1(Distance2D xy, Distance2D X0Y0, Distance2D X1Y0, Distance2D X0Y1, Distance2D X1Y1)
         //{
         //    double wx0;
         //    // Project on to 4 edges, to find "t" along each edge.
@@ -1437,7 +1437,7 @@ namespace Global
         //        wy = Clamp(wy, 0.0, 1.0);
         //    }
 
-        //    Point2D xyWgt = new Point2D(wx, wy);
+        //    Distance2D xyWgt = new Distance2D(wx, wy);
         //    return xyWgt;
         //}
 
@@ -1446,7 +1446,7 @@ namespace Global
         //// For example, if 4 corners are GPS coordinates in corners of an image, and pass in a GPS coordinate,
         //// return tells relative location within the image.
         //// TODO: This results in divide-by-zero, when sides are parallel.
-        //public static Point2D InverseLerp2D_A(Point2D xy, Point2D X0Y0, Point2D X1Y0, Point2D X0Y1, Point2D X1Y1)
+        //public static Distance2D InverseLerp2D_A(Distance2D xy, Distance2D X0Y0, Distance2D X1Y0, Distance2D X0Y1, Distance2D X1Y1)
         //{
         //    double x = xy.X;
         //    // Formula derived in Mathematica, by solving for (x, y) => (xWgt, yWgt), given the Lerp2D formula above.
@@ -1482,10 +1482,10 @@ namespace Global
         //        wy = Math.Abs(wy);
         //    if ((wx > 1) || (wy > 1))
         //        Dubious();
-        //    Point2D xyWgt = new Point2D(wx, wy);
+        //    Distance2D xyWgt = new Distance2D(wx, wy);
 
         //    // Verify
-        //    Point2D xy_verify = Lerp2D(xyWgt, X0Y0, X1Y0, X0Y1, X1Y1);
+        //    Distance2D xy_verify = Lerp2D(xyWgt, X0Y0, X1Y0, X0Y1, X1Y1);
         //    if (!xy_verify.NearlyEquals(xy))
         //        Trouble();
 
@@ -1921,7 +1921,7 @@ namespace Global
         //                return result;
         //            }
 
-        //            public PolarPoint(Point2D pt) : this(pt.X.Value, pt.Y.Value)
+        //            public PolarPoint(Distance2D pt) : this(pt.X.Value, pt.Y.Value)
         //            {
         //            }
 
@@ -1953,16 +1953,16 @@ namespace Global
         //                }
         //            }
 
-        //            public static PolarPoint operator +(PolarPoint p1, Point2D p2)
+        //            public static PolarPoint operator +(PolarPoint p1, Distance2D p2)
         //            {
-        //                Point2D sum = p1.AsPoint2D() + p2;
+        //                Distance2D sum = p1.AsPoint2D() + p2;
         //                return new PolarPoint(sum);
         //            }
 
-        //            public Point2D AsPoint2D()
+        //            public Distance2D AsPoint2D()
         //            {
         //                // TODO: How will GeoContext deal with units?
-        //                Point2D pt = new Point2D(Length * Math.Cos(Angle), Length * Math.Sin(Angle), null);
+        //                Distance2D pt = new Distance2D(Length * Math.Cos(Angle), Length * Math.Sin(Angle), null);
         //                return pt;
         //            }
         //        }

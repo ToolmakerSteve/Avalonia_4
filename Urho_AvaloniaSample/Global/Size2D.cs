@@ -29,7 +29,7 @@ namespace Global
         /// Implicitly has units Distance.DefaultUnits.
         /// </summary>
         /// <param name="point"></param>
-        public Size2D(Point2D point)
+        public Size2D(Distance2D point)
         {
             this.Width = point.X.Value;
             this.Height = point.Y.Value;
@@ -42,19 +42,19 @@ namespace Global
         }
 
         // Size of rotated rectangle. Top-Left, Top-Right, Bottom-Left corners.
-        public Size2D(Point2D cornerTL, Point2D cornerTR, Point2D cornerBL)
+        public Size2D(Distance2D cornerTL, Distance2D cornerTR, Distance2D cornerBL)
         {
-            this.Width = Point2D.DistanceBetween(cornerTL, cornerTR).Value;
-            this.Height = Point2D.DistanceBetween(cornerTL, cornerBL).Value;
+            this.Width = Distance2D.DistanceBetween(cornerTL, cornerTR).Value;
+            this.Height = Distance2D.DistanceBetween(cornerTL, cornerBL).Value;
         }
 
         //// Size of rotated rectangle. "corners" hold 4 corners of rectangle.
         //// "isZigZag" "=True" corner order: TL, TR, BL, BR; "=False" corner order (clockwise): TL, TR, BR, BL.
-        //public Size2D(Point2D[] corners, bool isZigZag = false) : this(corners[CornerIndex.TopLeft], corners[CornerIndex.TopRight], isZigZag ? corners[ZigZagIndex.BottomLeft] : corners[CornerIndex.BottomLeft])
+        //public Size2D(Distance2D[] corners, bool isZigZag = false) : this(corners[CornerIndex.TopLeft], corners[CornerIndex.TopRight], isZigZag ? corners[ZigZagIndex.BottomLeft] : corners[CornerIndex.BottomLeft])
         //{
 
         //    // Verify isZigZag.  Top-Left to Bottom-Right diagonal should be greater than height.
-        //    Point2D cornerBR = isZigZag ? corners[ZigZagIndex.BottomRight] : corners[CornerIndex.BottomRight];
+        //    Distance2D cornerBR = isZigZag ? corners[ZigZagIndex.BottomRight] : corners[CornerIndex.BottomRight];
         //    double diagonalLength = CalcDistance2D(corners[CornerIndex.TopLeft], cornerBR);
         //    if (diagonalLength < this.Height)
         //        throw new InvalidProgramException("Size2D.New from corners -- Incorrect ordering of corners");
@@ -134,7 +134,7 @@ namespace Global
             return new Size2D(scale * size.Width, scale * size.Height);
         }
 
-        public static Size2D operator *(Point2D scale, Size2D size)
+        public static Size2D operator *(Distance2D scale, Size2D size)
         {
             return new Size2D(scale.X.Value * size.Width, scale.Y.Value * size.Height);
         }

@@ -10,7 +10,7 @@ namespace Global
     {
         #region --- static ----------------------------------------
         // E.g. Maya ground plane in XZ, plus altitude above ground.
-        public static Point3D FromXZ(Point2D xz, Distance altitude)
+        public static Point3D FromXZ(Distance2D xz, Distance altitude)
         {
             // NOTE: "xz.Y" is actually "Z".
             return new Point3D(xz.X, altitude, xz.Y);
@@ -93,9 +93,9 @@ namespace Global
             }
         }
 
-        public Point3D(Point2D pt) : this(pt.X, pt.Y) { }
+        public Point3D(Distance2D pt) : this(pt.X, pt.Y) { }
 
-        public Point3D(Point2D pt, Distance z) : this(pt.X, pt.Y, z) { }
+        public Point3D(Distance2D pt, Distance z) : this(pt.X, pt.Y, z) { }
 
         public Point3D(PointF pt, Distance.UnitsType units) : this(pt.X, pt.Y, units) { }
 
@@ -105,7 +105,7 @@ namespace Global
         #endregion
 
 
-        public bool IsValid => Point2D.CoordIsValid(X) && Point2D.CoordIsValid(Y) && Point2D.CoordIsValid(Z);
+        public bool IsValid => Distance2D.CoordIsValid(X) && Distance2D.CoordIsValid(Y) && Distance2D.CoordIsValid(Z);
 
 
         public bool IsNaN => (double.IsNaN(X.Value) || double.IsNaN(Y.Value) || double.IsNaN(Z.Value));
@@ -174,15 +174,15 @@ namespace Global
         /// CAUTION: If altitude is in Y, use "XZ" instead.
         /// </summary>
         /// <returns></returns>
-        public Point2D To2D()
+        public Distance2D To2D()
         {
-            return new Point2D(X, Y);
+            return new Distance2D(X, Y);
         }
 
         // E.G. extract position on Maya ground plane.
-        public Point2D XZ()
+        public Distance2D XZ()
         {
-            return new Point2D(X, Z);
+            return new Distance2D(X, Z);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Global
             this.Z += pt2.Z;
         }
 
-        public void Add(Point2D pt)
+        public void Add(Distance2D pt)
         {
             this.X += pt.X;
             this.Y += pt.Y;
@@ -271,7 +271,7 @@ namespace Global
         //    return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z + ptd2.Z);
         //}
 
-        public static Point3D operator +(Point3D ptd1, Point2D ptd2)
+        public static Point3D operator +(Point3D ptd1, Distance2D ptd2)
         {
             return new Point3D(ptd1.X + ptd2.X, ptd1.Y + ptd2.Y, ptd1.Z);
         }
@@ -294,7 +294,7 @@ namespace Global
         //    return new Point3D(ptd1.X - ptd2.X, ptd1.Y - ptd2.Y, ptd1.Z - ptd2.Z);
         //}
 
-        public static Point3D operator -(Point3D ptd1, Point2D ptd2)
+        public static Point3D operator -(Point3D ptd1, Distance2D ptd2)
         {
             return new Point3D(ptd1.X - ptd2.X, ptd1.Y - ptd2.Y, ptd1.Z);
         }
@@ -425,7 +425,7 @@ namespace Global
         public static readonly Point3D UnitY = new Point3D(0, 1, 0, null);
         public static readonly Point3D UnitZ = new Point3D(0, 0, 1, null);
 
-        public static Point3D[] ListFromPoint2Ds(ref Point2D[] Point2Ds)
+        public static Point3D[] ListFromPoint2Ds(ref Distance2D[] Point2Ds)
         {
             int nPoints = Point2Ds.Length;
             Point3D[] Point3Ds = new Point3D[nPoints - 1 + 1];

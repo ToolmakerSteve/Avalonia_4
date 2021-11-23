@@ -31,12 +31,12 @@
 //        }
 
 
-//        public static Rectangle2D FromCenter(Point2D centerP, double width, double height, double rotation)
+//        public static Rectangle2D FromCenter(Distance2D centerP, double width, double height, double rotation)
 //        {
 //            // Create a rotated rect with corner at zero, so can use Rectangle2D's internal calculations to relate corner to center.
-//            Rectangle2D rect = new Rectangle2D(Point2D.Zero(), new Size2D(width, height), rotation, false);
+//            Rectangle2D rect = new Rectangle2D(Distance2D.Zero(), new Size2D(width, height), rotation, false);
 //            // Adjust so center is at correct position.
-//            Point2D invCenter = rect.Center;
+//            Distance2D invCenter = rect.Center;
 //            rect.m_position += centerP - invCenter;
 //            // Verify
 //            if (!rect.Center.NearlyEquals(centerP))
@@ -55,14 +55,14 @@
 
 //        // Preserves negative extents:  if minY > maxY, will have negative height.
 //        // TODO: Units.
-//        public static Rectangle2D FromMinMax(Point2D minP, Point2D maxP)
+//        public static Rectangle2D FromMinMax(Distance2D minP, Distance2D maxP)
 //        {
 //            return FromMinMax(minP.X.Value, minP.Y.Value, maxP.X.Value, maxP.Y.Value);
 //        }
 
 //        // If "preserveNegativeExtents = True", then corner1 => TopLeft, corner2 => BottomRight; Width and Height allowed to be negative.
 //        // TODO: Units.
-//        public static Rectangle2D FromOppositeCorners(Point2D corner1, Point2D corner2, bool preserveNegativeExtents = false)
+//        public static Rectangle2D FromOppositeCorners(Distance2D corner1, Distance2D corner2, bool preserveNegativeExtents = false)
 //        {
 //            if (preserveNegativeExtents)
 //                // corner1 => TopLeft, corner2 => BottomRight; Width and Height allowed to be negative.
@@ -79,11 +79,11 @@
 //        // rectPoints is 4-point-polygon (4 corners, clockwise or zig-zag).
 //        // Preserves flip in x or y (width/height may be negative).
 //        // TODO: Units.
-//        public static Rectangle2D FromRectAsPoints_AssumeNoRotation_PreserveFlip(Point2D[] rectPoints)
+//        public static Rectangle2D FromRectAsPoints_AssumeNoRotation_PreserveFlip(Distance2D[] rectPoints)
 //        {
 //            // TopLeft, TopRight.
-//            Point2D TL = rectPoints[0];
-//            Point2D TR = rectPoints[1];
+//            Distance2D TL = rectPoints[0];
+//            Distance2D TR = rectPoints[1];
 
 //            // ASSUME No Rotation.
 //            double left = TL.X.Value;
@@ -103,15 +103,15 @@
 //        //// This happens (to a perceptible amount) when convert WGS-84 to UTM.
 //        //// Also happens (even worse) when import changed corners from Maya.
 //        //// VERSION: If it is rotated, set twist based on rectPoints(1).
-//        //public static Rectangle2D FromRectAsPoints(Point2D[] rectPoints, bool preserveNegativeExtents = false)
+//        //public static Rectangle2D FromRectAsPoints(Distance2D[] rectPoints, bool preserveNegativeExtents = false)
 //        //{
-//        //    Point2D BL;
+//        //    Distance2D BL;
 //        //    // BottomLeft, BottomRight.
 //        //    bool isZigZag;
-//        //    Point2D BR = DetermineDiagonalPoint(rectPoints, out BL, out isZigZag);
+//        //    Distance2D BR = DetermineDiagonalPoint(rectPoints, out BL, out isZigZag);
 //        //    // TopLeft, TopRight.
-//        //    Point2D TL = rectPoints[0];
-//        //    Point2D TR = rectPoints[1];
+//        //    Distance2D TL = rectPoints[0];
+//        //    Distance2D TR = rectPoints[1];
 //        //    double rotation = GetAngleRadians2D(TR - TL);
 
 //        //    // So that round-off errors don't cause a rectangle to be rotated,
@@ -130,11 +130,11 @@
 //        //    if (false && preserveNegativeExtents)
 //        //    {
 //        //        // Verify
-//        //        Point2D[] resultAsPts = rect.AsCorners;
+//        //        Distance2D[] resultAsPts = rect.AsCorners;
 //        //        for (int i = 0; i <= 3; i++)
 //        //        {
-//        //            Point2D oldCorner = rectPoints[i];
-//        //            Point2D newCorner = resultAsPts[i];
+//        //            Distance2D oldCorner = rectPoints[i];
+//        //            Distance2D newCorner = resultAsPts[i];
 //        //            if (!newCorner.NearlyEquals(oldCorner))
 //        //                Trouble();
 //        //        }
@@ -153,20 +153,20 @@
 //        //// Width/Height always non-negative (does not preserve negative extents).
 //        //// If rect is rotated, returns the minimum non-rotated rectangle that includes all 4 corners.
 //        //// NOTE: "rectPoints" allowed to be an arbitrary polygon, with more or less than 4 points.
-//        //public static Rectangle2D FromRectAsPoints_NoRotation_NoFlip(Point2D[] rectPoints)
+//        //public static Rectangle2D FromRectAsPoints_NoRotation_NoFlip(Distance2D[] rectPoints)
 //        //{
 //        //    // Use all 4 points, and expand (non-rotated) rect to include them.
-//        //    Point2D maxPt;
-//        //    Point2D minPt = Calculate_MinMax(rectPoints, ref maxPt);
+//        //    Distance2D maxPt;
+//        //    Distance2D minPt = Calculate_MinMax(rectPoints, ref maxPt);
 //        //    return Rectangle2D.FromMinMax(minPt, maxPt);
 //        //}
 
 
 //        //// Return BottomRight; set BottomLeft, isZigZag1.
 //        //// TMS HACK: Some exports have BR corner in (3). Can tell which corner it is, by finding which point is farther from point (0).
-//        //public static Point2D DetermineDiagonalPoint(Point2D[] rectPoints, out Point2D BL, out bool isZigZag1)
+//        //public static Distance2D DetermineDiagonalPoint(Distance2D[] rectPoints, out Distance2D BL, out bool isZigZag1)
 //        //{
-//        //    Point2D BR;
+//        //    Distance2D BR;
 
 //        //    isZigZag1 = IsZigZag(rectPoints);
 //        //    if (isZigZag1)
@@ -186,7 +186,7 @@
 //        //// NOTE: When "preserveNegativeExtents=False", the corners may be flipped.
 //        //// That is, returned rectangle may no longer have TL as its TL.
 //        //// Only handles y-flip. TODO: Also need x-flip logic? (If both are flipped, may be ambiguous when rotated.)
-//        //private static Rectangle2D From3Corners_Rotated(Point2D TL, Point2D TR, Point2D BL, double rotation, bool fromZigZag, bool preserveNegativeExtents = false)
+//        //private static Rectangle2D From3Corners_Rotated(Distance2D TL, Distance2D TR, Distance2D BL, double rotation, bool fromZigZag, bool preserveNegativeExtents = false)
 //        //{
 //        //    // Because the rectangle is rotated, to detect y-flip, compare the RELATIVE orientations of
 //        //    // two adjacent sides (rather than directly comparing y).
@@ -238,13 +238,13 @@
 
 //        //// Force result to have positive (non-negative) Width and Height.
 //        //// Remember whether flipped x and/or y to achieve that.
-//        //public static Rectangle2D FromRectAsPoints_Cardinal(Point2D[] rectPoints, bool allowRotated, out bool xFlip, out bool yFlip)
+//        //public static Rectangle2D FromRectAsPoints_Cardinal(Distance2D[] rectPoints, bool allowRotated, out bool xFlip, out bool yFlip)
 //        //{
-//        //    Point2D pb;
+//        //    Distance2D pb;
 //        //    bool isZigZag;
-//        //    Point2D pDiag = DetermineDiagonalPoint(rectPoints, out pb, out isZigZag);
-//        //    Point2D p0 = rectPoints[0];
-//        //    Point2D delta = pDiag - p0;
+//        //    Distance2D pDiag = DetermineDiagonalPoint(rectPoints, out pb, out isZigZag);
+//        //    Distance2D p0 = rectPoints[0];
+//        //    Distance2D delta = pDiag - p0;
 
 //        //    xFlip = (delta.X < 0);
 //        //    yFlip = (delta.Y < 0);
@@ -292,7 +292,7 @@
 //        }
 
 //        //// TopLeft, TopRight, and BottomLeft.
-//        //public static Rectangle2D From3Corners(Point2D TL, Point2D TR, Point2D BL, bool fromZigZag)
+//        //public static Rectangle2D From3Corners(Distance2D TL, Distance2D TR, Distance2D BL, bool fromZigZag)
 //        //{
 //        //    double rotation = GetAngleRadians2D(TR - TL);
 //        //    if (rotation.NearlyEquals(0.0))
@@ -316,7 +316,7 @@
 
 
 
-//        private Point2D m_position;
+//        private Distance2D m_position;
 //        private Size2D m_size;
 //        private bool m_fromZigZag;
 //        private double m_rotationRadians;
@@ -327,11 +327,11 @@
 
 //        // X aka Left, Y aka Top.
 //        public Rectangle2D(double x, double y, double width, double height)
-//                : this(new Point2D(x, y), new Size2D(width, height))
+//                : this(new Distance2D(x, y), new Size2D(width, height))
 //        {
 //        }
 
-//        public Rectangle2D(Point2D position, Size2D size)
+//        public Rectangle2D(Distance2D position, Size2D size)
 //        {
 //            m_position = position;
 //            m_size = size;
@@ -342,7 +342,7 @@
 //            m_sin = 0;
 //        }
 
-//        public Rectangle2D(Point2D position, Size2D size, double rotationRadians1, bool fromZigZag)
+//        public Rectangle2D(Distance2D position, Size2D size, double rotationRadians1, bool fromZigZag)
 //        {
 //            m_position = position;
 //            m_size = size;
@@ -368,7 +368,7 @@
 
 
 
-//        public Point2D Position
+//        public Distance2D Position
 //        {
 //            get
 //            {
@@ -546,39 +546,39 @@
 //        }
 
 
-//        public Point2D WidthRotated
+//        public Distance2D WidthRotated
 //        {
 //            get
 //            {
-//                return m_size.Width * new Point2D(m_cos, m_sin);
+//                return m_size.Width * new Distance2D(m_cos, m_sin);
 //            }
 //        }
-//        public Point2D HeightRotated
+//        public Distance2D HeightRotated
 //        {
 //            get
 //            {
 //                // "Top to Bottom" is vector at "angle + 90 degrees".
 //                // (cos, sin)(angle + 90 degrees) = (-sin, cos)(angle)
-//                return m_size.Height * new Point2D(-m_sin, m_cos);
+//                return m_size.Height * new Distance2D(-m_sin, m_cos);
 //            }
 //        }
 
 //        // TODO: Doesn't handle negative Width.
-//        public Point2D UnitWidthRotated
+//        public Distance2D UnitWidthRotated
 //        {
 //            get
 //            {
-//                return new Point2D(m_cos, m_sin);
+//                return new Distance2D(m_cos, m_sin);
 //            }
 //        }
 //        // NOTE: If Height is negative, the unit's direction is inverted.
-//        public Point2D UnitHeightRotated
+//        public Distance2D UnitHeightRotated
 //        {
 //            get
 //            {
 //                // "Top to Bottom" is vector at "angle + 90 degrees".
 //                // (cos, sin)(angle + 90 degrees) = (-sin, cos)(angle)
-//                return Math.Sign(m_size.Height) * new Point2D(-m_sin, m_cos);
+//                return Math.Sign(m_size.Height) * new Distance2D(-m_sin, m_cos);
 //            }
 //        }
 
@@ -678,7 +678,7 @@
 //            }
 //        }
 
-//        public Point2D TopDelta
+//        public Distance2D TopDelta
 //        {
 //            get
 //            {
@@ -687,7 +687,7 @@
 //            }
 //        }
 
-//        public Point2D RightDelta
+//        public Distance2D RightDelta
 //        {
 //            get
 //            {
@@ -696,19 +696,19 @@
 //            }
 //        }
 
-//        public Point2D Center
+//        public Distance2D Center
 //        {
 //            get
 //            {
 //                if (this.IsRotated)
 //                    return Average(this.TopLeft, this.BottomRight);
 //                else
-//                    return new Point2D(m_position.X + m_size.Width / 2, m_position.Y + m_size.Height / 2);
+//                    return new Distance2D(m_position.X + m_size.Width / 2, m_position.Y + m_size.Height / 2);
 //            }
 //        }
 
 //        // CAUTION: Left/Right/Top/Bottom only correct if width&height are non-negative, and Not IsRotated!
-//        public Point2D TopLeft
+//        public Distance2D TopLeft
 //        {
 //            get
 //            {
@@ -720,42 +720,42 @@
 //            }
 //        }
 
-//        public Point2D TopRight
+//        public Distance2D TopRight
 //        {
 //            get
 //            {
 //                if (this.IsRotated)
 //                    return TopLeft + WidthRotated;
 //                else
-//                    return new Point2D(this.Right, this.Top);
+//                    return new Distance2D(this.Right, this.Top);
 //            }
 //        }
 
-//        public Point2D BottomLeft
+//        public Distance2D BottomLeft
 //        {
 //            get
 //            {
 //                if (this.IsRotated)
 //                    return TopLeft + HeightRotated;
 //                else
-//                    return new Point2D(this.Left, this.Bottom);
+//                    return new Distance2D(this.Left, this.Bottom);
 //            }
 //        }
 
-//        public Point2D BottomRight
+//        public Distance2D BottomRight
 //        {
 //            get
 //            {
 //                if (this.IsRotated)
 //                    return TopLeft + WidthRotated + HeightRotated;
 //                else
-//                    return new Point2D(this.Right, this.Bottom);
+//                    return new Distance2D(this.Right, this.Bottom);
 //            }
 //        }
 
 //        // Assume created with New variant that specifies fromZigZag;
 //        // otherwise defaults to ClockwiseCorners.
-//        public Point2D[] AsCorners
+//        public Distance2D[] AsCorners
 //        {
 //            get
 //            {
@@ -771,7 +771,7 @@
 //        // CAUTION: Some ExportRegion code must call ZigZagCorners, not this!
 //        // CAUTION: If negative extents, assumes TopLeft/etc do NOT attempt to compensate for negativity.
 //        // TopLeft = (X,Y), then BottomRight has extents added (possibly signed).
-//        public Point2D[] ClockwiseCorners
+//        public Distance2D[] ClockwiseCorners
 //        {
 //            get
 //            {
@@ -780,7 +780,7 @@
 //        }
 
 //        // "zig-zag" order: (Top-Left, Top-Right, Bottom-Left, Bottom-Right).
-//        public Point2D[] ZigZagCorners
+//        public Distance2D[] ZigZagCorners
 //        {
 //            get
 //            {
@@ -789,7 +789,7 @@
 //        }
 
 //        // "zig-zag" order (but switch Top and Bottom): (Bottom-Left, Bottom-Right, Top-Left, Top-Right).
-//        public Point2D[] ZigZagCorners_YFlip
+//        public Distance2D[] ZigZagCorners_YFlip
 //        {
 //            get
 //            {
@@ -823,7 +823,7 @@
 //        // Represent Rectangle2D as Min Point and Max Point.
 //        // Return maxP; Out minP
 //        // ASSUMES rectangle always has non-negative width & height (otherwise, min/max may be reversed).
-//        public Point2D ToMinMax(out Point2D minP)
+//        public Distance2D ToMinMax(out Distance2D minP)
 //        {
 //            if (this.IsRotated)
 //                throw new NotImplementedException("Rectangle2D.ToMinMax");
@@ -845,12 +845,12 @@
 
 //        //// Return list of points representing Me. xFlip, yFlip swap corresponding coordinate.
 //        //// zigZag determines order of points.
-//        //public Point2D[] ToRectAsPoints(bool xFlip, bool yFlip, bool zigZag)
+//        //public Distance2D[] ToRectAsPoints(bool xFlip, bool yFlip, bool zigZag)
 //        //{
 //        //    if (this.IsRotated)
 //        //    {
 //        //        // (Top-Left, Top-Right, Bottom-Left, Bottom-Right)
-//        //        Point2D[] corners = this.ZigZagCorners;
+//        //        Distance2D[] corners = this.ZigZagCorners;
 
 //        //        MaybeFlip(corners, xFlip, yFlip);
 //        //        if (!zigZag)
@@ -876,7 +876,7 @@
 
 //        //// SIDE-EFFECT: Swaps elements of "corners" as needed.
 //        //// No change if xFlip and yFlip both False.
-//        //private static void MaybeFlip(Point2D[] corners, bool xFlip, bool yFlip)
+//        //private static void MaybeFlip(Distance2D[] corners, bool xFlip, bool yFlip)
 //        //{
 //        //    if (xFlip)
 //        //    {
@@ -893,7 +893,7 @@
 
 //        //// Fill pts with representation of Me. xFlip, yFlip swap corresponding coordinate.
 //        //// zigZag determines order of points.
-//        //public void ToRectAsPoints(ref Point2D[] pts, bool xFlip, bool yFlip, bool zigZag)
+//        //public void ToRectAsPoints(ref Distance2D[] pts, bool xFlip, bool yFlip, bool zigZag)
 //        //{
 //        //    if (this.IsRotated)
 //        //        pts = ToRectAsPoints(xFlip, yFlip, zigZag);
@@ -959,16 +959,16 @@
 
 //        //public bool Contains(double px, double py)
 //        //{
-//        //    return Contains(new Point2D(px, py));
+//        //    return Contains(new Distance2D(px, py));
 //        //}
 
 //        //// "_Inclusive": Allowed to touch border.
-//        //public bool Contains(Point2D point)
+//        //public bool Contains(Distance2D point)
 //        //{
 //        //    return mDL2DLib.PointInsideRectangle2D_Inclusive(point, this);
 //        //}
 
-//        //public bool Contains_WithTolerance(Point2D point, double tolerance)
+//        //public bool Contains_WithTolerance(Distance2D point, double tolerance)
 //        //{
 //        //    return mDL2DLib.PointInsideRectangle2D_WithTolerance(point, this, tolerance);
 //        //}
@@ -981,7 +981,7 @@
 
 
 //        // If p is outside Me, adjust X and Y to closest edge of Me.
-//        public Point2D Clamp(Point2D p)
+//        public Distance2D Clamp(Distance2D p)
 //        {
 //            // --- TODO: Need logic for rotated. For now, we just use the regular logic, which won't correctly move it into rectangle, when rotated. ---
 //            // (Used indirectly somewhere in new 3D Mode. When setting up water?)
@@ -990,7 +990,7 @@
 //            // Throw New NotImplementedException("Rectangle2D.Clamp")
 
 //            // Else
-//            // NOTE: Point2D is Struct, so ok to modify p -- won't modify caller's p.
+//            // NOTE: Distance2D is Struct, so ok to modify p -- won't modify caller's p.
 //            if (p.X < this.MinX)
 //                p.X = this.MinX;
 //            else if (p.X > this.MaxX)
@@ -1016,8 +1016,8 @@
 //        //    // --- rotated => re-calc --
 //        //    bool xFlip = (this.Width < 0);
 //        //    bool yFlip = (this.Height < 0);
-//        //    Point2D maxPt;
-//        //    Point2D minPt = Calculate_MinMax(this.ClockwiseCorners, ref maxPt);
+//        //    Distance2D maxPt;
+//        //    Distance2D minPt = Calculate_MinMax(this.ClockwiseCorners, ref maxPt);
 //        //    Rectangle2D newRect = Rectangle2D.FromMinMax(minPt, maxPt);
 
 //        //    if (allowNegativeSize)
@@ -1041,8 +1041,8 @@
 //        {
 //            // TODO: Handle rotated rectangle.
 //            // TODO: Handle negative height.
-//            Point2D tl = new Point2D(this.Left - margin, this.Top - margin);
-//            Point2D br = new Point2D(this.Right + margin, this.Bottom + margin);
+//            Distance2D tl = new Distance2D(this.Left - margin, this.Top - margin);
+//            Distance2D br = new Distance2D(this.Right + margin, this.Bottom + margin);
 //            return Rectangle2D.FromOppositeCorners(tl, br);
 //        }
 //    }
