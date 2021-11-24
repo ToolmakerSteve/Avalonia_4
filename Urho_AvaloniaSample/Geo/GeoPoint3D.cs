@@ -6,7 +6,7 @@ namespace Geo
 {
     public struct GeoPoint3D
     {
-        public Distance3D Pt { get; private set; }
+        public Distance3D Pt;
         public IGeoContext Context { get; set; }
 
 
