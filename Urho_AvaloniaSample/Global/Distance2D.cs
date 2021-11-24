@@ -216,7 +216,6 @@ namespace Global
             }
         }
 
-
         public PointF ToPointF()
         {
             if (X.Value == double.MaxValue)
@@ -251,6 +250,12 @@ namespace Global
             return new Vector2(System.Convert.ToSingle(X), System.Convert.ToSingle(Y));
         }
 
+        /// <summary>Converts to raw unitless vector (no units).</summary>
+        /// <remarks>For situations where the units of X and Y "cancel out" (e.g. a ratio, or scalar value).</remarks>
+        public double2 ToDouble2()
+        {
+            return new double2(X.Value, Y.Value);
+        }
 
         public Distance2D SwapXY()
         {
