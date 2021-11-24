@@ -4,10 +4,11 @@ using Global;
 
 namespace Geo
 {
-    public class GeoPoint3D
+    public struct GeoPoint3D
     {
         public Distance3D Pt { get; private set; }
         public IGeoContext Context { get; set; }
+
 
         public Distance X { get => Pt.X; }
         public Distance Y { get => Pt.Y; }

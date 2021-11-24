@@ -4,13 +4,15 @@ using Global;
 
 namespace Geo
 {
-    public class GeoPoint2D
+    public struct GeoPoint2D
     {
         public Distance2D Pt { get; private set; }
         public IGeoContext Context { get; set; }
 
+
         public Distance X { get => Pt.X; }
         public Distance Y { get => Pt.Y; }
+
 
         public GeoPoint2D(Distance2D pt, IGeoContext context)
         {
