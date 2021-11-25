@@ -17,7 +17,7 @@ namespace Global
         /// <returns></returns>
         public static Vector3 PlaceOnTerrain(Terrain terrain, Vector2 srcPt, float altitude = 0)
         {
-            Vector3 destPt = new Vector3(srcPt);
+            Vector3 destPt = srcPt.ToXZ();
             // Y is altitude.
             destPt.Y = terrain.GetHeight(destPt) + altitude;
             return destPt;

@@ -220,7 +220,7 @@ namespace Global
         {
             if (X.Value == double.MaxValue)
                 return new PointF(float.MaxValue, float.MaxValue);
-            return new PointF(System.Convert.ToSingle(X), System.Convert.ToSingle(Y));
+            return new PointF((float)(X.Value), (float)(Y.Value));
         }
 
         public Distance3D ToPoint3D()
@@ -247,7 +247,7 @@ namespace Global
         {
             if (X.Value == double.MaxValue)
                 return new Vector2(float.MaxValue, float.MaxValue);
-            return new Vector2(System.Convert.ToSingle(X), System.Convert.ToSingle(Y));
+            return new Vector2((float)(X.Value), (float)(Y.Value));
         }
 
         /// <summary>Converts to raw unitless vector (no units).</summary>
@@ -510,7 +510,7 @@ namespace Global
 
         public RectangleF Mult(RectangleF rect)
         {
-            return new RectangleF(System.Convert.ToSingle(X * rect.Left), System.Convert.ToSingle(Y * rect.Top), System.Convert.ToSingle(X * rect.Width), System.Convert.ToSingle(Y * rect.Height));
+            return new RectangleF((float)(X.Value * rect.Left), (float)(Y.Value * rect.Top), (float)(X.Value * rect.Width), (float)(Y.Value * rect.Height));
         }
 
 
@@ -569,7 +569,7 @@ namespace Global
             for (int index = 0; index <= nPoints - 1; index++)
             {
                 Distance2D p = point2Ds[index];
-                PointFs[index] = new PointF(System.Convert.ToSingle(p.X), System.Convert.ToSingle(p.Y));
+                PointFs[index] = new PointF((float)(p.X.Value), (float)(p.Y.Value));
             }
 
             return PointFs;

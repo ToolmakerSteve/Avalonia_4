@@ -131,7 +131,8 @@ namespace Global
 
             static public bool operator ==(UnitsType left, UnitsType right)
             {
-                return left.TypeIndex == right.TypeIndex;
+                return ReferenceEquals(left, right);
+                //return left.TypeIndex == right.TypeIndex;
             }
             static public bool operator !=(UnitsType left, UnitsType right)
             {

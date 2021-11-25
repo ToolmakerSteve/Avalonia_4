@@ -18,7 +18,7 @@ namespace AvaloniaSample
         const bool StoneWallTest1 = true && UseWaterScene;   // TMS
 
         Camera Camera = null;
-		Scene Scene;
+		public Scene Scene;
         Viewport Viewport2;
         // Used by Water Scene.
         public Terrain Terrain;
@@ -26,6 +26,9 @@ namespace AvaloniaSample
         Node ReflectionCameraNode;
         // Used when showing wireframe.
         Material WireframeMaterial;
+
+        // TheWall.
+        public Node WallNode;
 
 		// private SampleAvaloniaWindow _window;
         [Preserve]

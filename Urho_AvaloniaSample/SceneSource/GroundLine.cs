@@ -69,6 +69,18 @@ namespace SceneSource
         #region --- OnUpdate ----------------------------------------
         internal void OnUpdate()
         {
+            // TBD: Ideally, add some representation when there is only one point.
+            // Given that we don't know what direction wall will go in,
+            // this will have to represent "a point".
+            // It could have the height and width of the wall. "Cylinder" would be ideal. "Rectangular Prism" would be okay.
+            if (Points.Count < 2)
+                return;
+
+            Node wallNode = EnsureWallNode();
+            StaticModel wall = EnsureModel(wallNode);
+
+            var it = AvaloniaSample.AvaloniaSample.It;
+            CreateGeometryFromPoints(wallNode, wall, it.Terrain);
         }
         #endregion
 
@@ -90,25 +102,36 @@ namespace SceneSource
             AddPoint(geoPt.Pt);
         }
 
-        public StaticModel AsModelIn(Scene scene, Terrain terrain)
+        private Node EnsureWallNode()
         {
-            if (Points.Count == 0)
-                return null;
+            var it = AvaloniaSample.AvaloniaSample.It;
+            if (it.WallNode == null)
+                it.WallNode = it.Scene.CreateChild("Wall");
 
-            var node = scene.CreateChild("Wall");
-            StaticModel model = node.CreateComponent<StaticModel>();
+            return it.WallNode;
+        }
 
+        public StaticModel EnsureModel(Node node)
+        {
+            StaticModel model = node.GetComponent<StaticModel>();
+            if (model == null)
+            {
+                model = node.CreateComponent<StaticModel>();
+            }
             model.CastShadows = true;
             Material mat = Material.FromColor(Color.Magenta);   // TODO
             model.SetMaterial(mat);
-
-            CreateGeometryFromPoints(model, terrain);
-
             return model;
         }
 
-        public void CreateGeometryFromPoints(StaticModel model, Terrain terrain)
+        public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
         {
+            if (Points.Count < 2)
+                return;
+
+            Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
+            //TODO ClearGeometry(node, model);
+
             var poly = new Poly3D();
 
             // TODO: TO calc good perpendicular (to give wall its width), need THREE points (except at ends).
@@ -138,22 +161,30 @@ namespace SceneSource
                     if (firstPerpendicular)
                     {
                         // We had no way to compute perpendicular at pt0; now we can.
-                        // TODO: Perpendicular endpoints need to also land on terrain!
                         firstPerpendicular = false;
-                        perp0 = CalcPerpendicularXZ(cl0, cl1);
+                        // EXPLAIN: We're only on the second point, so cl0=cl1.
+                        // There is only one perpendicular possible, from that point to cl2.
+                        // Put it in perp0; this will get transferred to perp0 at end of loop.
+                        // So it is perp0 for NEXT iteration.
+                        perp1 = CalcPerpendicularXZ(cl0, cl2);
                     }
+                    else
+                    {
+                        // GUESS that a good perpendicular at cl1 is tangent to the neighboring points.
+                        // TBD: Adjust for relative distances to those points?
+                        perp1 = CalcPerpendicularXZ(cl0, cl2);
 
-                    // GUESS that a good perpendicular at cl1 is tangent to the neighboring points.
-                    // TBD: Adjust for relative distances to those points?
-                    perp1 = CalcPerpendicularXZ(cl0, cl2);
-
-                    AddQuad(poly, cl0, cl1, perp0, perp1, terrain);
+                        AddQuad(poly, cl0, cl1, perp0, perp1, terrain);
+                    }
                 }
 
                 cl0 = cl1;
                 cl1 = cl2;
                 perp0 = perp1;
             }
+
+            // Add the final quad.
+            AddQuad(poly, cl0, cl1, perp0, perp1, terrain);
         }
 
         private void AddQuad(Poly3D poly, Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain)
@@ -167,6 +198,16 @@ namespace SceneSource
         {
             Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
             //throw new NotImplementedException();
+
+            if (true)
+            {
+                // test: A box at midpoint.
+
+            }
+            else
+            {
+
+            } 
         }
         #endregion
 
