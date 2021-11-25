@@ -15,8 +15,8 @@ namespace SceneSource
     /// </summary>
     public class GroundLine : SourceItem
     {
-        // TBD: Or use a "depth bias" technique?
-        const float DrawOffsetAboveTerrain = 0.1f;
+        private static ElementMask ElemMask = ElementMask.Position;
+        //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
 
         #region --- data, new ----------------------------------------
@@ -136,7 +136,7 @@ namespace SceneSource
             if (Poly == null)
             {
                 Poly = new Poly3D();
-                Poly.Init(model0);
+                Poly.Init(model0, ElemMask);
                 model.SetGeometry(0, 0, Poly.Geom);
                 //TBD model.BoundingBox = Bounds;
             }
