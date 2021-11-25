@@ -190,9 +190,8 @@ namespace AvaloniaSample
             if (doAddPoint)
             {
                 // HACK: Put a box at this point.
-                // TODO: Orient the box along direction of path.
-                // TODO: Create or Extend a path, and a corresponding extruded model.
-                AddBoxAt(penPosition2D);
+                //AddBoxAt(penPosition2D);
+                // Create or Extend a path, and a corresponding extruded model.
                 TheWall.AddPoint(new Global.Distance2D(penPosition2D, null));
                 TheWall.OnUpdate();
 
@@ -211,7 +210,7 @@ namespace AvaloniaSample
             //float boxScale = MinWallSegmentLength / 2;
             // "- small-value": Deliberate gap to see segments.
             float boxScale = MinWallSegmentLength - 0.1f;
-            AddBoxToScene(Scene, FromGroundPlane(penPosition2D), boxScale);
+            AddBoxToScene(Scene, FromGroundPlane(penPosition2D), boxScale, true);
         }
         #endregion
 
@@ -357,7 +356,7 @@ namespace AvaloniaSample
                 // TMS: Make the boxes different.
                 Material boxMaterial = materials[i % colors.Length];
 
-                AddBoxToScene(scene, position, boxScale, boxMaterial, cache);
+                AddBoxToScene(scene, position, boxScale, true, boxMaterial, cache);
             }
 
             // Create a water plane object that is as large as the terrain
@@ -373,7 +372,16 @@ namespace AvaloniaSample
             WaterSceneMainCameraSettings(CameraPositionNode, Camera);
         }
 
-        private void AddBoxToScene(Scene scene, Vector3 position, float boxScale,
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="position">if terrainRelative, .Y is height above terrain.</param>
+        /// <param name="boxScale"></param>
+        /// <param name="terrainRelative">when true, position.Y is height above terrain. And box rotates to follow the terrain's surface.</param>
+        /// <param name="boxMaterial"></param>
+        /// <param name="cache"></param>
+        public void AddBoxToScene(Node parent, Vector3 position, float boxScale, bool terrainRelative,
                                    Material boxMaterial = null, Urho.Resources.ResourceCache cache = null)
         {
             if (cache == null)
@@ -384,16 +392,21 @@ namespace AvaloniaSample
                 boxMaterial = cache.GetMaterial("Materials/Stone.xml");
             }
 
-            var objectNode = scene.CreateChild("Box");
+            var objectNode = parent.CreateChild("Box");
 
-            // "boxScale/2": box's position is center; want its bottom to touch ground.
-            // "- small-value": slightly underground so no gap due to uneven ground height. TBD: Proportional to box size?
-            //   TBD: proportional to angle between normal and vertical axis?
-            position.Y = Terrain.GetHeight(position) + boxScale/2 - 0.1f; //2.25f;
+            if (terrainRelative)
+            {
+                // "boxScale/2": box's position is center; want its bottom to touch ground.
+                // "- small-value": slightly underground so no gap due to uneven ground height. TBD: Proportional to box size?
+                //   TBD: proportional to angle between normal and vertical axis?
+                position.Y = Terrain.GetHeight(position) + boxScale / 2 - 0.1f; //2.25f;
+            }
             objectNode.Position = position;
 
-            // Create a rotation quaternion from up vector to terrain normal
-            objectNode.Rotation = Quaternion.FromRotationTo(new Vector3(0.0f, 1.0f, 0.0f), Terrain.GetNormal(position));
+            if (terrainRelative) {
+                // Create a rotation quaternion from up vector to terrain normal
+                objectNode.Rotation = Quaternion.FromRotationTo(new Vector3(0.0f, 1.0f, 0.0f), Terrain.GetNormal(position));
+            }
 
             objectNode.SetScale(boxScale);
 

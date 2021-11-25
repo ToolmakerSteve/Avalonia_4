@@ -130,7 +130,7 @@ namespace SceneSource
                 return;
 
             Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
-            //TODO ClearGeometry(node, model);
+            ClearGeometry(node, model);
 
             var poly = new Poly3D();
 
@@ -185,6 +185,34 @@ namespace SceneSource
 
             // Add the final quad.
             AddQuad(poly, cl0, cl1, perp0, perp1, terrain);
+            FinishGeometry();
+        }
+
+        const bool Test_BoxPerWallSegment = true;
+
+        private void ClearGeometry(Node node, StaticModel model)
+        {
+            if (Test_BoxPerWallSegment)
+            {
+                // Added box sub-nodes. Delete the old ones.
+                // TBD: Or just keep adding on new ones, re-use old ones?
+                _currentQuadCount = 0;
+            }
+            else
+            {
+                throw new NotImplementedException("ClearGeometry");
+            }
+        }
+
+        private void FinishGeometry()
+        {
+            _prevQuadCount = _currentQuadCount;
+            if (Test_BoxPerWallSegment)
+            {
+            }
+            else
+            {
+            }
         }
 
         private void AddQuad(Poly3D poly, Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain)
@@ -194,20 +222,33 @@ namespace SceneSource
             AddQuad(poly, wallPair0, wallPair1);
         }
 
+        private int _prevQuadCount = 0;
+        private int _currentQuadCount = 0;
+
         private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1)
         {
             Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
             //throw new NotImplementedException();
 
-            if (true)
+            if (Test_BoxPerWallSegment)
             {
                 // test: A box at midpoint.
-
+                var midpoint0 = U.Average(wallPair0.First, wallPair0.Second);
+                var midpoint1 = U.Average(wallPair1.First, wallPair1.Second);
+                var midPoint = U.Average(midpoint0, midpoint1);
+                _currentQuadCount++;
+                // VERSION: Only add if it is a new one.
+                if (_currentQuadCount > _prevQuadCount)
+                {
+                    var it = AvaloniaSample.AvaloniaSample.It;
+                    it.AddBoxToScene(it.WallNode, midPoint, 0.5f, false);
+                    // OPTIONAL: Could set _prevQuadCount = _currentQuadCount here.
+                }
             }
             else
             {
-
-            } 
+                throw new NotImplementedException("AddQuad");
+            }
         }
         #endregion
 
