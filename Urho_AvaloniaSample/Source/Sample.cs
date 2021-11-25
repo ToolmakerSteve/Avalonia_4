@@ -298,7 +298,7 @@ namespace AvaloniaSample
         {
             const float mouseSensitivity = .1f;
 
-            if (Input.GetMouseButtonDown(MouseButton.Left))
+            if (Input.GetMouseButtonDown(MouseButton.Right))
             {
                 var mouseMove = Input.MouseMove;
                 Yaw += mouseSensitivity * mouseMove.X;
@@ -354,7 +354,7 @@ namespace AvaloniaSample
 
 		protected void SimpleCreateInstructionsWithWasd (string extra = "")
 		{
-			SimpleCreateInstructions("Use WASD keys and mouse/touch to move" + extra);
+			SimpleCreateInstructions("WASD=move, RIGHT mouse/touch=rotate" + extra);
 		}
 	
 		protected void SimpleCreateInstructions(string text = "")
@@ -363,7 +363,7 @@ namespace AvaloniaSample
 				{
 					Value = text,
 					HorizontalAlignment = HorizontalAlignment.Center,
-					VerticalAlignment = VerticalAlignment.Center
+					VerticalAlignment = VerticalAlignment.Top
 				};
 			textElement.SetFont(ResourceCache.GetFont("Fonts/Anonymous Pro.ttf"), 15);
 			UI.Root.AddChild(textElement);

@@ -12,10 +12,10 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
-        const bool UseWaterScene = true;//true;   // TMS
         const bool IncludeAvaloniaLayer = false;   // TMS
+        const bool UseWaterScene = true;//true;   // TMS
+        const bool DrawWallAsFly = false && UseWaterScene;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
-        const bool StoneWallTest1 = true && UseWaterScene;   // TMS
 
         Camera Camera = null;
 		public Scene Scene;
@@ -138,9 +138,9 @@ namespace AvaloniaSample
 
             if (Camera != null)
             {
-                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && StoneWallTest1)
+                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
                 {
-                    if (Input.GetMouseButtonDown(MouseButton.Right))
+                    if (Input.GetMouseButtonDown(MouseButton.Left))
                     {
                         OnUpdate_DrawWall();
                     }
