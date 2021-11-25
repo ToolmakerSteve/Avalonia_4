@@ -3525,5 +3525,18 @@ namespace Global
         //            // falls within the unit triangle "A=>(u:0, v:0),  B=>(u:1, v:0),  C=>(u:0, v:1)".
         //            return (u >= 0.0) && (u <= 1.0) && (v >= 0) && (v <= 1) && (u + v <= 1);
         //        }
+
+
+        /// <summary>
+        /// Not an extension method, so will work with properties.
+        /// Usage: dst = CopyXZ(src, dst);
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
+        /// <returns></returns>
+        public static Vector3 CopyXZ(Vector3 src, Vector3 dst)
+        {
+            return new Vector3(src.X, dst.Y, src.Z);
+        }
     }
 }
