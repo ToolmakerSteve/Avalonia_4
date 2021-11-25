@@ -10,8 +10,8 @@ namespace Geo
         public IGeoContext Context { get; set; }
 
 
-        public Distance X { get => Pt.X; }
-        public Distance Y { get => Pt.Y; }
+        public Distance X { get => Pt.X; set => Pt.X = value; }
+        public Distance Y { get => Pt.Y; set => Pt.Y = value; }
 
 
         public GeoPoint2D(Distance2D pt, IGeoContext context)

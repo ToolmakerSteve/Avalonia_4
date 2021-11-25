@@ -98,6 +98,7 @@ namespace AvaloniaSample
         #region --- OnUpdate ----------------------------------------
         uint _startTime = 0;
         bool WallDrawStarted;   // TMS
+        SceneSource.GroundLine TheWall;
         Vector2 LastWallPosition2D;
         const float MinWallSegmentLength = 1;   // TBD: Good value.
 
@@ -173,6 +174,7 @@ namespace AvaloniaSample
             bool doAddPoint = false;
             if (!WallDrawStarted)
             {
+                StartWall();
                 doAddPoint = true;
             }
             else
@@ -188,10 +190,17 @@ namespace AvaloniaSample
                 // TODO: Orient the box along direction of path.
                 // TODO: Create or Extend a path, and a corresponding extruded model.
                 AddBoxAt(penPosition2D);
+                TheWall.AddPoint(new Global.Distance2D(penPosition2D, null));
+                TheWall.OnUpdate();
 
                 LastWallPosition2D = penPosition2D;
-                WallDrawStarted = true;
             }
+        }
+
+        private void StartWall()
+        {
+            WallDrawStarted = true;
+            TheWall = new SceneSource.GroundLine(2, 8);
         }
 
         private void AddBoxAt(Vector2 penPosition2D)

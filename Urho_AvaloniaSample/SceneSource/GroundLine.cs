@@ -27,9 +27,10 @@ namespace SceneSource
 
         public IGeoContext Context { get; set; }
         /// <summary>
-        /// Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Distance2D.
+        /// Within coord system of a scene, "float" precision is sufficient;
+        /// TBD: Make "float" version of Distance2D.
         /// </summary>
-        public List<Vector2> Points { get; private set; }
+        public List<Distance2D> Points { get; private set; }
 
         private float WidthMetersF => (float)Width.Value;
         private float HeightMetersF => (float)Height.Value;
@@ -61,17 +62,23 @@ namespace SceneSource
                 context = NoGeoContext.It;
             Context = context;
 
-            Points = new List<Vector2>();
+            Points = new List<Distance2D>();
         }
         #endregion
 
+
+        #region --- OnUpdate ----------------------------------------
+        internal void OnUpdate()
+        {
+        }
+        #endregion
 
         #region --- public methods ----------------------------------------
         /// <summary>
         /// ASSUMES in same Context.
         /// </summary>
         /// <param name="pt"></param>
-        public void AddPoint(Vector2 pt)
+        public void AddPoint(Distance2D pt)
         {
             Points.Add(pt);
         }
@@ -81,9 +88,7 @@ namespace SceneSource
             if (geoPt.Context != Context)
                 throw new NotImplementedException("AddPoint from a different Context");
 
-            var pt = geoPt.Pt;
-            // Within coord system of a scene, "float" precision is sufficient, so use Vector2 instead of Distance2D.
-            AddPoint(new Vector2((float)pt.X.Value, (float)pt.Y.Value));
+            AddPoint(geoPt.Pt);
         }
 
         public StaticModel AsModelIn(Scene scene, Terrain terrain)
@@ -118,10 +123,10 @@ namespace SceneSource
             Vector3 cl1 = new Vector3();
             Vector2 perp0 = new Vector2();
             Vector2 perp1 = new Vector2();
-            foreach (Vector2 srcPt in Points)
+            foreach (Distance2D srcPt in Points)
             {
                 // On wall's center line.
-                Vector3 cl2 = U.PlaceOnTerrain(terrain, srcPt);
+                Vector3 cl2 = U.PlaceOnTerrain(terrain, srcPt.ToVector2());
                 if (firstPoint)
                 {
                     cl1 = cl2;
