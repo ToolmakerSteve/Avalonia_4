@@ -76,7 +76,7 @@ namespace ModelFrom2DShape
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
 
             VData[_usedVFloats + 0] = position.X;
-            VData[_usedVFloats + 1] = 10;//position.Y;
+            VData[_usedVFloats + 1] = position.Y;
             VData[_usedVFloats + 2] = position.Z;
 
             if (ElemMask.HasFlag(ElementMask.Normal))

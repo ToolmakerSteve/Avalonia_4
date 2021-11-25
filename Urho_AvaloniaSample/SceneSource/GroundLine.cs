@@ -57,7 +57,7 @@ namespace SceneSource
 
         public GroundLine(Meters width, Meters height, Geo.IContext context = null)
         {
-            Width = new Meters(width.Value * 10);
+            Width = width;
             Height = height;
             // Initialized to altitude zero.
             BaseAltitude = Meters.Zero;
