@@ -50,6 +50,14 @@ namespace ModelFrom2DShape
         {
             NumQuads++;
 
+            if (NumQuads >= 2)
+            {
+                // Update the edge of previous quad.
+                // REASON: Adding this quad changes calc of perpendicular between the two quads.
+                UpdateRecentVertex(wallPair0.First, -2);
+                UpdateRecentVertex(wallPair0.Second, -1);
+            }
+
             // Add vertices for quad.
             AppendVertex(wallPair0.First);
             AppendVertex(wallPair0.Second);
@@ -75,21 +83,35 @@ namespace ModelFrom2DShape
             if (_usedVertices >= _numVertices)
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
 
-            VData[_usedVFloats + 0] = position.X;
-            VData[_usedVFloats + 1] = position.Y;
-            VData[_usedVFloats + 2] = position.Z;
+            UpdateVertex(position, _usedVFloats);
+
+            //// TODO: Need to set normals BEFORE increment !
+            _usedVFloats += (uint)NFloatsPerVertex();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="relIndex">-1 for previous vertex, -2 for one before that.</param>
+        private void UpdateRecentVertex(Vector3 position, int relIndex)
+        {
+            int relVFloatIndex = relIndex * NFloatsPerVertex();
+            UpdateVertex(position, (uint)(_usedVFloats + relVFloatIndex));
+        }
+
+        private void UpdateVertex(Vector3 position, uint iVFloat)
+        {
+            VData[iVFloat + 0] = position.X;
+            VData[iVFloat + 1] = position.Y;
+            VData[iVFloat + 2] = position.Z;
 
             if (ElemMask.HasFlag(ElementMask.Normal))
             {   // TODO
                 //Vector3 normal;
-                //VData[_usedVFloats + 3] = normal.X;
-                //VData[_usedVFloats + 4] = normal.Y;
-                //VData[_usedVFloats + 5] = normal.Z;
+                //VData[iVFloat + 3] = normal.X;
+                //VData[iVFloat + 4] = normal.Y;
+                //VData[iVFloat + 5] = normal.Z;
             }
-
-            //// TODO: Need to set normals BEFORE increment these values!
-            //_usedVertices++;
-            _usedVFloats += (uint)NFloatsPerVertex();
         }
 
         private void AppendQuadIndices()
