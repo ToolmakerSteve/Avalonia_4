@@ -156,10 +156,6 @@ namespace SceneSource
             if (Points.Count < 2)
                 return;
 
-            // TEST: Stop after adding one quad.
-            if (_currentQuadCount > 0)
-                return;
-
             Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
             CreateOrClearGeometry(node, model);
 
