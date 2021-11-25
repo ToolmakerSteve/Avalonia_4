@@ -16,7 +16,7 @@ namespace AvaloniaSample
         const bool UseWaterScene = true;//true;   // TMS
         const bool DrawWallAsFly = false && UseWaterScene;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
-        const float InitialAltitude2 = 10; //100;
+        const float InitialAltitude2 = 100;
 
         Camera Camera = null;
 		public Scene Scene;

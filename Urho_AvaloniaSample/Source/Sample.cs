@@ -41,6 +41,8 @@ namespace AvaloniaSample
 		UI ui;
 
         protected const bool ShowTwoViewports = true;//true;   // TMS
+        // Camera not only goes up as terrain rises, it also goes down as terrain falls.
+        protected const bool TrackAltitude = true;
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
         protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
         protected const float MinimumAltitudeAboveTerrain = 1;
@@ -224,10 +226,10 @@ namespace AvaloniaSample
             {
                 didMove = true;
                 var moveMult = moveSpeed * timeStep;
+                float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
                 if (GroundSpeedMultByAltitude)
                 {
                     float sceneAltitude = CurrentCameraMainNode.Position.Altitude();
-                    float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
                     float relAltitude = sceneAltitude - terrainAltitude;
                     float beginHighAltitude = overViewport2 ? 60 : 20;
                     if (relAltitude > beginHighAltitude)
@@ -241,14 +243,22 @@ namespace AvaloniaSample
                 }
                 //Debug.WriteLine($"--- deltaTime={deltaTime}, mult={moveMult}, elapsed={Time.ElapsedTime}, step={Time.TimeStep}, over2={overViewport2} ---");
 
+                bool enforceMaxAltitude = TrackAltitude && !altitudeMove.HasValue;
+                float currentMaxRelAltitude = enforceMaxAltitude ?
+                        CurrentCameraMainNode.Position.Altitude() - terrainAltitude :
+                        float.MaxValue;
+                float otherMaxAltitude = TrackAltitude ?
+                        OtherCameraMainNode.Position.Altitude() - terrainAltitude :
+                        float.MaxValue;
+
                 // Move current camera.
                 CurrentCameraMainNode.Translate(allAxesMove * moveMult);
-                EnforceMinimumAltitudeAboveTerrain(CurrentCameraMainNode, CurrentMinimumAltitudeAboveTerrain);
+                EnforceMinimumAltitudeAboveTerrain(CurrentCameraMainNode, CurrentMinimumAltitudeAboveTerrain, currentMaxRelAltitude);
 
                 if (ShowTwoViewports)
                 {
                     CopyXZ(CurrentCameraMainNode, OtherCameraMainNode);
-                    EnforceMinimumAltitudeAboveTerrain(OtherCameraMainNode, OtherMinimumAltitudeAboveTerrain);
+                    EnforceMinimumAltitudeAboveTerrain(OtherCameraMainNode, OtherMinimumAltitudeAboveTerrain, otherMaxAltitude);
                 }
             }
 
@@ -261,7 +271,7 @@ namespace AvaloniaSample
             return didMove;
         }
 
-        private void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude)
+        private void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude, float maxRelativeAltitude)
         {
             if (minimumRelativeAltitude > 0)
             {
@@ -275,6 +285,13 @@ namespace AvaloniaSample
                     sceneAltitude -= excess;
                     //relAltitude -= excess;
                     cameraMainNode.Position = U.SetAltitude(cameraMainNode.Position, sceneAltitude);
+                } else if (maxRelativeAltitude < float.MaxValue && maxRelativeAltitude > minimumRelativeAltitude)
+                {
+                    if (relAltitude > maxRelativeAltitude)
+                    {
+                        sceneAltitude = terrainAltitude + maxRelativeAltitude;
+                        cameraMainNode.Position = U.SetAltitude(cameraMainNode.Position, sceneAltitude);
+                    }
                 }
             }
         }
