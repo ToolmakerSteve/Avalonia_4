@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using Geo;
 using Global;
 using ModelFrom2DShape;
 using Urho;
@@ -25,7 +24,7 @@ namespace SceneSource
         public Meters Height { get; set; }
         public Meters BaseAltitude { get; set; }
 
-        public IGeoContext Context { get; set; }
+        public Geo.IContext Context { get; set; }
         /// <summary>
         /// Within coord system of a scene, "float" precision is sufficient;
         /// TBD: Make "float" version of Distance2D.
@@ -36,7 +35,7 @@ namespace SceneSource
         private float HeightMetersF => (float)Height.Value;
 
 
-        public GroundLine() : this(Meters.Zero, Meters.Zero, NoGeoContext.It)
+        public GroundLine() : this(Meters.Zero, Meters.Zero, Geo.NoContext.It)
         {
         }
 
@@ -46,12 +45,12 @@ namespace SceneSource
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="context"></param>
-        public GroundLine(double width, double height, IGeoContext context = null)
+        public GroundLine(double width, double height, Geo.IContext context = null)
                 : this(new Meters(width), new Meters(height), context)
         {
         }
 
-        public GroundLine(Meters width, Meters height, IGeoContext context = null)
+        public GroundLine(Meters width, Meters height, Geo.IContext context = null)
         {
             Width = width;
             Height = height;
@@ -59,7 +58,7 @@ namespace SceneSource
             BaseAltitude = Meters.Zero;
 
             if (context == null)
-                context = NoGeoContext.It;
+                context = Geo.NoContext.It;
             Context = context;
 
             Points = new List<Distance2D>();
@@ -83,7 +82,7 @@ namespace SceneSource
             Points.Add(pt);
         }
 
-        public void AddPoint(GeoPoint2D geoPt)
+        public void AddPoint(Geo.Point2D geoPt)
         {
             if (geoPt.Context != Context)
                 throw new NotImplementedException("AddPoint from a different Context");

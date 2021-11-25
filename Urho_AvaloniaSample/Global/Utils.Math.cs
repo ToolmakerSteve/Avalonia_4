@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Geo;
 using Urho;
 using static System.Math;
 
@@ -1421,7 +1420,7 @@ namespace Global
         //            bool allowExtendedT = false;
         //            // TODO: How pick an appropriate orthographic coordinate system?
         //            throw new NotImplementedException("closestPointOnLine_AndT_geo");
-        //            IGeoContext context;
+        //            Geo.IContext context;
         //            Distance2D mayaPt = context.FromWGS84(geoPt.To2D());
         //            Distance2D mayaP1 = context.FromWGS84(geoP1.To2D());
         //            Distance2D mayaP2 = context.FromWGS84(geoP2.To2D());
@@ -1439,7 +1438,7 @@ namespace Global
         //            bool allowExtendedT = false;
         //            // TODO: How pick an appropriate orthographic coordinate system?
         //            throw new NotImplementedException("closestPointOnLine_AndT_geo");
-        //            IGeoContext context;
+        //            Geo.IContext context;
         //            Distance2D mayaPt = context.FromWGS84(geoPt);
         //            Distance2D mayaP1 = context.FromWGS84(geoP1);
         //            Distance2D mayaP2 = context.FromWGS84(geoP2);
@@ -1646,7 +1645,7 @@ namespace Global
         //        {
         //            // TODO: How pick an appropriate orthographic coordinate system?
         //            throw new NotImplementedException("pointAlongLine_AED");
-        //            IGeoContext context;
+        //            Geo.IContext context;
         //            Distance3D mayaStartLocation = context.FromWGS84(geoStartLocation);
         //            Distance3D mayaEndLocation = context.FromWGS84(geoEndLocation);
         //            double endDistance = Distance3D.CalcDistance2D(mayaStartLocation, mayaEndLocation);
