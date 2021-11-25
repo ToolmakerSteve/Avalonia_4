@@ -94,10 +94,13 @@ namespace ModelFrom2DShape
 
         private void AppendQuadIndices()
         {
-            for (int ii = 0; ii < _indicesSegment.Length; ii++)
+            uint len = (uint)_indicesSegment.Length;
+
+            for (uint ii = 0; ii < len; ii++)
             {
                 IData[_usedIndices + ii] = (short)(_usedVertices + _indicesSegment[ii]);
             }
+            _usedIndices += len;
         }
 
         /// <summary>
@@ -150,7 +153,13 @@ namespace ModelFrom2DShape
                 VBuffer.SetSize(_numVertices, ElemMask, false);
 
                 var nFloats = _numVertices * NFloatsPerVertex();
+
+                float[] oldData = VData;
+
                 VData = new float[nFloats];
+
+                if (oldData != null)
+                    Array.Copy(oldData, VData, oldData.Length);
 
                 // NO, do this AFTER filling VData with correct content.
                 //VBuffer.SetData(VData);
@@ -163,7 +172,6 @@ namespace ModelFrom2DShape
             IBuffer.SetData(IData);
             Geom.SetVertexBuffer(0, VBuffer);
             Geom.IndexBuffer = IBuffer;
-            _usedIndices = 6;   // TODO
             Geom.SetDrawRange(PrimitiveType.TriangleList, 0, _usedIndices, false);
         }
 
@@ -196,7 +204,12 @@ namespace ModelFrom2DShape
                 _numIndices = numIndices;
                 IBuffer.SetSize(_numIndices, false, false);
 
+                short[] oldIndices = IData;
+
                 IData = new short[_numIndices];
+
+                if (oldIndices != null)
+                    Array.Copy(oldIndices, IData, oldIndices.Length);
 
                 // NO, do this AFTER filling IData with correct content.
                 //IBuffer.SetData(IData);
