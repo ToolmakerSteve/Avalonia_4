@@ -96,8 +96,6 @@ namespace SceneSource
         /// <param name="pt"></param>
         public void AddPoint(Distance2D pt)
         {
-            if (Points.Count > 0)
-                pt.Y += Distance.FromDefaultUnits(100);   // TODO
             Points.Add(pt);
         }
 
@@ -120,35 +118,36 @@ namespace SceneSource
 
         public StaticModel EnsureModel(Node node)
         {
-            StaticModel model = node.GetComponent<StaticModel>();
-            if (model == null)
+            StaticModel sModel = node.GetComponent<StaticModel>();
+            if (sModel == null)
             {
-                model = node.CreateComponent<StaticModel>();
+                sModel = node.CreateComponent<StaticModel>();
             }
-            model.CastShadows = true;
-            //Material mat = Material.FromColor(Color.Magenta);   // TODO
-            Material mat = Material.FromColor(Color.Magenta);   // TODO
-            model.SetMaterial(mat);
-            return model;
+            return sModel;
         }
 
-        public Poly3D EnsureGeometry(StaticModel model0)
+        public Poly3D EnsureGeometry(StaticModel sModel)
         {
-            var model = model0.Model;
+            if (Poly == null)
+            {
+                Poly = new Poly3D();
+                Poly.Init(sModel, ElemMask);
+            }
+
+            var model = sModel.Model;
             if (model == null)
             {
                 model = new Model();
                 model.NumGeometries = 1;
-                model0.Model = model;
-            }
-            if (Poly == null)
-            {
-                Poly = new Poly3D();
-                Poly.Init(model0, ElemMask);
                 model.SetGeometry(0, 0, Poly.Geom);
                 model.BoundingBox = new BoundingBox(-10000, 10000);
-            }
+                sModel.Model = model;
 
+                //sModel.CastShadows = true;
+                Material mat = Material.FromColor(Color.Magenta);   // TODO
+                mat.CullMode = CullMode.None;
+                sModel.SetMaterial(mat);
+            }
             return Poly;
         }
 
