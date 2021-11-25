@@ -232,7 +232,6 @@ namespace SceneSource
 
             if (Test_BoxPerWallSegment)
             {
-                // test: A box at midpoint.
                 var midpoint0 = U.Average(wallPair0.First, wallPair0.Second);
                 var midpoint1 = U.Average(wallPair1.First, wallPair1.Second);
                 var midPoint = U.Average(midpoint0, midpoint1);
@@ -241,7 +240,13 @@ namespace SceneSource
                 if (_currentQuadCount > _prevQuadCount)
                 {
                     var it = AvaloniaSample.AvaloniaSample.It;
-                    it.AddBoxToScene(it.WallNode, midPoint, 0.5f, false);
+                    // test: A box at midpoint.
+                    it.AddBoxToScene(it.WallNode, midPoint, 0.4f, false);
+                    // test: boxes midway to each corner.
+                    it.AddBoxToScene(it.WallNode, U.Average(wallPair0.First, midPoint), 0.4f, false);
+                    it.AddBoxToScene(it.WallNode, U.Average(wallPair0.Second, midPoint), 0.4f, false);
+                    it.AddBoxToScene(it.WallNode, U.Average(wallPair1.First, midPoint), 0.4f, false);
+                    it.AddBoxToScene(it.WallNode, U.Average(wallPair1.Second, midPoint), 0.4f, false);
                     // OPTIONAL: Could set _prevQuadCount = _currentQuadCount here.
                 }
             }
