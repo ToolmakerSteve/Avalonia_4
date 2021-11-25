@@ -3538,5 +3538,17 @@ namespace Global
         {
             return new Vector3(src.X, dst.Y, src.Z);
         }
+
+        /// <summary>
+        /// Not an extension method, so will work with properties.
+        /// Usage: dst = SetAltitude(dst, altitude);
+        /// </summary>
+        /// <param name="altitude"></param>
+        /// <param name="dst"></param>
+        /// <returns></returns>
+        public static Vector3 SetAltitude(Vector3 dst, float altitude)
+        {
+            return new Vector3(dst.X, altitude, dst.Z);
+        }
     }
 }

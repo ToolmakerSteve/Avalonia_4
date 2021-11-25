@@ -28,6 +28,7 @@ using Urho.Resources;
 using Urho.Gui;
 using Urho;
 using U = Global.Utils;
+using Global;   // For Vector3Exts.
 
 namespace AvaloniaSample
 {
@@ -42,11 +43,17 @@ namespace AvaloniaSample
         protected const bool ShowTwoViewports = true;//true;   // TMS
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
         protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
+        protected const float MinimumAltitudeAboveTerrain = 1;
+        protected const float MinimumAltitude2AboveTerrain = 10;
+        protected float CurrentMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude2AboveTerrain : MinimumAltitudeAboveTerrain;
 
         protected const float TouchSensitivity = 2;
 		protected float Yaw { get; set; }
 		protected float Pitch { get; set; }
 		protected bool TouchEnabled { get; set; }
+
+        // Used by Water Scene.
+        public Terrain Terrain;
 
         // Camera1 WASD applied to this node.
         // When !MovementIgnoresPitch, = Camera1FinalNode. 
@@ -218,21 +225,39 @@ namespace AvaloniaSample
                 var moveMult = moveSpeed * timeStep;
                 if (GroundSpeedMultByAltitude)
                 {
-                    var altitude = CurrentCameraMainNode.Position.Y;
+                    float sceneAltitude = CurrentCameraMainNode.Position.Altitude();
+                    float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
+                    float relAltitude = sceneAltitude - terrainAltitude;
                     float beginHighAltitude = overViewport2 ? 60 : 20;
-                    if (altitude > beginHighAltitude)
+                    if (relAltitude > beginHighAltitude)
                     {
                         // Move faster at high altitudes.
                         if (overViewport2)
-                            moveMult *= altitude / beginHighAltitude;
+                            moveMult *= relAltitude / beginHighAltitude;
                         else
-                            moveMult *= (float)Math.Sqrt(altitude / beginHighAltitude);
+                            moveMult *= (float)Math.Sqrt(relAltitude / beginHighAltitude);
                     }
                 }
                 //Debug.WriteLine($"--- deltaTime={deltaTime}, mult={moveMult}, elapsed={Time.ElapsedTime}, step={Time.TimeStep}, over2={overViewport2} ---");
 
                 // Move current camera.
                 CurrentCameraMainNode.Translate(allAxesMove * moveMult);
+
+                if (CurrentMinimumAltitudeAboveTerrain > 0)
+                {
+                    float sceneAltitude = CurrentCameraMainNode.Position.Altitude();
+                    float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
+                    float relAltitude = sceneAltitude - terrainAltitude;
+                    float excess = relAltitude - CurrentMinimumAltitudeAboveTerrain;
+                    if (excess < 0)
+                    {
+                        // Below what we need. "-" to add the missing altitude.
+                        sceneAltitude -= excess;
+                        //relAltitude -= excess;
+                        CurrentCameraMainNode.Position = U.SetAltitude(CurrentCameraMainNode.Position, sceneAltitude);
+                    }
+                }
+
                 if (ShowTwoViewports)
                     CopyXZ(CurrentCameraMainNode, OtherCameraMainNode);
             }

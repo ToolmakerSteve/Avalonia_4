@@ -20,8 +20,6 @@ namespace AvaloniaSample
         Camera Camera = null;
 		public Scene Scene;
         Viewport Viewport2;
-        // Used by Water Scene.
-        public Terrain Terrain;
         Node WaterNode;
         Node ReflectionCameraNode;
         // Used when showing wireframe.
