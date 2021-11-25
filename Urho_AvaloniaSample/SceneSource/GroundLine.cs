@@ -143,10 +143,14 @@ namespace SceneSource
                 model.BoundingBox = new BoundingBox(-10000, 10000);
                 sModel.Model = model;
 
+                var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
+
                 //sModel.CastShadows = true;
-                Material mat = Material.FromColor(Color.Magenta);   // TODO
-                mat.CullMode = CullMode.None;
+                Material mat = Material.FromColor(Color.Magenta, true);
+                //Material mat = res.GetMaterial("Materials/DefaultGrey.xml");// StoneTiled.xml");
+                mat.CullMode = CullMode.None; // CullMode.Cw;
                 sModel.SetMaterial(mat);
+                //sModel.CastShadows = true;
             }
             return Poly;
         }
