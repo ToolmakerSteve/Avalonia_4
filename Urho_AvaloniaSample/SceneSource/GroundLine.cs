@@ -34,6 +34,7 @@ namespace SceneSource
         private float WidthMetersF => (float)Width.Value;
         private float HeightMetersF => (float)Height.Value;
 
+        private Poly3D Poly;
 
         public GroundLine() : this(Meters.Zero, Meters.Zero, Geo.NoContext.It)
         {
@@ -124,13 +125,32 @@ namespace SceneSource
             return model;
         }
 
+        public Poly3D EnsureGeometry(StaticModel model0)
+        {
+            var model = model0.Model;
+            if (model == null)
+            {
+                model = new Model();
+                model.NumGeometries = 1;
+            }
+            if (Poly == null)
+            {
+                Poly = new Poly3D();
+                Poly.Init(model0);
+                model.SetGeometry(0, 0, Poly.Geom);
+                //TBD model.BoundingBox = Bounds;
+            }
+
+            return Poly;
+        }
+
         public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
         {
             if (Points.Count < 2)
                 return;
 
             Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
-            ClearGeometry(node, model);
+            CreateOrClearGeometry(node, model);
 
             var poly = new Poly3D();
 
@@ -188,9 +208,10 @@ namespace SceneSource
             FinishGeometry();
         }
 
-        const bool Test_BoxPerWallSegment = true;
+        const bool Test_BoxPerWallSegment = false;
+        const bool AddOnlyNewQuads = true;
 
-        private void ClearGeometry(Node node, StaticModel model)
+        private void CreateOrClearGeometry(Node node, StaticModel model)
         {
             if (Test_BoxPerWallSegment)
             {
@@ -200,13 +221,19 @@ namespace SceneSource
             }
             else
             {
-                throw new NotImplementedException("ClearGeometry");
+                //throw new NotImplementedException("ClearGeometry");
+                _currentQuadCount = 0;
+                _ = EnsureGeometry(model);
+                if (!AddOnlyNewQuads)
+                    // Recreating all quads each time.
+                    Poly.Clear();
             }
         }
 
         private void FinishGeometry()
         {
             _prevQuadCount = _currentQuadCount;
+
             if (Test_BoxPerWallSegment)
             {
             }
@@ -247,13 +274,19 @@ namespace SceneSource
                     it.AddBoxToScene(it.WallNode, U.Average(wallPair0.Second, midPoint), 0.4f, false);
                     it.AddBoxToScene(it.WallNode, U.Average(wallPair1.First, midPoint), 0.4f, false);
                     it.AddBoxToScene(it.WallNode, U.Average(wallPair1.Second, midPoint), 0.4f, false);
-                    // OPTIONAL: Could set _prevQuadCount = _currentQuadCount here.
                 }
             }
             else
             {
-                throw new NotImplementedException("AddQuad");
+                _currentQuadCount++;
+                // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
+                if (_currentQuadCount > _prevQuadCount || !AddOnlyNewQuads)
+                {
+                    var it = AvaloniaSample.AvaloniaSample.It;
+                    poly.AddQuad(wallPair0, wallPair1);
+                }
             }
+            // OPTIONAL: Could set _prevQuadCount = _currentQuadCount here.
         }
         #endregion
 
