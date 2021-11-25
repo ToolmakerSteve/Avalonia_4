@@ -16,6 +16,7 @@ namespace AvaloniaSample
         const bool UseWaterScene = true;//true;   // TMS
         const bool DrawWallAsFly = false && UseWaterScene;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
+        const float InitialAltitude2 = 10; //100;
 
         Camera Camera = null;
 		public Scene Scene;
@@ -537,7 +538,7 @@ namespace AvaloniaSample
         {
             Camera2MainNode = Scene.CreateChild("TopViewMain");
             // Move camera 2 up in the air, to show larger terrain area.
-            Camera2MainNode.Position = new Vector3(0, 100, 0);
+            Camera2MainNode.Position = new Vector3(0, InitialAltitude2, 0);
 
             Camera2FinalNode = Camera2MainNode.CreateChild("TopViewFinal");
             // Straight down.

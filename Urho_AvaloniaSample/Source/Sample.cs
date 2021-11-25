@@ -46,6 +46,7 @@ namespace AvaloniaSample
         protected const float MinimumAltitudeAboveTerrain = 1;
         protected const float MinimumAltitude2AboveTerrain = 10;
         protected float CurrentMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude2AboveTerrain : MinimumAltitudeAboveTerrain;
+        protected float OtherMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitudeAboveTerrain : MinimumAltitude2AboveTerrain;
 
         protected const float TouchSensitivity = 2;
 		protected float Yaw { get; set; }
@@ -242,24 +243,13 @@ namespace AvaloniaSample
 
                 // Move current camera.
                 CurrentCameraMainNode.Translate(allAxesMove * moveMult);
-
-                if (CurrentMinimumAltitudeAboveTerrain > 0)
-                {
-                    float sceneAltitude = CurrentCameraMainNode.Position.Altitude();
-                    float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
-                    float relAltitude = sceneAltitude - terrainAltitude;
-                    float excess = relAltitude - CurrentMinimumAltitudeAboveTerrain;
-                    if (excess < 0)
-                    {
-                        // Below what we need. "-" to add the missing altitude.
-                        sceneAltitude -= excess;
-                        //relAltitude -= excess;
-                        CurrentCameraMainNode.Position = U.SetAltitude(CurrentCameraMainNode.Position, sceneAltitude);
-                    }
-                }
+                EnforceMinimumAltitudeAboveTerrain(CurrentCameraMainNode, CurrentMinimumAltitudeAboveTerrain);
 
                 if (ShowTwoViewports)
+                {
                     CopyXZ(CurrentCameraMainNode, OtherCameraMainNode);
+                    EnforceMinimumAltitudeAboveTerrain(OtherCameraMainNode, OtherMinimumAltitudeAboveTerrain);
+                }
             }
 
 
@@ -269,6 +259,24 @@ namespace AvaloniaSample
             else
                 _HandleUserInput(timeStep, moveSpeed);
             return didMove;
+        }
+
+        private void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude)
+        {
+            if (minimumRelativeAltitude > 0)
+            {
+                float sceneAltitude = cameraMainNode.Position.Altitude();
+                float terrainAltitude = Terrain.GetHeight(cameraMainNode.Position);
+                float relAltitude = sceneAltitude - terrainAltitude;
+                float excess = relAltitude - minimumRelativeAltitude;
+                if (excess < 0)
+                {
+                    // Below what we need. "-" to add the missing altitude.
+                    sceneAltitude -= excess;
+                    //relAltitude -= excess;
+                    cameraMainNode.Position = U.SetAltitude(cameraMainNode.Position, sceneAltitude);
+                }
+            }
         }
 
         /// <summary>
