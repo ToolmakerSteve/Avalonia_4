@@ -63,7 +63,7 @@ namespace ModelFrom2DShape
             // TODO: Need to set normals BEFORE increment these values!
             uint nAddedVertices = 4;  // From above.
             _usedVertices += nAddedVertices;
-            _usedVFloats += (uint)NFloatsPerVertex() + nAddedVertices;
+            //_usedVFloats += (uint)NFloatsPerVertex() + nAddedVertices;
 
             // TODO: Do we have to do this whenever we change the data?
             // TODO: If adding many quads, should do this AFTER ALL quads added.
@@ -76,7 +76,7 @@ namespace ModelFrom2DShape
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
 
             VData[_usedVFloats + 0] = position.X;
-            VData[_usedVFloats + 1] = position.Y;
+            VData[_usedVFloats + 1] = 10;//position.Y;
             VData[_usedVFloats + 2] = position.Z;
 
             if (ElemMask.HasFlag(ElementMask.Normal))
@@ -89,7 +89,7 @@ namespace ModelFrom2DShape
 
             //// TODO: Need to set normals BEFORE increment these values!
             //_usedVertices++;
-            //_usedVFloats += (uint)NFloatsPerVertex();
+            _usedVFloats += (uint)NFloatsPerVertex();
         }
 
         private void AppendQuadIndices()
@@ -152,8 +152,8 @@ namespace ModelFrom2DShape
                 var nFloats = _numVertices * NFloatsPerVertex();
                 VData = new float[nFloats];
 
-                // TODO: Can we do this BEFORE filling VData with correct content?
-                VBuffer.SetData(VData);
+                // NO, do this AFTER filling VData with correct content.
+                //VBuffer.SetData(VData);
             }
         }
 
@@ -161,6 +161,10 @@ namespace ModelFrom2DShape
         {
             VBuffer.SetData(VData);
             IBuffer.SetData(IData);
+            Geom.SetVertexBuffer(0, VBuffer);
+            Geom.IndexBuffer = IBuffer;
+            _usedIndices = 6;   // TODO
+            Geom.SetDrawRange(PrimitiveType.TriangleList, 0, _usedIndices, false);
         }
 
 
@@ -194,8 +198,8 @@ namespace ModelFrom2DShape
 
                 IData = new short[_numIndices];
 
-                // TODO: Can we do this BEFORE filling IData with correct content?
-                IBuffer.SetData(IData);
+                // NO, do this AFTER filling IData with correct content.
+                //IBuffer.SetData(IData);
             }
         }
 

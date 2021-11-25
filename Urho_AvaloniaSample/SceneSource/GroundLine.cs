@@ -18,6 +18,10 @@ namespace SceneSource
         private static ElementMask ElemMask = ElementMask.Position;
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
+        const bool Test_BoxPerWallSegment = false;//false;
+        const bool AddOnlyNewQuads = true;
+
+
 
         #region --- data, new ----------------------------------------
         public Meters Width { get; set; }
@@ -53,7 +57,7 @@ namespace SceneSource
 
         public GroundLine(Meters width, Meters height, Geo.IContext context = null)
         {
-            Width = width;
+            Width = new Meters(width.Value * 10);
             Height = height;
             // Initialized to altitude zero.
             BaseAltitude = Meters.Zero;
@@ -92,6 +96,8 @@ namespace SceneSource
         /// <param name="pt"></param>
         public void AddPoint(Distance2D pt)
         {
+            if (Points.Count > 0)
+                pt.Y += Distance.FromDefaultUnits(100);   // TODO
             Points.Add(pt);
         }
 
@@ -120,6 +126,7 @@ namespace SceneSource
                 model = node.CreateComponent<StaticModel>();
             }
             model.CastShadows = true;
+            //Material mat = Material.FromColor(Color.Magenta);   // TODO
             Material mat = Material.FromColor(Color.Magenta);   // TODO
             model.SetMaterial(mat);
             return model;
@@ -132,13 +139,14 @@ namespace SceneSource
             {
                 model = new Model();
                 model.NumGeometries = 1;
+                model0.Model = model;
             }
             if (Poly == null)
             {
                 Poly = new Poly3D();
                 Poly.Init(model0, ElemMask);
                 model.SetGeometry(0, 0, Poly.Geom);
-                //TBD model.BoundingBox = Bounds;
+                model.BoundingBox = new BoundingBox(-10000, 10000);
             }
 
             return Poly;
@@ -149,10 +157,12 @@ namespace SceneSource
             if (Points.Count < 2)
                 return;
 
+            // TEST: Stop after adding one quad.
+            if (_currentQuadCount > 0)
+                return;
+
             Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
             CreateOrClearGeometry(node, model);
-
-            var poly = new Poly3D();
 
             // TODO: TO calc good perpendicular (to give wall its width), need THREE points (except at ends).
             // TODO: Need to detect "closed shape", for good perpendicular when wraps.
@@ -194,7 +204,7 @@ namespace SceneSource
                         // TBD: Adjust for relative distances to those points?
                         perp1 = CalcPerpendicularXZ(cl0, cl2);
 
-                        AddQuad(poly, cl0, cl1, perp0, perp1, terrain);
+                        AddQuad(Poly, cl0, cl1, perp0, perp1, terrain);
                     }
                 }
 
@@ -204,12 +214,9 @@ namespace SceneSource
             }
 
             // Add the final quad.
-            AddQuad(poly, cl0, cl1, perp0, perp1, terrain);
+            AddQuad(Poly, cl0, cl1, perp0, perp1, terrain);
             FinishGeometry();
         }
-
-        const bool Test_BoxPerWallSegment = false;
-        const bool AddOnlyNewQuads = true;
 
         private void CreateOrClearGeometry(Node node, StaticModel model)
         {
