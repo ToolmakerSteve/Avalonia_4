@@ -20,7 +20,6 @@ namespace Global
             }
             #endregion
 
-            public Meters ToMeters => new Meters(Distance);
             public double Distance => ConvertUnits(Value, Units, UnitsType.Meters);
             public double ToDefaultUnits => ConvertUnits(Value, Units, DefaultUnits);
 

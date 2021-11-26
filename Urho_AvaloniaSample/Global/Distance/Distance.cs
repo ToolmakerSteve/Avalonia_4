@@ -101,7 +101,6 @@ namespace Global
         }
 
 
-        public Meters ToMeters => new Meters(InMeters);
         public double InMeters => (_metersPerDefaultUnit * Value);
 
         public double ToUnits(UnitsType dstUnits)
