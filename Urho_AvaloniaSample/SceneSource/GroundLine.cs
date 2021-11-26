@@ -27,7 +27,7 @@ namespace SceneSource
         public Meters Height { get; set; }
         public Meters BaseAltitude { get; set; }
         public bool HasNormals { get; private set; }
-        public bool HasUV { get; private set; }
+        public bool HasUVs { get; private set; }
 
         public Geo.IContext Context { get; set; }
         /// <summary>
@@ -39,7 +39,7 @@ namespace SceneSource
         private float WidthMetersF => (float)Width.Value;
         private float HeightMetersF => (float)Height.Value;
 
-        private Poly3D Poly;
+        private Poly3D TopPoly, FirstSidePoly, SecondSidePoly;
 
         public GroundLine(bool hasUV = true, bool hasNormals = true) : this(Meters.Zero, Meters.Zero, Geo.NoContext.It, hasUV, hasNormals)
         {
@@ -60,7 +60,7 @@ namespace SceneSource
         {
             Width = width;
             Height = height;
-            HasUV = hasUV;
+            HasUVs = hasUV;
             HasNormals = hasNormals;
 
             // Initialized to altitude zero.
@@ -130,20 +130,30 @@ namespace SceneSource
             return sModel;
         }
 
-        public Poly3D EnsureGeometry(StaticModel sModel)
+        /// <summary>
+        /// Sets TopPoly, FirstSidePoly, SecondSidePoly.
+        /// </summary>
+        /// <param name="sModel"></param>
+        public void EnsureGeometry(StaticModel sModel)
         {
-            if (Poly == null)
+            if (TopPoly == null)
             {
-                Poly = new Poly3D();
-                Poly.Init(sModel, HasNormals, HasUV);
+                TopPoly = new Poly3D();
+                TopPoly.Init(sModel, HasNormals, HasUVs);
+                FirstSidePoly = new Poly3D();
+                FirstSidePoly.Init(sModel, HasNormals, HasUVs);
+                SecondSidePoly = new Poly3D();
+                SecondSidePoly.Init(sModel, HasNormals, HasUVs);
             }
 
             var model = sModel.Model;
             if (model == null)
             {
                 model = new Model();
-                model.NumGeometries = 1;
-                model.SetGeometry(0, 0, Poly.Geom);
+                model.NumGeometries = 3;
+                model.SetGeometry(0, 0, TopPoly.Geom);
+                model.SetGeometry(1, 0, FirstSidePoly.Geom);
+                model.SetGeometry(2, 0, SecondSidePoly.Geom);
                 model.BoundingBox = new BoundingBox(-10000, 10000);
                 sModel.Model = model;
 
@@ -159,7 +169,6 @@ namespace SceneSource
                 //sModel.CastShadows = true;
                 sModel.SetMaterial(mat);
             }
-            return Poly;
         }
 
         public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
@@ -210,7 +219,7 @@ namespace SceneSource
                         // TBD: Adjust for relative distances to those points?
                         perp1 = CalcPerpendicularXZ(cl0, cl2);
 
-                        AddQuad(Poly, cl0, cl1, perp0, perp1, terrain);
+                        AddWallSegment(cl0, cl1, perp0, perp1, terrain);
                     }
                 }
 
@@ -219,8 +228,8 @@ namespace SceneSource
                 perp0 = perp1;
             }
 
-            // Add the final quad.
-            AddQuad(Poly, cl0, cl1, perp0, perp1, terrain);
+            // Final quad.
+            AddWallSegment(cl0, cl1, perp0, perp1, terrain);
             FinishGeometry();
         }
 
@@ -230,22 +239,22 @@ namespace SceneSource
             {
                 // Added box sub-nodes. Delete the old ones.
                 // TBD: Or just keep adding on new ones, re-use old ones?
-                _currentQuadCount = 0;
+                _currentWallSegmentCount = 0;
             }
             else
             {
                 //throw new NotImplementedException("ClearGeometry");
-                _currentQuadCount = 0;
-                _ = EnsureGeometry(model);
+                _currentWallSegmentCount = 0;
+                EnsureGeometry(model);
                 if (!AddOnlyNewQuads)
                     // Recreating all quads each time.
-                    Poly.Clear();
+                    TopPoly.Clear();
             }
         }
 
         private void FinishGeometry()
         {
-            _prevQuadCount = _currentQuadCount;
+            _prevWallSegmentCount = _currentWallSegmentCount;
 
             if (Test_BoxPerWallSegment)
             {
@@ -255,15 +264,50 @@ namespace SceneSource
             }
         }
 
-        private void AddQuad(Poly3D poly, Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain)
+        private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain)
         {
+            _currentWallSegmentCount++;
+
+            // On top of wall.
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, HeightMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, HeightMetersF, terrain);
-            AddQuad(poly, wallPair0, wallPair1);
+            // Wall Segment: Top of wall.
+            AddQuad(TopPoly, wallPair0, wallPair1);
+
+            // Project to ground.
+            U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain);
+            U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain);
+
+            // Wall Segment: First side of wall.
+            // Must specify such that the second pair is at far end - these get adjusted when next quad is added.
+            // Swapped order w/i each pair, to flip normal.
+            U.Pair<Vector3> groundFirstSide0 = new U.Pair<Vector3>(groundPair0.First, wallPair0.First);
+            U.Pair<Vector3> groundFirstSide1 = new U.Pair<Vector3>(groundPair1.First, wallPair1.First);
+            AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1);
+
+            // Wall Segment: Second side of wall.
+            // Must specify such that the second pair is at far end - these get adjusted when next quad is added.
+            // Swapped order w/i each pair, to flip normal.
+            U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
+            U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
+            AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1);
         }
 
-        private int _prevQuadCount = 0;
-        private int _currentQuadCount = 0;
+        private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain)
+        {
+            Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain);
+            Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain);
+            return new U.Pair<Vector3>(groundFirst, groundSecond);
+        }
+
+        private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain)
+        {
+            float altitude = terrain.GetHeight(vec);
+            return U.SetAltitude(vec, altitude);
+        }
+
+        private int _prevWallSegmentCount = 0;
+        private int _currentWallSegmentCount = 0;
 
         private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1)
         {
@@ -275,9 +319,8 @@ namespace SceneSource
                 var midpoint0 = U.Average(wallPair0.First, wallPair0.Second);
                 var midpoint1 = U.Average(wallPair1.First, wallPair1.Second);
                 var midPoint = U.Average(midpoint0, midpoint1);
-                _currentQuadCount++;
                 // VERSION: Only add if it is a new one.
-                if (_currentQuadCount > _prevQuadCount)
+                if (_currentWallSegmentCount > _prevWallSegmentCount)
                 {
                     var it = AvaloniaSample.AvaloniaSample.It;
                     // test: A box at midpoint.
@@ -291,15 +334,12 @@ namespace SceneSource
             }
             else
             {
-                _currentQuadCount++;
                 // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
-                if (_currentQuadCount > _prevQuadCount || !AddOnlyNewQuads)
+                if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
                 {
-                    var it = AvaloniaSample.AvaloniaSample.It;
                     poly.AddQuad(wallPair0, wallPair1);
                 }
             }
-            // OPTIONAL: Could set _prevQuadCount = _currentQuadCount here.
         }
         #endregion
 

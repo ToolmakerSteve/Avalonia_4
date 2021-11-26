@@ -19,7 +19,7 @@ namespace ModelFrom2DShape
         private short[] IData;
         public uint FloatsPerVertex { get; private set; }
         public bool HasNormals { get; private set; }
-        public bool HasUV { get; private set; }
+        public bool HasUVs { get; private set; }
 
 
         public Poly3D()
@@ -27,7 +27,7 @@ namespace ModelFrom2DShape
 
         }
 
-        public void Init(UrhoObject something, bool hasNormals, bool hasUV)
+        public void Init(UrhoObject something, bool hasNormals, bool hasUVs)
         {
             const uint FloatsForVertexPosition = 3;
             const uint FloatsForVertexNormal = 3;
@@ -46,9 +46,9 @@ namespace ModelFrom2DShape
                 eleMask |= ElementMask.Normal;
                 floatsPerVertex += FloatsForVertexNormal;
             }
-            if (hasUV)
+            if (hasUVs)
             {
-                HasUV = true;
+                HasUVs = true;
                 eleMask |= ElementMask.TexCoord1;
                 floatsPerVertex += FloatsForVertexUV;
             }
@@ -83,11 +83,13 @@ namespace ModelFrom2DShape
                 UpdateRecentVertex(wallPair0.Second, -1, 3);
             }
 
+            // Calc normal to quad.  "-": For top of wall, this points Y up.
+            Vector3 normal = -U.Normal(wallPair0.First, wallPair0.Second, wallPair1.First);
             // Add vertices for quad.
-            AppendVertex(wallPair0.First, 0);
-            AppendVertex(wallPair0.Second, 1);
-            AppendVertex(wallPair1.First, 2);
-            AppendVertex(wallPair1.Second, 3);
+            AppendVertex(wallPair0.First, 0, normal);
+            AppendVertex(wallPair0.Second, 1, normal);
+            AppendVertex(wallPair1.First, 2, normal);
+            AppendVertex(wallPair1.Second, 3, normal);
 
             // Add indices for quad.
             AppendQuadIndices();
@@ -108,14 +110,13 @@ namespace ModelFrom2DShape
             new Vector2(0,0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)
         };
 
-        private void AppendVertex(Vector3 position, uint uvIdx)
+        private void AppendVertex(Vector3 position, uint uvIdx, Vector3 normal)
         {
             if (_usedVertices >= _numVertices)
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
 
-            UpdateVertex(position, uvIdx, _usedVFloats);
+            UpdateVertex(position, uvIdx, _usedVFloats, normal);
 
-            //// TODO: Need to set normals BEFORE increment !
             _usedVFloats += FloatsPerVertex;
         }
 
@@ -126,30 +127,35 @@ namespace ModelFrom2DShape
         private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx)
         {
             uint floatIndex = (uint)(_usedVFloats + (FloatsPerVertex * relIndex));
-            UpdateVertex(position, uvIdx, floatIndex);
+            UpdateVertex(position, uvIdx, floatIndex, new Vector3(), false);
         }
 
-        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat)
+        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat, Vector3 normal, bool updateNormal = true)
         {
             VData[iVFloat++] = position.X;
             VData[iVFloat++] = position.Y;
             VData[iVFloat++] = position.Z;
 
-            VData[iVFloat++] = 0;
-            VData[iVFloat++] = 1;
-            VData[iVFloat++] = 0;
+            if (HasNormals)
+            {
+                if (updateNormal)
+                {
+                    VData[iVFloat++] = normal.X;
+                    VData[iVFloat++] = normal.Y;
+                    VData[iVFloat++] = normal.Z;
+                }
+                else
+                {   // Skip over floats for normal.
+                    iVFloat += 3;
+                } 
+            }
 
-            Vector2 uv = s_UVPerQuad[uvIdx];
-            VData[iVFloat++] = uv.X;
-            VData[iVFloat++] = uv.Y;
-
-            //if (ElemMask.HasFlag(ElementMask.Normal))
-            //{   // TODO
-            //    //Vector3 normal;
-            //    //VData[iVFloat + 3] = normal.X;
-            //    //VData[iVFloat + 4] = normal.Y;
-            //    //VData[iVFloat + 5] = normal.Z;
-            //}
+            if (HasUVs)
+            {
+                Vector2 uv = s_UVPerQuad[uvIdx];
+                VData[iVFloat++] = uv.X;
+                VData[iVFloat++] = uv.Y;
+            }
         }
 
         private void AppendQuadIndices()

@@ -3550,5 +3550,21 @@ namespace Global
         {
             return new Vector3(dst.X, altitude, dst.Z);
         }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="v3"></param>
+        /// <returns>Unit length vector perpendicular to the plane through three points.</returns>
+        public static Vector3 Normal(Vector3 v1, Vector3 v2, Vector3 v3)
+        {
+            Vector3 delta12 = v2 - v1;
+            Vector3 delta13 = v3 - v1;
+            Vector3 normal = Vector3.Cross(delta13, delta12);
+            normal.Normalize();
+            return normal;
+        }
+
     }
 }
