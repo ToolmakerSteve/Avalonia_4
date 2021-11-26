@@ -200,6 +200,8 @@ namespace SceneSource
             Vector3 cl1 = new Vector3();
             Vector2 perp0 = new Vector2();
             Vector2 perp1 = new Vector2();
+            Vector3?[] normals = new Vector3?[3];
+
             foreach (Distance2D srcPt in Points)
             {
                 // On wall's center line.
@@ -229,7 +231,7 @@ namespace SceneSource
                         // TBD: Adjust for relative distances to those points?
                         perp1 = CalcPerpendicularXZ(cl0, cl2);
 
-                        AddWallSegment(cl0, cl1, perp0, perp1, terrain);
+                        AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
                     }
                 }
 
@@ -239,7 +241,7 @@ namespace SceneSource
             }
 
             // Final quad.
-            AddWallSegment(cl0, cl1, perp0, perp1, terrain);
+            AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
 
             if (Points.Count == 2)
             {
@@ -285,15 +287,19 @@ namespace SceneSource
             }
         }
 
-        private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain)
+        private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
         {
             _currentWallSegmentCount++;
+
+            Vector3? normTop = normals[0];
+            Vector3? normSide1 = normals[1];
+            Vector3? normSide2 = normals[2];
 
             // On top of wall.
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, HeightMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, HeightMetersF, terrain);
             // Wall Segment: Top of wall.
-            AddQuad(TopPoly, wallPair0, wallPair1);
+            AddQuad(TopPoly, wallPair0, wallPair1, ref normTop);
 
             // Project to ground.
             U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain);
@@ -304,14 +310,18 @@ namespace SceneSource
             // Swapped order w/i each pair, to flip normal.
             U.Pair<Vector3> groundFirstSide0 = new U.Pair<Vector3>(groundPair0.First, wallPair0.First);
             U.Pair<Vector3> groundFirstSide1 = new U.Pair<Vector3>(groundPair1.First, wallPair1.First);
-            AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1);
+            AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1, ref normSide1);
 
             // Wall Segment: Second side of wall.
             // Must specify such that the second pair is at far end - these get adjusted when next quad is added.
             // Swapped order w/i each pair, to flip normal.
             U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
             U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
-            AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1);
+            AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, ref normSide2);
+
+            normals[0] = normTop;
+            normals[1] = normSide1;
+            normals[2] = normSide2;
 
 
             if (Points.Count == 2)
@@ -326,13 +336,15 @@ namespace SceneSource
         {
             StartPoly.Clear();
             // Swapped to flip normal.
-            AddQuad(StartPoly, groundPair0, wallPair0);
+            Vector3? normal = null;
+            AddQuad(StartPoly, groundPair0, wallPair0, ref normal);
         }
 
         private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
         {
             EndPoly.Clear();
-            AddQuad(EndPoly, wallPair1, groundPair1);
+            Vector3? normal = null;
+            AddQuad(EndPoly, wallPair1, groundPair1, ref normal);
         }
 
         private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain)
@@ -351,7 +363,7 @@ namespace SceneSource
         private int _prevWallSegmentCount = 0;
         private int _currentWallSegmentCount = 0;
 
-        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1)
+        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, ref Vector3? normal)
         {
             //Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
             //throw new NotImplementedException();
@@ -379,7 +391,7 @@ namespace SceneSource
                 // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
                 if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
                 {
-                    poly.AddQuad(wallPair0, wallPair1);
+                    poly.AddQuad(wallPair0, wallPair1, ref normal);
                 }
             }
         }

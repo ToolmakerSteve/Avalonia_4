@@ -103,30 +103,44 @@ namespace ModelFrom2DShape
             }
         }
 
+        private float _textureScale = 1f;
+
         /// <summary>
         /// TODO: Normals. (Also change ElemMask passed in by client.)
         /// </summary>
         /// <param name="wallPair0"></param>
         /// <param name="wallPair1"></param>
-        internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1)
+        internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, ref Vector3? normal)
         {
             NumQuads++;
+
+            Vector3 newNormal = -U.Normal(wallPair0.First, wallPair0.Second, wallPair1.First);
+            Vector3 avgNormal = (normal.HasValue) ? (0.5f * (newNormal + normal.Value)) : newNormal;
 
             if (NumQuads >= 2)
             {
                 // Update the edge of previous quad.
                 // REASON: Adding this quad changes calc of perpendicular between the two quads.
-                UpdateRecentVertex(wallPair0.First, -2, 2);
-                UpdateRecentVertex(wallPair0.Second, -1, 3);
+                UpdateRecentVertex(wallPair0.First, -2, 2, avgNormal);
+                UpdateRecentVertex(wallPair0.Second, -1, 3, avgNormal);
             }
 
+            Vector3 vert = wallPair0.First - wallPair0.Second;
+            float dy = vert.LengthFast;
+            Vector3 Horiz = wallPair0.First - wallPair1.First;
+            float len = Horiz.LengthFast;
+
+
+            Vector2 uvScale = new Vector2((float)Math.Round(_textureScale * len), (float)Math.Round(_textureScale * dy));
+
             // Calc normal to quad.  "-": For top of wall, this points Y up.
-            Vector3 normal = -U.Normal(wallPair0.First, wallPair0.Second, wallPair1.First);
             // Add vertices for quad.
-            AppendVertex(wallPair0.First, 0, normal);
-            AppendVertex(wallPair0.Second, 1, normal);
-            AppendVertex(wallPair1.First, 2, normal);
-            AppendVertex(wallPair1.Second, 3, normal);
+            AppendVertex(wallPair0.First, 0, avgNormal, uvScale);
+            AppendVertex(wallPair0.Second, 1, avgNormal, uvScale);
+            AppendVertex(wallPair1.First, 2, newNormal, uvScale);
+            AppendVertex(wallPair1.Second, 3, newNormal, uvScale);
+
+            normal = newNormal;
 
             // Add indices for quad.
             AppendQuadIndices();
@@ -147,12 +161,12 @@ namespace ModelFrom2DShape
             new Vector2(0,0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)
         };
 
-        private void AppendVertex(Vector3 position, uint uvIdx, Vector3 normal)
+        private void AppendVertex(Vector3 position, uint uvIdx, Vector3 normal, Vector2 uvScale)
         {
             if (_usedVertices >= _numVertices)
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
 
-            UpdateVertex(position, uvIdx, _usedVFloats, normal);
+            UpdateVertex(position, uvIdx, _usedVFloats, normal, uvScale);
 
             _usedVFloats += FloatsPerVertex;
         }
@@ -161,13 +175,13 @@ namespace ModelFrom2DShape
         /// </summary>
         /// <param name="position"></param>
         /// <param name="relIndex">-1 for previous vertex, -2 for one before that.</param>
-        private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx)
+        private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx, Vector3 adjNormal)
         {
             uint floatIndex = (uint)(_usedVFloats + (FloatsPerVertex * relIndex));
-            UpdateVertex(position, uvIdx, floatIndex, new Vector3(), false);
+            UpdateVertex(position, uvIdx, floatIndex, adjNormal, Vector2.Zero, false);
         }
 
-        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat, Vector3 normal, bool updateNormal = true)
+        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat, Vector3 normal, Vector2 uvScale, bool updateUV = true)
         {
             VData[iVFloat++] = position.X;
             VData[iVFloat++] = position.Y;
@@ -175,23 +189,23 @@ namespace ModelFrom2DShape
 
             if (HasNormals)
             {
-                if (updateNormal)
-                {
-                    VData[iVFloat++] = normal.X;
-                    VData[iVFloat++] = normal.Y;
-                    VData[iVFloat++] = normal.Z;
-                }
-                else
-                {   // Skip over floats for normal.
-                    iVFloat += 3;
-                } 
+                VData[iVFloat++] = normal.X;
+                VData[iVFloat++] = normal.Y;
+                VData[iVFloat++] = normal.Z;
             }
 
             if (HasUVs)
             {
-                Vector2 uv = s_UVPerQuad[uvIdx];
-                VData[iVFloat++] = uv.X;
-                VData[iVFloat++] = uv.Y;
+                if (updateUV)
+                {
+                    Vector2 uv = s_UVPerQuad[uvIdx];
+                    VData[iVFloat++] = uv.X * uvScale.X;
+                    VData[iVFloat++] = uv.Y * uvScale.Y;
+                }
+                else
+                {   // Skip over floats for normal.
+                    iVFloat += 2;
+                }
             }
         }
 
