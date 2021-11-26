@@ -159,7 +159,7 @@ namespace SceneSource
                 model.SetGeometry(3, 0, SecondSidePoly.Geom);
                 model.SetGeometry(4, 0, StartPoly.Geom);
                 model.SetGeometry(5, 0, EndPoly.Geom);
-                model.BoundingBox = new BoundingBox(-100, 100);
+                model.BoundingBox = new BoundingBox(-10000, 10000);
                 sModel.Model = model;
 
                 var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
@@ -364,7 +364,7 @@ namespace SceneSource
 
         private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float depth = 0.5f)
         {
-            float altitude = (terrain != null) ? (terrain.GetHeight(vec) - depth) : -depth;
+            float altitude = terrain.GetHeight(vec) - depth;
             return U.SetAltitude(vec, altitude);
         }
 
@@ -441,11 +441,8 @@ namespace SceneSource
             Vector3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
             Vector3 first = wallCenter - halfPerp;
             Vector3 second = wallCenter + halfPerp;
-            first.Y = ((terrain != null) ? terrain.GetHeight(first) : 0f) + wallHeight;
-            second.Y = ((terrain != null) ? terrain.GetHeight(second) : 0f) + wallHeight;
-
-            //first.Y = terrain.GetHeight(first) + wallHeight;
-            //second.Y = terrain.GetHeight(second) + wallHeight;
+            first.Y = terrain.GetHeight(first) + wallHeight;
+            second.Y = terrain.GetHeight(second) + wallHeight;
 
             return new U.Pair<Vector3>(first, second);
         }

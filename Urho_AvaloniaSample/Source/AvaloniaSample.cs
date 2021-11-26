@@ -13,7 +13,7 @@ namespace AvaloniaSample
         public static AvaloniaSample It;   // TMS
 
         const bool IncludeAvaloniaLayer = false;   // TMS
-        const bool UseWaterScene = false;//true;   // TMS
+        const bool UseWaterScene = true;//true;   // TMS
         const bool DrawWallAsFly = true && UseWaterScene;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
         const float InitialAltitude2 = 100;
@@ -265,7 +265,7 @@ namespace AvaloniaSample
             // see the model get simpler as it moves further away). Finally, rendering a large number of the same object with the
             // same material allows instancing to be used, if the GPU supports it. This reduces the amount of CPU work in rendering the
             // scene.
-            const int NMushrooms = 0; //200
+            const int NMushrooms = 20; //200
             for (int i = 0; i < NMushrooms; i++)
             {
                 var mushroom = scene.CreateChild("Mushroom");
@@ -290,7 +290,7 @@ namespace AvaloniaSample
             // Create a Zone component for ambient lighting & fog control
             var zoneNode = scene.CreateChild("Zone");
             var zone = zoneNode.CreateComponent<Zone>();
-            zone.SetBoundingBox(new BoundingBox(-100.0f, 100.0f));
+            zone.SetBoundingBox(new BoundingBox(-1000.0f, 1000.0f));
             zone.AmbientColor = new Color(0.35f, 0.35f, 0.35f);
             //float fogBrightness = ShowWireframe ? 0.2f : 1.0f;   // TMS
             float fogBrightness = ShowWireframe ? 0.0f : 1.0f;

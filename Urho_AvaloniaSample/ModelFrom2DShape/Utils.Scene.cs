@@ -19,7 +19,7 @@ namespace Global
         {
             Vector3 destPt = srcPt.ToXZ();
             // Y is altitude.
-            destPt.Y = (terrain != null) ? (terrain.GetHeight(destPt) + altitude) : 0;
+            destPt.Y = terrain.GetHeight(destPt) + altitude;
             return destPt;
         }
 
