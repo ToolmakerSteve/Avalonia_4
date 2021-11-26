@@ -31,8 +31,8 @@ namespace Global
         /// <param name="point"></param>
         public Size2D(Distance2D point)
         {
-            this.Width = point.X.Value;
-            this.Height = point.Y.Value;
+            this.Width = point.X;
+            this.Height = point.Y;
         }
 
         public Size2D(double dblWidth, double dblHeight)
@@ -44,8 +44,8 @@ namespace Global
         // Size of rotated rectangle. Top-Left, Top-Right, Bottom-Left corners.
         public Size2D(Distance2D cornerTL, Distance2D cornerTR, Distance2D cornerBL)
         {
-            this.Width = Distance2D.DistanceBetween(cornerTL, cornerTR).Value;
-            this.Height = Distance2D.DistanceBetween(cornerTL, cornerBL).Value;
+            this.Width = Distance2D.DistanceBetween(cornerTL, cornerTR);
+            this.Height = Distance2D.DistanceBetween(cornerTL, cornerBL);
         }
 
         //// Size of rotated rectangle. "corners" hold 4 corners of rectangle.
@@ -136,7 +136,7 @@ namespace Global
 
         public static Size2D operator *(Distance2D scale, Size2D size)
         {
-            return new Size2D(scale.X.Value * size.Width, scale.Y.Value * size.Height);
+            return new Size2D(scale.X * size.Width, scale.Y * size.Height);
         }
 
         public static Size2D operator /(Size2D sz1, Size2D sz2)

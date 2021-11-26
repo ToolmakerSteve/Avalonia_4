@@ -247,7 +247,7 @@ namespace Global
 
         public static bool NearlyEquals(this Distance number, Distance target, double tolerance = EpsilonForOne)
         {
-            return (Math.Abs(number.Value - target.Value) <= tolerance);
+            return (Math.Abs(number - target) <= tolerance);
         }
 
         public static bool NearlyEquals(this Distance2D p1, Distance2D p2, double tolerance = EpsilonForOne)
@@ -385,7 +385,7 @@ namespace Global
 
         //        public static double getAngleDegrees(Distance2D origin, Distance2D aimPt)
         //        {
-        //            return getAngleDegrees(origin.X.Value, origin.Y.Value, aimPt.X.Value, aimPt.Y.Value);
+        //            return getAngleDegrees(origin.X, origin.Y, aimPt.X, aimPt.Y);
         //        }
 
         //        public static double getAngleDegrees(double originX, double originY, double aimPtX, double aimPtY)

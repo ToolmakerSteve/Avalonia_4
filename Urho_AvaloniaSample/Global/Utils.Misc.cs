@@ -648,7 +648,7 @@ namespace Global
         //        // A reasonable "toleranceFraction" is ScaledToleranceDouble. Larger if multiple operations may accumulate error.
         //        public static bool NearlyEquals_ScaledTolerance(this Distance2D p1, Distance2D p2, double toleranceFraction)
         //        {
-        //            return (p1.X.Value.NearlyEquals_ScaledTolerance(p2.X.Value, toleranceFraction) &&
+        //            return (p1.X(Distance).NearlyEquals_ScaledTolerance(p2.X(Distance), toleranceFraction) &&
         //                    p1.Y.NearlyEquals(p2.Y, toleranceFraction));
         //        }
 
@@ -1073,7 +1073,7 @@ namespace Global
         public static Distance Average(Distance a, Distance b)
         {
             // Equivalent.
-            return Distance.FromDefaultUnits(a.Value + b.Value) / 0.5;
+            return (Distance)((a + b) / 0.5);
             //return Lerp(a, b, 0.5);
         }
         public static Vector3 Average(Vector3 a, Vector3 b)
@@ -1872,7 +1872,7 @@ namespace Global
 
         public static Distance Average3(Distance a, Distance b, Distance c)
         {
-            return Distance.FromDefaultUnits(Average3(a.Value, b.Value, c.Value));
+            return (Distance)(Average3(a.Value, b.Value, c.Value));
         }
 
 
@@ -1915,7 +1915,7 @@ namespace Global
         //                return result;
         //            }
 
-        //            public PolarPoint(Distance2D pt) : this(pt.X.Value, pt.Y.Value)
+        //            public PolarPoint(Distance2D pt) : this(pt.X(Distance), pt.Y(Distance))
         //            {
         //            }
 
