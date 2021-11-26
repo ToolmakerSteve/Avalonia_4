@@ -19,8 +19,8 @@ namespace SceneSource
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
         const bool AddOnlyNewQuads = true;
-        public const bool SingleGeometry = true;
-        public const bool SingleGeometryTEST = true;   // TMS: Temporary changes.
+        public const bool SingleGeometry = false;
+        public const bool SingleGeometryTEST = false;   // TMS: Temporary changes.
 
 
         #region --- data, new ----------------------------------------
@@ -293,8 +293,8 @@ namespace SceneSource
 
         private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
         {
-            if (_currentWallSegmentCount >= 1)
-                return;   // ttt - only one segment
+            if (SingleGeometryTEST && _currentWallSegmentCount >= 1)
+                return;   // TEST - only one segment
 
             _currentWallSegmentCount++;
 

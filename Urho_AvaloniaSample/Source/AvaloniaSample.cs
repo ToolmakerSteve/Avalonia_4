@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Global;
+using SceneSource;
 using Urho;
 using Urho.Avalonia;
 using Urho.Gui;
@@ -106,7 +108,7 @@ namespace AvaloniaSample
         bool WallDrawStarted;   // TMS
         SceneSource.GroundLine TheWall;
         Vector2 LastWallPosition2D;
-        const float MinWallSegmentLength = 3;//ttt 1;   // TBD: Good value.
+        const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 1;   // TBD: Good value.
 
         private IntVector2 _lastScreenSize;
 
@@ -209,7 +211,8 @@ namespace AvaloniaSample
         {
             WallDrawStarted = true;
             TheWall = new SceneSource.GroundLine(2, 8);
-            //ttt TheWall.BaseAltitude = 8 * Distance.One;
+            // Uncomment for "floating wall".
+            //TheWall.BaseAltitude = 8 * Distance.One;   //ttt
         }
 
         /// <summary>
