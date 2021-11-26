@@ -3374,15 +3374,15 @@ namespace Global
         //            return new Distance2D(p1.X + totalDi * Math.Cos((angle / 180) * Math.PI), p1.Y + totalDi * Math.Sin((angle / 180) * Math.PI));
         //        }
 
-        //        public static double ToRadians(double angle)
-        //        {
-        //            return (Math.PI / 180.0) * angle;
-        //        }
+        public static double ToRadians(double angle)
+        {
+            return (Math.PI / 180.0) * angle;
+        }
 
-        //        public static float ToRadians(float angle)
-        //        {
-        //            return ((float)Math.PI / 180.0f) * angle;
-        //        }
+        public static float ToRadians(float angle)
+        {
+            return ((float)Math.PI / 180.0f) * angle;
+        }
 
 
         //        // ========== interpolateThreePoints ==========
@@ -3546,7 +3546,7 @@ namespace Global
         /// <param name="altitude"></param>
         /// <param name="dst"></param>
         /// <returns></returns>
-        public static Vector3 SetAltitude(Vector3 dst, float altitude)
+        public static Vector3 WithAltitude(Vector3 dst, float altitude)
         {
             return new Vector3(dst.X, altitude, dst.Z);
         }

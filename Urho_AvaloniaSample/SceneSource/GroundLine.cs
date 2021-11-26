@@ -119,10 +119,12 @@ namespace SceneSource
         private Node EnsureWallNode()
         {
             var it = AvaloniaSample.AvaloniaSample.It;
-            if (it.WallNode == null)
-                it.WallNode = it.Scene.CreateChild("Wall");
+            if (it.WallsNode == null)
+                it.WallsNode = it.Scene.CreateChild("Walls");
+            if (it.CurrentWallNode == null)
+                it.CurrentWallNode = it.WallsNode.CreateChild($"Wall{it.WallsNode.GetNumChildren()+1}");
 
-            return it.WallNode;
+            return it.CurrentWallNode;
         }
 
         public StaticModel EnsureModel(Node node)
@@ -385,7 +387,7 @@ namespace SceneSource
         private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float relAltitude)
         {
             float altitude = terrain.GetHeight(vec) + relAltitude;
-            return U.SetAltitude(vec, altitude);
+            return U.WithAltitude(vec, altitude);
         }
 
         private int _prevWallSegmentCount = 0;

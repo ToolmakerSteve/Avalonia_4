@@ -7,6 +7,7 @@ using Urho.Avalonia;
 using Urho.Gui;
 using Urho.IO;
 using Urho.Urho2D;
+using U = Global.Utils;
 using static Global.Distance;
 
 namespace AvaloniaSample
@@ -16,10 +17,13 @@ namespace AvaloniaSample
         public static AvaloniaSample It;   // TMS
 
         const bool IncludeAvaloniaLayer = false;   // TMS
-        const bool UseWaterScene = true;//true;   // TMS
-        const bool DrawWallAsFly = true && UseWaterScene;   // TMS
+        public const bool StartOnLand = true;
+        public const bool WallKeys = true;   // Keys to control Wall Drawing.
+        const bool DrawWallPressDrag = true;   // In Top View.
+        const bool DrawWallAsFly = true;   // In Perspective View. TMS
         const bool ShowWireframe = false;//false;   // TMS
-        const float InitialAltitude2 = 100;
+        const bool UseWaterScene = true;//true;   // TMS
+        const float InitialAltitude2 = 150;//ttt 100;
 
         Camera Camera = null;
 		public Scene Scene;
@@ -28,9 +32,10 @@ namespace AvaloniaSample
         Node ReflectionCameraNode;
         // Used when showing wireframe.
         Material WireframeMaterial;
+        public readonly List<GroundLine> Walls = new List<GroundLine>();
 
-        // TheWall.
-        public Node WallNode;
+        // CurrentWall.
+        public Node WallsNode, CurrentWallNode;
 
 		// private SampleAvaloniaWindow _window;
         [Preserve]
@@ -106,7 +111,7 @@ namespace AvaloniaSample
         #region --- OnUpdate ----------------------------------------
         uint _startTime = 0;
         bool WallDrawStarted;   // TMS
-        SceneSource.GroundLine TheWall;
+        SceneSource.GroundLine CurrentWall;
         Vector2 LastWallPosition2D;
         const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 1;   // TBD: Good value.
 
@@ -146,6 +151,9 @@ namespace AvaloniaSample
 
             if (Camera != null)
             {
+                if (Input.GetKeyPress(Key.N))
+                    StartNewWall();
+
                 if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
                 {
                     if (Input.GetMouseButtonDown(MouseButton.Left))
@@ -155,6 +163,36 @@ namespace AvaloniaSample
                 }
 
             }
+        }
+
+        private void StartNewWall()
+        {
+            // Keep existing wall, if it has contents.
+            if (CurrentWall != null)
+            {
+                if (CurrentWall.Points.Count <= 0)
+                {
+                    // Its empty, so use it. Happens if StartNewWall twice, without adding contents.
+                    // Starting over.
+                    WallDrawStarted = false;
+                    return;
+                }
+                else
+                {
+                    // "Keep" is automatic, because CurrentWall was added to WallsNode when it was created.
+                }
+            }
+
+            // Start a new one.
+            CurrentWall = null;
+            // Don't use previous wall's node.
+            CurrentWallNode = null;
+            // Starting over.
+            WallDrawStarted = false;
+
+
+            // SETS CurrentWall, WallDrawStarted.
+            //REDUNDANT_!WallDrawStarted_SUFFICIENT StartWall();
         }
 
         private void OnUpdate_Wireframe()
@@ -185,6 +223,7 @@ namespace AvaloniaSample
             bool doAddPoint = false;
             if (!WallDrawStarted)
             {
+                // SETS CurrentWall, WallDrawStarted.
                 StartWall();
                 doAddPoint = true;
             }
@@ -200,19 +239,22 @@ namespace AvaloniaSample
                 // HACK: Put a box at this point.
                 //AddBoxAt(penPosition2D);
                 // Create or Extend a path, and a corresponding extruded model.
-                TheWall.AddPoint(new Global.Distance2D(penPosition2D, null));
-                TheWall.OnUpdate();
+                CurrentWall.AddPoint(new Global.Distance2D(penPosition2D, null));
+                CurrentWall.OnUpdate();
 
                 LastWallPosition2D = penPosition2D;
             }
         }
 
+        /// <summary>
+        /// SETS CurrentWall, WallDrawStarted.
+        /// </summary>
         private void StartWall()
         {
             WallDrawStarted = true;
-            TheWall = new SceneSource.GroundLine(2, 8);
+            CurrentWall = new GroundLine(2, 8);
             // Uncomment for "floating wall".
-            //TheWall.BaseAltitude = 8 * Distance.One;   //ttt
+            //CurrentWall.BaseAltitude = 8 * Distance.One;   //ttt
         }
 
         /// <summary>
@@ -356,7 +398,7 @@ namespace AvaloniaSample
             foreach (var color in colors)
             {
                 var material = cache.GetMaterial("Materials/Stone.xml").Clone();
-                //material.SetShaderParameter("AmbientColor", color);
+                material.SetShaderParameter("AmbientColor", color);
                 materials.Add(material);
             }
 
@@ -463,8 +505,17 @@ namespace AvaloniaSample
         {
             camera.FarClip = 750.0f;
             // Set an initial position (for the camera scene node) above the plane.
-            //cameraPositionNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
-            Camera1FinalNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
+            if (StartOnLand)
+            {
+                float startAltitude = 7.0f;
+                Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 0.0f);
+                EnforceMinimumAltitudeAboveTerrain(Camera1MainNode, startAltitude);
+                Yaw = 70;
+                Pitch = 0;
+                ApplyPitchYawToCamera();
+            }
+            else
+                Camera1MainNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
         }
         #endregion
 
@@ -547,7 +598,7 @@ namespace AvaloniaSample
         {
             Camera2MainNode = Scene.CreateChild("TopViewMain");
             // Move camera 2 up in the air, to show larger terrain area.
-            Camera2MainNode.Position = new Vector3(0, InitialAltitude2, 0);
+            Camera2MainNode.Position = U.WithAltitude(Camera1MainNode.Position, InitialAltitude2);
 
             Camera2FinalNode = Camera2MainNode.CreateChild("TopViewFinal");
             // Straight down.

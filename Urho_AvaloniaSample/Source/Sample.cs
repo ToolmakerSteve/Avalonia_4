@@ -45,12 +45,13 @@ namespace AvaloniaSample
         protected const bool TrackAltitude = true;
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
         protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
-        protected const float MinimumAltitudeAboveTerrain = 1;
+        protected const float MinimumAltitude1AboveTerrain = 1;
         protected const float MinimumAltitude2AboveTerrain = 10;
-        protected float CurrentMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude2AboveTerrain : MinimumAltitudeAboveTerrain;
-        protected float OtherMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitudeAboveTerrain : MinimumAltitude2AboveTerrain;
+        protected float CurrentMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude2AboveTerrain : MinimumAltitude1AboveTerrain;
+        protected float OtherMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude1AboveTerrain : MinimumAltitude2AboveTerrain;
 
         protected const float TouchSensitivity = 2;
+        // Degrees.
 		protected float Yaw { get; set; }
 		protected float Pitch { get; set; }
 		protected bool TouchEnabled { get; set; }
@@ -271,7 +272,7 @@ namespace AvaloniaSample
             return didMove;
         }
 
-        private void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude, float maxRelativeAltitude)
+        protected void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude, float maxRelativeAltitude = float.MaxValue)
         {
             if (minimumRelativeAltitude > 0)
             {
@@ -284,13 +285,13 @@ namespace AvaloniaSample
                     // Below what we need. "-" to add the missing altitude.
                     sceneAltitude -= excess;
                     //relAltitude -= excess;
-                    cameraMainNode.Position = U.SetAltitude(cameraMainNode.Position, sceneAltitude);
+                    cameraMainNode.Position = U.WithAltitude(cameraMainNode.Position, sceneAltitude);
                 } else if (maxRelativeAltitude < float.MaxValue && maxRelativeAltitude > minimumRelativeAltitude)
                 {
                     if (relAltitude > maxRelativeAltitude)
                     {
                         sceneAltitude = terrainAltitude + maxRelativeAltitude;
-                        cameraMainNode.Position = U.SetAltitude(cameraMainNode.Position, sceneAltitude);
+                        cameraMainNode.Position = U.WithAltitude(cameraMainNode.Position, sceneAltitude);
                     }
                 }
             }
@@ -301,16 +302,16 @@ namespace AvaloniaSample
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dst"></param>
-        private void CopyXZ(Node src, Node dst)
+        protected void CopyXZ(Node src, Node dst)
         {
             dst.Position = U.CopyXZ(src.Position, dst.Position);
         }
 
-        private void _HandleUserInput()// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
+        protected void _HandleUserInput()// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
         {
             _HandleUserInput(0.02f, 10f);//najak-TODO - make the timeStep 'real'
         }
-        private void _HandleUserInput(float timeStep, float moveSpeed)// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
+        protected void _HandleUserInput(float timeStep, float moveSpeed)// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
         {
             const float mouseSensitivity = .1f;
 
@@ -325,7 +326,7 @@ namespace AvaloniaSample
             }
         }
 
-        private void ApplyPitchYawToCamera()
+        protected void ApplyPitchYawToCamera()
         {
             if (MovementIgnoresPitch)
             {
