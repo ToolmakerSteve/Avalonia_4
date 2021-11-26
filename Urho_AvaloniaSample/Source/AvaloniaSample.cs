@@ -105,7 +105,7 @@ namespace AvaloniaSample
         bool WallDrawStarted;   // TMS
         SceneSource.GroundLine TheWall;
         Vector2 LastWallPosition2D;
-        const float MinWallSegmentLength = 1;   // TBD: Good value.
+        const float MinWallSegmentLength = 3;//ttt 1;   // TBD: Good value.
 
         private IntVector2 _lastScreenSize;
 

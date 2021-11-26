@@ -19,7 +19,7 @@ namespace SceneSource
 
         const bool Test_BoxPerWallSegment = false;//false;
         const bool AddOnlyNewQuads = true;
-
+        const bool SingleGeometry = false;//true;
 
 
         #region --- data, new ----------------------------------------
@@ -75,7 +75,6 @@ namespace SceneSource
             Points = new List<Distance2D>();
         }
         #endregion
-
 
         #region --- OnUpdate ----------------------------------------
         internal void OnUpdate()
@@ -141,11 +140,23 @@ namespace SceneSource
             if (TopPoly == null)
             {
                 TopPoly = CreateAndInitPoly(sModel);
-                BtmPoly = CreateAndInitPoly(sModel);
-                FirstSidePoly = CreateAndInitPoly(sModel);
-                SecondSidePoly = CreateAndInitPoly(sModel);
-                StartPoly = CreateAndInitPoly(sModel);
-                EndPoly = CreateAndInitPoly(sModel);
+                if (SingleGeometry)
+                {
+                    // HACK as long as we have !SingleGeometry option.
+                    BtmPoly = TopPoly;
+                    FirstSidePoly = TopPoly;
+                    SecondSidePoly = TopPoly;
+                    StartPoly = TopPoly;
+                    EndPoly = TopPoly;
+                }
+                else
+                {
+                    BtmPoly = CreateAndInitPoly(sModel);
+                    FirstSidePoly = CreateAndInitPoly(sModel);
+                    SecondSidePoly = CreateAndInitPoly(sModel);
+                    StartPoly = CreateAndInitPoly(sModel);
+                    EndPoly = CreateAndInitPoly(sModel);
+                }
             }
 
             var model = sModel.Model;
@@ -256,41 +267,28 @@ namespace SceneSource
 
         private void EnsureAndMaybeClearGeometry(Node node, StaticModel model)
         {
-            if (Test_BoxPerWallSegment)
-            {
-                // Added box sub-nodes. Delete the old ones.
-                // TBD: Or just keep adding on new ones, re-use old ones?
-                _currentWallSegmentCount = 0;
-            }
-            else
-            {
-                _currentWallSegmentCount = 0;
-                EnsureGeometry(model);
+            _currentWallSegmentCount = 0;
+            EnsureGeometry(model);
 
-                if (!AddOnlyNewQuads)
-                {
-                    // Recreating all quads each time.
-                    TopPoly.Clear();
-                    // TODO: Other polys also.
-                    throw new NotImplementedException("EnsureAndMaybeClearGeometry - clear all polys");
-                }
+            if (!AddOnlyNewQuads)
+            {
+                // Recreating all quads each time.
+                TopPoly.Clear();
+                // TODO: Other polys also.
+                throw new NotImplementedException("EnsureAndMaybeClearGeometry - clear all polys");
             }
         }
 
         private void FinishGeometry()
         {
             _prevWallSegmentCount = _currentWallSegmentCount;
-
-            if (Test_BoxPerWallSegment)
-            {
-            }
-            else
-            {
-            }
         }
 
         private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
         {
+            if (_currentWallSegmentCount >= 1)
+                return;   // ttt - only one segment
+
             _currentWallSegmentCount++;
 
             Vector3? normTop = normals[0];
@@ -376,35 +374,13 @@ namespace SceneSource
             //Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
             //throw new NotImplementedException();
 
-            if (Test_BoxPerWallSegment)
+            // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
+            if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
             {
-                var midpoint0 = U.Average(wallPair0.First, wallPair0.Second);
-                var midpoint1 = U.Average(wallPair1.First, wallPair1.Second);
-                var midPoint = U.Average(midpoint0, midpoint1);
-                // VERSION: Only add if it is a new one.
-                if (_currentWallSegmentCount > _prevWallSegmentCount)
-                {
-                    var it = AvaloniaSample.AvaloniaSample.It;
-                    // test: A box at midpoint.
-                    it.AddBoxToScene(it.WallNode, midPoint, 0.4f, false);
-                    // test: boxes midway to each corner.
-                    it.AddBoxToScene(it.WallNode, U.Average(wallPair0.First, midPoint), 0.4f, false);
-                    it.AddBoxToScene(it.WallNode, U.Average(wallPair0.Second, midPoint), 0.4f, false);
-                    it.AddBoxToScene(it.WallNode, U.Average(wallPair1.First, midPoint), 0.4f, false);
-                    it.AddBoxToScene(it.WallNode, U.Average(wallPair1.Second, midPoint), 0.4f, false);
-                }
-            }
-            else
-            {
-                // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
-                if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
-                {
-                    poly.AddQuad(wallPair0, wallPair1, ref normal, invertNorm);
-                }
+                poly.AddQuad(wallPair0, wallPair1, ref normal, invertNorm);
             }
         }
         #endregion
-
 
         #region --- private methods ----------------------------------------
         /// <summary>
