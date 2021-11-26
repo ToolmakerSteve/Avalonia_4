@@ -15,7 +15,6 @@ namespace SceneSource
     /// </summary>
     public class GroundLine : SourceItem
     {
-        private static ElementMask ElemMask = ElementMask.Position;
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
         const bool Test_BoxPerWallSegment = false;//false;
@@ -27,6 +26,8 @@ namespace SceneSource
         public Meters Width { get; set; }
         public Meters Height { get; set; }
         public Meters BaseAltitude { get; set; }
+        public bool HasNormals { get; private set; }
+        public bool HasUV { get; private set; }
 
         public Geo.IContext Context { get; set; }
         /// <summary>
@@ -40,7 +41,7 @@ namespace SceneSource
 
         private Poly3D Poly;
 
-        public GroundLine() : this(Meters.Zero, Meters.Zero, Geo.NoContext.It)
+        public GroundLine(bool hasUV = true, bool hasNormals = true) : this(Meters.Zero, Meters.Zero, Geo.NoContext.It, hasUV, hasNormals)
         {
         }
 
@@ -50,15 +51,18 @@ namespace SceneSource
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="context"></param>
-        public GroundLine(double width, double height, Geo.IContext context = null)
+        public GroundLine(double width, double height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
                 : this(new Meters(width), new Meters(height), context)
         {
         }
 
-        public GroundLine(Meters width, Meters height, Geo.IContext context = null)
+        public GroundLine(Meters width, Meters height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
         {
             Width = width;
             Height = height;
+            HasUV = hasUV;
+            HasNormals = hasNormals;
+
             // Initialized to altitude zero.
             BaseAltitude = Meters.Zero;
 
@@ -131,7 +135,7 @@ namespace SceneSource
             if (Poly == null)
             {
                 Poly = new Poly3D();
-                Poly.Init(sModel, ElemMask);
+                Poly.Init(sModel, HasNormals, HasUV);
             }
 
             var model = sModel.Model;
@@ -146,11 +150,14 @@ namespace SceneSource
                 var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
 
                 //sModel.CastShadows = true;
-                Material mat = Material.FromColor(Color.Magenta, true);
-                //Material mat = res.GetMaterial("Materials/DefaultGrey.xml");// StoneTiled.xml");
-                mat.CullMode = CullMode.None; // CullMode.Cw;
-                sModel.SetMaterial(mat);
+                //Material mat = Material.FromColor(Color.Magenta, false);
+                Material mat = res.GetMaterial("Materials/StoneTiledH.xml");
+                mat.CullMode = CullMode.Cw; // CullMode.Cw;
+                //mat.SetShaderParameter("AmbientColor", Color.White);
+                //mat.PixelShaderDefines("")
+
                 //sModel.CastShadows = true;
+                sModel.SetMaterial(mat);
             }
             return Poly;
         }

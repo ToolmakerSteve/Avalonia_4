@@ -14,7 +14,7 @@ namespace AvaloniaSample
 
         const bool IncludeAvaloniaLayer = false;   // TMS
         const bool UseWaterScene = true;//true;   // TMS
-        const bool DrawWallAsFly = false && UseWaterScene;   // TMS
+        const bool DrawWallAsFly = true && UseWaterScene;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
         const float InitialAltitude2 = 100;
 
@@ -347,7 +347,7 @@ namespace AvaloniaSample
             foreach (var color in colors)
             {
                 var material = cache.GetMaterial("Materials/Stone.xml").Clone();
-                material.SetShaderParameter("AmbientColor", color);
+                //material.SetShaderParameter("AmbientColor", color);
                 materials.Add(material);
             }
 

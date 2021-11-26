@@ -17,6 +17,9 @@ namespace ModelFrom2DShape
         private ElementMask ElemMask;
         private float[] VData;
         private short[] IData;
+        public uint FloatsPerVertex { get; private set; }
+        public bool HasNormals { get; private set; }
+        public bool HasUV { get; private set; }
 
 
         public Poly3D()
@@ -24,13 +27,35 @@ namespace ModelFrom2DShape
 
         }
 
-        public void Init(UrhoObject something, ElementMask mask)
+        public void Init(UrhoObject something, bool hasNormals, bool hasUV)
         {
+            const uint FloatsForVertexPosition = 3;
+            const uint FloatsForVertexNormal = 3;
+            const uint FloatsForVertexUV = 2;
+
             VBuffer = new VertexBuffer(something.Context, false);
             IBuffer = new IndexBuffer(something.Context, false);
             Geom = new Geometry();
-            ElemMask = mask;
+
+            var eleMask = ElementMask.Position;
+            uint  floatsPerVertex = FloatsForVertexPosition;
+
+            if (hasNormals)
+            {
+                HasNormals = true;
+                eleMask |= ElementMask.Normal;
+                floatsPerVertex += FloatsForVertexNormal;
+            }
+            if (hasUV)
+            {
+                HasUV = true;
+                eleMask |= ElementMask.TexCoord1;
+                floatsPerVertex += FloatsForVertexUV;
+            }
+            FloatsPerVertex = floatsPerVertex;
+            ElemMask = eleMask;
         }
+
 
         /// <summary>
         /// For a situation where everything needs to be recalculated.
@@ -54,15 +79,15 @@ namespace ModelFrom2DShape
             {
                 // Update the edge of previous quad.
                 // REASON: Adding this quad changes calc of perpendicular between the two quads.
-                UpdateRecentVertex(wallPair0.First, -2);
-                UpdateRecentVertex(wallPair0.Second, -1);
+                UpdateRecentVertex(wallPair0.First, -2, 2);
+                UpdateRecentVertex(wallPair0.Second, -1, 3);
             }
 
             // Add vertices for quad.
-            AppendVertex(wallPair0.First);
-            AppendVertex(wallPair0.Second);
-            AppendVertex(wallPair1.First);
-            AppendVertex(wallPair1.Second);
+            AppendVertex(wallPair0.First, 0);
+            AppendVertex(wallPair0.Second, 1);
+            AppendVertex(wallPair1.First, 2);
+            AppendVertex(wallPair1.Second, 3);
 
             // Add indices for quad.
             AppendQuadIndices();
@@ -78,40 +103,53 @@ namespace ModelFrom2DShape
             UpdateBufferData();
         }
 
-        private void AppendVertex(Vector3 position)
+        static private Vector2[] s_UVPerQuad = new Vector2[4]
+        {
+            new Vector2(0,0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)
+        };
+
+        private void AppendVertex(Vector3 position, uint uvIdx)
         {
             if (_usedVertices >= _numVertices)
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
 
-            UpdateVertex(position, _usedVFloats);
+            UpdateVertex(position, uvIdx, _usedVFloats);
 
             //// TODO: Need to set normals BEFORE increment !
-            _usedVFloats += (uint)NFloatsPerVertex();
+            _usedVFloats += FloatsPerVertex;
         }
 
         /// <summary>
         /// </summary>
         /// <param name="position"></param>
         /// <param name="relIndex">-1 for previous vertex, -2 for one before that.</param>
-        private void UpdateRecentVertex(Vector3 position, int relIndex)
+        private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx)
         {
-            int relVFloatIndex = relIndex * NFloatsPerVertex();
-            UpdateVertex(position, (uint)(_usedVFloats + relVFloatIndex));
+            uint floatIndex = (uint)(_usedVFloats + (FloatsPerVertex * relIndex));
+            UpdateVertex(position, uvIdx, floatIndex);
         }
 
-        private void UpdateVertex(Vector3 position, uint iVFloat)
+        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat)
         {
-            VData[iVFloat + 0] = position.X;
-            VData[iVFloat + 1] = position.Y;
-            VData[iVFloat + 2] = position.Z;
+            VData[iVFloat++] = position.X;
+            VData[iVFloat++] = position.Y;
+            VData[iVFloat++] = position.Z;
 
-            if (ElemMask.HasFlag(ElementMask.Normal))
-            {   // TODO
-                //Vector3 normal;
-                //VData[iVFloat + 3] = normal.X;
-                //VData[iVFloat + 4] = normal.Y;
-                //VData[iVFloat + 5] = normal.Z;
-            }
+            VData[iVFloat++] = 0;
+            VData[iVFloat++] = 1;
+            VData[iVFloat++] = 0;
+
+            Vector2 uv = s_UVPerQuad[uvIdx];
+            VData[iVFloat++] = uv.X;
+            VData[iVFloat++] = uv.Y;
+
+            //if (ElemMask.HasFlag(ElementMask.Normal))
+            //{   // TODO
+            //    //Vector3 normal;
+            //    //VData[iVFloat + 3] = normal.X;
+            //    //VData[iVFloat + 4] = normal.Y;
+            //    //VData[iVFloat + 5] = normal.Z;
+            //}
         }
 
         private void AppendQuadIndices()
@@ -174,7 +212,7 @@ namespace ModelFrom2DShape
                 _numVertices = numVertices;
                 VBuffer.SetSize(_numVertices, ElemMask, false);
 
-                var nFloats = _numVertices * NFloatsPerVertex();
+                var nFloats = _numVertices * FloatsPerVertex;
 
                 float[] oldData = VData;
 
@@ -197,27 +235,6 @@ namespace ModelFrom2DShape
             Geom.SetDrawRange(PrimitiveType.TriangleList, 0, _usedIndices, false);
         }
 
-
-        const int FloatsForVertexPosition = 3;
-        const int FloatsForVertexNormal = 3;
-
-        private int NFloatsPerVertex()
-        {
-            return NFloatsPerVertex(ElemMask);
-        }
-
-        static private int NFloatsPerVertex(ElementMask mask)
-        {
-            int n = 0;
-
-            // TBD: Any helper method to determine size given ElementMask bits?
-            if (mask.HasFlag(ElementMask.Position))
-                n += FloatsForVertexPosition;
-            if (mask.HasFlag(ElementMask.Normal))
-                n += FloatsForVertexNormal;
-
-            return n;
-        }
 
         private void EnsureIndexCapacity(uint numIndices)
         {
