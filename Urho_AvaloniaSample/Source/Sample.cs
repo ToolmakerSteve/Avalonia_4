@@ -179,6 +179,15 @@ namespace AvaloniaSample
 
         uint PreviousTime = 0;
 
+        private float _planeY = 0;
+
+        public float GetTerrainElevation(Vector3 worldPos)
+        {
+            if (Terrain != null)
+                return Terrain.GetHeight(worldPos);
+            else
+                return _planeY;
+        }
 
         /// <summary>
         /// Move camera for 3D samples.
@@ -276,7 +285,7 @@ namespace AvaloniaSample
             if (minimumRelativeAltitude > 0)
             {
                 float sceneAltitude = cameraMainNode.Position.Altitude();
-                float terrainAltitude = Terrain.GetHeight(cameraMainNode.Position);
+                float terrainAltitude = GetTerrainElevation(cameraMainNode.Position);
                 float relAltitude = sceneAltitude - terrainAltitude;
                 float excess = relAltitude - minimumRelativeAltitude;
                 if (excess < 0)
