@@ -5,6 +5,7 @@ using Urho.Avalonia;
 using Urho.Gui;
 using Urho.IO;
 using Urho.Urho2D;
+using static Global.Distance;
 
 namespace AvaloniaSample
 {
@@ -208,6 +209,7 @@ namespace AvaloniaSample
         {
             WallDrawStarted = true;
             TheWall = new SceneSource.GroundLine(2, 8);
+            //ttt TheWall.BaseAltitude = 8 * Meters.One;
         }
 
         private void AddBoxAt(Vector2 penPosition2D)

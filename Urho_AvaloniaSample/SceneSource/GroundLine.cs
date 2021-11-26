@@ -5,6 +5,7 @@ using System.Text;
 using Global;
 using ModelFrom2DShape;
 using Urho;
+using static Global.Distance;
 using U = Global.Utils;
 
 namespace SceneSource
@@ -37,7 +38,10 @@ namespace SceneSource
         public List<Distance2D> Points { get; private set; }
 
         private float WidthMetersF => (float)Width.Value;
-        private float HeightMetersF => (float)Height.Value;
+        //USE_TopMetersF private float HeightMetersF => (float)Height.Value;
+        private float TopMetersF => (float)(Height.Value + BaseAltitude.Value);
+        // Project to ground. When at 0, go slightly below ground, to avoid "crack" at base.
+        private float BottomMetersF => (float)(BaseAltitude.Value == 0 ? -0.5 : BaseAltitude.Value);
 
         // Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
         // TBD: Start/EndPolys could be combined.
@@ -221,7 +225,7 @@ namespace SceneSource
             foreach (Distance2D srcPt in Points)
             {
                 // On wall's center line.
-                Vector3 cl2 = U.PlaceOnTerrain(terrain, srcPt.ToVector2());
+                Vector3 cl2 = U.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
                 if (firstPoint)
                 {
                     cl1 = cl2;
@@ -300,14 +304,13 @@ namespace SceneSource
             Vector3? normSide2 = normals[3];
 
             // On top of wall.
-            U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, HeightMetersF, terrain);
-            U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, HeightMetersF, terrain);
+            U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
+            U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
             // Wall Segment: Top of wall.
             AddQuad(TopPoly, wallPair0, wallPair1, ref normTop);
 
-            // Project to ground.
-            U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain);
-            U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain);
+            U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
+            U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
 
             // Wall Segment: Top of wall.
             AddQuad(BtmPoly, groundPair0, groundPair1, ref normBtm, true);
@@ -353,21 +356,35 @@ namespace SceneSource
         private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
         {
             if (!GroundLine.SingleGeometryTEST)
-                EndPoly.Clear();
+            EndPoly.Clear();
             Vector3? normal = null;
             AddQuad(EndPoly, wallPair1, groundPair1, ref normal);
         }
 
-        private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain, float depth = 0.5f)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="wallPair"></param>
+        /// <param name="terrain"></param>
+        /// <param name="relAltitude">relative altitude: distance above terrain.</param>
+        /// <returns></returns>
+        private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain, float relAltitude)
         {
-            Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain, depth);
-            Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain, depth);
+            Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain, relAltitude);
+            Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain, relAltitude);
             return new U.Pair<Vector3>(groundFirst, groundSecond);
         }
 
-        private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float depth = 0.5f)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="terrain"></param>
+        /// <param name="relAltitude">relative altitude: distance above terrain.</param>
+        /// <returns></returns>
+        private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float relAltitude)
         {
-            float altitude = terrain.GetHeight(vec) - depth;
+            float altitude = terrain.GetHeight(vec) + relAltitude;
             return U.SetAltitude(vec, altitude);
         }
 
@@ -412,18 +429,18 @@ namespace SceneSource
         /// <param name="wallCenter"></param>
         /// <param name="wallWidth"></param>
         /// <param name="perpendicularUnit">REQUIRE LENGTH=1</param>
-        /// <param name="wallHeight">Distance above terrain</param>
+        /// <param name="wallTop">Distance above terrain</param>
         /// <param name="terrain"></param>
         /// <returns>Two points above terrain, perpendicular to wall center, "wallWidth" apart.</returns>
         private U.Pair<Vector3> WallPerpendicularOnTerrain(
-                    Vector3 wallCenter, float wallWidth, Vector2 perpendicularUnit, float wallHeight, Terrain terrain)
+                    Vector3 wallCenter, float wallWidth, Vector2 perpendicularUnit, float wallTop, Terrain terrain)
         {
             float halfWidth = wallWidth / 2.0f;
             Vector3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
             Vector3 first = wallCenter - halfPerp;
             Vector3 second = wallCenter + halfPerp;
-            first.Y = terrain.GetHeight(first) + wallHeight;
-            second.Y = terrain.GetHeight(second) + wallHeight;
+            first.Y = terrain.GetHeight(first) + wallTop;
+            second.Y = terrain.GetHeight(second) + wallTop;
 
             return new U.Pair<Vector3>(first, second);
         }
