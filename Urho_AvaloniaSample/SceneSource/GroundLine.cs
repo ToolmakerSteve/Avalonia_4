@@ -17,9 +17,9 @@ namespace SceneSource
     {
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
-        const bool Test_BoxPerWallSegment = false;//false;
         const bool AddOnlyNewQuads = true;
-        const bool SingleGeometry = false;//true;
+        public const bool SingleGeometry = true;
+        public const bool SingleGeometryTEST = true;   // TMS: Temporary changes.
 
 
         #region --- data, new ----------------------------------------
@@ -163,13 +163,16 @@ namespace SceneSource
             if (model == null)
             {
                 model = new Model();
-                model.NumGeometries = 6;//3;
+                model.NumGeometries = SingleGeometry ? 1 : 6;
                 model.SetGeometry(0, 0, TopPoly.Geom);
-                model.SetGeometry(1, 0, BtmPoly.Geom);
-                model.SetGeometry(2, 0, FirstSidePoly.Geom);
-                model.SetGeometry(3, 0, SecondSidePoly.Geom);
-                model.SetGeometry(4, 0, StartPoly.Geom);
-                model.SetGeometry(5, 0, EndPoly.Geom);
+                if (!SingleGeometry)
+                {
+                    model.SetGeometry(1, 0, BtmPoly.Geom);
+                    model.SetGeometry(2, 0, FirstSidePoly.Geom);
+                    model.SetGeometry(3, 0, SecondSidePoly.Geom);
+                    model.SetGeometry(4, 0, StartPoly.Geom);
+                    model.SetGeometry(5, 0, EndPoly.Geom);
+                }
                 model.BoundingBox = new BoundingBox(-10000, 10000);
                 sModel.Model = model;
 
@@ -340,7 +343,8 @@ namespace SceneSource
 
         private void CreateStartPoly(U.Pair<Vector3> wallPair0, U.Pair<Vector3> groundPair0, Terrain terrain)
         {
-            StartPoly.Clear();
+            if (!GroundLine.SingleGeometryTEST)
+                StartPoly.Clear();
             // Swapped to flip normal.
             Vector3? normal = null;
             AddQuad(StartPoly, groundPair0, wallPair0, ref normal);
@@ -348,7 +352,8 @@ namespace SceneSource
 
         private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
         {
-            EndPoly.Clear();
+            if (!GroundLine.SingleGeometryTEST)
+                EndPoly.Clear();
             Vector3? normal = null;
             AddQuad(EndPoly, wallPair1, groundPair1, ref normal);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LineLayer3D;
+using SceneSource;
 using Urho;
 using U = Global.Utils;
 
@@ -31,6 +32,16 @@ namespace ModelFrom2DShape
                 // TODO: Optimize so don't have to increase on every quad.
                 EnsureVertexCapacity(NVerticesForQuads(_numQuads));
                 EnsureIndexCapacity(NIndicesForQuads(_numQuads));
+            }
+        }
+
+        private int _numWallSegments;
+        public int NumWallSegments
+        {
+            get => _numWallSegments;
+            set
+            {
+                _numWallSegments = value;
             }
         }
 
@@ -119,8 +130,11 @@ namespace ModelFrom2DShape
                 newNormal *= -1;
 
             Vector3 avgNormal = (normal.HasValue) ? (0.5f * (newNormal + normal.Value)) : newNormal;
-
-            if (NumQuads >= 2)
+            if (GroundLine.SingleGeometryTEST)
+            {   // ttt
+                avgNormal = newNormal;   // for test, normals are not related.
+            }
+            if (NumQuads >= 2 && !GroundLine.SingleGeometryTEST)   //ttt: SingleGeometry test
             {
                 // Update the edge of previous quad.
                 // REASON: Adding this quad changes calc of perpendicular between the two quads.
@@ -144,7 +158,6 @@ namespace ModelFrom2DShape
 
             Vector2 uvScale = new Vector2((float)Math.Round(_textureScale * len), (float)Math.Round(_textureScale * dy));
 
-            // Calc normal to quad.  "-": For top of wall, this points Y up.
             // Add vertices for quad.
             if (invertNorm)
             {
