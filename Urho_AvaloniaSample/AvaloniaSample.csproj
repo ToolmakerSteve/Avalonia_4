@@ -53,6 +53,13 @@
     <None Remove="libs\dotnet\bcl\**" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Compile Remove="_WTF\**" />
+    <EmbeddedResource Remove="_WTF\**" />
+    <None Remove="_WTF\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Remove="libs\dotnet\bcl\ios\Consts.cs" />
   </ItemGroup>
