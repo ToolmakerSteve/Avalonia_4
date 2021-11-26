@@ -103,26 +103,37 @@ namespace ModelFrom2DShape
             }
         }
 
-        private float _textureScale = 1f;
+        private float _textureScale = 0.5f;
 
         /// <summary>
         /// TODO: Normals. (Also change ElemMask passed in by client.)
         /// </summary>
         /// <param name="wallPair0"></param>
         /// <param name="wallPair1"></param>
-        internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, ref Vector3? normal)
+        internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, ref Vector3? normal, bool invertNorm)
         {
             NumQuads++;
 
             Vector3 newNormal = -U.Normal(wallPair0.First, wallPair0.Second, wallPair1.First);
+            if (invertNorm)
+                newNormal *= -1;
+
             Vector3 avgNormal = (normal.HasValue) ? (0.5f * (newNormal + normal.Value)) : newNormal;
 
             if (NumQuads >= 2)
             {
                 // Update the edge of previous quad.
                 // REASON: Adding this quad changes calc of perpendicular between the two quads.
-                UpdateRecentVertex(wallPair0.First, -2, 2, avgNormal);
-                UpdateRecentVertex(wallPair0.Second, -1, 3, avgNormal);
+                if (invertNorm)
+				{
+                    UpdateRecentVertex(wallPair0.First, -1, 3, avgNormal);
+                    UpdateRecentVertex(wallPair0.Second, -2, 2, avgNormal);
+                }
+                else
+                {
+                    UpdateRecentVertex(wallPair0.First, -2, 2, avgNormal);
+                    UpdateRecentVertex(wallPair0.Second, -1, 3, avgNormal);
+                }
             }
 
             Vector3 vert = wallPair0.First - wallPair0.Second;
@@ -135,11 +146,20 @@ namespace ModelFrom2DShape
 
             // Calc normal to quad.  "-": For top of wall, this points Y up.
             // Add vertices for quad.
-            AppendVertex(wallPair0.First, 0, avgNormal, uvScale);
-            AppendVertex(wallPair0.Second, 1, avgNormal, uvScale);
-            AppendVertex(wallPair1.First, 2, newNormal, uvScale);
-            AppendVertex(wallPair1.Second, 3, newNormal, uvScale);
-
+            if (invertNorm)
+            {
+                AppendVertex(wallPair0.Second, 0, avgNormal, uvScale);
+                AppendVertex(wallPair0.First, 1, avgNormal, uvScale);
+                AppendVertex(wallPair1.Second, 3, newNormal, uvScale);
+                AppendVertex(wallPair1.First, 2, newNormal, uvScale);
+            }
+            else
+            {
+                AppendVertex(wallPair0.First, 0, avgNormal, uvScale);
+                AppendVertex(wallPair0.Second, 1, avgNormal, uvScale);
+                AppendVertex(wallPair1.First, 2, newNormal, uvScale);
+                AppendVertex(wallPair1.Second, 3, newNormal, uvScale);
+            }
             normal = newNormal;
 
             // Add indices for quad.

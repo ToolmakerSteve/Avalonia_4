@@ -41,7 +41,7 @@ namespace SceneSource
 
         // Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
         // TBD: Start/EndPolys could be combined.
-        private Poly3D TopPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
+        private Poly3D TopPoly, BtmPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
 
         public GroundLine(bool hasUV = true, bool hasNormals = true) : this(Meters.Zero, Meters.Zero, Geo.NoContext.It, hasUV, hasNormals)
         {
@@ -141,6 +141,7 @@ namespace SceneSource
             if (TopPoly == null)
             {
                 TopPoly = CreateAndInitPoly(sModel);
+                BtmPoly = CreateAndInitPoly(sModel);
                 FirstSidePoly = CreateAndInitPoly(sModel);
                 SecondSidePoly = CreateAndInitPoly(sModel);
                 StartPoly = CreateAndInitPoly(sModel);
@@ -151,12 +152,13 @@ namespace SceneSource
             if (model == null)
             {
                 model = new Model();
-                model.NumGeometries = 5;//3;
+                model.NumGeometries = 6;//3;
                 model.SetGeometry(0, 0, TopPoly.Geom);
-                model.SetGeometry(1, 0, FirstSidePoly.Geom);
-                model.SetGeometry(2, 0, SecondSidePoly.Geom);
-                model.SetGeometry(3, 0, StartPoly.Geom);
-                model.SetGeometry(4, 0, EndPoly.Geom);
+                model.SetGeometry(1, 0, BtmPoly.Geom);
+                model.SetGeometry(2, 0, FirstSidePoly.Geom);
+                model.SetGeometry(3, 0, SecondSidePoly.Geom);
+                model.SetGeometry(4, 0, StartPoly.Geom);
+                model.SetGeometry(5, 0, EndPoly.Geom);
                 model.BoundingBox = new BoundingBox(-10000, 10000);
                 sModel.Model = model;
 
@@ -169,7 +171,7 @@ namespace SceneSource
                 //mat.SetShaderParameter("AmbientColor", Color.White);
                 //mat.PixelShaderDefines("")
 
-                //sModel.CastShadows = true;
+                sModel.CastShadows = true;
                 sModel.SetMaterial(mat);
             }
         }
@@ -200,7 +202,7 @@ namespace SceneSource
             Vector3 cl1 = new Vector3();
             Vector2 perp0 = new Vector2();
             Vector2 perp1 = new Vector2();
-            Vector3?[] normals = new Vector3?[3];
+            Vector3?[] normals = new Vector3?[4];
 
             foreach (Distance2D srcPt in Points)
             {
@@ -292,8 +294,9 @@ namespace SceneSource
             _currentWallSegmentCount++;
 
             Vector3? normTop = normals[0];
-            Vector3? normSide1 = normals[1];
-            Vector3? normSide2 = normals[2];
+            Vector3? normBtm = normals[1];
+            Vector3? normSide1 = normals[2];
+            Vector3? normSide2 = normals[3];
 
             // On top of wall.
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, HeightMetersF, terrain);
@@ -304,6 +307,10 @@ namespace SceneSource
             // Project to ground.
             U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain);
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain);
+
+            // Wall Segment: Top of wall.
+            AddQuad(BtmPoly, groundPair0, groundPair1, ref normBtm, true);
+
 
             // Wall Segment: First side of wall.
             // Must specify such that the second pair is at far end - these get adjusted when next quad is added.
@@ -320,8 +327,9 @@ namespace SceneSource
             AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, ref normSide2);
 
             normals[0] = normTop;
-            normals[1] = normSide1;
-            normals[2] = normSide2;
+            normals[1] = normBtm;
+            normals[2] = normSide1;
+            normals[3] = normSide2;
 
 
             if (Points.Count == 2)
@@ -347,23 +355,23 @@ namespace SceneSource
             AddQuad(EndPoly, wallPair1, groundPair1, ref normal);
         }
 
-        private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain)
+        private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain, float depth = 0.5f)
         {
-            Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain);
-            Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain);
+            Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain, depth);
+            Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain, depth);
             return new U.Pair<Vector3>(groundFirst, groundSecond);
         }
 
-        private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain)
+        private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float depth = 0.5f)
         {
-            float altitude = terrain.GetHeight(vec);
+            float altitude = terrain.GetHeight(vec) - depth;
             return U.SetAltitude(vec, altitude);
         }
 
         private int _prevWallSegmentCount = 0;
         private int _currentWallSegmentCount = 0;
 
-        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, ref Vector3? normal)
+        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, ref Vector3? normal, bool invertNorm = false)
         {
             //Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
             //throw new NotImplementedException();
@@ -391,7 +399,7 @@ namespace SceneSource
                 // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
                 if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
                 {
-                    poly.AddQuad(wallPair0, wallPair1, ref normal);
+                    poly.AddQuad(wallPair0, wallPair1, ref normal, invertNorm);
                 }
             }
         }
