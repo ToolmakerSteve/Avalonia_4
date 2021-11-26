@@ -167,7 +167,7 @@ namespace SceneSource
             if (Points.Count < 2)
                 return;
 
-            Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
+            //Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
             CreateOrClearGeometry(node, model);
 
             // TODO: TO calc good perpendicular (to give wall its width), need THREE points (except at ends).
@@ -267,7 +267,7 @@ namespace SceneSource
 
         private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1)
         {
-            Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
+            //Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
             //throw new NotImplementedException();
 
             if (Test_BoxPerWallSegment)
