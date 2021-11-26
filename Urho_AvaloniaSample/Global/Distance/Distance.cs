@@ -88,7 +88,7 @@ namespace Global
         public UnitsType Units => DefaultUnits;
 
 
-        private Distance(double value)
+        public Distance(double value)
         {
             Value = value;
             //s_NumInstancesConstructed++;
@@ -133,6 +133,11 @@ namespace Global
         #endregion --- Instance Members -------------------------------------
 
         #region === Static Conversion/Create Methods ===============================================
+        public static implicit operator double(Distance it) => it.Value;
+        public static explicit operator Distance(double value) => (Distance)(value);
+        public static explicit operator float(Distance it) => (float)it.Value;
+        public static explicit operator Distance(float value) => (Distance)(value);
+
         static public Distance FromMeters(double meters)
         {
             return new Distance(_defaultUnitsPerMeter * meters);

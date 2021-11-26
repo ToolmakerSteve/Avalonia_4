@@ -24,9 +24,9 @@ namespace SceneSource
 
 
         #region --- data, new ----------------------------------------
-        public Meters Width { get; set; }
-        public Meters Height { get; set; }
-        public Meters BaseAltitude { get; set; }
+        public Distance Width { get; set; }
+        public Distance Height { get; set; }
+        public Distance BaseAltitude { get; set; }
         public bool HasNormals { get; private set; }
         public bool HasUVs { get; private set; }
 
@@ -37,17 +37,17 @@ namespace SceneSource
         /// </summary>
         public List<Distance2D> Points { get; private set; }
 
-        private float WidthMetersF => (float)Width.Value;
+        private float WidthMetersF => (float)Width;
         //USE_TopMetersF private float HeightMetersF => (float)Height.Value;
-        private float TopMetersF => (float)(Height.Value + BaseAltitude.Value);
+        private float TopMetersF => (float)(Height + BaseAltitude);
         // Project to ground. When at 0, go slightly below ground, to avoid "crack" at base.
-        private float BottomMetersF => (float)(BaseAltitude.Value == 0 ? -0.5 : BaseAltitude.Value);
+        private float BottomMetersF => (float)(BaseAltitude == 0 ? -0.5 : BaseAltitude);
 
         // Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
         // TBD: Start/EndPolys could be combined.
         private Poly3D TopPoly, BtmPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
 
-        public GroundLine(bool hasUV = true, bool hasNormals = true) : this(Meters.Zero, Meters.Zero, Geo.NoContext.It, hasUV, hasNormals)
+        public GroundLine(bool hasUV = true, bool hasNormals = true) : this(Distance.Zero, Distance.Zero, Geo.NoContext.It, hasUV, hasNormals)
         {
         }
 
@@ -58,11 +58,11 @@ namespace SceneSource
         /// <param name="height"></param>
         /// <param name="context"></param>
         public GroundLine(double width, double height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
-                : this(new Meters(width), new Meters(height), context)
+                : this(new Distance(width), new Distance(height), context)
         {
         }
 
-        public GroundLine(Meters width, Meters height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
+        public GroundLine(Distance width, Distance height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
         {
             Width = width;
             Height = height;
@@ -70,7 +70,7 @@ namespace SceneSource
             HasNormals = hasNormals;
 
             // Initialized to altitude zero.
-            BaseAltitude = Meters.Zero;
+            BaseAltitude = Distance.Zero;
 
             if (context == null)
                 context = Geo.NoContext.It;

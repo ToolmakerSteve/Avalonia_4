@@ -209,9 +209,13 @@ namespace AvaloniaSample
         {
             WallDrawStarted = true;
             TheWall = new SceneSource.GroundLine(2, 8);
-            //ttt TheWall.BaseAltitude = 8 * Meters.One;
+            //ttt TheWall.BaseAltitude = 8 * Distance.One;
         }
 
+        /// <summary>
+        /// For test, where create a model at each point.
+        /// </summary>
+        /// <param name="penPosition2D"></param>
         private void AddBoxAt(Vector2 penPosition2D)
         {
             //float boxScale = MinWallSegmentLength / 2;
