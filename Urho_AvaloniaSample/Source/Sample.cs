@@ -27,6 +27,8 @@ using System.Globalization;
 using Urho.Resources;
 using Urho.Gui;
 using Urho;
+using U = Global.Utils;
+using Global;   // For Vector3Exts.
 
 namespace AvaloniaSample
 {
@@ -39,26 +41,39 @@ namespace AvaloniaSample
 		UI ui;
 
         protected const bool ShowTwoViewports = true;//true;   // TMS
+        // Camera not only goes up as terrain rises, it also goes down as terrain falls.
+        protected const bool TrackAltitude = true;
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
         protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
+        protected const float MinimumAltitudeAboveTerrain = 1;
+        protected const float MinimumAltitude2AboveTerrain = 10;
+        protected float CurrentMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude2AboveTerrain : MinimumAltitudeAboveTerrain;
+        protected float OtherMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitudeAboveTerrain : MinimumAltitude2AboveTerrain;
 
         protected const float TouchSensitivity = 2;
 		protected float Yaw { get; set; }
 		protected float Pitch { get; set; }
 		protected bool TouchEnabled { get; set; }
 
-        protected Node CameraNode { get; set; }
-        protected Node CameraNode2 { get; set; }
-        /// <summary>
-        /// Only used when two cameras (two viewports).
-        /// So can move both cameras in world coords, instead of relative to camera orientation.
-        /// </summary>
-        protected Node CameraWorldBaseNode { get; set; }
-        // When MovementIgnoresPitch, Camera1 WASD applied to this node.
-        protected Node CameraYawNode;
-        // Set to the node that is positioned by keys. When one camera, is CameraNode.
-        // When two cameras, is CameraWorldBaseNode or CameraYawNode.
-        protected Node CameraPositionNode;
+        // Used by Water Scene.
+        public Terrain Terrain;
+
+        // Camera1 WASD applied to this node.
+        // When !MovementIgnoresPitch, = Camera1FinalNode. 
+        protected Node Camera1MainNode;
+        // The camera is attached to this.
+        protected Node Camera1FinalNode;
+        // So "Translate" is not affected by the downward orientation of this camera.
+        protected Node Camera2MainNode;
+        // The camera is attached to this.
+        protected Node Camera2FinalNode;
+        // So WASD keys know which camera to affect.
+        protected bool MovingCamera2;
+        // WASD keys applied to this node.
+        protected Node CurrentCameraMainNode => MovingCamera2 ? Camera2MainNode : Camera1MainNode;
+        protected Node CurrentCameraFinalNode => MovingCamera2 ? Camera2FinalNode : Camera1FinalNode;
+        // After moving one camera, apply XZ to other camera.
+        protected Node OtherCameraMainNode => MovingCamera2 ? Camera1MainNode : Camera2MainNode;
 
         protected MonoDebugHud MonoDebugHud { get; set; }
 
@@ -144,20 +159,20 @@ namespace AvaloniaSample
 			const float moveSpeed = 4.0f;
 
 			// Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-			if (Input.GetKeyDown(Key.W)) CameraNode.Translate( Vector3.UnitY * moveSpeed * timeStep);
-			if (Input.GetKeyDown(Key.S)) CameraNode.Translate(-Vector3.UnitY * moveSpeed * timeStep);
-			if (Input.GetKeyDown(Key.A)) CameraNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
-			if (Input.GetKeyDown(Key.D)) CameraNode.Translate( Vector3.UnitX * moveSpeed * timeStep);
+			if (Input.GetKeyDown(Key.W)) Camera1FinalNode.Translate( Vector3.UnitY * moveSpeed * timeStep);
+			if (Input.GetKeyDown(Key.S)) Camera1FinalNode.Translate(-Vector3.UnitY * moveSpeed * timeStep);
+			if (Input.GetKeyDown(Key.A)) Camera1FinalNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
+			if (Input.GetKeyDown(Key.D)) Camera1FinalNode.Translate( Vector3.UnitX * moveSpeed * timeStep);
 
             if (Input.GetKeyDown(Key.PageUp))
 			{
-				Camera camera = CameraNode.GetComponent<Camera>();
+				Camera camera = Camera1FinalNode.GetComponent<Camera>();
 				camera.Zoom = camera.Zoom * 1.01f;
 			}
 
 			if (Input.GetKeyDown(Key.PageDown))
 			{
-				Camera camera = CameraNode.GetComponent<Camera>();
+				Camera camera = Camera1FinalNode.GetComponent<Camera>();
 				camera.Zoom = camera.Zoom * 0.99f;
 			}
 		}
@@ -211,73 +226,39 @@ namespace AvaloniaSample
             {
                 didMove = true;
                 var moveMult = moveSpeed * timeStep;
+                float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
                 if (GroundSpeedMultByAltitude)
                 {
-                    var altitude = CameraPositionNode.Position.Y;
-                    if (overViewport2)
-                        altitude += CameraNode2.Position.Y;
-                    else
-                        altitude += CameraNode.Position.Y;
+                    float sceneAltitude = CurrentCameraMainNode.Position.Altitude();
+                    float relAltitude = sceneAltitude - terrainAltitude;
                     float beginHighAltitude = overViewport2 ? 60 : 20;
-                    if (altitude > beginHighAltitude)
+                    if (relAltitude > beginHighAltitude)
                     {
                         // Move faster at high altitudes.
                         if (overViewport2)
-                            moveMult *= altitude / beginHighAltitude;
+                            moveMult *= relAltitude / beginHighAltitude;
                         else
-                            moveMult *= (float)Math.Sqrt(altitude / beginHighAltitude);
+                            moveMult *= (float)Math.Sqrt(relAltitude / beginHighAltitude);
                     }
                 }
                 //Debug.WriteLine($"--- deltaTime={deltaTime}, mult={moveMult}, elapsed={Time.ElapsedTime}, step={Time.TimeStep}, over2={overViewport2} ---");
 
-                if (ShowTwoViewports && CameraPositionNode != null)
+                bool enforceMaxAltitude = TrackAltitude && !altitudeMove.HasValue;
+                float currentMaxRelAltitude = enforceMaxAltitude ?
+                        CurrentCameraMainNode.Position.Altitude() - terrainAltitude :
+                        float.MaxValue;
+                float otherMaxAltitude = TrackAltitude ?
+                        OtherCameraMainNode.Position.Altitude() - terrainAltitude :
+                        float.MaxValue;
+
+                // Move current camera.
+                CurrentCameraMainNode.Translate(allAxesMove * moveMult);
+                EnforceMinimumAltitudeAboveTerrain(CurrentCameraMainNode, CurrentMinimumAltitudeAboveTerrain, currentMaxRelAltitude);
+
+                if (ShowTwoViewports)
                 {
-                    if (overViewport2)
-                    {
-                        // This moves both cameras in world ground plane.
-                        CameraPositionNode.Translate(cameraPlaneMove * moveMult);
-                        if (altitudeMove.HasValue)
-                        {
-                            // Move camera2 in Altitude, which is Y above;
-                            // but in CameraNode2's orientation (pointing down), it is "-Z".
-                            altitudeMove = Vector3.UnitZ * -Math.Sign(altitudeMove.Value.Y);
-                            CameraNode2.Translate(altitudeMove.Value * moveMult);
-                        }
-                    }
-                    else
-                    {
-                        // Find the equivalent world-move of this camera-oriented move.
-                        var worldPositionBefore = CameraNode.WorldPosition;
-                        //CameraNode.Translate(allAxesMove * moveMult);
-                        Node cameraPlaneNode = MovementIgnoresPitch ? CameraYawNode : CameraNode;
-                        cameraPlaneNode.Translate(cameraPlaneMove * moveMult);
-                        if (altitudeMove.HasValue)
-                            CameraNode.Translate(altitudeMove.Value * moveMult);
-                        var worldPositionAfter = CameraNode.WorldPosition;
-                        // Undo the move. Will instead apply equivalent to CameraPositionNode.
-                        //CameraNode.Translate(allAxesMove * -moveMult);
-                        cameraPlaneNode.Translate(cameraPlaneMove * -moveMult);
-                        if (altitudeMove.HasValue)
-                            CameraNode.Translate(altitudeMove.Value * -moveMult);
-
-                        var worldDelta = worldPositionAfter - worldPositionBefore;
-                        //var altitudeAfter = worldPositionAfter.Y;
-                        var altitudeDelta = worldDelta.Y;
-                        //Debug.WriteLine($"--- {allAxesMove} -> {worldPositionAfter}, worldDelta {worldDelta}, altitude {altitudeAfter} ---");
-
-                        // HACK: I don't know why the camera moves so slowly when change world position to world Translate.
-                        moveMult *= 30;
-
-                        // Move both cameras in world coords.
-                        // TODO: Why so much slower than when apply directly to either CameraNode?
-                        CameraPositionNode.Translate(worldDelta * moveMult);
-                        // Cancel out Camera 2's altitude change. (convert Y change to -Z, then negate to +Z to compensate for change to CameraPositionNode.)
-                        CameraNode2.Translate(new Vector3(0, 0, altitudeDelta * moveMult));
-                    }
-                }
-                else
-                {   // There is only one camera. Apply all axes to it.
-                    CameraNode.Translate(allAxesMove * moveMult);
+                    CopyXZ(CurrentCameraMainNode, OtherCameraMainNode);
+                    EnforceMinimumAltitudeAboveTerrain(OtherCameraMainNode, OtherMinimumAltitudeAboveTerrain, otherMaxAltitude);
                 }
             }
 
@@ -290,6 +271,41 @@ namespace AvaloniaSample
             return didMove;
         }
 
+        private void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude, float maxRelativeAltitude)
+        {
+            if (minimumRelativeAltitude > 0)
+            {
+                float sceneAltitude = cameraMainNode.Position.Altitude();
+                float terrainAltitude = Terrain.GetHeight(cameraMainNode.Position);
+                float relAltitude = sceneAltitude - terrainAltitude;
+                float excess = relAltitude - minimumRelativeAltitude;
+                if (excess < 0)
+                {
+                    // Below what we need. "-" to add the missing altitude.
+                    sceneAltitude -= excess;
+                    //relAltitude -= excess;
+                    cameraMainNode.Position = U.SetAltitude(cameraMainNode.Position, sceneAltitude);
+                } else if (maxRelativeAltitude < float.MaxValue && maxRelativeAltitude > minimumRelativeAltitude)
+                {
+                    if (relAltitude > maxRelativeAltitude)
+                    {
+                        sceneAltitude = terrainAltitude + maxRelativeAltitude;
+                        cameraMainNode.Position = U.SetAltitude(cameraMainNode.Position, sceneAltitude);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// TBD: Move to some Urho Utilities class.
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
+        private void CopyXZ(Node src, Node dst)
+        {
+            dst.Position = U.CopyXZ(src.Position, dst.Position);
+        }
+
         private void _HandleUserInput()// najak-HACK - to permit MouseInput to go through Avalonia transparencies.
         {
             _HandleUserInput(0.02f, 10f);//najak-TODO - make the timeStep 'real'
@@ -298,7 +314,7 @@ namespace AvaloniaSample
         {
             const float mouseSensitivity = .1f;
 
-            if (Input.GetMouseButtonDown(MouseButton.Left))
+            if (Input.GetMouseButtonDown(MouseButton.Right))
             {
                 var mouseMove = Input.MouseMove;
                 Yaw += mouseSensitivity * mouseMove.X;
@@ -313,16 +329,16 @@ namespace AvaloniaSample
         {
             if (MovementIgnoresPitch)
             {
-                CameraYawNode.Rotation = new Quaternion(0, Yaw, 0);
-                CameraNode.Rotation = new Quaternion(Pitch, 0, 0);
+                Camera1MainNode.Rotation = new Quaternion(0, Yaw, 0);
+                Camera1FinalNode.Rotation = new Quaternion(Pitch, 0, 0);
             }
             else
-                CameraNode.Rotation = new Quaternion(Pitch, Yaw, 0);
+                Camera1FinalNode.Rotation = new Quaternion(Pitch, Yaw, 0);
         }
 
         protected void MoveCameraByTouches (float timeStep)
 		{
-			if (!TouchEnabled || CameraNode == null)
+			if (!TouchEnabled || Camera1FinalNode == null)
 				return;
 
 			var input = Input;
@@ -334,7 +350,7 @@ namespace AvaloniaSample
 
 				if (state.Delta.X != 0 || state.Delta.Y != 0)
 				{
-					var camera = CameraNode.GetComponent<Camera>();
+					var camera = Camera1FinalNode.GetComponent<Camera>();
 					if (camera == null)
 						return;
 
@@ -354,7 +370,7 @@ namespace AvaloniaSample
 
 		protected void SimpleCreateInstructionsWithWasd (string extra = "")
 		{
-			SimpleCreateInstructions("Use WASD keys and mouse/touch to move" + extra);
+			SimpleCreateInstructions("WASD=move, RIGHT mouse/touch=rotate" + extra);
 		}
 	
 		protected void SimpleCreateInstructions(string text = "")
@@ -363,7 +379,7 @@ namespace AvaloniaSample
 				{
 					Value = text,
 					HorizontalAlignment = HorizontalAlignment.Center,
-					VerticalAlignment = VerticalAlignment.Center
+					VerticalAlignment = VerticalAlignment.Top
 				};
 			textElement.SetFont(ResourceCache.GetFont("Fonts/Anonymous Pro.ttf"), 15);
 			UI.Root.AddChild(textElement);

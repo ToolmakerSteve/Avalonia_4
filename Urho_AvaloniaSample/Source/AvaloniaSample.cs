@@ -12,16 +12,15 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
-        const bool UseWaterScene = true;//true;   // TMS
         const bool IncludeAvaloniaLayer = false;   // TMS
+        const bool UseWaterScene = true;//true;   // TMS
+        const bool DrawWallAsFly = false && UseWaterScene;   // TMS
         const bool ShowWireframe = false;//false;   // TMS
-        const bool StoneWallTest1 = true && UseWaterScene;   // TMS
+        const float InitialAltitude2 = 100;
 
         Camera Camera = null;
 		public Scene Scene;
         Viewport Viewport2;
-        // Used by Water Scene.
-        public Terrain Terrain;
         Node WaterNode;
         Node ReflectionCameraNode;
         // Used when showing wireframe.
@@ -64,14 +63,17 @@ namespace AvaloniaSample
 
             Scene = new Scene();
 
-            Node parentOfCamera = GetMainCamerasParentAndMaybeSetCameraWorldBaseNode();
             // Create a scene node for the camera, which we will move around
+            Node parentOfCameraNode = GetParentOfCamera1Final();
             // Can override camera's default settings later. (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
-            CameraNode = parentOfCamera.CreateChild("camera");
-            Camera = CameraNode.CreateComponent<Camera>();
+            Camera1FinalNode = parentOfCameraNode.CreateChild("camera");
+            // When Camera1 does NOT have a two-node setup, make these the same.
+            if (Camera1MainNode == null)
+                Camera1MainNode = Camera1FinalNode;
+
+            Camera = Camera1FinalNode.CreateComponent<Camera>();
             //if (ShowWireframe)
             //    Camera.FillMode = FillMode.Wireframe;
-            SetCameraPositionNode();
 
             if (UseWaterScene)
                 CreateWaterScene(Scene);
@@ -134,13 +136,16 @@ namespace AvaloniaSample
                     overViewport2 = true;
                 else
                     overViewport2 = false;   // (redundant - for debugging)
+
+                // So WASD keys know which camera to affect.
+                MovingCamera2 = overViewport2;
             }
 
             if (Camera != null)
             {
-                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && StoneWallTest1)
+                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
                 {
-                    if (Input.GetMouseButtonDown(MouseButton.Right))
+                    if (Input.GetMouseButtonDown(MouseButton.Left))
                     {
                         OnUpdate_DrawWall();
                     }
@@ -173,7 +178,7 @@ namespace AvaloniaSample
 
         private void OnUpdate_DrawWall()
         {
-            Vector2 penPosition2D = InGroundPlane(CameraPositionNode.Position);
+            Vector2 penPosition2D = InGroundPlane(CurrentCameraMainNode.Position);
             bool doAddPoint = false;
             if (!WallDrawStarted)
             {
@@ -272,7 +277,7 @@ namespace AvaloniaSample
                 mushroomObject.SetMaterial(ResourceCache.GetMaterial("Materials/Mushroom.xml"));
             }
 
-            MushroomSceneMainCameraSettings(CameraPositionNode);
+            MushroomSceneMainCameraSettings(Camera1FinalNode);
         }
 
         void CreateWaterScene(Scene scene)
@@ -369,7 +374,7 @@ namespace AvaloniaSample
             // Set a different viewmask on the water plane to be able to hide it from the reflection camera
             water.ViewMask = 0x80000000;
 
-            WaterSceneMainCameraSettings(CameraPositionNode, Camera);
+            WaterSceneMainCameraSettings(Camera1FinalNode, Camera);
         }
 
         /// <summary>
@@ -450,53 +455,30 @@ namespace AvaloniaSample
             camera.FarClip = 750.0f;
             // Set an initial position (for the camera scene node) above the plane.
             //cameraPositionNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
-            CameraNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
+            Camera1FinalNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
         }
         #endregion
 
 
         #region --- First camera and viewport ----------------------------------------
         /// <summary>
-        /// When two viewports, sets CameraWorldBaseNode.
+        /// When MovementIgnoresPitch, there is a separate "Camera1MainNode".
         /// </summary>
-        /// <returns>parentOfMainCameraNode: The node that will be parent of CameraNode.</returns>
-        private Node GetMainCamerasParentAndMaybeSetCameraWorldBaseNode()
+        /// <returns>parentOfCamera: The node that will be parent of Camera1FinalNode.</returns>
+        private Node GetParentOfCamera1Final()
         {
-            Node parentOfMainCameraNode;
-            if (ShowTwoViewports)
-            {
-                CameraWorldBaseNode = Scene.CreateChild("cameraBase");
+            Camera1MainNode = null;
 
-                if (MovementIgnoresPitch)
-                {
-                    CameraYawNode = CameraWorldBaseNode.CreateChild("cameraYaw");
-                    parentOfMainCameraNode = CameraYawNode;
-                }
-                else
-                    parentOfMainCameraNode = CameraWorldBaseNode;
+            Node parentOfCamera;
+            if (MovementIgnoresPitch)
+            {
+                Camera1MainNode = Scene.CreateChild("cameraYaw");
+                parentOfCamera = Camera1MainNode;
             }
             else
-            {   // One camera - create it directly in the scene.
-                parentOfMainCameraNode = Scene;
-            }
+                parentOfCamera = Scene;
 
-            return parentOfMainCameraNode;
-        }
-
-        /// <summary>
-        /// Sets CameraPositionNode.
-        /// </summary>
-        private void SetCameraPositionNode()
-        {
-            if (ShowTwoViewports)
-            {
-                // This node gets the position.
-                CameraPositionNode = CameraWorldBaseNode;
-            }
-            else
-            {   // One camera - create it directly in the scene.
-                CameraPositionNode = CameraNode;
-            }
+            return parentOfCamera;
         }
 
 
@@ -522,7 +504,7 @@ namespace AvaloniaSample
             // Create camera for water reflection
             // It will have the same farclip and position as the main viewport camera, but uses a reflection plane to modify
             // its position when rendering
-            ReflectionCameraNode = CameraNode.CreateChild();
+            ReflectionCameraNode = Camera1FinalNode.CreateChild();
             var reflectionCamera = ReflectionCameraNode.CreateComponent<Camera>();
             reflectionCamera.FarClip = 750.0f;
             reflectionCamera.ViewMask = 0x7fffffff; // Hide objects with only bit 31 in the viewmask (the water plane)
@@ -554,33 +536,15 @@ namespace AvaloniaSample
         #region --- Two viewports (and two cameras) ----------------------------------------
         void SetupSecondCamera()
         {
-            if (false)
-            {   // "Rear-view mirror".
-                // Parent the rear camera node to the front camera node and turn it 180 degrees to face backward
-                // Here, we use the angle-axis constructor for Quaternion instead of the usual Euler angles
-                CameraNode2 = CameraNode.CreateChild("RearCamera");
-                CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitY, 180.0f), TransformSpace.Local);
+            Camera2MainNode = Scene.CreateChild("TopViewMain");
+            // Move camera 2 up in the air, to show larger terrain area.
+            Camera2MainNode.Position = new Vector3(0, InitialAltitude2, 0);
 
-                Camera rearCamera = CameraNode2.CreateComponent<Camera>();
-                rearCamera.FarClip = 300.0f;
-                // Because the rear viewport is rather small, disable occlusion culling from it. Use the camera's
-                // "view override flags" for this. We could also disable eg. shadows or force low material quality
-                // if we wanted
+            Camera2FinalNode = Camera2MainNode.CreateChild("TopViewFinal");
+            // Straight down.
+            Camera2FinalNode.Rotation = new Quaternion(90, 0, 0);
 
-                rearCamera.ViewOverrideFlags = ViewOverrideFlags.DisableOcclusion;
-            }
-            else
-            {
-                CameraNode2 = CameraWorldBaseNode.CreateChild("TopViewCamera");
-                // Straight down. BUT then it shouldn't use rotation of first camera; only position.
-                //CameraNode2.Rotate(Quaternion.FromAxisAngle(Vector3.UnitX, 90.0f), TransformSpace.Local);
-                // TODO: motions are relative to camera orientation; how make them absolute orientation?
-                CameraNode2.Rotation = new Quaternion(90, 0, 0);
-                // Move camera 2 up in the air, to show larger terrain area.
-                CameraNode2.Position = new Vector3(0, 100, 0);
-
-                Camera topCamera = CameraNode2.CreateComponent<Camera>();
-            }
+            Camera topCamera = Camera2FinalNode.CreateComponent<Camera>();
         }
 
         /// <summary>
@@ -595,9 +559,9 @@ namespace AvaloniaSample
             int halfWidth = (int)(Graphics.Width / 2);
 
             // Set up the first camera viewport as right-hand pane (half of screen width).
-            Viewport viewport = new Viewport(Context, Scene, CameraNode.GetComponent<Camera>(), null);
+            Viewport viewport = new Viewport(Context, Scene, Camera1FinalNode.GetComponent<Camera>(), null);
             var rect = RectBySize(halfWidth, 0, halfWidth, Graphics.Height);
-            Renderer.SetViewport(0, new Viewport(Context, Scene, CameraNode.GetComponent<Camera>(), rect, null));
+            Renderer.SetViewport(0, new Viewport(Context, Scene, Camera1FinalNode.GetComponent<Camera>(), rect, null));
 
             var cache = ResourceCache;
             if (false)   // TMS "false": Disable Render PostProcessing not important for this demo.
@@ -619,7 +583,7 @@ namespace AvaloniaSample
 
             // Set up the second camera viewport as left-hand pane (half of screen width).
             rect = RectBySize(0, 0, halfWidth, graphics.Height);
-            Viewport2 = new Viewport(Context, Scene, CameraNode2.GetComponent<Camera>(), rect, null);
+            Viewport2 = new Viewport(Context, Scene, Camera2FinalNode.GetComponent<Camera>(), rect, null);
 
             renderer.SetViewport(1, Viewport2);
         }
