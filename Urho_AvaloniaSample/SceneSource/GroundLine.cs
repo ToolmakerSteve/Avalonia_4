@@ -39,7 +39,9 @@ namespace SceneSource
         private float WidthMetersF => (float)Width.Value;
         private float HeightMetersF => (float)Height.Value;
 
-        private Poly3D TopPoly, FirstSidePoly, SecondSidePoly;
+        // Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
+        // TBD: Start/EndPolys could be combined.
+        private Poly3D TopPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
 
         public GroundLine(bool hasUV = true, bool hasNormals = true) : this(Meters.Zero, Meters.Zero, Geo.NoContext.It, hasUV, hasNormals)
         {
@@ -138,22 +140,23 @@ namespace SceneSource
         {
             if (TopPoly == null)
             {
-                TopPoly = new Poly3D();
-                TopPoly.Init(sModel, HasNormals, HasUVs);
-                FirstSidePoly = new Poly3D();
-                FirstSidePoly.Init(sModel, HasNormals, HasUVs);
-                SecondSidePoly = new Poly3D();
-                SecondSidePoly.Init(sModel, HasNormals, HasUVs);
+                TopPoly = CreateAndInitPoly(sModel);
+                FirstSidePoly = CreateAndInitPoly(sModel);
+                SecondSidePoly = CreateAndInitPoly(sModel);
+                StartPoly = CreateAndInitPoly(sModel);
+                EndPoly = CreateAndInitPoly(sModel);
             }
 
             var model = sModel.Model;
             if (model == null)
             {
                 model = new Model();
-                model.NumGeometries = 3;
+                model.NumGeometries = 5;//3;
                 model.SetGeometry(0, 0, TopPoly.Geom);
                 model.SetGeometry(1, 0, FirstSidePoly.Geom);
                 model.SetGeometry(2, 0, SecondSidePoly.Geom);
+                model.SetGeometry(3, 0, StartPoly.Geom);
+                model.SetGeometry(4, 0, EndPoly.Geom);
                 model.BoundingBox = new BoundingBox(-10000, 10000);
                 sModel.Model = model;
 
@@ -171,13 +174,20 @@ namespace SceneSource
             }
         }
 
+        private Poly3D CreateAndInitPoly(StaticModel sModel)
+        {
+            var poly = new Poly3D();
+            poly.Init(sModel, HasNormals, HasUVs);
+            return poly;
+        }
+
         public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
         {
             if (Points.Count < 2)
                 return;
 
             //Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
-            CreateOrClearGeometry(node, model);
+            EnsureAndMaybeClearGeometry(node, model);
 
             // TODO: TO calc good perpendicular (to give wall its width), need THREE points (except at ends).
             // TODO: Need to detect "closed shape", for good perpendicular when wraps.
@@ -230,10 +240,17 @@ namespace SceneSource
 
             // Final quad.
             AddWallSegment(cl0, cl1, perp0, perp1, terrain);
+
+            if (Points.Count == 2)
+            {
+                // Now that we know wall direction, create StartPoly.
+                //CreateStartPoly(cl0, cl1, perp0, perp1, terrain);
+            }
+
             FinishGeometry();
         }
 
-        private void CreateOrClearGeometry(Node node, StaticModel model)
+        private void EnsureAndMaybeClearGeometry(Node node, StaticModel model)
         {
             if (Test_BoxPerWallSegment)
             {
@@ -243,12 +260,16 @@ namespace SceneSource
             }
             else
             {
-                //throw new NotImplementedException("ClearGeometry");
                 _currentWallSegmentCount = 0;
                 EnsureGeometry(model);
+
                 if (!AddOnlyNewQuads)
+                {
                     // Recreating all quads each time.
                     TopPoly.Clear();
+                    // TODO: Other polys also.
+                    throw new NotImplementedException("EnsureAndMaybeClearGeometry - clear all polys");
+                }
             }
         }
 
@@ -291,6 +312,27 @@ namespace SceneSource
             U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
             U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
             AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1);
+
+
+            if (Points.Count == 2)
+            {
+                // Now that we know wall direction, create StartPoly.
+                CreateStartPoly(wallPair0, groundPair0, terrain);
+            }
+            CreateEndPoly(wallPair1, groundPair1, terrain);
+        }
+
+        private void CreateStartPoly(U.Pair<Vector3> wallPair0, U.Pair<Vector3> groundPair0, Terrain terrain)
+        {
+            StartPoly.Clear();
+            // Swapped to flip normal.
+            AddQuad(StartPoly, groundPair0, wallPair0);
+        }
+
+        private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
+        {
+            EndPoly.Clear();
+            AddQuad(EndPoly, wallPair1, groundPair1);
         }
 
         private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain)

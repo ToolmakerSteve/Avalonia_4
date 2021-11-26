@@ -21,6 +21,28 @@ namespace ModelFrom2DShape
         public bool HasNormals { get; private set; }
         public bool HasUVs { get; private set; }
 
+        private int _numQuads;
+        public int NumQuads
+        {
+            get => _numQuads;
+            set
+            {
+                _numQuads = value;
+                // TODO: Optimize so don't have to increase on every quad.
+                EnsureVertexCapacity(NVerticesForQuads(_numQuads));
+                EnsureIndexCapacity(NIndicesForQuads(_numQuads));
+            }
+        }
+
+        // Capacity.
+        private uint _numVertices;
+        private uint _numIndices;
+        // Contain data. Append starting here, up to capacity.
+        private uint _usedVertices;
+        private uint _usedVFloats;
+        private uint _usedIndices;
+
+
 
         public Poly3D()
         {
@@ -61,9 +83,24 @@ namespace ModelFrom2DShape
         /// For a situation where everything needs to be recalculated.
         /// Clear buffers? Release what?
         /// </summary>
-        internal void Clear()
+        internal void Clear(bool doTruncate = false, bool doRelease = false)
         {
-            throw new NotImplementedException("Poly3d.Clear");
+            _usedVertices = 0;
+            _usedVFloats = 0;
+            _usedIndices = 0;
+            _numQuads = 0;
+
+            if (doTruncate)
+            {
+                // TODO: Truncate arrays.
+                //_numVertices = 0;
+                //_numIndices = 0;
+            }
+
+            if (doRelease)
+            {
+                // TODO: Release what?
+            }
         }
 
         /// <summary>
@@ -174,26 +211,6 @@ namespace ModelFrom2DShape
         /// </summary>
         protected int[] _indicesSegment = new int[] { 0, 2, 3, 3, 1, 0 };
 
-
-        private int _numQuads;
-        public int NumQuads {
-            get =>_numQuads;
-            set
-            {
-                _numQuads = value;
-                // TODO: Optimize so don't have to increase on every quad.
-                EnsureVertexCapacity(NVerticesForQuads(_numQuads));
-                EnsureIndexCapacity(NIndicesForQuads(_numQuads));
-            }
-        }
-
-        // Capacity.
-        private uint _numVertices;
-        private uint _numIndices;
-        // Contain data. Append starting here, up to capacity.
-        private uint _usedVertices;
-        private uint _usedVFloats;
-        private uint _usedIndices;
 
         private uint NVerticesForQuads(int numQuads)
         {
