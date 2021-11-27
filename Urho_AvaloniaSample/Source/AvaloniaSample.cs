@@ -510,7 +510,7 @@ namespace AvaloniaSample
                 float startAltitude = 7.0f;
                 Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 0.0f);
                 EnforceMinimumAltitudeAboveTerrain(Camera1MainNode, startAltitude);
-                Yaw = 70;
+                //tttt Yaw = 70;
                 Pitch = ThirdPersonPerspective ? 45 : 0;
                 ApplyPitchYawToCamera();
             }

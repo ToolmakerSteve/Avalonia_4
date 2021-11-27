@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Diagnostics;
 //using System.Numerics;
 
 namespace Global
@@ -24,53 +26,91 @@ namespace Global
         public delegate Distance2D ThreeD_P2DDelegate(Distance3D xyz);
 
 
-        //        #region --- debug functions ----------------------------------------
-        //        // (aka "NoOp"): Indicates deliberate absence of action.
-        //        public static void DoNothing()
-        //        {
-        //        }
-        //        // Used during testing, to add a line where a breakpoint can be set.
-        //        public static void Test()
-        //        {
-        //        }
-        //        // Test point that we hope to reach - good to get here.
-        //        public static void Good()
-        //        {
-        //        }
-        //        // Test point that represents a possible problem.
-        //        public static void Dubious()
-        //        {
-        //            Dubious("unspecified");
-        //        }
-        //        // Test point that represents a definite problem.
-        //        public static void Trouble(string msg = "")
-        //        {
-        //            Debug.WriteLine("***** Trouble: " + msg + " *****");
-        //        }
-        //        // Indicates code needs to be written.
-        //        public static void TODO()
-        //        {
-        //        }
-        //        public static void Trouble()
-        //        {
-        //            Trouble("unspecified");
-        //        }
+        #region --- debug functions ----------------------------------------
+        // (aka "NoOp"): Indicates deliberate absence of action.
+        public static void DoNothing()
+        {
+        }
 
-        //        public static void Trouble(string msg_or_format, params object[] args)
-        //        {
-        //            string msg = args.Count() > 0 ? string.Format(msg_or_format, args) : msg_or_format;
-        //            Trouble(msg);
-        //        }
+        // Used during testing, to add a line where a breakpoint can be set.
+        public static void Test()
+        {
+        }
+
+        // Test point that we hope to reach - good to get here.
+        public static void Good()
+        {
+        }
+
+        // Test point that represents a possible problem.
+        public static void Dubious()
+        {
+            Dubious("unspecified");
+        }
+
+        private readonly static HashSet<string> s_dubiousSeen = new HashSet<string>();
+
+        // Only Write these errors ONCE each. (might flood output).
+        // When msg is formatted string (so different for each call), use tag so know is same type of message.
+        public static void Dubious(string msg_or_format, params object[] args) // Optional tag As String = "")
+        {
+            if (!s_dubiousSeen.Contains(msg_or_format))
+            {
+                s_dubiousSeen.Add(msg_or_format);
+                string msg = args.Count() > 0 ? string.Format(msg_or_format, args) : msg_or_format;
+                Debug.WriteLine("***** Dubious: " + msg + " *****");
+            }
+        }
+
+        // Test point that represents a definite problem.
+        public static void Trouble(string msg = "")
+        {
+            Debug.WriteLine("***** Trouble: " + msg + " *****");
+        }
+
+        public static void Trouble()
+        {
+            Trouble("unspecified");
+        }
+
+        public static void Trouble(string msg_or_format, params object[] args)
+        {
+            string msg = args.Count() > 0 ? string.Format(msg_or_format, args) : msg_or_format;
+            Trouble(msg);
+        }
+
+        // Indicates code needs to be written.
+        public static void TODO()
+        {
+        }
+
+        // Convenience: Set breakpoint here to find places that likely need code work.
+        public static void TODO(string msg = "")
+        {
+            if (string.IsNullOrEmpty(msg))
+                msg = "(Unspecified)";
+            Dubious("TODO: " + msg);
+        }
 
 
-        //        // Convenience: Set breakpoint here to find places that likely need code work.
-        //        public static void TODO(string msg = "")
-        //        {
-        //            if (!HasContents(msg))
-        //                msg = "(Unspecified)";
-        //            Dubious("TODO: " + msg);
-        //        }
-        //        #endregion
+        public static void Kludge()
+        {
+            Kludge("unspecified");
+        }
+
+        private readonly static HashSet<string> s_kludgeSeen = new HashSet<string>();
+
+        // Only Write these ONCE each. (Not error)
+        public static void Kludge(string msg)
+        {
+            if (!s_kludgeSeen.Contains(msg))
+            {
+                s_kludgeSeen.Add(msg);
+                Debug.WriteLine("+++++ Kludge: " + msg + " +++++");
+            }
+        }
+
+        #endregion
 
 
         //        public static bool Exists(object ob)
@@ -3262,39 +3302,6 @@ namespace Global
         //                list.Remove(item);
         //        }
 
-
-
-        //        private readonly static HashSet<string> s_dubiousSeen = new HashSet<string>();
-
-        //        // Only Write these errors ONCE each. (might flood output).
-        //        // When msg is formatted string (so different for each call), use tag so know is same type of message.
-        //        public static void Dubious(string msg_or_format, params object[] args) // Optional tag As String = "")
-        //        {
-        //            if (!s_dubiousSeen.Contains(msg_or_format))
-        //            {
-        //                s_dubiousSeen.Add(msg_or_format);
-        //                string msg = args.Count() > 0 ? string.Format(msg_or_format, args) : msg_or_format;
-        //                Debug.WriteLine("***** Dubious: " + msg + " *****");
-        //            }
-        //        }
-
-
-        //        public static void Kludge()
-        //        {
-        //            Kludge("unspecified");
-        //        }
-
-        //        private readonly static HashSet<string> s_kludgeSeen = new HashSet<string>();
-
-        //        // Only Write these ONCE each. (Not error)
-        //        public static void Kludge(string msg)
-        //        {
-        //            if (!s_kludgeSeen.Contains(msg))
-        //            {
-        //                s_kludgeSeen.Add(msg);
-        //                Debug.WriteLine("+++++ Kludge: " + msg + " +++++");
-        //            }
-        //        }
 
 
         //        // "ctr" set to 0, if don't need to append a number (filepath does not yet exist).

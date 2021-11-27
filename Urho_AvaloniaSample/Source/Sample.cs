@@ -303,6 +303,9 @@ namespace AvaloniaSample
             N.Quaternion rotationQ = new N.Quaternion(q.X, q.Y, q.Z, q.W);
             // ttttt: Wrong transform?
             N.Vector3 heading = N.Vector3.Transform(N.Vector3.UnitZ, rotationQ);
+            if (heading.Length() < 0.99f || heading.Length() > 1.01f)
+                U.Trouble();
+
             //N.Vector3 relPosition = CameraDistance * heading;
             N.Vector3 relPosition = -CameraDistance * heading;
             return new Vector3(relPosition.X, relPosition.Y, relPosition.Z);
