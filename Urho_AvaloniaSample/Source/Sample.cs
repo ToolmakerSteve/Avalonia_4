@@ -189,7 +189,7 @@ namespace AvaloniaSample
         /// <param name="moveSpeed"></param>
         /// <param name="overViewport2"></param>
         /// <returns>true if did move (a move key was down)</returns>
-        protected bool SimpleMoveCamera3D(float timeStep, float moveSpeed = 10.0f, bool overViewport2 = false)
+        protected bool MoveCamera3DFirstOrThirdPerson(float timeStep, float moveSpeed = 10.0f, bool overViewport2 = false)
 		{
             uint CurrentTime = Time.SystemTime;
             uint deltaTime = 0;
@@ -262,6 +262,8 @@ namespace AvaloniaSample
                     CopyXZ(CurrentCameraMainNode, OtherCameraMainNode);
                     EnforceMinimumAltitudeAboveTerrain(OtherCameraMainNode, OtherMinimumAltitudeAboveTerrain, otherMaxAltitude);
                 }
+
+                MaybeApplyThirdPersonPerspective();
             }
 
 
@@ -271,6 +273,14 @@ namespace AvaloniaSample
             else
                 _HandleUserInput(timeStep, moveSpeed);
             return didMove;
+        }
+
+        protected void MaybeApplyThirdPersonPerspective()
+        {
+            if (ThirdPersonPerspective)
+            {
+                var dummy = Yaw;
+            }
         }
 
         protected void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude, float maxRelativeAltitude = float.MaxValue)
@@ -324,6 +334,7 @@ namespace AvaloniaSample
                 Pitch = MathHelper.Clamp(Pitch, -90, 90);
 
                 ApplyPitchYawToCamera();
+                MaybeApplyThirdPersonPerspective();
             }
         }
 
@@ -335,7 +346,12 @@ namespace AvaloniaSample
                 Camera1FinalNode.Rotation = new Quaternion(Pitch, 0, 0);
             }
             else
-                Camera1FinalNode.Rotation = new Quaternion(Pitch, Yaw, 0);
+                Camera1FinalNode.Rotation = PitchYawQuaternion();
+        }
+
+        protected Quaternion PitchYawQuaternion()
+        {
+            return new Quaternion(Pitch, Yaw, 0);
         }
 
         protected void MoveCameraByTouches (float timeStep)
@@ -360,6 +376,7 @@ namespace AvaloniaSample
 					Yaw += TouchSensitivity * camera.Fov / graphics.Height * state.Delta.X;
 					Pitch += TouchSensitivity * camera.Fov / graphics.Height * state.Delta.Y;
                     ApplyPitchYawToCamera();
+                    MaybeApplyThirdPersonPerspective();
                 }
                 else
 				{

@@ -154,7 +154,7 @@ namespace AvaloniaSample
                 if (Input.GetKeyPress(Key.N))
                     StartNewWall();
 
-                if (SimpleMoveCamera3D(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
+                if (MoveCamera3DFirstOrThirdPerson(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
                 {
                     if (Input.GetMouseButtonDown(MouseButton.Left))
                     {
@@ -511,11 +511,14 @@ namespace AvaloniaSample
                 Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 0.0f);
                 EnforceMinimumAltitudeAboveTerrain(Camera1MainNode, startAltitude);
                 Yaw = 70;
-                Pitch = 0;
+                Pitch = ThirdPersonPerspective ? 45 : 0;
                 ApplyPitchYawToCamera();
             }
             else
                 Camera1MainNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
+
+            MaybeApplyThirdPersonPerspective();
+
         }
         #endregion
 
