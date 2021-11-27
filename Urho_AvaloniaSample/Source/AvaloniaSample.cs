@@ -239,7 +239,7 @@ namespace AvaloniaSample
                 // HACK: Put a box at this point.
                 //AddBoxAt(penPosition2D);
                 // Create or Extend a path, and a corresponding extruded model.
-                CurrentWall.AddPoint(new Global.Distance2D(penPosition2D, null));
+                CurrentWall.AddPoint(new Distance2D(penPosition2D, null));
                 CurrentWall.OnUpdate();
 
                 LastWallPosition2D = penPosition2D;
@@ -507,9 +507,11 @@ namespace AvaloniaSample
             // Set an initial position (for the camera scene node) above the plane.
             if (StartOnLand)
             {
-                float startAltitude = 7.0f;
+                float startAltitude = 0;//7.0f;
                 Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 0.0f);
+                Camera1MainNode.Position = new Vector3(0.0f, startAltitude, 0.0f);
                 EnforceMinimumAltitudeAboveTerrain(Camera1MainNode, startAltitude);
+                //tttt Yaw = 45;
                 //tttt Yaw = 70;
                 Pitch = ThirdPersonPerspective ? 45 : 0;
                 ApplyPitchYawToCamera();

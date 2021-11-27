@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Urho;
 using static System.Math;
+using N = System.Numerics;
 
 namespace Global
 {
@@ -267,6 +268,20 @@ namespace Global
             return (p1.X.NearlyEquals(p2.X, tolerance) && p1.Y.NearlyEquals(p2.Y, tolerance) && p1.Z.NearlyEquals(p2.Z, tolerance));
         }
 
+        public static bool NearlyEquals3(this N.Vector3 p1, N.Vector3 p2, float tolerance = (float)NearZeroX10)
+        {
+            return p1.ToU().NearlyEquals3(p2.ToU(), tolerance);
+        }
+
+        public static N.Vector3 ToN(this Vector3 p)
+        {
+            return new N.Vector3(p.X, p.Y, p.Z);
+        }
+
+        public static Vector3 ToU(this N.Vector3 p)
+        {
+            return new Vector3(p.X, p.Y, p.Z);
+        }
 
         //        // ========== Miscellaneous calculations ==========
 

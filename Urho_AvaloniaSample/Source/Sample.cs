@@ -279,6 +279,10 @@ namespace AvaloniaSample
         {
             if (ThirdPersonPerspective)
             {   // Camera1 - show Third Person perspective.
+                // TEST: When ONLY Yaw, looks like its trying to maintain focus at the center.
+                // EITHER parameter by itself works well. There is just some mistake when do both.
+                //Pitch = 0;   // ttttt
+
                 // "LookAt" Camera1Main.WorldPosition, projected to Terrain.
                 Vector3 lookAt_World = Camera1MainNode.WorldPosition;
                 float mainAltitude = lookAt_World.Altitude();
@@ -290,10 +294,14 @@ namespace AvaloniaSample
                 // figure out the appropriate position, such that the result is looking at what we want.
                 Vector3 relPosition = CalcCameraRelativePosition(mainAltitude - terrainAltitude + _extraCameraDistance);
                 var camera_World = lookAt_World + relPosition;
+                // TODO WRONG: Not taking into account parent's (Yaw) rotation.
                 var camera_RelParent = camera_World - Camera1MainNode.WorldPosition;
                 Camera1FinalNode.Position = camera_RelParent;
+                var camera_World_verify = Camera1FinalNode.WorldPosition;
+                if (!camera_World_verify.NearlyEquals3(camera_World))
+                    U.Trouble();
 
-                if (true)   //ttttt
+                if (false)   //ttttt
                 {
                     var Y = U.Round3(Yaw);
                     var P = U.Round3(Pitch);
@@ -307,21 +315,73 @@ namespace AvaloniaSample
             }
         }
 
+        /// <summary>
+        /// Project world position into parent's space.
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="pt_world"></param>
+        /// <returns></returns>
+        //protected Vector3 ProjectToParentSpace(Node parent, Vector3 pt_world)
+        //{
+        //    // 
+        //    Matrix3x4 parentFullMat = parent.WorldTransform;
+        //    // 3x4 harder to work with; omit translation for our purposes.
+        //    Matrix3 parentFullRotate = parentFullMat.ToMatrix3();
+
+        //    //MISSING Matrix3 inversePFR = parentFullRotate.Inverse();
+        //    Matrix3 inversePFR = parentFullMat.Inverse().ToMatrix3();
+
+        //    Quaternion parentFullQ = parent.WorldRotation;
+        //    Quaternion inversePFQ0 = Quaternion.Invert(parentFullQ);
+
+        //    N.Quaternion pfq = NQuaternionFrom(parentFullQ);
+        //    N.Quaternion inversePFQ1 = NQuaternionFrom(inversePFQ0);
+        //    N.Quaternion inversePFQ2 = N.Quaternion.Inverse(pfq);
+        //    N.Matrix4x4 pfm = N.Matrix4x4.CreateFromQuaternion(pfq);
+        //}
+
         // When ThirdPerson, want camera significantly farther away than the FirstPerson relAltitude.
         // TBD: How change this?
         protected float _extraCameraDistance = 100f;
 
+        /// <summary>
+        /// In world space.
+        /// </summary>
+        /// <param name="cameraDistance"></param>
+        /// <returns></returns>
         private Vector3 CalcCameraRelativePosition(float cameraDistance)
         {
             // N has needed methods.
-            N.Vector3 heading = N.Vector3.UnitZ;
-            //heading = N.Vector3.Transform(N.Vector3.UnitZ, NQuaternionFrom(PitchYawQuaternion()));
-            // TODO: It doesn't seem to matter which order I do these two in. HOw is that possible??
-            heading = N.Vector3.Transform(heading, NQuaternionFrom(YawQuaternion()));
-            heading = N.Vector3.Transform(heading, NQuaternionFrom(PitchQuaternion()));
+
+            // TODO: Neither is correct when both yaw and pitch.
+            // Strangely, swapping order has similar visual results (though different X-Y values in heading).
+            // ttttt causes? Y-up? need matrix-inverse? applying to camera wrong?
+            // Pitch + altitude-change is good.
+            // Yaw + altitude-change is NOT good.
+            // THOUGHT: Yaw is applied to MainNode. relPositionParent is in THAT coord system. How compensate?
+            // (Can test this by taking WorldPosition after apply relParent)
+            N.Vector3 heading = HeadingYawThenPitch();
+            //N.Vector3 heading = HeadingPitchThenYaw();
             // "-": "pull back" from the look-at, so inverse direction.
             N.Vector3 relPosition = -cameraDistance * heading;
             return new Vector3(relPosition.X, relPosition.Y, relPosition.Z);
+        }
+
+        private N.Vector3 HeadingYawThenPitch()
+        {
+            N.Vector3 heading = N.Vector3.UnitZ;
+            // TODO: It doesn't seem to matter which order I do these two in. HOW is that possible??
+            heading = N.Vector3.Transform(heading, NQuaternionFrom(YawQuaternion()));
+            heading = N.Vector3.Transform(heading, NQuaternionFrom(PitchQuaternion()));
+            return heading;
+        }
+
+        private N.Vector3 HeadingPitchThenYaw()
+        {
+            N.Vector3 heading = N.Vector3.UnitZ;
+            heading = N.Vector3.Transform(heading, NQuaternionFrom(PitchQuaternion()));
+            heading = N.Vector3.Transform(heading, NQuaternionFrom(YawQuaternion()));
+            return heading;
         }
 
         private static N.Quaternion NQuaternionFrom(Quaternion q)
