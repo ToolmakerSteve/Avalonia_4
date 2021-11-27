@@ -3527,6 +3527,8 @@ namespace Global
         //        }
 
 
+        static public Vector3 UpAxis = Vector3.UnitY;
+
         /// <summary>
         /// Not an extension method, so will work with properties.
         /// Usage: dst = CopyXZ(src, dst);
