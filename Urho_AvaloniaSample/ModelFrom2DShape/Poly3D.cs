@@ -131,10 +131,10 @@ namespace ModelFrom2DShape
 
             Vector3 avgNormal = (normal.HasValue) ? (0.5f * (newNormal + normal.Value)) : newNormal;
             if (GroundLine.SingleGeometryTEST)
-            {   // ttt
+            {
                 avgNormal = newNormal;   // for test, normals are not related.
             }
-            if (NumQuads >= 2 && !GroundLine.SingleGeometryTEST)   //ttt: SingleGeometry test
+            if (NumQuads >= 2 && !GroundLine.SingleGeometryTEST)
             {
                 // Update the edge of previous quad.
                 // REASON: Adding this quad changes calc of perpendicular between the two quads.

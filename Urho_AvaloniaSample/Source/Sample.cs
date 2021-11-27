@@ -293,14 +293,17 @@ namespace AvaloniaSample
                 var camera_RelParent = camera_World - Camera1MainNode.WorldPosition;
                 Camera1FinalNode.Position = camera_RelParent;
 
-                var Y = U.Round3(Yaw);
-                var P = U.Round3(Pitch);
-                var M = U.Round3(Camera1MainNode.WorldPosition);
-                var L = U.Round3(lookAt_World);
-                var R = U.Round3(relPosition);
-                var CW = U.Round3(camera_World);
-                var CP = U.Round3(camera_RelParent);
-                U.DebugWriteLineIfChange($"--- Y={Y}, P={P}, M={M}, L={L}, R={R}, CW={CW}, CP={CP} ---");
+                if (true)   //ttttt
+                {
+                    var Y = U.Round3(Yaw);
+                    var P = U.Round3(Pitch);
+                    var M = U.Round3(Camera1MainNode.WorldPosition);
+                    var L = U.Round3(lookAt_World);
+                    var R = U.Round3(relPosition);
+                    var CW = U.Round3(camera_World);
+                    var CP = U.Round3(camera_RelParent);
+                    U.DebugWriteLineIfChange($"--- Y={Y}, P={P}, M={M}, L={L}, R={R}, CW={CW}, CP={CP} ---");
+                }
             }
         }
 
@@ -310,17 +313,20 @@ namespace AvaloniaSample
 
         private Vector3 CalcCameraRelativePosition(float cameraDistance)
         {
-            Quaternion q = PitchYawQuaternion();
             // N has needed methods.
-            N.Quaternion rotationQ = new N.Quaternion(q.X, q.Y, q.Z, q.W);
-            // ttttt: Wrong transform?
-            N.Vector3 heading = N.Vector3.Transform(N.Vector3.UnitZ, rotationQ);
-            if (heading.Length() < 0.99f || heading.Length() > 1.01f)
-                U.Trouble();
-
-            //N.Vector3 relPosition = cameraDistance * heading;
+            N.Vector3 heading = N.Vector3.UnitZ;
+            //heading = N.Vector3.Transform(N.Vector3.UnitZ, NQuaternionFrom(PitchYawQuaternion()));
+            // TODO: It doesn't seem to matter which order I do these two in. HOw is that possible??
+            heading = N.Vector3.Transform(heading, NQuaternionFrom(YawQuaternion()));
+            heading = N.Vector3.Transform(heading, NQuaternionFrom(PitchQuaternion()));
+            // "-": "pull back" from the look-at, so inverse direction.
             N.Vector3 relPosition = -cameraDistance * heading;
             return new Vector3(relPosition.X, relPosition.Y, relPosition.Z);
+        }
+
+        private static N.Quaternion NQuaternionFrom(Quaternion q)
+        {
+            return new N.Quaternion(q.X, q.Y, q.Z, q.W);
         }
 
         protected void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude, float maxRelativeAltitude = float.MaxValue)
@@ -382,11 +388,21 @@ namespace AvaloniaSample
         {
             if (MovementIgnoresPitch)
             {
-                Camera1MainNode.Rotation = new Quaternion(0, Yaw, 0);
-                Camera1FinalNode.Rotation = new Quaternion(Pitch, 0, 0);
+                Camera1MainNode.Rotation = YawQuaternion();
+                Camera1FinalNode.Rotation = PitchQuaternion();
             }
             else
                 Camera1FinalNode.Rotation = PitchYawQuaternion();
+        }
+
+        protected Quaternion YawQuaternion()
+        {
+            return new Quaternion(0, Yaw, 0);
+        }
+
+        protected Quaternion PitchQuaternion()
+        {
+            return new Quaternion(Pitch, 0, 0);
         }
 
         protected Quaternion PitchYawQuaternion()

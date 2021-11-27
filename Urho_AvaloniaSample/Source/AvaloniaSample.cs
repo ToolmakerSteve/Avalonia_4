@@ -23,7 +23,7 @@ namespace AvaloniaSample
         const bool DrawWallAsFly = true;   // In Perspective View. TMS
         const bool ShowWireframe = false;//false;   // TMS
         const bool UseWaterScene = true;//true;   // TMS
-        const float InitialAltitude2 = 150;//ttt 100;
+        const float InitialAltitude2 = 250;//ttt 100;
 
         Camera Camera = null;
 		public Scene Scene;
