@@ -23,16 +23,16 @@
 
 using System;
 using System.Diagnostics;
-using System.Globalization;
-using Urho.Resources;
-using Urho.Gui;
-using Urho;
-using U = Global.Utils;
 using Global;   // For Vector3Exts.
+using Urho;
+using Urho.Gui;
+using Urho.Resources;
+using N = System.Numerics;
+using U = Global.Utils;
 
 namespace AvaloniaSample
 {
-	public class Sample : Application
+    public class Sample : Application
 	{
 		UrhoConsole console;
 		DebugHud debugHud;
@@ -278,9 +278,34 @@ namespace AvaloniaSample
         protected void MaybeApplyThirdPersonPerspective()
         {
             if (ThirdPersonPerspective)
-            {
-                var dummy = Yaw;
+            {   // Camera1 - show Third Person perspective.
+                // "LookAt" Camera1Main.WorldPosition, projected to Terrain.
+                Vector3 lookAt_World = Camera1MainNode.WorldPosition;
+                lookAt_World.SetAltitude(Terrain.GetHeight(lookAt_World));
+
+                // Move camera1Final away from that point, oriented according to pitch/yaw.
+                // IDEA: Fake it. We've already oriented the camera;
+                // figure out the appropriate position, such that the result is looking at what we want.
+                Vector3 relPosition = CalcCameraRelativePosition();
+                var camera_World = lookAt_World + relPosition;
+                var camera_RelParent = camera_World - Camera1MainNode.WorldPosition;
+                Camera1FinalNode.Position = camera_RelParent;
             }
+        }
+
+        // TODO: How change this?
+        protected float CameraDistance = 100;
+
+        private Vector3 CalcCameraRelativePosition()
+        {
+            Quaternion q = PitchYawQuaternion();
+            // N has needed methods.
+            N.Quaternion rotationQ = new N.Quaternion(q.X, q.Y, q.Z, q.W);
+            // ttttt: Wrong transform?
+            N.Vector3 heading = N.Vector3.Transform(N.Vector3.UnitZ, rotationQ);
+            //N.Vector3 relPosition = CameraDistance * heading;
+            N.Vector3 relPosition = -CameraDistance * heading;
+            return new Vector3(relPosition.X, relPosition.Y, relPosition.Z);
         }
 
         protected void EnforceMinimumAltitudeAboveTerrain(Node cameraMainNode, float minimumRelativeAltitude, float maxRelativeAltitude = float.MaxValue)
