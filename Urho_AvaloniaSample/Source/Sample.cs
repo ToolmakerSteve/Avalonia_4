@@ -281,22 +281,34 @@ namespace AvaloniaSample
             {   // Camera1 - show Third Person perspective.
                 // "LookAt" Camera1Main.WorldPosition, projected to Terrain.
                 Vector3 lookAt_World = Camera1MainNode.WorldPosition;
-                lookAt_World.SetAltitude(Terrain.GetHeight(lookAt_World));
-
+                float mainAltitude = lookAt_World.Altitude();
+                float terrainAltitude = Terrain.GetHeight(lookAt_World);
+                lookAt_World.SetAltitude(terrainAltitude);
+                
                 // Move camera1Final away from that point, oriented according to pitch/yaw.
                 // IDEA: Fake it. We've already oriented the camera;
                 // figure out the appropriate position, such that the result is looking at what we want.
-                Vector3 relPosition = CalcCameraRelativePosition();
+                Vector3 relPosition = CalcCameraRelativePosition(mainAltitude - terrainAltitude + _extraCameraDistance);
                 var camera_World = lookAt_World + relPosition;
                 var camera_RelParent = camera_World - Camera1MainNode.WorldPosition;
                 Camera1FinalNode.Position = camera_RelParent;
+
+                var Y = U.Round3(Yaw);
+                var P = U.Round3(Pitch);
+                var M = U.Round3(Camera1MainNode.WorldPosition);
+                var L = U.Round3(lookAt_World);
+                var R = U.Round3(relPosition);
+                var CW = U.Round3(camera_World);
+                var CP = U.Round3(camera_RelParent);
+                U.DebugWriteLineIfChange($"--- Y={Y}, P={P}, M={M}, L={L}, R={R}, CW={CW}, CP={CP} ---");
             }
         }
 
-        // TODO: How change this?
-        protected float CameraDistance = 100;
+        // When ThirdPerson, want camera significantly farther away than the FirstPerson relAltitude.
+        // TBD: How change this?
+        protected float _extraCameraDistance = 100f;
 
-        private Vector3 CalcCameraRelativePosition()
+        private Vector3 CalcCameraRelativePosition(float cameraDistance)
         {
             Quaternion q = PitchYawQuaternion();
             // N has needed methods.
@@ -306,8 +318,8 @@ namespace AvaloniaSample
             if (heading.Length() < 0.99f || heading.Length() > 1.01f)
                 U.Trouble();
 
-            //N.Vector3 relPosition = CameraDistance * heading;
-            N.Vector3 relPosition = -CameraDistance * heading;
+            //N.Vector3 relPosition = cameraDistance * heading;
+            N.Vector3 relPosition = -cameraDistance * heading;
             return new Vector3(relPosition.X, relPosition.Y, relPosition.Z);
         }
 

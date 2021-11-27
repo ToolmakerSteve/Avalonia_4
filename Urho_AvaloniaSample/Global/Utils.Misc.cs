@@ -110,6 +110,19 @@ namespace Global
             }
         }
 
+        /// <summary>
+        /// Debug.WriteLine if msg different than most recent msg.
+        /// </summary>
+        /// <param name="msg"></param>
+        static public void DebugWriteLineIfChange(string msg)
+        {
+            if (!msg.Equals(_prevDebugMsg))
+            {
+                Debug.WriteLine(msg);
+                _prevDebugMsg = msg;
+            }
+        }
+        static private string _prevDebugMsg = "";
         #endregion
 
 
@@ -1698,6 +1711,12 @@ namespace Global
                 return Math.Round(value);
 
             return Math.Round(value * parts) / parts;
+        }
+
+
+        static public Vector3 Round3(Vector3 vec)
+        {
+            return new Vector3((float)Round3(vec.X), (float)Round3(vec.Y), (float)Round3(vec.Z));
         }
 
 

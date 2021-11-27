@@ -19,7 +19,7 @@ namespace Global
         /// <param name="altitude"></param>
         /// <param name="dst"></param>
         /// <returns></returns>
-        public static void SetAltitude(this Vector3 dst, float altitude)
+        public static void SetAltitude(this ref Vector3 dst, float altitude)
         {
             dst.Y = altitude;
         }
