@@ -46,17 +46,17 @@ namespace AvaloniaSample
         // Camera not only goes up as terrain rises, it also goes down as terrain falls.
         protected const bool TrackAltitude = true;
         // Shift key not down multiplies speed by this.
-        protected const float NoShiftSpeedMult = AvaloniaSample.DrawWallAsFly ? 1 : 3;
+        protected const float NoShiftSpeedMult = 1;
         // Shift key down multiplies speed by this.
-        protected const float ShiftSpeedMult = AvaloniaSample.DrawWallAsFly ? 3 : 1;
+        protected const float ShiftSpeedMult = 3;
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
         protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
         protected const float MinimumAltitude1AboveTerrain = 1;
         protected const float MinimumCameraDistance = 3;
         protected const float SlowCameraDistance = 15;
         protected const float MinimumAltitude2AboveTerrain = 10;
-        protected float CurrentMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude2AboveTerrain : MinimumAltitude1AboveTerrain;
-        protected float OtherMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude1AboveTerrain : MinimumAltitude2AboveTerrain;
+        protected float CurrentMinimumAltitudeAboveTerrain => OverViewport2 ? MinimumAltitude2AboveTerrain : MinimumAltitude1AboveTerrain;
+        protected float OtherMinimumAltitudeAboveTerrain => OverViewport2 ? MinimumAltitude1AboveTerrain : MinimumAltitude2AboveTerrain;
         // When ThirdPerson, want camera significantly farther away than the FirstPerson relAltitude.
         protected float _extraCameraDistance = 100f;
 
@@ -67,8 +67,10 @@ namespace AvaloniaSample
 		protected float Pitch { get; set; }
 		protected bool TouchEnabled { get; set; }
 
-        // Used by Water Scene.
-        public Terrain Terrain;
+		protected Camera Camera1;
+		protected Camera Camera2;
+		// Used by Water Scene.
+		public Terrain Terrain;
 
         // Camera1 WASD applied to this node.
         // When !MovementIgnoresPitch, = Camera1FinalNode. 
@@ -80,12 +82,12 @@ namespace AvaloniaSample
         // The camera is attached to this.
         protected Node Camera2FinalNode;
         // So WASD keys know which camera to affect.
-        protected bool MovingCamera2;
+        protected bool OverViewport2;
         // WASD keys applied to this node.
-        protected Node CurrentCameraMainNode => MovingCamera2 ? Camera2MainNode : Camera1MainNode;
-        protected Node CurrentCameraFinalNode => MovingCamera2 ? Camera2FinalNode : Camera1FinalNode;
+        protected Node CurrentCameraMainNode => OverViewport2 ? Camera2MainNode : Camera1MainNode;
+        protected Node CurrentCameraFinalNode => OverViewport2 ? Camera2FinalNode : Camera1FinalNode;
         // After moving one camera, apply XZ to other camera.
-        protected Node OtherCameraMainNode => MovingCamera2 ? Camera1MainNode : Camera2MainNode;
+        protected Node OtherCameraMainNode => OverViewport2 ? Camera1MainNode : Camera2MainNode;
 
         protected MonoDebugHud MonoDebugHud { get; set; }
 
@@ -178,13 +180,13 @@ namespace AvaloniaSample
 
             if (Input.GetKeyDown(Key.PageUp))
 			{
-				Camera camera = Camera1FinalNode.GetComponent<Camera>();
+				Camera camera = Camera1;
 				camera.Zoom = camera.Zoom * 1.01f;
 			}
 
 			if (Input.GetKeyDown(Key.PageDown))
 			{
-				Camera camera = Camera1FinalNode.GetComponent<Camera>();
+				Camera camera = Camera1;
 				camera.Zoom = camera.Zoom * 0.99f;
 			}
 		}
@@ -268,7 +270,7 @@ namespace AvaloniaSample
                         float.MaxValue;
 
                 // Move current camera.
-                if (MovingCamera2)
+                if (OverViewport2)
                     CurrentCameraMainNode.Translate(allAxesMove * moveMult);
                 else
                 {
@@ -526,7 +528,7 @@ namespace AvaloniaSample
 
 				if (state.Delta.X != 0 || state.Delta.Y != 0)
 				{
-					var camera = Camera1FinalNode.GetComponent<Camera>();
+					var camera = Camera1;
 					if (camera == null)
 						return;
 

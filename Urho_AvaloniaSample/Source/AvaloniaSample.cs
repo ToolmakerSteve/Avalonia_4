@@ -10,6 +10,7 @@ using Urho.Urho2D;
 using OU;
 using U = OU.Utils;
 using static OU.DistD;
+using System.Diagnostics;
 
 namespace AvaloniaSample
 {
@@ -19,14 +20,13 @@ namespace AvaloniaSample
 
         const bool IncludeAvaloniaLayer = false;   // TMS
         public const bool StartOnLand = true;
-        public const bool WallKeys = true;   // Keys to control Wall Drawing.
-        const bool DrawWallPressDrag = true;   // In Top View.
+        public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
+        public const bool DrawWallPressDrag = true;   // In Top View.
         public const bool DrawWallAsFly = true;   // In Perspective View. TMS
         const bool ShowWireframe = false;//false;   // TMS
         const bool UseWaterScene = true;//true;   // TMS
         const float InitialAltitude2 = 250;//ttt 100;
 
-        Camera Camera = null;
 		public Scene Scene;
         Viewport Viewport2;
         Node WaterNode;
@@ -80,7 +80,7 @@ namespace AvaloniaSample
             if (Camera1MainNode == null)
                 Camera1MainNode = Camera1FinalNode;
 
-            Camera = Camera1FinalNode.CreateComponent<Camera>();
+            Camera1 = Camera1FinalNode.CreateComponent<Camera>();
             //if (ShowWireframe)
             //    Camera.FillMode = FillMode.Wireframe;
 
@@ -127,6 +127,8 @@ namespace AvaloniaSample
             }
 
             base.OnUpdate(timeStep);
+            if (Camera1 == null)
+                return;
 
             OnUpdate_Wireframe();
 
@@ -147,22 +149,41 @@ namespace AvaloniaSample
                     overViewport2 = false;   // (redundant - for debugging)
 
                 // So WASD keys know which camera to affect.
-                MovingCamera2 = overViewport2;
+                OverViewport2 = overViewport2;
             }
 
-            if (Camera != null)
+            if (WallKeys && Input.GetKeyPress(Key.N))
+                StartNewWall();
+
+            if (OverViewport2 && DrawWallPressDrag)
+                OnUpdate_MaybeDrawingWall();
+
+            if (MoveCamera3DFirstOrThirdPerson(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
             {
-                if (Input.GetKeyPress(Key.N))
-                    StartNewWall();
+                if (!OverViewport2 && Input.GetMouseButtonDown(MouseButton.Left))
+                    ExtendWallAtCameraPosition();
+            }
+        }
 
-                if (MoveCamera3DFirstOrThirdPerson(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
-                {
-                    if (Input.GetMouseButtonDown(MouseButton.Left))
-                    {
-                        OnUpdate_DrawWall();
-                    }
-                }
+        private void OnUpdate_Wireframe()
+        {
+            if (ShowWireframe)
+            {
+                int liveMillis = 0;
+                uint now = Time.SystemTime;
+                if (_startTime > 0)
+                    liveMillis = (int)(now - _startTime);
+                else
+                    _startTime = now;
 
+                int flashesPerSecond = 6;
+                // "1.0f" to have wireframe stay visible; lesser values to flash on and off.
+                float fractionOn = 1.0f; //0.7f; //0.3f;
+                int millisPerFlash = (int)Math.Round(1000.0 / flashesPerSecond);
+                int millisOn = (int)Math.Round(millisPerFlash * fractionOn);
+
+                bool asWireframe = (liveMillis % millisPerFlash) < millisOn;
+                SetWireframeVisibility(asWireframe);
             }
         }
 
@@ -196,61 +217,77 @@ namespace AvaloniaSample
             //REDUNDANT_!WallDrawStarted_SUFFICIENT StartWall();
         }
 
-        private void OnUpdate_Wireframe()
+
+		private bool wasDrawing;
+
+		private void OnUpdate_MaybeDrawingWall()
         {
-            if (ShowWireframe)
-            {
-                int liveMillis = 0;
-                uint now = Time.SystemTime;
-                if (_startTime > 0)
-                    liveMillis = (int)(now - _startTime);
-                else
-                    _startTime = now;
+            bool drawing = Input.GetMouseButtonDown(MouseButton.Left);
+			if (drawing) {
+				if (!wasDrawing)
+					StartNewWall();
+				Vector2 penPosition2D = MousePositionOnGroundPlane();
+				ExtendWall(penPosition2D);
 
-                int flashesPerSecond = 6;
-                // "1.0f" to have wireframe stay visible; lesser values to flash on and off.
-                float fractionOn = 1.0f; //0.7f; //0.3f;
-                int millisPerFlash = (int)Math.Round(1000.0 / flashesPerSecond);
-                int millisOn = (int)Math.Round(millisPerFlash * fractionOn);
+			} else if (wasDrawing) {
+				EndWall();
+			}
 
-                bool asWireframe = (liveMillis % millisPerFlash) < millisOn;
-                SetWireframeVisibility(asWireframe);
-            }
-        }
+			wasDrawing = drawing;
+		}
 
-        private void OnUpdate_DrawWall()
-        {
-            Vector2 penPosition2D = InGroundPlane(CurrentCameraMainNode.Position);
-            bool doAddPoint = false;
-            if (!WallDrawStarted)
-            {
-                // SETS CurrentWall, WallDrawStarted.
-                StartWall();
-                doAddPoint = true;
-            }
-            else
-            {
-                var length = Vector2.Subtract(penPosition2D, LastWallPosition2D).Length;
-                if (length > MinWallSegmentLength)
-                    doAddPoint = true;
-            }
+		private Vector2 MousePositionOnGroundPlane()
+		{
+			var screenPt = Input.MousePosition;
+			IntRect rect2 = Viewport2.Rect;
+			// TODO: What makes this multiplier necessary?
+			float mult = 2;
+			var normScreenPt = new Vector2(screenPt.X / rect2.Width(), screenPt.Y / rect2.Height());
+			float depth = 100;   // TODO
+			Vector2 pt = mult * Camera2.ScreenToWorldPoint(new Vector3(normScreenPt.X, normScreenPt.Y, depth)).XZ();
+			Debug.WriteLine($"--- mouse={screenPt} -> {pt} in scene ---");
+			return pt;
+		}
 
-            if (doAddPoint)
-            {
-                // HACK: Put a box at this point.
-                //AddBoxAt(penPosition2D);
-                // Create or Extend a path, and a corresponding extruded model.
-                CurrentWall.AddPoint(penPosition2D.asDist());
-                CurrentWall.OnUpdate();
+		private void EndWall()
+		{
+		}
 
-                LastWallPosition2D = penPosition2D;
-            }
-        }
 
-        /// <summary>
-        /// SETS CurrentWall, WallDrawStarted.
-        /// </summary>
-        private void StartWall()
+        private void ExtendWallAtCameraPosition()
+		{
+			Vector2 penPosition2D = InGroundPlane(CurrentCameraMainNode.Position);
+			ExtendWall(penPosition2D);
+		}
+
+		private void ExtendWall(Vector2 penPosition2D)
+		{
+			bool doAddPoint = false;
+			if (!WallDrawStarted) {
+				// SETS CurrentWall, WallDrawStarted.
+				StartWall();
+				doAddPoint = true;
+			} else {
+				var length = Vector2.Subtract(penPosition2D, LastWallPosition2D).Length;
+				if (length > MinWallSegmentLength)
+					doAddPoint = true;
+			}
+
+			if (doAddPoint) {
+				// HACK: Put a box at this point.
+				//AddBoxAt(penPosition2D);
+				// Create or Extend a path, and a corresponding extruded model.
+				CurrentWall.AddPoint(penPosition2D.asDist());
+				CurrentWall.OnUpdate();
+
+				LastWallPosition2D = penPosition2D;
+			}
+		}
+
+		/// <summary>
+		/// SETS CurrentWall, WallDrawStarted.
+		/// </summary>
+		private void StartWall()
         {
             WallDrawStarted = true;
             CurrentWall = new GroundLine(2, 8);
@@ -426,7 +463,7 @@ namespace AvaloniaSample
             // Set a different viewmask on the water plane to be able to hide it from the reflection camera
             water.ViewMask = 0x80000000;
 
-            WaterSceneMainCameraSettings(Camera1FinalNode, Camera);
+            WaterSceneMainCameraSettings(Camera1FinalNode, Camera1);
         }
 
         /// <summary>
@@ -553,7 +590,7 @@ namespace AvaloniaSample
             // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen. We need to define the scene and the camera
             // at minimum. Additionally we could configure the viewport screen size and the rendering path (eg. forward / deferred) to
             // use, but now we just use full screen and default render path configured in the engine command line options
-            Renderer.SetViewport(0, new Viewport(Context, Scene, Camera, null));
+            Renderer.SetViewport(0, new Viewport(Context, Scene, Camera1, null));
 
             if (UseWaterScene)
                 SetupWaterReflectionAndItsViewport(Graphics, ResourceCache);
@@ -625,9 +662,9 @@ namespace AvaloniaSample
             int halfWidth = (int)(Graphics.Width / 2);
 
             // Set up the first camera viewport as right-hand pane (half of screen width).
-            Viewport viewport = new Viewport(Context, Scene, Camera1FinalNode.GetComponent<Camera>(), null);
+            Viewport viewport = new Viewport(Context, Scene, Camera1, null);
             var rect = RectBySize(halfWidth, 0, halfWidth, Graphics.Height);
-            Renderer.SetViewport(0, new Viewport(Context, Scene, Camera1FinalNode.GetComponent<Camera>(), rect, null));
+            Renderer.SetViewport(0, new Viewport(Context, Scene, Camera1, rect, null));
 
             var cache = ResourceCache;
             if (false)   // TMS "false": Disable Render PostProcessing not important for this demo.
@@ -649,7 +686,8 @@ namespace AvaloniaSample
 
             // Set up the second camera viewport as left-hand pane (half of screen width).
             rect = RectBySize(0, 0, halfWidth, graphics.Height);
-            Viewport2 = new Viewport(Context, Scene, Camera2FinalNode.GetComponent<Camera>(), rect, null);
+			Camera2 = Camera2FinalNode.GetComponent<Camera>();
+			Viewport2 = new Viewport(Context, Scene, Camera2, rect, null);
 
             renderer.SetViewport(1, Viewport2);
         }

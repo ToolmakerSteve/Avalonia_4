@@ -28,5 +28,11 @@ namespace Global
         {
             return new Vector3(src.X, dst.Y, src.Z);
         }
-    }
+
+		// REDUNDANT: In Utils.Scene.cs.
+		//static public Vector2 XZ(this Vector3 pt)
+		//{
+		//	return new Vector2(pt.X, pt.Z);
+		//}
+	}
 }
