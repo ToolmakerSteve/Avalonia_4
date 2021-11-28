@@ -14,7 +14,7 @@ namespace OU
 			return points;
 		}
 
-		internal static DistD DistanceBetween(Dist2D cornerTL, Dist2D cornerTR)
+		static public DistD DistanceBetween(Dist2D cornerTL, Dist2D cornerTR)
 		{
 			return (cornerTR - cornerTL).Length;
 		}
@@ -593,5 +593,11 @@ namespace OU
 
 			return deltas;
 		}
+
+
+        static public Dist2D FromMeters(double x, double y)
+        {
+            return new Dist2D(DistD.FromMeters(x), DistD.FromMeters(y));
+        }
 	}
 }

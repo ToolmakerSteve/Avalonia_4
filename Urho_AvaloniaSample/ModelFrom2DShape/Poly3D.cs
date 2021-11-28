@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LineLayer3D;
 using SceneSource;
 using Urho;
-using U = Global.Utils;
+using U = OU.Utils;
 
 namespace ModelFrom2DShape
 {

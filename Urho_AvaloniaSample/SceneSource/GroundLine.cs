@@ -5,8 +5,9 @@ using System.Text;
 using Global;
 using ModelFrom2DShape;
 using Urho;
-using static Global.DistD;
-using U = Global.Utils;
+using static OU.DistD;
+using OU;
+using U = OU.Utils;
 
 namespace SceneSource
 {
@@ -37,11 +38,11 @@ namespace SceneSource
         /// </summary>
         public List<Dist2D> Points { get; private set; }
 
-        private float WidthMetersF => (float)Width;
+        private float WidthMetersF => (float)Width.Meters;
         //USE_TopMetersF private float HeightMetersF => (float)Height.Value;
-        private float TopMetersF => (float)(Height + BaseAltitude);
+        private float TopMetersF => (float)(Height + BaseAltitude).Meters;
         // Project to ground. When at 0, go slightly below ground, to avoid "crack" at base.
-        private float BottomMetersF => (float)(BaseAltitude == 0 ? -0.5 : BaseAltitude);
+        private float BottomMetersF => (float)(BaseAltitude.Value == 0 ? -0.5 : BaseAltitude.Meters);
 
         // Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
         // TBD: Start/EndPolys could be combined.
@@ -227,7 +228,7 @@ namespace SceneSource
             foreach (Dist2D srcPt in Points)
             {
                 // On wall's center line.
-                Vector3 cl2 = U.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
+                Vector3 cl2 = Global.Utils.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
                 if (firstPoint)
                 {
                     cl1 = cl2;

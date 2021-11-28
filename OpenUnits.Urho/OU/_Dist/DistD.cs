@@ -89,7 +89,7 @@ namespace OU
 		public UnitsType Units => DefaultUnits;
 
 
-		private DistD(double value)
+		public DistD(double value)
 		{
 			Value = value;
 			//s_NumInstancesConstructed++;

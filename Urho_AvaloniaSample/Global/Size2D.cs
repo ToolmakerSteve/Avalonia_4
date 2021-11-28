@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OU;
 
 namespace Global
 {
@@ -31,8 +32,8 @@ namespace Global
         /// <param name="point"></param>
         public Size2D(Dist2D point)
         {
-            this.Width = point.X;
-            this.Height = point.Y;
+            this.Width = point.X.Value;
+            this.Height = point.Y.Value;
         }
 
         public Size2D(double dblWidth, double dblHeight)
@@ -41,11 +42,18 @@ namespace Global
             this.Height = dblHeight;
         }
 
+        public Size2D(DistD x, DistD y)
+        {
+            this.Width = x.Value;
+            this.Height = y.Value;
+        }
+
+
         // Size of rotated rectangle. Top-Left, Top-Right, Bottom-Left corners.
         public Size2D(Dist2D cornerTL, Dist2D cornerTR, Dist2D cornerBL)
         {
-            this.Width = Dist2D.DistanceBetween(cornerTL, cornerTR);
-            this.Height = Dist2D.DistanceBetween(cornerTL, cornerBL);
+            this.Width = Dist2D.DistanceBetween(cornerTL, cornerTR).Value;
+            this.Height = Dist2D.DistanceBetween(cornerTL, cornerBL).Value;
         }
 
         //// Size of rotated rectangle. "corners" hold 4 corners of rectangle.

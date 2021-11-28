@@ -7,8 +7,9 @@ using Urho.Avalonia;
 using Urho.Gui;
 using Urho.IO;
 using Urho.Urho2D;
-using U = Global.Utils;
-using static Global.DistD;
+using OU;
+using U = OU.Utils;
+using static OU.DistD;
 
 namespace AvaloniaSample
 {
@@ -239,7 +240,7 @@ namespace AvaloniaSample
                 // HACK: Put a box at this point.
                 //AddBoxAt(penPosition2D);
                 // Create or Extend a path, and a corresponding extruded model.
-                CurrentWall.AddPoint(new Dist2D(penPosition2D, null));
+                CurrentWall.AddPoint(penPosition2D.asDist());
                 CurrentWall.OnUpdate();
 
                 LastWallPosition2D = penPosition2D;

@@ -23,12 +23,13 @@
 
 using System;
 using System.Diagnostics;
-using Global;   // For Vector3Exts.
+using Global;
 using Urho;
 using Urho.Gui;
 using Urho.Resources;
 using N = System.Numerics;
-using U = Global.Utils;
+using OU;   // For Vector3Exts.
+using U = OU.Utils;
 
 namespace AvaloniaSample
 {

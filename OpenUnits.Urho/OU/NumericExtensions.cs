@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Urho;
 
 namespace OU
 {
@@ -15,5 +16,10 @@ namespace OU
 		static public DistD asDistD(this long val) { return DistD.FromDefaultUnits(val); }
 
 		static public DistD asMeters(this int val) { return DistD.FromMeters(val); }
-	}
+
+
+        static public Dist2D asDist(this Vector2 v2) { return new Dist2D(DistD.FromDefaultUnits(v2.X), DistD.FromDefaultUnits(v2.Y)); }
+        static public Dist2D asMeters(this Vector2 v2) { return Dist2D.FromMeters(v2.X, v2.Y); }
+
+    }
 }

@@ -55,12 +55,20 @@
 
 
   <ItemGroup>
+    <Compile Remove="Global\Distance\**" />
+    <Compile Remove="Global\Geo\**" />
     <Compile Remove="_WTF\**" />
+    <EmbeddedResource Remove="Global\Distance\**" />
+    <EmbeddedResource Remove="Global\Geo\**" />
     <EmbeddedResource Remove="_WTF\**" />
+    <None Remove="Global\Distance\**" />
+    <None Remove="Global\Geo\**" />
     <None Remove="_WTF\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Global\Vec2D.cs" />
+    <Compile Remove="Global\Vec3D.cs" />
     <Compile Remove="libs\dotnet\bcl\ios\Consts.cs" />
   </ItemGroup>
 
@@ -188,6 +196,7 @@
   </Target>
   
   <ItemGroup>
+    <ProjectReference Include="..\OpenUnits.Urho\OpenUnits.Urho.csproj" />
     <ProjectReference Include="..\packages\Avalonia\Avalonia.csproj" />
     <ProjectReference Include="..\samples\ControlCatalog\ControlCatalog.csproj" />
     <ProjectReference Include="..\samples\TopHUD\TopHUD.csproj" />
