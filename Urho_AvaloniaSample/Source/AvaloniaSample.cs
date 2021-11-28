@@ -28,7 +28,9 @@ namespace AvaloniaSample
         const float InitialAltitude2 = 250;//ttt 100;
 
 		public Scene Scene;
-        Viewport Viewport2;
+		public Octree Octree;
+
+		Viewport Viewport2;
         Node WaterNode;
         Node ReflectionCameraNode;
         // Used when showing wireframe.
@@ -71,9 +73,10 @@ namespace AvaloniaSample
 
 
             Scene = new Scene();
+			Octree = Scene.CreateComponent<Octree>();
 
-            // Create a scene node for the camera, which we will move around
-            Node parentOfCameraNode = GetParentOfCamera1Final();
+			// Create a scene node for the camera, which we will move around
+			Node parentOfCameraNode = GetParentOfCamera1Final();
             // Can override camera's default settings later. (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
             Camera1FinalNode = parentOfCameraNode.CreateChild("camera");
             // When Camera1 does NOT have a two-node setup, make these the same.
@@ -226,8 +229,8 @@ namespace AvaloniaSample
 			if (drawing) {
 				if (!wasDrawing)
 					StartNewWall();
-				Vector2 penPosition2D = MousePositionOnGroundPlane();
-				ExtendWall(penPosition2D);
+				if (MousePositionOnGroundPlane(out Vector2 groundPt))
+					ExtendWall(groundPt);
 
 			} else if (wasDrawing) {
 				EndWall();
@@ -236,18 +239,43 @@ namespace AvaloniaSample
 			wasDrawing = drawing;
 		}
 
-		private Vector2 MousePositionOnGroundPlane()
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="groundPt">out ray collision position in XZ.</param>
+		/// <returns>True if ray hit a mesh.</returns>
+		private bool MousePositionOnGroundPlane(out Vector2 groundPt)
 		{
 			var screenPt = Input.MousePosition;
 			IntRect rect2 = Viewport2.Rect;
 			// TODO: What makes this multiplier necessary?
 			float mult = 2;
 			var normScreenPt = new Vector2(screenPt.X / rect2.Width(), screenPt.Y / rect2.Height());
-			float depth = 100;   // TODO
-			Vector2 pt = mult * Camera2.ScreenToWorldPoint(new Vector3(normScreenPt.X, normScreenPt.Y, depth)).XZ();
-			Debug.WriteLine($"--- mouse={screenPt} -> {pt} in scene ---");
-			return pt;
+			Ray cameraRay = Camera2.GetScreenRay(normScreenPt.X, normScreenPt.Y);
+			var result = Octree.RaycastSingle(cameraRay, RayQueryLevel.Triangle, 10000, DrawableFlags.Geometry);
+			if (result != null) {
+				groundPt = result.Value.Position.XZ();
+				Debug.WriteLine($"--- mouse={screenPt} -> {groundPt} in scene ---");
+				return true;
+			}
+
+			groundPt = new Vector2();   // Caller should ignore this.
+			return false;
 		}
+
+		// This approach might work for an orthographic top view (but ours is currently perspective).
+		//private Vector2 MousePositionOnGroundPlane()
+		//{
+		//	var screenPt = Input.MousePosition;
+		//	IntRect rect2 = Viewport2.Rect;
+		//	// TODO: What makes this multiplier necessary?
+		//	float mult = 2;
+		//	var normScreenPt = new Vector2(screenPt.X / rect2.Width(), screenPt.Y / rect2.Height());
+		//	float depth = 100;   // TODO
+		//	Vector2 pt = mult * Camera2.ScreenToWorldPoint(new Vector3(normScreenPt.X, normScreenPt.Y, depth)).XZ();
+		//	Debug.WriteLine($"--- mouse={screenPt} -> {pt} in scene ---");
+		//	return pt;
+		//}
 
 		private void EndWall()
 		{
