@@ -199,7 +199,7 @@
   <!-- needed for intellisense -->
   <ItemGroup>
     <Reference Include="UrhoDotNet">
-        <HintPath>References\UrhoDotNet.dll</HintPath>
+        <HintPath>..\OpenUnits.Urho\References\UrhoDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
