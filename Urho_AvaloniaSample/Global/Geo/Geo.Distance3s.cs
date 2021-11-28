@@ -13,7 +13,7 @@ namespace Global
         {
             #region --- data ----------------------------------------
             IContext Context;
-            public readonly List<Distance3D> Values = new List<Distance3D>();
+            public readonly List<Dist3D> Values = new List<Dist3D>();
             #endregion
 
 
@@ -70,7 +70,7 @@ namespace Global
             /// <returns></returns>
             public bool Contains(Point3D item)
             {
-                Distance3D value = ToOurContext(item);
+                Dist3D value = ToOurContext(item);
                 return Values.Contains(value);
             }
 
@@ -87,7 +87,7 @@ namespace Global
             /// <returns></returns>
             public int IndexOf(Point3D item)
             {
-                Distance3D value = ToOurContext(item);
+                Dist3D value = ToOurContext(item);
                 return Values.IndexOf(value);
             }
 
@@ -104,7 +104,7 @@ namespace Global
             /// <returns></returns>
             public bool Remove(Point3D item)
             {
-                Distance3D value = ToOurContext(item);
+                Dist3D value = ToOurContext(item);
                 return Values.Remove(value);
             }
 
@@ -116,9 +116,9 @@ namespace Global
 
 
             #region --- public methods ----------------------------------------
-            public Distance3D ToOurContext(Point3D value)
+            public Dist3D ToOurContext(Point3D value)
             {
-                Distance3D finalValue = (Distance3D)value.Pt;
+                Dist3D finalValue = (Dist3D)value.Pt;
                 if (value.Context != Context)
                 {   // Convert to our Context.
                     throw new NotImplementedException("Distance3D.ToOurContext with different Context.");

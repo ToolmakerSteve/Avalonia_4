@@ -7,39 +7,39 @@ using static Global.Utils;
 
 namespace Global
 {
-    public struct Distance2D : IEquatable<Distance2D>
+    public struct Dist2D : IEquatable<Dist2D>
     {
-        public static Distance2D[] OneElementArray(Distance2D point)
+        public static Dist2D[] OneElementArray(Dist2D point)
         {
-            Distance2D[] points = new Distance2D[1];
+            Dist2D[] points = new Dist2D[1];
             points[0] = point;
             return points;
         }
 
-        internal static Distance DistanceBetween(Distance2D cornerTL, Distance2D cornerTR)
+        internal static DistD DistanceBetween(Dist2D cornerTL, Dist2D cornerTR)
         {
             return (cornerTR - cornerTL).Length;
         }
 
-        public static Distance2D Average(Distance2D p0, Distance2D p1)
+        public static Dist2D Average(Dist2D p0, Dist2D p1)
         {
-            return new Distance2D(Utils.Average(p0.X, p1.X), Utils.Average(p0.Y, p1.Y));
+            return new Dist2D(Utils.Average(p0.X, p1.X), Utils.Average(p0.Y, p1.Y));
         }
 
-        public static Distance2D Average3(Distance2D p0, Distance2D p1, Distance2D p2)
+        public static Dist2D Average3(Dist2D p0, Dist2D p1, Dist2D p2)
         {
-            return new Distance2D(Utils.Average3(p0.X, p1.X, p2.X), Utils.Average3(p0.Y, p1.Y, p2.Y));
+            return new Dist2D(Utils.Average3(p0.X, p1.X, p2.X), Utils.Average3(p0.Y, p1.Y, p2.Y));
         }
 
 
         #region --- data ----------------------------------------
-        public Distance X { get; set; }
-        public Distance Y { get; set; }
+        public DistD X { get; set; }
+        public DistD Y { get; set; }
         #endregion
 
 
         #region --- new ----------------------------------------
-        public Distance2D(Distance x, Distance y)
+        public Dist2D(DistD x, DistD y)
         {
             X = x;
             Y = y;
@@ -50,13 +50,13 @@ namespace Global
         /// (A bit overkill for a "struct" - could just "=".)
         /// </summary>
         /// <param name="pt"></param>
-        public Distance2D(Distance2D pt)
+        public Dist2D(Dist2D pt)
         {
             X = pt.X;
             Y = pt.Y;
         }
 
-        public Distance2D(Distance3D pt)
+        public Dist2D(Dist3D pt)
         {
             X = pt.X;
             Y = pt.Y;
@@ -66,7 +66,7 @@ namespace Global
         /// Set both X and Y to "value".
         /// </summary>
         /// <param name="value"></param>
-        public Distance2D(Distance value)
+        public Dist2D(DistD value)
         {
             X = value;
             Y = value;
@@ -77,17 +77,17 @@ namespace Global
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="units">null means "use Distance.DefaultUnits".</param>
-        public Distance2D(double x, double y, Distance.UnitsType units)
+        public Dist2D(double x, double y, DistD.UnitsType units)
         {
             if (units == null)
             {
-                X = Global.Distance.FromDefaultUnits(x);
-                Y = Global.Distance.FromDefaultUnits(y);
+                X = Global.DistD.FromDefaultUnits(x);
+                Y = Global.DistD.FromDefaultUnits(y);
             }
             else
             {
-                X = Global.Distance.FromSpecifiedUnits(x, units);
-                Y = Global.Distance.FromSpecifiedUnits(y, units);
+                X = Global.DistD.FromSpecifiedUnits(x, units);
+                Y = Global.DistD.FromSpecifiedUnits(y, units);
             }
         }
 
@@ -95,11 +95,11 @@ namespace Global
         /// </summary>
         /// <param name="pt"></param>
         /// <param name="units">null means "use Distance.DefaultUnits".</param>
-        public Distance2D(PointF pt, Distance.UnitsType units) : this(pt.X, pt.Y, units)
+        public Dist2D(PointF pt, DistD.UnitsType units) : this(pt.X, pt.Y, units)
         {
         }
 
-        public Distance2D(Vector2 pt, Distance.UnitsType units) : this(pt.X, pt.Y, units)
+        public Dist2D(Vector2 pt, DistD.UnitsType units) : this(pt.X, pt.Y, units)
         {
         }
 
@@ -108,7 +108,7 @@ namespace Global
         /// </summary>
         /// <param name="value"></param>
         /// <param name="units">null means "use Distance.DefaultUnits".</param>
-        public Distance2D(double value, Distance.UnitsType units) : this(value, value, units)
+        public Dist2D(double value, DistD.UnitsType units) : this(value, value, units)
         {
         }
         #endregion
@@ -159,27 +159,27 @@ namespace Global
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(Distance2D other)
+        public bool Equals(Dist2D other)
         {
             return (X == other.X) && (Y == other.Y);
         }
 
         // Compare two Distance2D's for "equal within a tolerance".
-        public bool NearlyEquals(Distance2D p2, double tolerance = EpsilonForOne)
+        public bool NearlyEquals(Dist2D p2, double tolerance = EpsilonForOne)
         {
             return X.NearlyEquals(p2.X, tolerance) && Y.NearlyEquals(p2.Y, tolerance);
         }
 
 
         // When geo coords are stored in a point, X is EW, Y is NS.
-        public Distance LongitudeEW
+        public DistD LongitudeEW
         {
             get
             {
                 return X;
             }
         }
-        public Distance LatitudeNS
+        public DistD LatitudeNS
         {
             get
             {
@@ -188,7 +188,7 @@ namespace Global
         }
 
         // Quicker than "Length" - avoids Sqrt.
-        public Distance.Squared LengthSquared
+        public DistD.Squared LengthSquared
         {
             get
             {
@@ -196,7 +196,7 @@ namespace Global
             }
         }
 
-        public Distance Length
+        public DistD Length
         {
             get
             {
@@ -205,7 +205,7 @@ namespace Global
         }
 
         // Return point with units length (or zero, if Me is zero).
-        public Distance2D Normalize
+        public Dist2D Normalize
         {
             get
             {
@@ -223,9 +223,9 @@ namespace Global
             return new PointF((float)(X.Value), (float)(Y.Value));
         }
 
-        public Distance3D ToPoint3D()
+        public Dist3D ToPoint3D()
         {
-            return new Distance3D(X, Y);
+            return new Dist3D(X, Y);
         }
 
         /// <summary>
@@ -252,14 +252,14 @@ namespace Global
 
         /// <summary>Converts to raw unitless vector (no units).</summary>
         /// <remarks>For situations where the units of X and Y "cancel out" (e.g. a ratio, or scalar value).</remarks>
-        public double2 ToDouble2()
+        public Vec2D ToDouble2()
         {
-            return new double2(X.Value, Y.Value);
+            return new Vec2D(X.Value, Y.Value);
         }
 
-        public Distance2D SwapXY()
+        public Dist2D SwapXY()
         {
-            return new Distance2D(Y, X);
+            return new Dist2D(Y, X);
         }
 
         public override string ToString()
@@ -299,35 +299,35 @@ namespace Global
         // Public Shared Operator <>(ByVal left As PointD, ByVal right As PointD) As PointD
         // End Operator
 
-        public void Add(Distance2D ptdPoint)
+        public void Add(Dist2D ptdPoint)
         {
             X += ptdPoint.X;
             Y += ptdPoint.Y;
         }
 
 
-        public void Add(PointF pt, Distance.UnitsType units)
+        public void Add(PointF pt, DistD.UnitsType units)
         {
             if (units == null)
             {
-                X = Distance.FromDefaultUnits(X.Value + pt.X);
-                Y = Distance.FromDefaultUnits(Y.Value + pt.Y);
+                X = DistD.FromDefaultUnits(X.Value + pt.X);
+                Y = DistD.FromDefaultUnits(Y.Value + pt.Y);
             }
             else
             {
-                X = X + Distance.FromSpecifiedUnits(pt.X, units);
-                Y = Y + Distance.FromSpecifiedUnits(pt.Y, units);
+                X = X + DistD.FromSpecifiedUnits(pt.X, units);
+                Y = Y + DistD.FromSpecifiedUnits(pt.Y, units);
             }
         }
 
-        public Distance2D Round(int digits)
+        public Dist2D Round(int digits)
         {
-            return new Distance2D(Math.Round(X.Value, digits), Math.Round(Y.Value, digits), null);
+            return new Dist2D(Math.Round(X.Value, digits), Math.Round(Y.Value, digits), null);
         }
 
-        public Distance2D Map(UnaryDeleg action)
+        public Dist2D Map(UnaryDeleg action)
         {
-            return new Distance2D(action(X.Value), action(Y.Value), null);
+            return new Dist2D(action(X.Value), action(Y.Value), null);
         }
 
         /// <summary>
@@ -338,46 +338,46 @@ namespace Global
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <returns></returns>
-        public Distance.Squared Cross(Distance2D p1, Distance2D p2)
+        public DistD.Squared Cross(Dist2D p1, Dist2D p2)
         {
             return (p1.Y - Y) * (p2.X - X) - (p1.X - X) * (p2.Y - Y);
         }
 
         // Return Normal to segment between Me and p2.
-        public Distance2D SegmentNormal(Distance2D p2)
+        public Dist2D SegmentNormal(Dist2D p2)
         {
-            Distance2D normal1 = new Distance2D(-(p2.Y - Y), p2.X - X);
+            Dist2D normal1 = new Dist2D(-(p2.Y - Y), p2.X - X);
             normal1 = normal1.Normalize;
             return normal1;
         }
 
-        public static bool operator ==(Distance2D ptd1, Distance2D ptd2)
+        public static bool operator ==(Dist2D ptd1, Dist2D ptd2)
         {
             return (ptd1.X == ptd2.X) && (ptd1.Y == ptd2.Y);
         }
 
-        public static bool operator !=(Distance2D ptd1, Distance2D ptd2)
+        public static bool operator !=(Dist2D ptd1, Dist2D ptd2)
         {
             return !(ptd1 == ptd2);
         }
 
 
-        public static Distance2D operator +(Distance2D p1, Distance2D p2)
+        public static Dist2D operator +(Dist2D p1, Dist2D p2)
         {
-            return new Distance2D(p1.X + p2.X, p1.Y + p2.Y);
+            return new Dist2D(p1.X + p2.X, p1.Y + p2.Y);
         }
 
 
-        public static Distance2D operator -(Distance2D p1, Distance2D p2)
+        public static Dist2D operator -(Dist2D p1, Dist2D p2)
         {
-            return new Distance2D(p1.X - p2.X, p1.Y - p2.Y);
+            return new Dist2D(p1.X - p2.X, p1.Y - p2.Y);
         }
 
 
         // Negate (unary)
-        public static Distance2D operator -(Distance2D ptd1)
+        public static Dist2D operator -(Dist2D ptd1)
         {
-            return new Distance2D(-ptd1.X, -ptd1.Y);
+            return new Dist2D(-ptd1.X, -ptd1.Y);
         }
 
         /// <summary>
@@ -387,7 +387,7 @@ namespace Global
         /// </summary>
         /// <param name="b"></param>
         /// <returns></returns>
-        public Distance.Squared Dot(Distance2D b)
+        public DistD.Squared Dot(Dist2D b)
         {
             return (X * b.X) + (Y * b.Y);
         }
@@ -398,13 +398,13 @@ namespace Global
         /// <param name="ptd1"></param>
         /// <param name="ptd2"></param>
         /// <returns></returns>
-        public static Distance2D operator *(Distance2D ptd1, double2 ptd2)
+        public static Dist2D operator *(Dist2D ptd1, Vec2D ptd2)
         {
-            return new Distance2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
+            return new Dist2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
         }
-        public static Distance2D operator *(double2 ptd1, Distance2D ptd2)
+        public static Dist2D operator *(Vec2D ptd1, Dist2D ptd2)
         {
-            return new Distance2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
+            return new Dist2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
         }
 
         // -- commented out; I think its okay to automatically promote to the "double" version. --
@@ -418,20 +418,20 @@ namespace Global
         //    return new Distance2D(ptd1.X * sng2, ptd1.Y * sng2);
         //}
 
-        public static Distance2D operator *(Distance2D ptd1, double dbl2)
+        public static Dist2D operator *(Dist2D ptd1, double dbl2)
         {
-            return new Distance2D(ptd1.X * dbl2, ptd1.Y * dbl2);
+            return new Dist2D(ptd1.X * dbl2, ptd1.Y * dbl2);
         }
 
-        public static Distance2D operator *(double dbl1, Distance2D ptd2)
+        public static Dist2D operator *(double dbl1, Dist2D ptd2)
         {
-            return new Distance2D(dbl1 * ptd2.X, dbl1 * ptd2.Y);
+            return new Dist2D(dbl1 * ptd2.X, dbl1 * ptd2.Y);
         }
 
 
-        public static Distance2D operator /(Distance2D p1, double2 p2)
+        public static Dist2D operator /(Dist2D p1, Vec2D p2)
         {
-            return new Distance2D(p1.X / p2.X, p1.Y / p2.Y);
+            return new Dist2D(p1.X / p2.X, p1.Y / p2.Y);
         }
 
         // -- commented out; I think its okay to automatically promote to the "double" version. --
@@ -445,9 +445,9 @@ namespace Global
         //    return new Distance2D(p1.X / sng2, p1.Y / sng2);
         //}
 
-        public static Distance2D operator /(Distance2D p1, double dbl2)
+        public static Dist2D operator /(Dist2D p1, double dbl2)
         {
-            return new Distance2D(p1.X / dbl2, p1.Y / dbl2);
+            return new Dist2D(p1.X / dbl2, p1.Y / dbl2);
         }
 
         /// <summary>
@@ -456,31 +456,31 @@ namespace Global
         /// <param name="dbl1"></param>
         /// <param name="p2"></param>
         /// <returns></returns>
-        public static double2 operator /(Distance dbl1, Distance2D p2)
+        public static Vec2D operator /(DistD dbl1, Dist2D p2)
         {
-            return new double2(dbl1 / p2.X, dbl1 / p2.Y);
+            return new Vec2D(dbl1 / p2.X, dbl1 / p2.Y);
         }
 
 
-        public static Distance2D Zero()
+        public static Dist2D Zero()
         {
-            return new Distance2D();
+            return new Dist2D();
         }
 
-        public static Distance2D NaN()
+        public static Dist2D NaN()
         {
-            return new Distance2D(double.NaN, double.NaN, null);
+            return new Dist2D(double.NaN, double.NaN, null);
         }
 
-        public static readonly Distance2D MinValue = new Distance2D(double.MinValue, double.MinValue, null);
-        public static readonly Distance2D MaxValue = new Distance2D(double.MaxValue, double.MaxValue, null);
+        public static readonly Dist2D MinValue = new Dist2D(double.MinValue, double.MinValue, null);
+        public static readonly Dist2D MaxValue = new Dist2D(double.MaxValue, double.MaxValue, null);
 
         public static bool CoordIsValid(double xOrY)
         {
             return (!double.IsNaN(xOrY)) && (!double.IsInfinity(xOrY)) && (double.MaxValue > xOrY) && (double.MinValue < xOrY);
         }
 
-        public static bool CoordIsValid(Distance xOrY)
+        public static bool CoordIsValid(DistD xOrY)
         {
             return CoordIsValid(xOrY.Value);
         }
@@ -491,20 +491,20 @@ namespace Global
             return !double.IsNaN(X.Value);
         }
 
-        public Distance2D Abs()
+        public Dist2D Abs()
         {
-            return new Distance2D(X.Abs(), Y.Abs());
+            return new Dist2D(X.Abs(), Y.Abs());
         }
 
         // Return Min of (each coordinate of) Me and p2.
-        public Distance2D Min(Distance2D p2)
+        public Dist2D Min(Dist2D p2)
         {
-            return new Distance2D(Distance.Min(X, p2.X), Distance.Min(Y, p2.Y));
+            return new Dist2D(DistD.Min(X, p2.X), DistD.Min(Y, p2.Y));
         }
         // Return Max of (each coordinate of) Me and p2.
-        public Distance2D Max(Distance2D p2)
+        public Dist2D Max(Dist2D p2)
         {
-            return new Distance2D(Distance.Max(X, p2.X), Distance.Max(Y, p2.Y));
+            return new Dist2D(DistD.Max(X, p2.X), DistD.Max(Y, p2.Y));
         }
 
 
@@ -514,45 +514,45 @@ namespace Global
         }
 
 
-        public static Distance2D[] ArrayFromPointFs(PointF[] points, Distance.UnitsType units)
+        public static Dist2D[] ArrayFromPointFs(PointF[] points, DistD.UnitsType units)
         {
             int nPoints = points.Length;
-            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
+            Dist2D[] Point2Ds = new Dist2D[nPoints - 1 + 1];
 
             for (int index = 0; index <= nPoints - 1; index++)
-                Point2Ds[index] = new Distance2D(points[index], units);
+                Point2Ds[index] = new Dist2D(points[index], units);
 
             return Point2Ds;
         }
 
-        public static Distance2D[] ArrayFromDouble2s(double[,] points, Distance.UnitsType units)
+        public static Dist2D[] ArrayFromDouble2s(double[,] points, DistD.UnitsType units)
         {
             int lastIndex = points.GetUpperBound(0);
-            Distance2D[] Point2Ds = new Distance2D[lastIndex + 1];
+            Dist2D[] Point2Ds = new Dist2D[lastIndex + 1];
 
             for (int index = 0; index <= lastIndex; index++)
-                Point2Ds[index] = new Distance2D(points[index, 0], points[index, 1], units);
+                Point2Ds[index] = new Dist2D(points[index, 0], points[index, 1], units);
 
             return Point2Ds;
         }
 
         // NOTE: "point3Ds" might be List or Array.
-        public static Distance2D[] ListFromPoint3Ds(IList<Distance3D> point3Ds)
+        public static Dist2D[] ListFromPoint3Ds(IList<Dist3D> point3Ds)
         {
             int nPoints = point3Ds.Count;
-            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
+            Dist2D[] Point2Ds = new Dist2D[nPoints - 1 + 1];
 
             for (int index = 0; index <= nPoints - 1; index++)
-                Point2Ds[index] = new Distance2D(point3Ds[index]);
+                Point2Ds[index] = new Dist2D(point3Ds[index]);
 
             return Point2Ds;
         }
 
         // NOTE: "point3Ds" might be List or Array.
-        public static Distance2D[] ListFromPointXZs(IList<Distance3D> point3Ds)
+        public static Dist2D[] ListFromPointXZs(IList<Dist3D> point3Ds)
         {
             int nPoints = point3Ds.Count;
-            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
+            Dist2D[] Point2Ds = new Dist2D[nPoints - 1 + 1];
 
             for (int index = 0; index <= nPoints - 1; index++)
                 Point2Ds[index] = point3Ds[index].XZ();
@@ -561,14 +561,14 @@ namespace Global
         }
 
         // NOTE: "point2Ds" might be List or Array.
-        public static PointF[] ListToPointFs(IList<Distance2D> point2Ds)
+        public static PointF[] ListToPointFs(IList<Dist2D> point2Ds)
         {
             int nPoints = point2Ds.Count;
             PointF[] PointFs = new PointF[nPoints - 1 + 1];
 
             for (int index = 0; index <= nPoints - 1; index++)
             {
-                Distance2D p = point2Ds[index];
+                Dist2D p = point2Ds[index];
                 PointFs[index] = new PointF((float)(p.X.Value), (float)(p.Y.Value));
             }
 
@@ -576,17 +576,17 @@ namespace Global
         }
 
 
-        public static List<Distance2D> CalcDeltas(IList<Distance2D> points)
+        public static List<Dist2D> CalcDeltas(IList<Dist2D> points)
         {
-            List<Distance2D> deltas = new List<Distance2D>();
+            List<Dist2D> deltas = new List<Dist2D>();
 
-            Distance2D priorPt = default(Distance2D);
+            Dist2D priorPt = default(Dist2D);
             bool hasPriorPt = false;
-            foreach (Distance2D point in points)
+            foreach (Dist2D point in points)
             {
                 if (hasPriorPt)
                 {
-                    Distance2D delta = point - priorPt;
+                    Dist2D delta = point - priorPt;
                     deltas.Add(delta);
                 }
                 priorPt = point;

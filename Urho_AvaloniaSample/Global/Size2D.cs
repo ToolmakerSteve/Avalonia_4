@@ -29,7 +29,7 @@ namespace Global
         /// Implicitly has units Distance.DefaultUnits.
         /// </summary>
         /// <param name="point"></param>
-        public Size2D(Distance2D point)
+        public Size2D(Dist2D point)
         {
             this.Width = point.X;
             this.Height = point.Y;
@@ -42,10 +42,10 @@ namespace Global
         }
 
         // Size of rotated rectangle. Top-Left, Top-Right, Bottom-Left corners.
-        public Size2D(Distance2D cornerTL, Distance2D cornerTR, Distance2D cornerBL)
+        public Size2D(Dist2D cornerTL, Dist2D cornerTR, Dist2D cornerBL)
         {
-            this.Width = Distance2D.DistanceBetween(cornerTL, cornerTR);
-            this.Height = Distance2D.DistanceBetween(cornerTL, cornerBL);
+            this.Width = Dist2D.DistanceBetween(cornerTL, cornerTR);
+            this.Height = Dist2D.DistanceBetween(cornerTL, cornerBL);
         }
 
         //// Size of rotated rectangle. "corners" hold 4 corners of rectangle.
@@ -94,7 +94,7 @@ namespace Global
 
         public void ResizeProportionalByWidth(double dblWidth)
         {
-            double2 ptdFactor = new double2(this.Width / this.Height, this.Height / this.Width);
+            Vec2D ptdFactor = new Vec2D(this.Width / this.Height, this.Height / this.Width);
 
             this.Width = dblWidth;
             this.Height = dblWidth * ptdFactor.Y;
@@ -102,7 +102,7 @@ namespace Global
 
         public void ResizeProportionalByHeight(double dblHeight)
         {
-            double2 ptdFactor = new double2(this.Width / this.Height, this.Height / this.Width);
+            Vec2D ptdFactor = new Vec2D(this.Width / this.Height, this.Height / this.Width);
 
             this.Width = dblHeight * ptdFactor.X;
             this.Height = dblHeight;
@@ -134,7 +134,7 @@ namespace Global
             return new Size2D(scale * size.Width, scale * size.Height);
         }
 
-        public static Size2D operator *(Distance2D scale, Size2D size)
+        public static Size2D operator *(Dist2D scale, Size2D size)
         {
             return new Size2D(scale.X * size.Width, scale.Y * size.Height);
         }

@@ -8,7 +8,7 @@ namespace Global
     /// "unitless" multipliers that may be different in the three axes.
     /// See usage in Distance3D.
     /// </summary>
-    public struct double3
+    public struct Vec3D
     {
         #region --- data ----------------------------------------
         public double X;
@@ -18,7 +18,7 @@ namespace Global
 
 
         #region --- new ----------------------------------------
-        public double3(double x, double y, double z)
+        public Vec3D(double x, double y, double z)
         {
             X = x;
             Y = y;
@@ -32,7 +32,7 @@ namespace Global
         /// Be careful to only use where valid to do so.
         /// </summary>
         /// <param name="pt"></param>
-        public double3(Distance3D pt)
+        public Vec3D(Dist3D pt)
         {
             X = pt.X.Value;
             Y = pt.Y.Value;

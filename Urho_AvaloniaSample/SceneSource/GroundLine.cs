@@ -5,7 +5,7 @@ using System.Text;
 using Global;
 using ModelFrom2DShape;
 using Urho;
-using static Global.Distance;
+using static Global.DistD;
 using U = Global.Utils;
 
 namespace SceneSource
@@ -24,9 +24,9 @@ namespace SceneSource
 
 
         #region --- data, new ----------------------------------------
-        public Distance Width { get; set; }
-        public Distance Height { get; set; }
-        public Distance BaseAltitude { get; set; }
+        public DistD Width { get; set; }
+        public DistD Height { get; set; }
+        public DistD BaseAltitude { get; set; }
         public bool HasNormals { get; private set; }
         public bool HasUVs { get; private set; }
 
@@ -35,7 +35,7 @@ namespace SceneSource
         /// Within coord system of a scene, "float" precision is sufficient;
         /// TBD: Make "float" version of Distance2D.
         /// </summary>
-        public List<Distance2D> Points { get; private set; }
+        public List<Dist2D> Points { get; private set; }
 
         private float WidthMetersF => (float)Width;
         //USE_TopMetersF private float HeightMetersF => (float)Height.Value;
@@ -47,7 +47,7 @@ namespace SceneSource
         // TBD: Start/EndPolys could be combined.
         private Poly3D TopPoly, BtmPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
 
-        public GroundLine(bool hasUV = true, bool hasNormals = true) : this(Distance.Zero, Distance.Zero, Geo.NoContext.It, hasUV, hasNormals)
+        public GroundLine(bool hasUV = true, bool hasNormals = true) : this(DistD.Zero, DistD.Zero, Geo.NoContext.It, hasUV, hasNormals)
         {
         }
 
@@ -58,11 +58,11 @@ namespace SceneSource
         /// <param name="height"></param>
         /// <param name="context"></param>
         public GroundLine(double width, double height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
-                : this(new Distance(width), new Distance(height), context)
+                : this(new DistD(width), new DistD(height), context)
         {
         }
 
-        public GroundLine(Distance width, Distance height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
+        public GroundLine(DistD width, DistD height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
         {
             Width = width;
             Height = height;
@@ -70,13 +70,13 @@ namespace SceneSource
             HasNormals = hasNormals;
 
             // Initialized to altitude zero.
-            BaseAltitude = Distance.Zero;
+            BaseAltitude = DistD.Zero;
 
             if (context == null)
                 context = Geo.NoContext.It;
             Context = context;
 
-            Points = new List<Distance2D>();
+            Points = new List<Dist2D>();
         }
         #endregion
 
@@ -103,7 +103,7 @@ namespace SceneSource
         /// ASSUMES in same Context.
         /// </summary>
         /// <param name="pt"></param>
-        public void AddPoint(Distance2D pt)
+        public void AddPoint(Dist2D pt)
         {
             Points.Add(pt);
         }
@@ -224,7 +224,7 @@ namespace SceneSource
             Vector2 perp1 = new Vector2();
             Vector3?[] normals = new Vector3?[4];
 
-            foreach (Distance2D srcPt in Points)
+            foreach (Dist2D srcPt in Points)
             {
                 // On wall's center line.
                 Vector3 cl2 = U.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);

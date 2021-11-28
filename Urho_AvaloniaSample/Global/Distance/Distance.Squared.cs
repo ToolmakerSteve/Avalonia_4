@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Global
 {
-    public partial struct Distance
+    public partial struct DistD
     {
         /// <summary>
         /// Value has Units "Distance.DefaultUnit SQUARED".
@@ -72,17 +72,17 @@ namespace Global
             /// <param name="a"></param>
             /// <param name="b"></param>
             /// <returns></returns>
-            static public Distance operator /(Squared a, Distance b)
+            static public DistD operator /(Squared a, DistD b)
             {
-                return Distance.FromDefaultUnits(a.Value / b.Value);
+                return DistD.FromDefaultUnits(a.Value / b.Value);
             }
             #endregion
 
 
             #region --- public methods -----------------------------------------
-            public Distance Sqrt()
+            public DistD Sqrt()
             {
-                return Distance.FromDefaultUnits(Math.Sqrt(Value));
+                return DistD.FromDefaultUnits(Math.Sqrt(Value));
             }
             #endregion
         }

@@ -8,13 +8,13 @@ namespace Global
         {
             public string StandardName { get; protected set; }
 
-            public abstract Distance2D FromWGS84(Distance2D geoPt);
+            public abstract Dist2D FromWGS84(Dist2D geoPt);
 
-            public abstract Distance3D FromWGS84(Distance3D geoPt);
+            public abstract Dist3D FromWGS84(Dist3D geoPt);
 
-            public abstract Distance2D ToWGS84(Distance2D pt);
+            public abstract Dist2D ToWGS84(Dist2D pt);
 
-            public abstract Distance3D ToWGS84(Distance3D pt);
+            public abstract Dist3D ToWGS84(Dist3D pt);
         }
 
 
@@ -31,22 +31,22 @@ namespace Global
             }
 
 
-            public override Distance2D FromWGS84(Distance2D geoPt)
+            public override Dist2D FromWGS84(Dist2D geoPt)
             {
                 throw new NotImplementedException();
             }
 
-            public override Distance3D FromWGS84(Distance3D geoPt)
+            public override Dist3D FromWGS84(Dist3D geoPt)
             {
                 throw new NotImplementedException();
             }
 
-            public override Distance2D ToWGS84(Distance2D pt)
+            public override Dist2D ToWGS84(Dist2D pt)
             {
                 throw new NotImplementedException();
             }
 
-            public override Distance3D ToWGS84(Distance3D pt)
+            public override Dist3D ToWGS84(Dist3D pt)
             {
                 throw new NotImplementedException();
             }

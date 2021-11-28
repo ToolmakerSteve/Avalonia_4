@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Global
 {
-    public partial struct Distance
+    public partial struct DistD
     {
         public struct Exact
         {
@@ -28,7 +28,7 @@ namespace Global
                 return ConvertUnits(Value, Units, dstUnit);
             }
 
-            public void SetFrom(Distance d)
+            public void SetFrom(DistD d)
             {
                 Value = ConvertUnits(d.Value, d.Units, Units);
             }

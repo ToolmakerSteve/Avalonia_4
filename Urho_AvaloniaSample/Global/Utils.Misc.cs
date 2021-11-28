@@ -22,8 +22,8 @@ namespace Global
         public delegate bool DelegateMatchTyped<T>(T Value);
         public delegate bool DelegateMatchData(object Value, object UserData);
         public delegate bool DelegateMatchDataTyped<T>(T Value, T UserData);
-        public delegate Distance3D TwoDWithZ_P3DDelegate(Distance2D xy, double z);
-        public delegate Distance2D ThreeD_P2DDelegate(Distance3D xyz);
+        public delegate Dist3D TwoDWithZ_P3DDelegate(Dist2D xy, double z);
+        public delegate Dist2D ThreeD_P2DDelegate(Dist3D xyz);
 
 
         #region --- debug functions ----------------------------------------
@@ -1034,7 +1034,7 @@ namespace Global
             return (dx * dx) + (dy * dy);
         }
         // PERFORMANCE: Quicker than Distance, because does not need SQRT.
-        public static Distance.Squared DistanceSquared2D(Distance x1, Distance y1, Distance x2, Distance y2)
+        public static DistD.Squared DistanceSquared2D(DistD x1, DistD y1, DistD x2, DistD y2)
         {
             var dx = x2 - x1;
             var dy = y2 - y1;
@@ -1044,17 +1044,17 @@ namespace Global
         {
             return Math.Sqrt(DistanceSquared2D(x1, y1, x2, y2));
         }
-        public static Distance CalcDistance2D(Distance x1, Distance y1, Distance x2, Distance y2)
+        public static DistD CalcDistance2D(DistD x1, DistD y1, DistD x2, DistD y2)
         {
             return DistanceSquared2D(x1, y1, x2, y2).Sqrt();
         }
 
-        public static Distance CalcDistance2D(Distance2D p1, Distance2D p2)
+        public static DistD CalcDistance2D(Dist2D p1, Dist2D p2)
         {
             return DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y).Sqrt();
         }
 
-        public static Distance CalcDistance2D(Distance3D p1, Distance3D p2)
+        public static DistD CalcDistance2D(Dist3D p1, Dist3D p2)
         {
             return CalcDistance2D(p1.X, p1.Y, p2.X, p2.Y);
         }
@@ -1068,7 +1068,7 @@ namespace Global
         {
             return a + (wgtB * (b - a));
         }
-        public static Distance Lerp(Distance a, Distance b, double wgtB)
+        public static DistD Lerp(DistD a, DistD b, double wgtB)
         {
             return a + (wgtB * (b - a));
         }
@@ -1094,13 +1094,13 @@ namespace Global
         {
             return new PointF(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
         }
-        public static Distance2D Lerp(Distance2D a, Distance2D b, double wgtB)
+        public static Dist2D Lerp(Dist2D a, Dist2D b, double wgtB)
         {
-            return new Distance2D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
+            return new Dist2D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
         }
-        public static Distance3D Lerp(Distance3D a, Distance3D b, double wgtB)
+        public static Dist3D Lerp(Dist3D a, Dist3D b, double wgtB)
         {
-            return new Distance3D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB), Lerp(a.Z, b.Z, wgtB));
+            return new Dist3D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB), Lerp(a.Z, b.Z, wgtB));
         }
         public static Vector3 Lerp(Vector3 a, Vector3 b, float wgtB)
         {
@@ -1123,10 +1123,10 @@ namespace Global
             return (a + b) / 0.5;
             //return Lerp(a, b, 0.5);
         }
-        public static Distance Average(Distance a, Distance b)
+        public static DistD Average(DistD a, DistD b)
         {
             // Equivalent.
-            return (Distance)((a + b) / 0.5);
+            return (DistD)((a + b) / 0.5);
             //return Lerp(a, b, 0.5);
         }
         public static Vector3 Average(Vector3 a, Vector3 b)
@@ -1137,22 +1137,22 @@ namespace Global
         {
             return Lerp(a, b, 0.5F);
         }
-        public static Distance2D Average(Distance2D a, Distance2D b)
+        public static Dist2D Average(Dist2D a, Dist2D b)
         {
             return Lerp(a, b, 0.5);
         }
-        public static Distance3D Average(Distance3D a, Distance3D b)
+        public static Dist3D Average(Dist3D a, Dist3D b)
         {
             return Lerp(a, b, 0.5);
         }
 
-        public static Distance2D Average(IList<Distance2D> points)
+        public static Dist2D Average(IList<Dist2D> points)
         {
             var count = 0;
-            Distance sumX = Distance.Zero;
-            Distance sumY = Distance.Zero;
+            DistD sumX = DistD.Zero;
+            DistD sumY = DistD.Zero;
 
-            foreach (Distance2D point in points)
+            foreach (Dist2D point in points)
             {
                 count += 1;
                 sumX += point.X;
@@ -1160,9 +1160,9 @@ namespace Global
             }
 
             if (count == 0)
-                return new Distance2D(Distance.Zero, Distance.Zero);
+                return new Dist2D(DistD.Zero, DistD.Zero);
             else
-                return new Distance2D(sumX / count, sumY / count);
+                return new Dist2D(sumX / count, sumY / count);
         }
 
         // Geometric Average.
@@ -1236,12 +1236,12 @@ namespace Global
         }
 
         // Only meaningful if points are (nearly) colinear, and resultPt and pB are both in same direction from pA.
-        public static double WgtFromResult(Distance2D pA, Distance2D pB, Distance2D resultPt)
+        public static double WgtFromResult(Dist2D pA, Dist2D pB, Dist2D resultPt)
         {
-            Distance2D dB = pB - pA;
-            Distance2D dResult = resultPt - pA;
-            Distance lengthB = dB.Length;
-            Distance lengthResult = dResult.Length;
+            Dist2D dB = pB - pA;
+            Dist2D dResult = resultPt - pA;
+            DistD lengthB = dB.Length;
+            DistD lengthResult = dResult.Length;
             return lengthResult / lengthB;
         }
 
@@ -1258,7 +1258,7 @@ namespace Global
         // Find analogous interpolated value.
         // inNear:inGoal:inFar corresponds to outNear:outGoal:outFar.
         // CAUTION: "inGoal" - maybe it should have been FIRST parameter, but it isn't.
-        public static Distance2D MatchingLerp(double inNear, double inFar, double inGoal, Distance2D outNear, Distance2D outFar)
+        public static Dist2D MatchingLerp(double inNear, double inFar, double inGoal, Dist2D outNear, Dist2D outFar)
         {
             double wgt = WgtFromResult(inNear, inFar, inGoal);
             // outGoal
@@ -1285,9 +1285,9 @@ namespace Global
 
 
         // Interpolate, with separate weights in X and Y.
-        public static Distance2D LerpXY(Distance2D a, Distance2D b, double2 wgtB)
+        public static Dist2D LerpXY(Dist2D a, Dist2D b, Vec2D wgtB)
         {
-            return new Distance2D(Lerp(a.X, b.X, wgtB.X), Lerp(a.Y, b.Y, wgtB.Y));
+            return new Dist2D(Lerp(a.X, b.X, wgtB.X), Lerp(a.Y, b.Y, wgtB.Y));
         }
         public static SizeF LerpXY(SizeF a, SizeF b, SizeF wgtB)
         {
@@ -1301,12 +1301,12 @@ namespace Global
         // The result is GPS coord corresponding to xyWgt.
         // E.g. given (0.5, 0.5), the result will be the GPS coord at center of image.
         // NOTE: corners are ZIGZAG (not clockwise).
-        public static Distance2D Lerp2D(double2 xyWgt, Distance2D X0Y0, Distance2D X1Y0, Distance2D X0Y1, Distance2D X1Y1)
+        public static Dist2D Lerp2D(Vec2D xyWgt, Dist2D X0Y0, Dist2D X1Y0, Dist2D X0Y1, Dist2D X1Y1)
         {
-            Distance2D xY0 = Lerp(X0Y0, X1Y0, xyWgt.X);
-            Distance2D xY1 = Lerp(X0Y1, X1Y1, xyWgt.X);
+            Dist2D xY0 = Lerp(X0Y0, X1Y0, xyWgt.X);
+            Dist2D xY1 = Lerp(X0Y1, X1Y1, xyWgt.X);
 
-            Distance2D xy = Lerp(xY0, xY1, xyWgt.Y);
+            Dist2D xy = Lerp(xY0, xY1, xyWgt.Y);
             return xy;
         }
 
@@ -1333,7 +1333,7 @@ namespace Global
         // and the ZAtXnYn values are altitudes at the 4 corners of the image,
         // The result is altitude corresponding to xyWgt.
         // E.g. given (0.5, 0.5), the result will be the altitude at center of image.
-        public static double Lerp2D(double2 xyWgt, double ZAtX0Y0, double ZAtX1Y0, double ZAtX0Y1, double ZAtX1Y1)
+        public static double Lerp2D(Vec2D xyWgt, double ZAtX0Y0, double ZAtX1Y0, double ZAtX0Y1, double ZAtX1Y1)
         {
             double zAt_xY0 = Lerp(ZAtX0Y0, ZAtX1Y0, xyWgt.X);
             double zAt_xY1 = Lerp(ZAtX0Y1, ZAtX1Y1, xyWgt.X);
@@ -1929,9 +1929,9 @@ namespace Global
             return ((a + b + c) / 3);
         }
 
-        public static Distance Average3(Distance a, Distance b, Distance c)
+        public static DistD Average3(DistD a, DistD b, DistD c)
         {
-            return (Distance)(Average3(a.Value, b.Value, c.Value));
+            return (DistD)(Average3(a.Value, b.Value, c.Value));
         }
 
 

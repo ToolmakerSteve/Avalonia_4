@@ -5,7 +5,7 @@ using System.Text;
 namespace Global
 {
     /// <summary>Double-precision two-dimensional (XY) unitless vector value.   Same as a Vector2, but with double-precision.</summary>
-    public struct double2
+    public struct Vec2D
     {
         #region --- data ----------------------------------------
         public double X;
@@ -14,7 +14,7 @@ namespace Global
 
 
         #region --- new ----------------------------------------
-        public double2(double x, double y)
+        public Vec2D(double x, double y)
         {
             X = x;
             Y = y;

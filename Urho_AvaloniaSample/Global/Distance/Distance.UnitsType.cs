@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Global
 {
-    public partial struct Distance
+    public partial struct DistD
     {
         /// <summary>
         /// 1:1 with "DistanceUnit.MeterMults".

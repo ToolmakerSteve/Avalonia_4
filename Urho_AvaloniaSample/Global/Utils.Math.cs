@@ -246,12 +246,12 @@ namespace Global
             return (Math.Abs(number - target) <= tolerance);
         }
 
-        public static bool NearlyEquals(this Distance number, Distance target, double tolerance = EpsilonForOne)
+        public static bool NearlyEquals(this DistD number, DistD target, double tolerance = EpsilonForOne)
         {
             return (Math.Abs(number - target) <= tolerance);
         }
 
-        public static bool NearlyEquals(this Distance2D p1, Distance2D p2, double tolerance = EpsilonForOne)
+        public static bool NearlyEquals(this Dist2D p1, Dist2D p2, double tolerance = EpsilonForOne)
         {
             return (NearlyEquals(p1.X, p2.X, tolerance) && NearlyEquals(p1.Y, p2.Y, tolerance));
         }
@@ -3294,17 +3294,17 @@ namespace Global
             return ret;
         }
 
-        public static Distance2D RotateByDegrees(Distance2D pos, double degrees)
+        public static Dist2D RotateByDegrees(Dist2D pos, double degrees)
         {
             return rotateByRadians(pos, degreesToRadians(degrees));
         }
 
-        public static Distance2D rotateByRadians(Distance2D pos, double radians)
+        public static Dist2D rotateByRadians(Dist2D pos, double radians)
         {
             double cosR = Math.Cos(radians);
             double sinR = Math.Sin(radians);
 
-            Distance2D ret = new Distance2D(pos.X * cosR - pos.Y * sinR, pos.X * sinR + pos.Y * cosR);
+            Dist2D ret = new Dist2D(pos.X * cosR - pos.Y * sinR, pos.X * sinR + pos.Y * cosR);
 
             return ret;
         }

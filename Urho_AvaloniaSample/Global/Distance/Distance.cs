@@ -13,7 +13,7 @@ namespace Global
     /// If you need to retain an EXACT value (or remember what units they were in), use type "Distance.Exact" -
     /// this has a settable "Units" property.
     /// </summary>
-    public partial struct Distance
+    public partial struct DistD
     {
         #region --- static -------------------------------------
         static public UnitsType DefaultUnits { get; private set; }
@@ -23,12 +23,12 @@ namespace Global
         static private double _metersPerDefaultUnit;
         static private double _defaultUnitsPerMeter;
 
-        static public readonly Distance Zero = new Distance();
-        static public Distance One { get; private set; }
+        static public readonly DistD Zero = new DistD();
+        static public DistD One { get; private set; }
 
 
         // static constructor.
-        static Distance()
+        static DistD()
         {
             //DefaultUnits = UnitsType.Meters;
             //_metersPerDefaultUnit = DefaultUnits.MetersPerUnit;
@@ -68,14 +68,14 @@ namespace Global
         static private bool s_InstancesHaveBeenConstructed = false;
 
 
-        static public Distance Min(Distance a, Distance b)
+        static public DistD Min(DistD a, DistD b)
         {
-            return Distance.FromDefaultUnits(Math.Min(a.Value, b.Value));
+            return DistD.FromDefaultUnits(Math.Min(a.Value, b.Value));
         }
 
-        static public Distance Max(Distance a, Distance b)
+        static public DistD Max(DistD a, DistD b)
         {
-            return Distance.FromDefaultUnits(Math.Max(a.Value, b.Value));
+            return DistD.FromDefaultUnits(Math.Max(a.Value, b.Value));
         }
         #endregion --- static -------------------------------------
 
@@ -88,7 +88,7 @@ namespace Global
         public UnitsType Units => DefaultUnits;
 
 
-        public Distance(double value)
+        public DistD(double value)
         {
             Value = value;
             //s_NumInstancesConstructed++;
@@ -115,7 +115,7 @@ namespace Global
             return Math.Round(convertedValue, 7);
         }
 
-        public void SetFrom(Distance d)
+        public void SetFrom(DistD d)
         {
             Value = ConvertUnits(d.Value, d.Units, Units);
         }
@@ -125,30 +125,30 @@ namespace Global
             Value = _defaultUnitsPerMeter * meters;
         }
 
-        public Distance Abs()
+        public DistD Abs()
         {
             return FromDefaultUnits(Math.Abs(Value));
         }
         #endregion --- Instance Members -------------------------------------
 
         #region === Static Conversion/Create Methods ===============================================
-        public static implicit operator double(Distance it) => it.Value;
-        public static explicit operator Distance(double value) => (Distance)(value);
-        public static explicit operator float(Distance it) => (float)it.Value;
-        public static explicit operator Distance(float value) => (Distance)(value);
+        public static implicit operator double(DistD it) => it.Value;
+        public static explicit operator DistD(double value) => (DistD)(value);
+        public static explicit operator float(DistD it) => (float)it.Value;
+        public static explicit operator DistD(float value) => (DistD)(value);
 
-        static public Distance FromMeters(double meters)
+        static public DistD FromMeters(double meters)
         {
-            return new Distance(_defaultUnitsPerMeter * meters);
+            return new DistD(_defaultUnitsPerMeter * meters);
         }
-        static public Distance FromDefaultUnits(double value)
+        static public DistD FromDefaultUnits(double value)
         {
-            return new Distance(value);
+            return new DistD(value);
         }
-        static public Distance FromSpecifiedUnits(double value, UnitsType units)
+        static public DistD FromSpecifiedUnits(double value, UnitsType units)
         {
             double valueInDefaultUnits = ConvertUnits(value, units, DefaultUnits);
-            return new Distance(valueInDefaultUnits);
+            return new DistD(valueInDefaultUnits);
         }
 
         static public double ConvertUnits(double srcValue, UnitsType srcUnit, UnitsType dstUnit)
@@ -162,42 +162,42 @@ namespace Global
         #endregion === Static Conversion/Create Methods ===============================================
 
         #region --- static operators -------------------------------------
-        static public bool operator ==(Distance a, Distance b)
+        static public bool operator ==(DistD a, DistD b)
         {
             return a.Value == b.Value;
         }
 
-        static public bool operator !=(Distance a, Distance b)
+        static public bool operator !=(DistD a, DistD b)
         {
             return a.Value != b.Value;
         }
 
-        static public Distance operator +(Distance a, Distance b)
+        static public DistD operator +(DistD a, DistD b)
         {
             return FromDefaultUnits(a.Value + b.Value);
         }
 
-        static public Distance operator -(Distance a, Distance b)
+        static public DistD operator -(DistD a, DistD b)
         {
             return FromDefaultUnits(a.Value - b.Value);
         }
 
-        static public Distance operator -(Distance a)
+        static public DistD operator -(DistD a)
         {
             return FromDefaultUnits(-a.Value);
         }
 
-        static public Distance operator *(Distance a, double b)
+        static public DistD operator *(DistD a, double b)
         {
             return FromDefaultUnits(a.Value * b);
         }
 
-        static public Distance operator *(double a, Distance b)
+        static public DistD operator *(double a, DistD b)
         {
             return FromDefaultUnits(a * b.Value);
         }
 
-        static public Squared operator *(Distance a, Distance b)
+        static public Squared operator *(DistD a, DistD b)
         {
             return Squared.FromDefaultUnitsSquared(a.Value * b.Value);
         }
@@ -211,7 +211,7 @@ namespace Global
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        static public Distance operator /(Distance a, double b)
+        static public DistD operator /(DistD a, double b)
         {
             return FromDefaultUnits(a.Value / b);
         }
@@ -223,7 +223,7 @@ namespace Global
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns>the ratio between a and b</returns>
-        static public double operator /(Distance a, Distance b)
+        static public double operator /(DistD a, DistD b)
         {
             return (a.Value / b.Value);
         }
