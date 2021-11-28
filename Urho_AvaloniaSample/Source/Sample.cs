@@ -52,9 +52,14 @@ namespace AvaloniaSample
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
         protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
         protected const float MinimumAltitude1AboveTerrain = 1;
+        protected const float MinimumCameraDistance = 3;
+        protected const float SlowCameraDistance = 15;
         protected const float MinimumAltitude2AboveTerrain = 10;
         protected float CurrentMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude2AboveTerrain : MinimumAltitude1AboveTerrain;
         protected float OtherMinimumAltitudeAboveTerrain => MovingCamera2 ? MinimumAltitude1AboveTerrain : MinimumAltitude2AboveTerrain;
+        // When ThirdPerson, want camera significantly farther away than the FirstPerson relAltitude.
+        protected float _extraCameraDistance = 100f;
+
 
         protected const float TouchSensitivity = 2;
         // Degrees.
@@ -263,7 +268,17 @@ namespace AvaloniaSample
                         float.MaxValue;
 
                 // Move current camera.
-                CurrentCameraMainNode.Translate(allAxesMove * moveMult);
+                if (MovingCamera2)
+                    CurrentCameraMainNode.Translate(allAxesMove * moveMult);
+                else
+                {
+                    CurrentCameraMainNode.Translate(cameraPlaneMove * moveMult);
+                    if (altitudeMove.HasValue)
+                    {
+                        var deltaAltitude = altitudeMove.Value.Altitude() * moveMult;
+                        ApplyDeltaAltitudeToCameraDistance(deltaAltitude);
+                    }
+                }
                 EnforceMinimumAltitudeAboveTerrain(CurrentCameraMainNode, CurrentMinimumAltitudeAboveTerrain, currentMaxRelAltitude);
 
                 if (ShowTwoViewports)
@@ -282,6 +297,15 @@ namespace AvaloniaSample
             else
                 _HandleUserInput(timeStep, moveSpeed);
             return didMove;
+        }
+
+        private void ApplyDeltaAltitudeToCameraDistance(float deltaAltitude)
+        {
+            if (_extraCameraDistance < SlowCameraDistance)
+                deltaAltitude *= 0.333f;
+
+            _extraCameraDistance += deltaAltitude;
+            EnsureMinimumCameraDistance();
         }
 
         protected void MaybeApplyThirdPersonPerspective()
@@ -351,10 +375,6 @@ namespace AvaloniaSample
         //    N.Matrix4x4 pfm = N.Matrix4x4.CreateFromQuaternion(pfq);
         //}
 
-        // When ThirdPerson, want camera significantly farther away than the FirstPerson relAltitude.
-        // TBD: How change this?
-        protected float _extraCameraDistance = 100f;
-
         /// <summary>
         /// In world space.
         /// </summary>
@@ -402,10 +422,13 @@ namespace AvaloniaSample
                 if (excess < 0)
                 {
                     // Below what we need. "-" to add the missing altitude.
-                    sceneAltitude -= excess;
-                    //relAltitude -= excess;
+                    var missing = -excess;
+                    sceneAltitude += missing;
+                    //relAltitude += missing;
                     cameraMainNode.Position = U.WithAltitude(cameraMainNode.Position, sceneAltitude);
-                } else if (maxRelativeAltitude < float.MaxValue && maxRelativeAltitude > minimumRelativeAltitude)
+                    MaybeShortenCameraDistance(cameraMainNode, missing);
+                }
+                else if (maxRelativeAltitude < float.MaxValue && maxRelativeAltitude > minimumRelativeAltitude)
                 {
                     if (relAltitude > maxRelativeAltitude)
                     {
@@ -414,6 +437,23 @@ namespace AvaloniaSample
                     }
                 }
             }
+        }
+
+        private void MaybeShortenCameraDistance(Node cameraMainNode, float missing)
+        {
+            if (ThirdPersonPerspective && ReferenceEquals(cameraMainNode, Camera1MainNode))
+            {
+                // We stopped LookAt from moving down this much.
+                // Instead, move camera closer (zoom in).
+                // Zoom slower when close.
+                ApplyDeltaAltitudeToCameraDistance(-missing);
+            }
+        }
+
+        private void EnsureMinimumCameraDistance()
+        {
+            if (_extraCameraDistance < MinimumCameraDistance)
+                _extraCameraDistance = MinimumCameraDistance;
         }
 
         /// <summary>
