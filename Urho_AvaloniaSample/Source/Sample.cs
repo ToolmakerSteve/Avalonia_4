@@ -45,6 +45,10 @@ namespace AvaloniaSample
         protected const bool ShowTwoViewports = true;//true;   // TMS
         // Camera not only goes up as terrain rises, it also goes down as terrain falls.
         protected const bool TrackAltitude = true;
+        // Shift key not down multiplies speed by this.
+        protected const float NoShiftSpeedMult = AvaloniaSample.DrawWallAsFly ? 1 : 3;
+        // Shift key down multiplies speed by this.
+        protected const float ShiftSpeedMult = AvaloniaSample.DrawWallAsFly ? 3 : 1;
         protected const bool GroundSpeedMultByAltitude = true;   // TMS - otherwise, when high up, camera move feels very slow.
         protected const bool MovementIgnoresPitch = true;   // Instead of following "nose" of camera, WASD are along ground plane.
         protected const float MinimumAltitude1AboveTerrain = 1;
@@ -229,6 +233,10 @@ namespace AvaloniaSample
             {
                 didMove = true;
                 var moveMult = moveSpeed * timeStep;
+                if (Input.GetKeyDown(Key.Shift))
+                    moveMult *= ShiftSpeedMult;
+                else
+                    moveMult *= NoShiftSpeedMult;
                 float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
                 if (GroundSpeedMultByAltitude)
                 {

@@ -21,7 +21,7 @@ namespace AvaloniaSample
         public const bool StartOnLand = true;
         public const bool WallKeys = true;   // Keys to control Wall Drawing.
         const bool DrawWallPressDrag = true;   // In Top View.
-        const bool DrawWallAsFly = true;   // In Perspective View. TMS
+        public const bool DrawWallAsFly = true;   // In Perspective View. TMS
         const bool ShowWireframe = false;//false;   // TMS
         const bool UseWaterScene = true;//true;   // TMS
         const float InitialAltitude2 = 250;//ttt 100;
