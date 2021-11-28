@@ -296,11 +296,13 @@ namespace AvaloniaSample
                 Vector3 relPosition = CalcCameraRelativePosition(mainAltitude - terrainAltitude + _extraCameraDistance);
                 var camera_World = lookAt_World + relPosition;
                 // TODO WRONG: Not taking into account parent's (Yaw) rotation.
-                var camera_RelParent = camera_World - Camera1MainNode.WorldPosition;
+                //var camera_RelParent = camera_World - Camera1MainNode.WorldPosition;
+                var camera_RelParent = Camera1MainNode.WorldToLocal(camera_World);
+
                 Camera1FinalNode.Position = camera_RelParent;
-                var camera_World_verify = Camera1FinalNode.WorldPosition;
-                if (!camera_World_verify.NearlyEquals3(camera_World))
-                    U.Trouble();
+                //var camera_World_verify = Camera1FinalNode.WorldPosition;
+                //if (!camera_World_verify.NearlyEquals3(camera_World, 0.0001f))
+                //    U.Trouble();
 
                 if (false)   //ttttt
                 {
@@ -352,37 +354,28 @@ namespace AvaloniaSample
         /// <returns></returns>
         private Vector3 CalcCameraRelativePosition(float cameraDistance)
         {
-            // N has needed methods.
+            Vector3 heading = HeadingPitchThenYaw();
 
-            // TODO: Neither is correct when both yaw and pitch.
-            // Strangely, swapping order has similar visual results (though different X-Y values in heading).
-            // ttttt causes? Y-up? need matrix-inverse? applying to camera wrong?
-            // Pitch + altitude-change is good.
-            // Yaw + altitude-change is NOT good.
-            // THOUGHT: Yaw is applied to MainNode. relPositionParent is in THAT coord system. How compensate?
-            // (Can test this by taking WorldPosition after apply relParent)
-            N.Vector3 heading = HeadingYawThenPitch();
-            //N.Vector3 heading = HeadingPitchThenYaw();
             // "-": "pull back" from the look-at, so inverse direction.
-            N.Vector3 relPosition = -cameraDistance * heading;
-            return new Vector3(relPosition.X, relPosition.Y, relPosition.Z);
+            Vector3 relPosition = -cameraDistance * heading;
+            return relPosition;
         }
 
-        private N.Vector3 HeadingYawThenPitch()
-        {
-            N.Vector3 heading = N.Vector3.UnitZ;
-            // TODO: It doesn't seem to matter which order I do these two in. HOW is that possible??
-            heading = N.Vector3.Transform(heading, NQuaternionFrom(YawQuaternion()));
-            heading = N.Vector3.Transform(heading, NQuaternionFrom(PitchQuaternion()));
-            return heading;
-        }
+        //private Vector3 HeadingPitchThenYaw()
+        //{
+        //    // N has needed methods.
+        //    N.Vector3 heading = N.Vector3.UnitZ;
+        //    heading = N.Vector3.Transform(heading, NQuaternionFrom(PitchQuaternion()));
+        //    heading = N.Vector3.Transform(heading, NQuaternionFrom(YawQuaternion()));
+        //    return new Vector3(heading.X, heading.Y, heading.Z);
+        //}
 
-        private N.Vector3 HeadingPitchThenYaw()
+        private Vector3 HeadingPitchThenYaw()
         {
-            N.Vector3 heading = N.Vector3.UnitZ;
-            heading = N.Vector3.Transform(heading, NQuaternionFrom(PitchQuaternion()));
-            heading = N.Vector3.Transform(heading, NQuaternionFrom(YawQuaternion()));
-            return heading;
+            Vector3 heading = Vector3.UnitZ;
+            Vector4 vec4 = Vector3.Transform(heading, Matrix4.Rotate(PitchQuaternion()));
+            vec4 = Vector4.Transform(vec4, Matrix4.Rotate(YawQuaternion()));
+            return new Vector3(vec4.X, vec4.Y, vec4.Z);
         }
 
         private static N.Quaternion NQuaternionFrom(Quaternion q)
