@@ -21,6 +21,8 @@ namespace ModelFrom2DShape
         public uint FloatsPerVertex { get; private set; }
         public bool HasNormals { get; private set; }
         public bool HasUVs { get; private set; }
+		// For current wall segment.
+		public float CurrentStartU, CurrentEndU;
 
         private int _numQuads;
         public int NumQuads
@@ -155,8 +157,9 @@ namespace ModelFrom2DShape
             Vector3 Horiz = wallPair0.First - wallPair1.First;
             float len = Horiz.LengthFast;
 
-
-            Vector2 uvScale = new Vector2((float)Math.Round(_textureScale * len), (float)Math.Round(_textureScale * dy));
+			float deltaU = _textureScale * len;
+			Vector2 uvScale = new Vector2(deltaU, _textureScale * dy);
+			CurrentEndU = CurrentStartU + deltaU;
 
             // Add vertices for quad.
             if (invertNorm)
@@ -187,7 +190,10 @@ namespace ModelFrom2DShape
             // TODO: Do we have to do this whenever we change the data?
             // TODO: If adding many quads, should do this AFTER ALL quads added.
             UpdateBufferData();
-        }
+			// Accumulate, for next quad.
+			CurrentStartU = CurrentEndU;
+
+		}
 
         static private Vector2[] s_UVPerQuad = new Vector2[4]
         {
@@ -241,7 +247,7 @@ namespace ModelFrom2DShape
                 if (updateUV)
                 {
                     Vector2 uv = s_UVPerQuad[uvIdx];
-                    VData[iVFloat++] = uv.X * uvScale.X;
+                    VData[iVFloat++] = CurrentStartU + uv.X * uvScale.X;
                     VData[iVFloat++] = uv.Y * uvScale.Y;
                 }
                 else

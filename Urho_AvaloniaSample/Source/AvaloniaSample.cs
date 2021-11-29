@@ -28,7 +28,7 @@ namespace AvaloniaSample
 		const bool ShowWireframe = false;//false;   // TMS
 		const bool ShowTerrainWireframe = false && ShowWireframe;
 		const bool ShowWallWireframe = true && ShowWireframe;
-		const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 1f;//0.5f;   // TBD: Good value.
+		const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 0.5f;//1f;//0.5f;   // TBD: Good value.
 
 
 		public Scene Scene;
