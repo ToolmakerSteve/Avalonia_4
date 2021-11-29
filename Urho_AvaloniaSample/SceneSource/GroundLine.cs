@@ -132,6 +132,7 @@ namespace SceneSource
         /// <param name="pt"></param>
         public void AddPoint(Dist2D pt)
         {
+			//return;   // tmstest: Can we get a lockup when no walls are drawn?
 			FlushWithSmooth(pt);
 
 			if (DoDeferPoint) {

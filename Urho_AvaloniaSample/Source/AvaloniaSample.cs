@@ -25,9 +25,9 @@ namespace AvaloniaSample
 		static float GroundSize = 500;//2000;//500;
 		const bool IncludeWater = false;
 		const bool IncludeScatteredModels = false;//true;
-		const bool ScatteredModelsAreBoxes = true;
 		const int NScatteredModels = 1000;
-		const bool BoxesHaveShadows = false;//true;  // TMS
+		const bool ScatteredModelsAreBoxes = true;
+		const bool BoxesHaveShadows = true;//true;  // TMS
 
 		public const bool StartCameraOnLand = true;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
