@@ -21,7 +21,7 @@ namespace AvaloniaSample
 
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
-		const bool UseTerrainScene = false;//true;   // TMS
+		const bool UseTerrainScene = true;//true;   // TMS
 		static float GroundSize = 500;//2000;//500;
 		const bool IncludeWater = false;
 		const bool IncludeScatteredModels = false;//true;
