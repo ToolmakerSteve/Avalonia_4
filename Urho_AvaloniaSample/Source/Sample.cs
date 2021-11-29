@@ -70,7 +70,6 @@ namespace AvaloniaSample
 		protected Camera Camera1;
 		protected Camera Camera2;
 		protected Camera CurrentCamera => OverViewport2 ? Camera2 : Camera1;
-		// Used by Water Scene.
 		public Terrain Terrain;
 
         // Camera1 WASD applied to this node.

@@ -20,7 +20,7 @@ namespace SceneSource
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
         const bool AddOnlyNewQuads = true;
-		const bool AllowShadows = true; //true;
+		const bool AllowShadows = false; //true;
         public const bool SingleGeometry = false;
         public const bool SingleGeometryTEST = false;   // TMS: Temporary changes.
 
@@ -227,9 +227,8 @@ namespace SceneSource
 											//mat.PixelShaderDefines("")
 				AvaloniaSample.AvaloniaSample.It.MaybeSetWireframeMaterial(mat);
 
-				if (AllowShadows)
-					sModel.CastShadows = true;
-                sModel.SetMaterial(mat);
+				sModel.CastShadows = AllowShadows;
+				sModel.SetMaterial(mat);
             }
         }
 

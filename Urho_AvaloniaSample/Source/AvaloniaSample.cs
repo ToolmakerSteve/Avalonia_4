@@ -18,13 +18,14 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
-        const bool IncludeAvaloniaLayer = false;   // TMS
-        public const bool StartOnLand = true;
+        const bool IncludeAvaloniaLayer = false;
+		const bool UseTerrainScene = true;//true;
+		const bool IncludeWater = false;
+		public const bool StartCameraOnLand = true;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
         public const bool DrawWallPressDrag = true;   // In Top View.
         public const bool DrawWallAsFly = false && !DrawWallPressDrag;   // In Perspective View. TMS
-        const bool UseWaterScene = true;//true;   // TMS
-        const float InitialAltitude2 = 250;//tmstest 100;
+		const float InitialAltitude2 = 250;//tmstest 100;
 		const bool ShowWireframe = false;//false;   // TMS
 		const bool ShowTerrainWireframe = false && ShowWireframe;
 		const bool ShowWallWireframe = true && ShowWireframe;
@@ -92,8 +93,8 @@ namespace AvaloniaSample
             //if (ShowWireframe)
             //    Camera.FillMode = FillMode.Wireframe;
 
-            if (UseWaterScene)
-                CreateWaterScene(Scene);
+            if (UseTerrainScene)
+                CreateTerrainScene(Scene);
             else
                 CreateMushroomScene(Scene);
 
@@ -526,7 +527,7 @@ namespace AvaloniaSample
             MushroomSceneMainCameraSettings(Camera1FinalNode);
         }
 
-        void CreateWaterScene(Scene scene)
+        void CreateTerrainScene(Scene scene)
         {
             var cache = ResourceCache;
 
@@ -608,17 +609,19 @@ namespace AvaloniaSample
                 AddBoxToScene(scene, position, boxScale, true, boxMaterial, cache);
             }
 
-            // Create a water plane object that is as large as the terrain
-            WaterNode = scene.CreateChild("Water");
-            WaterNode.Scale = new Vector3(2048.0f, 1.0f, 2048.0f);
-            WaterNode.Position = new Vector3(0.0f, 5.0f, 0.0f);
-            var water = WaterNode.CreateComponent<StaticModel>();
-            water.Model = cache.GetModel("Models/Plane.mdl");
-            water.SetMaterial(cache.GetMaterial("Materials/Water.xml"));
-            // Set a different viewmask on the water plane to be able to hide it from the reflection camera
-            water.ViewMask = 0x80000000;
+			if (IncludeWater) {
+				// Create a water plane object that is as large as the terrain
+				WaterNode = scene.CreateChild("Water");
+				WaterNode.Scale = new Vector3(2048.0f, 1.0f, 2048.0f);
+				WaterNode.Position = new Vector3(0.0f, 5.0f, 0.0f);
+				var water = WaterNode.CreateComponent<StaticModel>();
+				water.Model = cache.GetModel("Models/Plane.mdl");
+				water.SetMaterial(cache.GetMaterial("Materials/Water.xml"));
+				// Set a different viewmask on the water plane to be able to hide it from the reflection camera
+				water.ViewMask = 0x80000000;
+			}
 
-            WaterSceneMainCameraSettings(Camera1FinalNode, Camera1);
+			TerrainSceneMainCameraSettings(Camera1FinalNode, Camera1);
         }
 
 		public void MaybeSetWireframeMaterial(Material mat = null)
@@ -688,10 +691,12 @@ namespace AvaloniaSample
             if (visible && !_wasVisible)
             {
                 WireframeMaterial.FillMode = FillMode.Wireframe;
-                // Water exists over large area (not just where above the surface); remove it when terrain is wireframe.
-                //Scene.RemoveChild(WaterNode);
-                WaterNode.Enabled = false;
-            }
+				if (IncludeWater) {
+					// Water exists over large area (not just where above the surface); remove it when terrain is wireframe.
+					//Scene.RemoveChild(WaterNode);
+					WaterNode.Enabled = false;
+				}
+			}
             else if (!visible && _wasVisible)
             {
                 WireframeMaterial.FillMode = FillMode.Solid;
@@ -709,11 +714,11 @@ namespace AvaloniaSample
             cameraPositionNode.Position = new Vector3(0, 5, 0);
         }
 
-        private void WaterSceneMainCameraSettings(Node cameraPositionNode, Camera camera)
+        private void TerrainSceneMainCameraSettings(Node cameraPositionNode, Camera camera)
         {
             camera.FarClip = 750.0f;
             // Set an initial position (for the camera scene node) above the plane.
-            if (StartOnLand)
+            if (StartCameraOnLand)
             {
                 float startAltitude = ThirdPersonPerspective ? 0 : 7.0f;
                 Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 100.0f);
@@ -760,12 +765,15 @@ namespace AvaloniaSample
             // use, but now we just use full screen and default render path configured in the engine command line options
             Renderer.SetViewport(0, new Viewport(Context, Scene, Camera1, null));
 
-            if (UseWaterScene)
+            if (UseTerrainScene && IncludeWater)
                 SetupWaterReflectionAndItsViewport(Graphics, ResourceCache);
         }
 
         private void SetupWaterReflectionAndItsViewport(Graphics graphics, Urho.Resources.ResourceCache cache)
         {
+			if (!IncludeWater)
+				return;
+
             // Create a mathematical plane to represent the water in calculations
 
             Plane waterPlane = new Plane(WaterNode.WorldRotation * new Vector3(0.0f, 1.0f, 0.0f), WaterNode.WorldPosition);
