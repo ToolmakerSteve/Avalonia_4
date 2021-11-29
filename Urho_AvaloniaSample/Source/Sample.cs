@@ -41,7 +41,7 @@ namespace AvaloniaSample
 		Sprite logoSprite;
 		UI ui;
 
-        protected const bool ThirdPersonPerspective = false;//true;
+        protected const bool ThirdPersonPerspective = true;//true;
         protected const bool ShowTwoViewports = true;//true;   // TMS
         // Camera not only goes up as terrain rises, it also goes down as terrain falls.
         protected const bool TrackAltitude = true;
