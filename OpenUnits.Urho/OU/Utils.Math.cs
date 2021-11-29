@@ -251,6 +251,11 @@ namespace OU
             return (Math.Abs(number.Value - target.Value) <= tolerance);
         }
 
+        public static bool NearlyEquals(this Vector2 p1, Vector2 p2, float tolerance = EpsilonForOneF)
+        {
+            return (NearlyEquals(p1.X, p2.X, tolerance) && NearlyEquals(p1.Y, p2.Y, tolerance));
+        }
+
         public static bool NearlyEquals(this Dist2D p1, Dist2D p2, double tolerance = EpsilonForOne)
         {
             return (NearlyEquals(p1.X, p2.X, tolerance) && NearlyEquals(p1.Y, p2.Y, tolerance));

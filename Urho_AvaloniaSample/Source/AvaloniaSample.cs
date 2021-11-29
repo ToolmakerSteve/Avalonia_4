@@ -30,7 +30,8 @@ namespace AvaloniaSample
 		public Scene Scene;
 		public Octree Octree;
 
-		Viewport Viewport2;
+		Viewport Viewport1, Viewport2;
+		Viewport CurrentViewport => OverViewport2 ? Viewport2 : Viewport1;
         Node WaterNode;
         Node ReflectionCameraNode;
         // Used when showing wireframe.
@@ -115,9 +116,11 @@ namespace AvaloniaSample
         #region --- OnUpdate ----------------------------------------
         uint _startTime = 0;
         bool WallDrawStarted;   // TMS
-        SceneSource.GroundLine CurrentWall;
-        Vector2 LastWallPosition2D;
-        const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 1;   // TBD: Good value.
+        GroundLine CurrentWall;
+		// LastPenPosition2D used to draw short segment when lift pen.
+		// LastWallPosition2D used to measure how far mouse has moved (on the ground).
+		Vector2 LastPenPosition2D, LastWallPosition2D;
+        const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 0.5f;   // TBD: Good value.
 
         private IntVector2 _lastScreenSize;
 
@@ -158,8 +161,8 @@ namespace AvaloniaSample
             if (WallKeys && Input.GetKeyPress(Key.N))
                 StartNewWall();
 
-            if (OverViewport2 && DrawWallPressDrag)
-                OnUpdate_MaybeDrawingWall();
+            if (DrawWallPressDrag)   //OverViewport2 && 
+				OnUpdate_MaybeDrawingWall();
 
             if (MoveCamera3DFirstOrThirdPerson(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
             {
@@ -246,21 +249,26 @@ namespace AvaloniaSample
 		/// <returns>True if ray hit a mesh.</returns>
 		private bool MousePositionOnGroundPlane(out Vector2 groundPt)
 		{
-			var screenPt = Input.MousePosition;
-			IntRect rect2 = Viewport2.Rect;
-			// TODO: What makes this multiplier necessary?
-			float mult = 2;
-			var normScreenPt = new Vector2(screenPt.X / rect2.Width(), screenPt.Y / rect2.Height());
-			Ray cameraRay = Camera2.GetScreenRay(normScreenPt.X, normScreenPt.Y);
+			var normScreenPt = MouseToNormalizedScreenPt();
+			Ray cameraRay = CurrentCamera.GetScreenRay(normScreenPt.X, normScreenPt.Y);
 			var result = Octree.RaycastSingle(cameraRay, RayQueryLevel.Triangle, 10000, DrawableFlags.Geometry);
 			if (result != null) {
 				groundPt = result.Value.Position.XZ();
-				Debug.WriteLine($"--- mouse={screenPt} -> {groundPt} in scene ---");
+				//Debug.WriteLine($"--- mouse={Input.MousePosition} -> {groundPt} in scene ---");
 				return true;
 			}
 
 			groundPt = new Vector2();   // Caller should ignore this.
 			return false;
+		}
+
+		public Vector2 MouseToNormalizedScreenPt()
+		{
+			var screenPt = Input.MousePosition;
+			IntRect rect = CurrentViewport.Rect;
+			var normScreenPt = new Vector2((screenPt.X - rect.Left) / rect.Width(), (screenPt.Y - rect.Top) / rect.Height());
+			Debug.WriteLine($"--- screen={screenPt}, rect={rect} -> norm={normScreenPt} ---");
+			return normScreenPt;
 		}
 
 		// This approach might work for an orthographic top view (but ours is currently perspective).
@@ -279,10 +287,20 @@ namespace AvaloniaSample
 
 		private void EndWall()
 		{
+			// NOTE: Currently we don't allow you to draw a "single-point" wall.
+			if (CurrentWall != null && CurrentWall.Points.Count > 0 &&
+					!LastPenPosition2D.NearlyEquals(LastWallPosition2D, 0.05f)) {
+				CurrentWall.AddPoint(LastPenPosition2D.asDist());
+				LastWallPosition2D = LastPenPosition2D;
+				CurrentWall.OnUpdate();
+			}
+
+			// Done with this wall.
+			WallDrawStarted = false;
 		}
 
 
-        private void ExtendWallAtCameraPosition()
+		private void ExtendWallAtCameraPosition()
 		{
 			Vector2 penPosition2D = InGroundPlane(CurrentCameraMainNode.Position);
 			ExtendWall(penPosition2D);
@@ -302,14 +320,15 @@ namespace AvaloniaSample
 			}
 
 			if (doAddPoint) {
-				// HACK: Put a box at this point.
-				//AddBoxAt(penPosition2D);
 				// Create or Extend a path, and a corresponding extruded model.
 				CurrentWall.AddPoint(penPosition2D.asDist());
 				CurrentWall.OnUpdate();
 
 				LastWallPosition2D = penPosition2D;
 			}
+
+			// LastPenPosition2D used to draw short segment when lift pen.
+			LastPenPosition2D = penPosition2D;
 		}
 
 		/// <summary>
@@ -690,9 +709,9 @@ namespace AvaloniaSample
             int halfWidth = (int)(Graphics.Width / 2);
 
             // Set up the first camera viewport as right-hand pane (half of screen width).
-            Viewport viewport = new Viewport(Context, Scene, Camera1, null);
             var rect = RectBySize(halfWidth, 0, halfWidth, Graphics.Height);
-            Renderer.SetViewport(0, new Viewport(Context, Scene, Camera1, rect, null));
+			Viewport1 = new Viewport(Context, Scene, Camera1, rect, null);
+			Renderer.SetViewport(0, Viewport1);
 
             var cache = ResourceCache;
             if (false)   // TMS "false": Disable Render PostProcessing not important for this demo.
@@ -701,7 +720,7 @@ namespace AvaloniaSample
                 // bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
                 // for example with the effect name to allow easy toggling on and off. We start with the effects
                 // disabled.
-                RenderPath effectRenderPath = viewport.RenderPath.Clone();
+                RenderPath effectRenderPath = Viewport1.RenderPath.Clone();
                 effectRenderPath.Append(cache.GetXmlFile("PostProcess/Bloom.xml"));
                 effectRenderPath.Append(cache.GetXmlFile("PostProcess/FXAA2.xml"));
                 // Make the bloom mixing parameter more pronounced
@@ -709,7 +728,7 @@ namespace AvaloniaSample
 
                 effectRenderPath.SetEnabled("Bloom", false);
                 effectRenderPath.SetEnabled("FXAA2", false);
-                viewport.RenderPath = effectRenderPath;
+                Viewport1.RenderPath = effectRenderPath;
             }
 
             // Set up the second camera viewport as left-hand pane (half of screen width).
