@@ -41,7 +41,7 @@ namespace AvaloniaSample
 		Sprite logoSprite;
 		UI ui;
 
-        protected const bool ThirdPersonPerspective = true;
+        protected const bool ThirdPersonPerspective = false;//true;
         protected const bool ShowTwoViewports = true;//true;   // TMS
         // Camera not only goes up as terrain rises, it also goes down as terrain falls.
         protected const bool TrackAltitude = true;
@@ -266,12 +266,12 @@ namespace AvaloniaSample
                 float currentMaxRelAltitude = enforceMaxAltitude ?
                         CurrentCameraMainNode.Position.Altitude() - terrainAltitude :
                         float.MaxValue;
-                float otherMaxAltitude = TrackAltitude ?
+                float otherMaxAltitude = TrackAltitude && !altitudeMove.HasValue ?
                         OtherCameraMainNode.Position.Altitude() - terrainAltitude :
                         float.MaxValue;
 
                 // Move current camera.
-                if (OverViewport2)
+                if (OverViewport2 || !ThirdPersonPerspective)
                     CurrentCameraMainNode.Translate(allAxesMove * moveMult);
                 else
                 {
