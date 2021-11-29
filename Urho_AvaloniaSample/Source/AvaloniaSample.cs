@@ -22,10 +22,12 @@ namespace AvaloniaSample
         public const bool StartOnLand = true;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
         public const bool DrawWallPressDrag = true;   // In Top View.
-        public const bool DrawWallAsFly = true;   // In Perspective View. TMS
-        const bool ShowWireframe = false;//false;   // TMS
+        public const bool DrawWallAsFly = false && !DrawWallPressDrag;   // In Perspective View. TMS
         const bool UseWaterScene = true;//true;   // TMS
         const float InitialAltitude2 = 250;//ttt 100;
+		const bool ShowWireframe = false;//false;   // TMS
+		const bool ShowTerrainWireframe = false && ShowWireframe;
+		const bool ShowWallWireframe = true && ShowWireframe;
 
 		public Scene Scene;
 		public Octree Octree;
@@ -173,24 +175,26 @@ namespace AvaloniaSample
 
         private void OnUpdate_Wireframe()
         {
-            if (ShowWireframe)
-            {
-                int liveMillis = 0;
-                uint now = Time.SystemTime;
-                if (_startTime > 0)
-                    liveMillis = (int)(now - _startTime);
-                else
-                    _startTime = now;
+			SetWireframeVisibility(ShowWireframe);
 
-                int flashesPerSecond = 6;
-                // "1.0f" to have wireframe stay visible; lesser values to flash on and off.
-                float fractionOn = 1.0f; //0.7f; //0.3f;
-                int millisPerFlash = (int)Math.Round(1000.0 / flashesPerSecond);
-                int millisOn = (int)Math.Round(millisPerFlash * fractionOn);
+			//if (ShowWireframe)
+   //         {
+   //             int liveMillis = 0;
+   //             uint now = Time.SystemTime;
+   //             if (_startTime > 0)
+   //                 liveMillis = (int)(now - _startTime);
+   //             else
+   //                 _startTime = now;
 
-                bool asWireframe = (liveMillis % millisPerFlash) < millisOn;
-                SetWireframeVisibility(asWireframe);
-            }
+   //             int flashesPerSecond = 6;
+   //             // "1.0f" to have wireframe stay visible; lesser values to flash on and off.
+   //             float fractionOn = 1.0f; //0.7f; //0.3f;
+   //             int millisPerFlash = (int)Math.Round(1000.0 / flashesPerSecond);
+   //             int millisOn = (int)Math.Round(millisPerFlash * fractionOn);
+
+   //             bool asWireframe = (liveMillis % millisPerFlash) < millisOn;
+   //             SetWireframeVisibility(asWireframe);
+   //         }
         }
 
         private void StartNewWall()
@@ -528,12 +532,10 @@ namespace AvaloniaSample
             // The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
             // terrain patches and other objects behind it
             Terrain.Occluder = true;
-            if (ShowWireframe)
-                WireframeMaterial = Terrain.Material;
+			MaybeSetWireframeMaterial();
 
-
-            // Have some different color boxes, so can tell them apart (somewhat).
-            var colors = new Color[] {
+			// Have some different color boxes, so can tell them apart (somewhat).
+			var colors = new Color[] {
                     Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta,
                     Color.White, Color.Black
             };
@@ -571,16 +573,28 @@ namespace AvaloniaSample
             WaterSceneMainCameraSettings(Camera1FinalNode, Camera1);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="position">if terrainRelative, .Y is height above terrain.</param>
-        /// <param name="boxScale"></param>
-        /// <param name="terrainRelative">when true, position.Y is height above terrain. And box rotates to follow the terrain's surface.</param>
-        /// <param name="boxMaterial"></param>
-        /// <param name="cache"></param>
-        public void AddBoxToScene(Node parent, Vector3 position, float boxScale, bool terrainRelative,
+		public void MaybeSetWireframeMaterial(Material mat = null)
+		{
+			if (ShowWireframe) {
+				if (ShowTerrainWireframe)
+					WireframeMaterial = Terrain.Material;   // To show terrain's wireframe.
+				else if (ShowWallWireframe && mat != null) {
+					WireframeMaterial = mat;
+				}
+			}
+
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parent"></param>
+		/// <param name="position">if terrainRelative, .Y is height above terrain.</param>
+		/// <param name="boxScale"></param>
+		/// <param name="terrainRelative">when true, position.Y is height above terrain. And box rotates to follow the terrain's surface.</param>
+		/// <param name="boxMaterial"></param>
+		/// <param name="cache"></param>
+		public void AddBoxToScene(Node parent, Vector3 position, float boxScale, bool terrainRelative,
                                    Material boxMaterial = null, Urho.Resources.ResourceCache cache = null)
         {
             if (cache == null)
@@ -620,6 +634,9 @@ namespace AvaloniaSample
 
         void SetWireframeVisibility(bool visible)
         {
+			if (WireframeMaterial == null)
+				return;
+
             if (visible && !_wasVisible)
             {
                 WireframeMaterial.FillMode = FillMode.Wireframe;

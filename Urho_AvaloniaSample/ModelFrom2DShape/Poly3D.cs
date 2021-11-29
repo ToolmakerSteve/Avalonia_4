@@ -214,6 +214,15 @@ namespace ModelFrom2DShape
             UpdateVertex(position, uvIdx, floatIndex, adjNormal, Vector2.Zero, false);
         }
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="uvIdx"></param>
+		/// <param name="iVFloat"></param>
+		/// <param name="normal"></param>
+		/// <param name="uvScale">Used when updateUV=true</param>
+		/// <param name="updateUV"></param>
         private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat, Vector3 normal, Vector2 uvScale, bool updateUV = true)
         {
             VData[iVFloat++] = position.X;

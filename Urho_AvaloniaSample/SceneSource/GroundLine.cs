@@ -190,10 +190,11 @@ namespace SceneSource
                 //Material mat = Material.FromColor(Color.Magenta, false);
                 Material mat = res.GetMaterial("Materials/StoneTiledH.xml");
                 mat.CullMode = CullMode.Cw; // CullMode.Cw;
-                //mat.SetShaderParameter("AmbientColor", Color.White);
-                //mat.PixelShaderDefines("")
+											//mat.SetShaderParameter("AmbientColor", Color.White);
+											//mat.PixelShaderDefines("")
+				AvaloniaSample.AvaloniaSample.It.MaybeSetWireframeMaterial(mat);
 
-                sModel.CastShadows = true;
+				sModel.CastShadows = true;
                 sModel.SetMaterial(mat);
             }
         }
