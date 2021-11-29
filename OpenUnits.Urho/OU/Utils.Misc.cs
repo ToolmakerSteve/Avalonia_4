@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Diagnostics;
+using System.Collections;
 //using System.Numerics;
 
 namespace OU
@@ -227,52 +228,52 @@ namespace OU
         //        // If add more parameters, use primes about half as large each time. From that table:  .., 50331653, 25165843, 12582917, 6291469.
 
 
-        //        public const int INVALID_SIZE = -1;
+        public const int INVALID_SIZE = -1;
 
 
-        //        public const int FIRST_INDEX = 0;
-        //        public const int INVALID_INDEX = -1;
-        //        public const int INVALID_POSITIVE_INTEGER = -1;
+        public const int FIRST_INDEX = 0;
+        public const int INVALID_INDEX = -1;
+        public const int INVALID_POSITIVE_INTEGER = -1;
 
-        //        // Given start and end indices, return count of elements.
-        //        public static int CountFromStartEnd(int iStart, int iEnd)
-        //        {
-        //            return iEnd - iStart + 1;
-        //        }
+        // Given start and end indices, return count of elements.
+        public static int CountFromStartEnd(int iStart, int iEnd)
+        {
+            return iEnd - iStart + 1;
+        }
 
-        //        public static int LastIndex<T>(this T[] a)
-        //        {
-        //            return a.Length - 1;
-        //        }
-        //        /// <summary>
-        //        ///     ''' TBD: Why is this necessary? Get compiler complaint if remove, even though Array inherits from ICollection.
-        //        ///     ''' </summary>
-        //        ///     ''' <param name="a"></param>
-        //        ///     ''' <returns></returns>
-        //        public static int LastIndex(this Array a)
-        //        {
-        //            return a.Length - 1;
-        //        }
-        //        public static int LastIndex<T>(this List<T> a)
-        //        {
-        //            return a.Count - 1;
-        //        }
-        //        public static int LastIndex<T>(this IList<T> a)
-        //        {
-        //            return a.Count - 1;
-        //        }
-        //        public static int LastIndex<T>(this ICollection<T> a)
-        //        {
-        //            return a.Count - 1;
-        //        }
-        //        public static int LastIndex(this ICollection a)
-        //        {
-        //            return a.Count - 1;
-        //        }
-        //        public static int LastIndex(this string a)
-        //        {
-        //            return a.Length - 1;
-        //        }
+        public static int LastIndex<T>(this T[] a)
+        {
+            return a.Length - 1;
+        }
+        /// <summary>
+        ///     ''' TBD: Why is this necessary? Get compiler complaint if remove, even though Array inherits from ICollection.
+        ///     ''' </summary>
+        ///     ''' <param name="a"></param>
+        ///     ''' <returns></returns>
+        public static int LastIndex(this Array a)
+        {
+            return a.Length - 1;
+        }
+        public static int LastIndex<T>(this List<T> a)
+        {
+            return a.Count - 1;
+        }
+        public static int LastIndex<T>(this IList<T> a)
+        {
+            return a.Count - 1;
+        }
+        public static int LastIndex<T>(this ICollection<T> a)
+        {
+            return a.Count - 1;
+        }
+        public static int LastIndex(this ICollection a)
+        {
+            return a.Count - 1;
+        }
+        public static int LastIndex(this string a)
+        {
+            return a.Length - 1;
+        }
 
         //        // Returns nothing if index out of range.
         //        public static T ElementSafe<T>(T[] list, int index)

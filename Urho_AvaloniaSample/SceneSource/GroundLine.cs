@@ -37,6 +37,9 @@ namespace SceneSource
         /// TBD: Make "float" version of Distance2D.
         /// </summary>
         public List<Dist2D> Points { get; private set; }
+		public bool DoDeferPoint { get; set; }
+		private bool HasDeferredPoint;
+		private Dist2D DeferredPoint;
 
         private float WidthMetersF => (float)Width.Meters;
         //USE_TopMetersF private float HeightMetersF => (float)Height.Value;
@@ -106,9 +109,16 @@ namespace SceneSource
         /// <param name="pt"></param>
         public void AddPoint(Dist2D pt)
         {
-            Points.Add(pt);
+			FlushWithSmooth(pt);
+
+			if (DoDeferPoint) {
+				DeferredPoint = pt;
+				HasDeferredPoint = true;
+			} else {
+				Points.Add(pt);
+			}
 			//Debug.WriteLine($"--- wall pt={pt.Round(3)} rel={(pt - Points[0]).Round(3)} ---");
-        }
+		}
 
         public void AddPoint(Geo.Point2D geoPt)
         {
@@ -349,7 +359,36 @@ namespace SceneSource
             CreateEndPoly(wallPair1, groundPair1, terrain);
         }
 
-        private void CreateStartPoly(U.Pair<Vector3> wallPair0, U.Pair<Vector3> groundPair0, Terrain terrain)
+		internal void Flush()
+		{
+			if (HasDeferredPoint) {
+				Points.Add(DeferredPoint);
+				HasDeferredPoint = false;
+			}
+		}
+
+		internal void FlushWithSmooth(Dist2D futurePoint)
+		{
+			if (HasDeferredPoint) {
+				if (Points.Count > 0) {
+					// Smooth DeferredPoint to lessen ripples.
+					// TBD: Good algorithm? Limit distance moved by smooth?
+					// TBD: Fit curve through more points. Ideally do that later, so have more future points.
+					Dist2D neighborAvg = U.Average(Points[Points.LastIndex()], futurePoint);
+					DeferredPoint = U.Lerp(DeferredPoint, neighborAvg, 0.7);
+				}
+
+				Flush();
+			}
+		}
+
+		internal bool HasContents()
+		{
+			return Points.Count > 0 || HasDeferredPoint;
+		}
+
+
+		private void CreateStartPoly(U.Pair<Vector3> wallPair0, U.Pair<Vector3> groundPair0, Terrain terrain)
         {
             if (!GroundLine.SingleGeometryTEST)
                 StartPoly.Clear();

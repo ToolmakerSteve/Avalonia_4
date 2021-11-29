@@ -217,15 +217,13 @@ namespace AvaloniaSample
             }
 
             // Start a new one.
-            CurrentWall = null;
-            // Don't use previous wall's node.
-            CurrentWallNode = null;
+			FlushAndNullWall();
+			// Don't use previous wall's node.
+			CurrentWallNode = null;
             // Starting over.
             WallDrawStarted = false;
-
-
-            // SETS CurrentWall, WallDrawStarted.
-            //REDUNDANT_!WallDrawStarted_SUFFICIENT StartWall();
+			// Start now, so we can set properties (DoDeferPoint) on it.
+			StartWall();
         }
 
 
@@ -248,11 +246,20 @@ namespace AvaloniaSample
 
 			bool drawing = Input.GetMouseButtonDown(MouseButton.Left);
 			if (Input.GetKeyDown(Key.Shift)) {
+				SetDoDeferPoint(false);
 				PointToPointWallDrawing(drawing);
 			} else {
 				// Down-move-up freehand drawing.
 				FreehandWallDrawing(drawing);
 			}
+		}
+
+		private void SetDoDeferPoint(bool value)
+		{
+			if (CurrentWall != null)
+				CurrentWall.DoDeferPoint = value;
+			else if (value)
+				throw new InvalidProgramException("SetDoDeferPoint requires wall");
 		}
 
 		private bool DoDeleteWalls()
@@ -288,6 +295,7 @@ namespace AvaloniaSample
 
 				if (!_wasDrawing)
 					StartNewWall();
+				SetDoDeferPoint(true);
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
 					ExtendWall(groundPt);
 				_prevModeWasFreehand = true;
@@ -351,17 +359,30 @@ namespace AvaloniaSample
 		private void EndWall()
 		{
 			// NOTE: Currently we don't allow you to draw a "single-point" wall.
-			if (CurrentWall != null && CurrentWall.Points.Count > 0 &&
-					!LastPenPosition2D.NearlyEquals(LastWallPosition2D, 0.05f)) {
-				CurrentWall.AddPoint(LastPenPosition2D.asDist());
-				LastWallPosition2D = LastPenPosition2D;
-				CurrentWall.OnUpdate();
+			if (CurrentWall != null && CurrentWall.Points.Count > 0) {
+				// When freehand drawing, catch up to mouse position.
+				CurrentWall.Flush();
+				// NOTE: Currently we don't allow you to draw a "single-point" wall.
+				if (!LastPenPosition2D.NearlyEquals(LastWallPosition2D, 0.05f)) {
+					CurrentWall.AddPoint(LastPenPosition2D.asDist());
+					LastWallPosition2D = LastPenPosition2D;
+					CurrentWall.Flush();
+					CurrentWall.OnUpdate();
+				}
 			}
 
 			// Done with this wall.  TBD: Interferes with point-to-point drawing?
 			//MAYBE WallDrawStarted = false;
 		}
 
+		private void FlushAndNullWall()
+		{
+			if (CurrentWall != null && CurrentWall.HasContents()) {
+				CurrentWall.Flush();
+				CurrentWall.OnUpdate();
+				CurrentWall = null;
+			}
+		}
 
 		private void ExtendWallAtCameraPosition()
 		{
@@ -411,7 +432,9 @@ namespace AvaloniaSample
 		/// </summary>
 		private void StartWall()
         {
-            WallDrawStarted = true;
+			FlushAndNullWall();
+			
+			WallDrawStarted = true;
             CurrentWall = new GroundLine(2, 8);
             // Uncomment for "floating wall".
             //CurrentWall.BaseAltitude = 8 * Distance.One;   //ttt
