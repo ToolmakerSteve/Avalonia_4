@@ -101,10 +101,18 @@ namespace OU
 		public Dist3D(Vec3 pt, DistD.UnitsType units) : this(pt.X, pt.Y, pt.Z, units) { }
 
 		public Dist3D(double value, DistD.UnitsType units) : this(value, value, value, units) { }
-		#endregion
+        #endregion
 
 
-		public bool IsValid => Dist2D.CoordIsValid(X) && Dist2D.CoordIsValid(Y) && Dist2D.CoordIsValid(Z);
+        #region --- implicit/explicit conversions ----------------------------------------
+        // Explicit due to loss of precision.
+        static public explicit operator Vec3(Dist3D it) => new Vec3((float)it.X, (float)it.Y, (float)it.Z);
+        // Explicit due to automatically applying default units.
+        static public explicit operator Dist3D(Vec3 value) => (new Dist3D(value, null));
+        #endregion-
+
+
+        public bool IsValid => Dist2D.CoordIsValid(X) && Dist2D.CoordIsValid(Y) && Dist2D.CoordIsValid(Z);
 
 
 		public bool IsNaN => (double.IsNaN(X.Value) || double.IsNaN(Y.Value) || double.IsNaN(Z.Value));

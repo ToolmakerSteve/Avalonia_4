@@ -109,11 +109,19 @@ namespace OU
 		public Dist2D(double value, DistD.UnitsType units) : this(value, value, units)
 		{
 		}
-		#endregion
+        #endregion
+
+
+        #region --- implicit/explicit conversions ----------------------------------------
+        // Explicit due to loss of precision.
+        static public explicit operator Vec2(Dist2D it) => new Vec2((float)it.X, (float)it.Y);
+        // Explicit due to automatically applying default units.
+        static public explicit operator Dist2D(Vec2 value) => (new Dist2D(value, null));
+        #endregion-
 
 
 
-		public bool IsValid
+        public bool IsValid
 		{
 			get
 			{
