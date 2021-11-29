@@ -315,12 +315,12 @@ namespace AvaloniaSample
         {
             if (ThirdPersonPerspective)
             {   // Camera1 - show Third Person perspective.
-                // TEST: When ONLY Yaw, looks like its trying to maintain focus at the center.
-                // EITHER parameter by itself works well. There is just some mistake when do both.
-                //Pitch = 0;   // ttttt
+				// TEST: When ONLY Yaw, looks like its trying to maintain focus at the center.
+				// EITHER parameter by itself works well. There is just some mistake when do both.
+				//Pitch = 0;   // tmstest
 
-                // "LookAt" Camera1Main.WorldPosition, projected to Terrain.
-                Vector3 lookAt_World = Camera1MainNode.WorldPosition;
+				// "LookAt" Camera1Main.WorldPosition, projected to Terrain.
+				Vector3 lookAt_World = Camera1MainNode.WorldPosition;
                 float mainAltitude = lookAt_World.Altitude();
                 float terrainAltitude = Terrain.GetHeight(lookAt_World);
                 lookAt_World.SetAltitude(terrainAltitude);
@@ -339,7 +339,7 @@ namespace AvaloniaSample
                 //if (!camera_World_verify.NearlyEquals3(camera_World, 0.0001f))
                 //    U.Trouble();
 
-                if (false)   //ttttt
+                if (false)   // tmstest
                 {
                     var Y = U.Round3(Yaw);
                     var P = U.Round3(Pitch);

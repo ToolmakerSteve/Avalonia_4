@@ -24,7 +24,7 @@ namespace AvaloniaSample
         public const bool DrawWallPressDrag = true;   // In Top View.
         public const bool DrawWallAsFly = false && !DrawWallPressDrag;   // In Perspective View. TMS
         const bool UseWaterScene = true;//true;   // TMS
-        const float InitialAltitude2 = 250;//ttt 100;
+        const float InitialAltitude2 = 250;//tmstest 100;
 		const bool ShowWireframe = false;//false;   // TMS
 		const bool ShowTerrainWireframe = false && ShowWireframe;
 		const bool ShowWallWireframe = true && ShowWireframe;
@@ -146,11 +146,11 @@ namespace AvaloniaSample
                 reflectionCamera.AspectRatio = (float)Graphics.Width / Graphics.Height;
 
 
-            // TMS HACK: Which pane are we over?
-            bool overViewport2 = false;
+            // TMS: Which pane are we over?
             if (ShowTwoViewports && Viewport2 != null)
             {
-                IntVector2 mousePosition = Input.MousePosition; //TBD - ScreenPosition;
+				bool overViewport2;
+				IntVector2 mousePosition = Input.MousePosition; //TBD - ScreenPosition;
                 IntRect rect2 = Viewport2.Rect;
                 if (mousePosition.X < rect2.Right)
                     overViewport2 = true;
@@ -167,7 +167,7 @@ namespace AvaloniaSample
             if (DrawWallPressDrag)   //OverViewport2 && 
 				OnUpdate_MaybeDrawingWall();
 
-            if (MoveCamera3DFirstOrThirdPerson(timeStep, 10.0f, overViewport2) && DrawWallAsFly)
+            if (MoveCamera3DFirstOrThirdPerson(timeStep, 10.0f, OverViewport2) && DrawWallAsFly)
             {
                 if (!OverViewport2 && Input.GetMouseButtonDown(MouseButton.Left))
                     ExtendWallAtCameraPosition();
@@ -198,10 +198,16 @@ namespace AvaloniaSample
    //         }
         }
 
+		private bool _wallDrawStartedOverViewport2;
+		private bool _suppressWallDraw;
+
         private void StartNewWall()
         {
-            // Keep existing wall, if it has contents.
-            if (CurrentWall != null)
+			_suppressWallDraw = false;
+			_wallDrawStartedOverViewport2 = OverViewport2;
+
+			// Keep existing wall, if it has contents.
+			if (CurrentWall != null)
             {
                 if (CurrentWall.Points.Count <= 0)
                 {
@@ -295,6 +301,11 @@ namespace AvaloniaSample
 
 				if (!_wasDrawing)
 					StartNewWall();
+				else if (_wallDrawStartedOverViewport2 != OverViewport2)
+					// To avoid wall making segment that leads to a far point.
+					_suppressWallDraw = true;
+				if (_suppressWallDraw)
+					return;
 				SetDoDeferPoint(true);
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
 					ExtendWall(groundPt);
@@ -436,8 +447,8 @@ namespace AvaloniaSample
 			
 			WallDrawStarted = true;
             CurrentWall = new GroundLine(2, 8);
-            // Uncomment for "floating wall".
-            //CurrentWall.BaseAltitude = 8 * Distance.One;   //ttt
+			// Uncomment for "floating wall".
+			//CurrentWall.BaseAltitude = 8 * Distance.One;   // tmstest
 			Debug.WriteLine($"--- StartWall N walls={Walls.Count} ---");
         }
 
