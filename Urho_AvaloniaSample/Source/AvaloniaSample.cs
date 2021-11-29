@@ -22,8 +22,13 @@ namespace AvaloniaSample
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
 		const bool UseTerrainScene = false;//true;   // TMS
+		static float GroundSize = 500;//2000;//500;
 		const bool IncludeWater = false;
+		const bool IncludeScatteredModels = true;//true;
+		const bool ScatteredModelsAreBoxes = true;
+		const int NScatteredModels = 1000;
 		const bool BoxesHaveShadows = false;//true;  // TMS
+
 		public const bool StartCameraOnLand = true;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
         public const bool DrawWallPressDrag = true;   // In Top View.
@@ -99,7 +104,7 @@ namespace AvaloniaSample
             if (UseTerrainScene)
                 CreateTerrainScene(Scene);
             else
-                CreateMushroomScene(Scene);
+                CreateGroundPlaneScene(Scene);
 
             if (ShowTwoViewports)
                 SetupSecondCamera();
@@ -471,147 +476,110 @@ namespace AvaloniaSample
 
 
         #region --- scene specifics ----------------------------------------
-        void CreateMushroomScene(Scene scene)
-        {
-            // Create the Octree component to the scene. This is required before adding any drawable components, or else nothing will
-            // show up. The default octree volume will be from (-1000, -1000, -1000) to (1000, 1000, 1000) in world coordinates; it
-            // is also legal to place objects outside the volume but their visibility can then not be checked in a hierarchically
-            // optimizing manner
-            scene.CreateComponent<Octree>();
+        void CreateGroundPlaneScene(Scene scene)
+		{
+			// Create the Octree component to the scene. This is required before adding any drawable components, or else nothing will
+			// show up. The default octree volume will be from (-1000, -1000, -1000) to (1000, 1000, 1000) in world coordinates; it
+			// is also legal to place objects outside the volume but their visibility can then not be checked in a hierarchically
+			// optimizing manner
+			scene.CreateComponent<Octree>();
 
 
-            // Create a child scene node (at world origin) and a StaticModel component into it. Set the StaticModel to show a simple
-            // plane mesh with a "stone" material. Note that naming the scene nodes is optional. Scale the scene node larger
-            // (100 x 100 world units)
-            var planeNode = scene.CreateChild("Plane");
-			const float GroundPlaneSize = 500;
-            planeNode.Scale = new Vector3(GroundPlaneSize, 1, GroundPlaneSize);
-            var planeObject = planeNode.CreateComponent<StaticModel>();
-            planeObject.Model = ResourceCache.GetModel("Models/Plane.mdl");
-            planeObject.SetMaterial(ResourceCache.GetMaterial("Materials/StoneTiled.xml"));
+			// Create a child scene node (at world origin) and a StaticModel component into it. Set the StaticModel to show a simple
+			// plane mesh with a "stone" material. Note that naming the scene nodes is optional. Scale the scene node larger
+			// (100 x 100 world units)
+			var planeNode = scene.CreateChild("Plane");
+			planeNode.Scale = new Vector3(GroundSize, 1, GroundSize);
+			var planeObject = planeNode.CreateComponent<StaticModel>();
+			planeObject.Model = ResourceCache.GetModel("Models/Plane.mdl");
+			planeObject.SetMaterial(ResourceCache.GetMaterial("Materials/StoneTiled.xml"));
 
 
-            // Create a directional light to the world so that we can see something. The light scene node's orientation controls the
-            // light direction; we will use the SetDirection() function which calculates the orientation from a forward direction vector.
-            // The light will use default settings (white light, no shadows)
-            var lightNode = scene.CreateChild("DirectionalLight");
-            lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
-            var light = lightNode.CreateComponent<Light>();
-            light.LightType = LightType.Directional;
+			// Create a directional light to the world so that we can see something. The light scene node's orientation controls the
+			// light direction; we will use the SetDirection() function which calculates the orientation from a forward direction vector.
+			// The light will use default settings (white light, no shadows)
+			var lightNode = scene.CreateChild("DirectionalLight");
+			lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
+			var light = lightNode.CreateComponent<Light>();
+			light.LightType = LightType.Directional;
 
 
-            // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
-            // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
-            // generate the necessary 3D texture coordinates for cube mapping
-            var skyNode = scene.CreateChild("Sky");
-            skyNode.SetScale(500.0f); // The scale actually does not matter
-            var skybox = skyNode.CreateComponent<Skybox>();
-            skybox.Model = ResourceCache.GetModel("Models/Box.mdl");
-            skybox.SetMaterial(ResourceCache.GetMaterial("Materials/Skybox.xml"));
+			// Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
+			// illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
+			// generate the necessary 3D texture coordinates for cube mapping
+			var skyNode = scene.CreateChild("Sky");
+			skyNode.SetScale(500.0f); // The scale actually does not matter
+			var skybox = skyNode.CreateComponent<Skybox>();
+			skybox.Model = ResourceCache.GetModel("Models/Box.mdl");
+			skybox.SetMaterial(ResourceCache.GetMaterial("Materials/Skybox.xml"));
 
 
-            // Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
-            // quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
-            // LOD levels, so the StaticModel component will automatically select the LOD level according to the view distance (you'll
-            // see the model get simpler as it moves further away). Finally, rendering a large number of the same object with the
-            // same material allows instancing to be used, if the GPU supports it. This reduces the amount of CPU work in rendering the
-            // scene.
-            const int NMushrooms = 20; //200
-            for (int i = 0; i < NMushrooms; i++)
-            {
-                var mushroom = scene.CreateChild("Mushroom");
-                mushroom.Position = new Vector3(random.Next(90) - 45, 0, random.Next(90) - 45);
-                mushroom.Rotation = new Quaternion(0, random.Next(360), 0);
-                mushroom.SetScale(0.5f + random.Next(20000) / 10000.0f);
-                var mushroomObject = mushroom.CreateComponent<StaticModel>();
-                mushroomObject.Model = ResourceCache.GetModel("Models/Mushroom.mdl");
-                mushroomObject.SetMaterial(ResourceCache.GetMaterial("Materials/Mushroom.xml"));
-            }
+			// Create more StaticModel objects to the scene, randomly positioned, rotated and scaled. For rotation, we construct a
+			// quaternion from Euler angles where the Y angle (rotation about the Y axis) is randomized. The mushroom model contains
+			// LOD levels, so the StaticModel component will automatically select the LOD level according to the view distance (you'll
+			// see the model get simpler as it moves further away). Finally, rendering a large number of the same object with the
+			// same material allows instancing to be used, if the GPU supports it. This reduces the amount of CPU work in rendering the
+			// scene.
+			ScatterObjects(scene, NScatteredModels);
 
-            MushroomSceneMainCameraSettings(Camera1FinalNode);
-        }
+			GroundPlaneSceneMainCameraSettings(Camera1FinalNode);
+		}
 
-        void CreateTerrainScene(Scene scene)
-        {
-            var cache = ResourceCache;
+		void CreateTerrainScene(Scene scene)
+		{
+			var cache = ResourceCache;
 
-            // Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
-            scene.CreateComponent<Octree>();
+			// Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
+			scene.CreateComponent<Octree>();
 
-            // Create a Zone component for ambient lighting & fog control
-            var zoneNode = scene.CreateChild("Zone");
-            var zone = zoneNode.CreateComponent<Zone>();
-            zone.SetBoundingBox(new BoundingBox(-1000.0f, 1000.0f));
-            zone.AmbientColor = new Color(0.35f, 0.35f, 0.35f);
-            //float fogBrightness = ShowWireframe ? 0.2f : 1.0f;   // TMS
-            float fogBrightness = ShowWireframe ? 0.0f : 1.0f;
-            zone.FogColor = new Color(fogBrightness, fogBrightness, fogBrightness);
-            zone.FogStart = 500.0f;
-            zone.FogEnd = 750.0f;
+			// Create a Zone component for ambient lighting & fog control
+			var zoneNode = scene.CreateChild("Zone");
+			var zone = zoneNode.CreateComponent<Zone>();
+			zone.SetBoundingBox(new BoundingBox(-1000.0f, 1000.0f));
+			zone.AmbientColor = new Color(0.35f, 0.35f, 0.35f);
+			//float fogBrightness = ShowWireframe ? 0.2f : 1.0f;   // TMS
+			float fogBrightness = ShowWireframe ? 0.0f : 1.0f;
+			zone.FogColor = new Color(fogBrightness, fogBrightness, fogBrightness);
+			zone.FogStart = 500.0f;
+			zone.FogEnd = 750.0f;
 
-            // Create a directional light to the world. Enable cascaded shadows on it
-            var lightNode = scene.CreateChild("DirectionalLight");
-            lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
-            var light = lightNode.CreateComponent<Light>();
-            light.LightType = LightType.Directional;
-            light.CastShadows = true;
-            light.ShadowBias = new BiasParameters(0.00025f, 0.5f);
-            light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
-            light.SpecularIntensity = 0.5f;
-            // Apply slightly overbright lighting to match the skybox
-            light.Color = new Color(1.2f, 1.2f, 1.2f);
+			// Create a directional light to the world. Enable cascaded shadows on it
+			var lightNode = scene.CreateChild("DirectionalLight");
+			lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
+			var light = lightNode.CreateComponent<Light>();
+			light.LightType = LightType.Directional;
+			light.CastShadows = true;
+			light.ShadowBias = new BiasParameters(0.00025f, 0.5f);
+			light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
+			light.SpecularIntensity = 0.5f;
+			// Apply slightly overbright lighting to match the skybox
+			light.Color = new Color(1.2f, 1.2f, 1.2f);
 
-            if (!ShowWireframe)
-            {
-                // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
-                // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
-                // generate the necessary 3D texture coordinates for cube mapping
-                var skyNode = scene.CreateChild("Sky");
-                skyNode.SetScale(500.0f); // The scale actually does not matter
-                var skybox = skyNode.CreateComponent<Skybox>();
-                skybox.Model = cache.GetModel("Models/Box.mdl");
-                skybox.SetMaterial(cache.GetMaterial("Materials/Skybox.xml"));
-            }
+			if (!ShowWireframe) {
+				// Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
+				// illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
+				// generate the necessary 3D texture coordinates for cube mapping
+				var skyNode = scene.CreateChild("Sky");
+				skyNode.SetScale(500.0f); // The scale actually does not matter
+				var skybox = skyNode.CreateComponent<Skybox>();
+				skybox.Model = cache.GetModel("Models/Box.mdl");
+				skybox.SetMaterial(cache.GetMaterial("Materials/Skybox.xml"));
+			}
 
-            // Create heightmap terrain
-            var terrainNode = scene.CreateChild("Terrain");
-            terrainNode.Position = new Vector3(0.0f, 0.0f, 0.0f);
-            Terrain = terrainNode.CreateComponent<Terrain>();
-            Terrain.PatchSize = 64;
-            Terrain.Spacing = new Vector3(2.0f, 0.5f, 2.0f); // Spacing between vertices and vertical resolution of the height map
-            Terrain.Smoothing = true;
-            Terrain.SetHeightMap(cache.GetImage("Textures/HeightMap.png"));
-            Terrain.Material = cache.GetMaterial("Materials/Terrain.xml");
-            // The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
-            // terrain patches and other objects behind it
-            Terrain.Occluder = true;
+			// Create heightmap terrain
+			var terrainNode = scene.CreateChild("Terrain");
+			terrainNode.Position = new Vector3(0.0f, 0.0f, 0.0f);
+			Terrain = terrainNode.CreateComponent<Terrain>();
+			Terrain.PatchSize = 64;
+			Terrain.Spacing = new Vector3(2.0f, 0.5f, 2.0f); // Spacing between vertices and vertical resolution of the height map
+			Terrain.Smoothing = true;
+			Terrain.SetHeightMap(cache.GetImage("Textures/HeightMap.png"));
+			Terrain.Material = cache.GetMaterial("Materials/Terrain.xml");
+			// The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
+			// terrain patches and other objects behind it
+			Terrain.Occluder = true;
 			MaybeSetWireframeMaterial();
-
-			// Have some different color boxes, so can tell them apart (somewhat).
-			var colors = new Color[] {
-                    Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta,
-                    Color.White, Color.Black
-            };
-            List<Material> materials = new List<Material>();
-            foreach (var color in colors)
-            {
-                var material = cache.GetMaterial("Materials/Stone.xml").Clone();
-                material.SetShaderParameter("AmbientColor", color);
-                materials.Add(material);
-            }
-
-            // Create 1000 boxes in the terrain. Always face outward along the terrain normal
-            int numObjects = 1000;
-            float boxScale = 5.0f;
-            for (int i = 0; i < numObjects; ++i)
-            {
-                Vector3 position = new Vector3(NextRandom(2000.0f) - 1000.0f, 0.0f, NextRandom(2000.0f) - 1000.0f);
-
-                // TMS: Make the boxes different.
-                Material boxMaterial = materials[i % colors.Length];
-
-                AddBoxToScene(scene, position, boxScale, true, boxMaterial, cache);
-            }
+			ScatterObjects(scene, NScatteredModels);
 
 			if (IncludeWater) {
 				// Create a water plane object that is as large as the terrain
@@ -626,7 +594,58 @@ namespace AvaloniaSample
 			}
 
 			TerrainSceneMainCameraSettings(Camera1FinalNode, Camera1);
-        }
+		}
+
+		private void ScatterObjects(Scene scene, int nScatteredModels)
+		{
+			if (IncludeScatteredModels) {
+				if (ScatteredModelsAreBoxes)
+					ScatterBoxes(scene, nScatteredModels);
+				else
+					ScatterMushrooms(scene, nScatteredModels);
+			}
+		}
+
+		private void ScatterMushrooms(Scene scene, int nScatteredModels)
+		{
+			for (int i = 0; i < nScatteredModels; i++) {
+				var mushroom = scene.CreateChild("Mushroom");
+				mushroom.Position = new Vector3(random.Next(90) - 45, 0, random.Next(90) - 45);
+				mushroom.Rotation = new Quaternion(0, random.Next(360), 0);
+				mushroom.SetScale(0.5f + random.Next(20000) / 10000.0f);
+				var mushroomObject = mushroom.CreateComponent<StaticModel>();
+				mushroomObject.Model = ResourceCache.GetModel("Models/Mushroom.mdl");
+				mushroomObject.SetMaterial(ResourceCache.GetMaterial("Materials/Mushroom.xml"));
+			}
+		}
+
+		private void ScatterBoxes(Scene scene, int nScatteredModels)
+		{
+
+			// Have some different color boxes, so can tell them apart (somewhat).
+			var colors = new Color[] {
+					Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta,
+					Color.White, Color.Black
+			};
+			List<Material> materials = new List<Material>();
+			foreach (var color in colors) {
+				var material = ResourceCache.GetMaterial("Materials/Stone.xml").Clone();
+				material.SetShaderParameter("AmbientColor", color);
+				materials.Add(material);
+			}
+
+			// Create boxes in the terrain. Always face outward along the terrain normal
+			float boxScale = 5.0f;
+			float halfGroundSize = GroundSize / 2;
+			for (int i = 0; i < nScatteredModels; ++i) {
+				Vector3 position = new Vector3(NextRandom(GroundSize) - halfGroundSize, 0.0f, NextRandom(GroundSize) - halfGroundSize);
+
+				// TMS: Make the boxes different.
+				Material boxMaterial = materials[i % colors.Length];
+
+				AddBoxToScene(scene, position, boxScale, true, boxMaterial, ResourceCache);
+			}
+		}
 
 		public void MaybeSetWireframeMaterial(Material mat = null)
 		{
@@ -652,6 +671,8 @@ namespace AvaloniaSample
 		public void AddBoxToScene(Node parent, Vector3 position, float boxScale, bool terrainRelative,
                                    Material boxMaterial = null, Urho.Resources.ResourceCache cache = null)
         {
+			if (Terrain == null)
+				terrainRelative = false;
             if (cache == null)
                 cache = ResourceCache;
             // AFTER set cache.
@@ -712,7 +733,7 @@ namespace AvaloniaSample
         }
 
 
-        private void MushroomSceneMainCameraSettings(Node cameraPositionNode)
+        private void GroundPlaneSceneMainCameraSettings(Node cameraPositionNode)
         {
             // Set an initial position (for the camera node(s)) above the plane.
             cameraPositionNode.Position = new Vector3(0, 5, 0);
