@@ -269,7 +269,7 @@ namespace AvaloniaSample
 				if (_sawShiftToggleUp)// && !_prevModeWasFreehand)
 					StartNewWall();
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
-					ExtendWall(groundPt);
+					ExtendWall(groundPt, true);
 				_sawShiftToggleUp = false;
 				_prevModeWasFreehand = false;
 				_wasClickDrawing = true;
@@ -369,20 +369,32 @@ namespace AvaloniaSample
 			ExtendWall(penPosition2D);
 		}
 
-		private void ExtendWall(Vector2 penPosition2D)
+		private void ExtendWall(Vector2 penPosition2D, bool maybeBend = false)
 		{
 			bool doAddPoint = false;
+			float length = 0;
 			if (!WallDrawStarted) {
 				// SETS CurrentWall, WallDrawStarted.
 				StartWall();
 				doAddPoint = true;
 			} else {
-				var length = Vector2.Subtract(penPosition2D, LastWallPosition2D).Length;
+				length = Vector2.Subtract(penPosition2D, LastWallPosition2D).Length;
 				if (length > MinWallSegmentLength)
 					doAddPoint = true;
 			}
 
 			if (doAddPoint) {
+				if (maybeBend) {
+					if (length > 2 * MinWallSegmentLength) {
+						// Add a short join segment. This "absorbs" any angle change, so long segment has full wall width.
+						// TBD: Calculate angle of direction change. Don't need for small angles.
+						const float JoinLength = 0.1f;
+						float joinWgt = JoinLength / length;
+						// End of short join segment.
+						var joinPt = U.Lerp(LastWallPosition2D, penPosition2D, joinWgt);
+						CurrentWall.AddPoint((Dist2D)joinPt);
+					}
+				}
 				// Create or Extend a path, and a corresponding extruded model.
 				CurrentWall.AddPoint(penPosition2D.asDist());
 				CurrentWall.OnUpdate();

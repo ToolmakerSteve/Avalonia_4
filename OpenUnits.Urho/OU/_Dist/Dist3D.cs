@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using Urho;
 //using System.Numerics;
 using static OU.Utils;
 
@@ -98,17 +99,20 @@ namespace OU
 
 		public Dist3D(PointF pt, DistD.UnitsType units) : this(pt.X, pt.Y, units) { }
 
-		public Dist3D(Vec3 pt, DistD.UnitsType units) : this(pt.X, pt.Y, pt.Z, units) { }
+        public Dist3D(Vec3 pt, DistD.UnitsType units) : this(pt.X, pt.Y, pt.Z, units) { }
+        public Dist3D(Vector3 pt, DistD.UnitsType units) : this(pt.X, pt.Y, pt.Z, units) { }
 
-		public Dist3D(double value, DistD.UnitsType units) : this(value, value, value, units) { }
+        public Dist3D(double value, DistD.UnitsType units) : this(value, value, value, units) { }
         #endregion
 
 
         #region --- implicit/explicit conversions ----------------------------------------
         // Explicit due to loss of precision.
         static public explicit operator Vec3(Dist3D it) => new Vec3((float)it.X, (float)it.Y, (float)it.Z);
+        static public explicit operator Vector3(Dist3D it) => new Vector3((float)it.X, (float)it.Y, (float)it.Z);
         // Explicit due to automatically applying default units.
         static public explicit operator Dist3D(Vec3 value) => (new Dist3D(value, null));
+        static public explicit operator Dist3D(Vector3 value) => (new Dist3D(value, null));
         #endregion-
 
 

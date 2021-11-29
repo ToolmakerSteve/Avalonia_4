@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Urho;
 using static OU.Utils;
 
 namespace OU
@@ -97,16 +98,19 @@ namespace OU
 		{
 		}
 
-		public Dist2D(Vec2 pt, DistD.UnitsType units) : this(pt.X, pt.Y, units)
-		{
-		}
+        public Dist2D(Vec2 pt, DistD.UnitsType units) : this(pt.X, pt.Y, units)
+        {
+        }
+        public Dist2D(Vector2 pt, DistD.UnitsType units) : this(pt.X, pt.Y, units)
+        {
+        }
 
-		/// <summary>
-		/// Set both X and Y to "value".
-		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="units">null means "use DistD.DefaultUnits".</param>
-		public Dist2D(double value, DistD.UnitsType units) : this(value, value, units)
+        /// <summary>
+        /// Set both X and Y to "value".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="units">null means "use DistD.DefaultUnits".</param>
+        public Dist2D(double value, DistD.UnitsType units) : this(value, value, units)
 		{
 		}
         #endregion
@@ -115,8 +119,10 @@ namespace OU
         #region --- implicit/explicit conversions ----------------------------------------
         // Explicit due to loss of precision.
         static public explicit operator Vec2(Dist2D it) => new Vec2((float)it.X, (float)it.Y);
+        static public explicit operator Vector2(Dist2D it) => new Vector2((float)it.X, (float)it.Y);
         // Explicit due to automatically applying default units.
         static public explicit operator Dist2D(Vec2 value) => (new Dist2D(value, null));
+        static public explicit operator Dist2D(Vector2 value) => (new Dist2D(value, null));
         #endregion-
 
 
