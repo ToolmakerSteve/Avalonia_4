@@ -11,6 +11,7 @@ namespace OU
 {
     /// <summary>
     /// Miscellaneous functions.
+    /// TODO: Move Math functions to Utils.Math.cs.
     /// TODO: Change function names to PascalCase (capitalize first letter).
     /// </summary>
     public static partial class Utils

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Urho;
 using static System.Math;
 using N = System.Numerics;
@@ -353,36 +354,152 @@ namespace OU
         //        }
 
 
-        //        // ========== AccumMinMax ==========
-        //        // Before first call, caller must initialize minV to Integer.MaxValue, and maxV to Integer.MinValue.
-        //        public static void AccumMinMax(int v, ref int minV, ref int maxV)
-        //        {
-        //            if (v < minV)
-        //                minV = v;
-        //            if (v > maxV)
-        //                maxV = v;
-        //        }
-        //        // Before first call, caller must initialize minV to Single.MaxValue, and maxV to Single.MinValue.
-        //        public static void AccumMinMax(float v, ref float minV, ref float maxV)
-        //        {
-        //            if (v < minV)
-        //                minV = v;
-        //            if (v > maxV)
-        //                maxV = v;
-        //        }
+        #region --- InitMinMax, AccumMinMax, PointF_Zero|Min|MaxValue ----------------------------------------
+        public static PointF PointF_Zero()
+        {
+            return new PointF(0, 0);
+        }
 
-        //        // Before first call, caller must initialize minV to Double.MaxValue, and maxV to Double.MinValue.
-        //        public static void AccumMinMax(double v, ref double minV, ref double maxV)
-        //        {
-        //            if (v < minV)
-        //                minV = v;
-        //            if (v > maxV)
-        //                maxV = v;
-        //        }
+        public static PointF PointF_MinValue()
+        {
+            return new PointF(float.MinValue, float.MinValue);
+        }
+
+        public static PointF PointF_MaxValue()
+        {
+            return new PointF(float.MaxValue, float.MaxValue);
+        }
 
 
-        // ========== Degrees and Radians - "double" ==========
+        public static void InitMinMax(out Vector2 minV, out Vector2 maxV)
+        {
+            // Initialize each to the OPPOSITE end of the range,
+            // so don't need special test on first AccumMinMax call.
+            minV = new Vector2(float.MaxValue, float.MaxValue);
+            maxV = new Vector2(float.MinValue, float.MinValue);
+        }
 
+        public static void InitMinMax(out Vector3 minV, out Vector3 maxV)
+        {
+            // Initialize each to the OPPOSITE end of the range,
+            // so don't need special test on first AccumMinMax call.
+            minV = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            maxV = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+        }
+
+
+        // Before first call, caller must initialize minV to Integer.MaxValue, and maxV to Integer.MinValue.
+        public static void AccumMinMax(int v, ref int minV, ref int maxV)
+        {
+            if (v < minV)
+                minV = v;
+            if (v > maxV)
+                maxV = v;
+        }
+        // Before first call, caller must initialize minV to Single.MaxValue, and maxV to Single.MinValue.
+        public static void AccumMinMax(float v, ref float minV, ref float maxV)
+        {
+            if (v < minV)
+                minV = v;
+            if (v > maxV)
+                maxV = v;
+        }
+
+        // Before first call, caller must initialize minV to Double.MaxValue, and maxV to Double.MinValue.
+        public static void AccumMinMax(double v, ref double minV, ref double maxV)
+        {
+            if (v < minV)
+                minV = v;
+            if (v > maxV)
+                maxV = v;
+        }
+
+        // Before first call,
+        // caller must initialize minV to New Vector2(Single.MaxValue),
+        // and maxV to New Vector2(Single.MinValue).
+        public static void AccumMinMax(Vector2 v, ref Vector2 minV, ref Vector2 maxV)
+        {
+            if (v.X < minV.X)
+                minV.X = v.X;
+            if (v.Y < minV.Y)
+                minV.Y = v.Y;
+
+            if (v.X > maxV.X)
+                maxV.X = v.X;
+            if (v.Y > maxV.Y)
+                maxV.Y = v.Y;
+        }
+
+        // Before first call, call InitMinMax,
+        // to initialize minV to New Vector3(Single.MaxValue),
+        // and maxV to New Vector3(Single.MinValue).
+        public static void AccumMinMax(Vector3 v, ref Vector3 minV, ref Vector3 maxV)
+        {
+            if (v.X < minV.X)
+                minV.X = v.X;
+            if (v.Y < minV.Y)
+                minV.Y = v.Y;
+            if (v.Z < minV.Z)
+                minV.Z = v.Z;
+
+            if (v.X > maxV.X)
+                maxV.X = v.X;
+            if (v.Y > maxV.Y)
+                maxV.Y = v.Y;
+            if (v.Z > maxV.Z)
+                maxV.Z = v.Z;
+        }
+
+        // Before first call,
+        // caller must initialize minV to Dist2D.MaxValue,
+        // and maxV to Dist2D.MinValue.
+        public static void AccumMinMax(Dist2D v, ref Dist2D minV, ref Dist2D maxV)
+        {
+            if (v.X < minV.X)
+                minV.X = v.X;
+            if (v.Y < minV.Y)
+                minV.Y = v.Y;
+
+            if (v.X > maxV.X)
+                maxV.X = v.X;
+            if (v.Y > maxV.Y)
+                maxV.Y = v.Y;
+        }
+
+        //// Before first call,
+        //// caller must initialize minV to Dist2D.MaxValue,
+        //// and maxV to Dist2D.MinValue.
+        //public static void AccumMinMax(Rectangle2D rect, ref Dist2D minPt, ref Dist2D maxPt)
+        //{
+        //    AccumMinMax(rect.TopLeft, ref minPt, ref maxPt);
+        //    AccumMinMax(rect.BottomRight, ref minPt, ref maxPt);
+        //}
+
+        // Before first call, caller must initialize minPt and maxPt. E.g.:
+        // Dim minPt As PointF = PointF_MaxValue, maxPt As PointF = PointF_MinValue
+        public static void AccumMinMax(PointF v, ref PointF minPt, ref PointF maxPt)
+        {
+            if (v.X < minPt.X)
+                minPt.X = v.X;
+            if (v.Y < minPt.Y)
+                minPt.Y = v.Y;
+
+            if (v.X > maxPt.X)
+                maxPt.X = v.X;
+            if (v.Y > maxPt.Y)
+                maxPt.Y = v.Y;
+        }
+
+        // Before first call, caller must initialize minPt and maxPt. E.g.:
+        // Dim minPt As PointF = PointF_MaxValue, maxPt As PointF = PointF_MinValue
+        public static void AccumMinMax(RectangleF rect, ref PointF minPt, ref PointF maxV)
+        {
+            AccumMinMax(rect.Location, ref minPt, ref maxV);
+            AccumMinMax(new PointF(rect.Right, rect.Bottom), ref minPt, ref maxV);
+        }
+        #endregion
+
+        #region --- Degrees and Radians - "double" ----------------------------------------
         public static readonly double OneDegreeAsRadiansD = (Math.PI / 180.0);
         public static readonly double OneRadianAsDegreesD = (180.0 / Math.PI);
         public static readonly float OneDegreeAsRadiansF = ((float)Math.PI / 180.0f);
@@ -403,7 +520,7 @@ namespace OU
             return OneDegreeAsRadiansF * degrees;
         }
 
-        //        public static double getAngleDegrees(Distance2D origin, Distance2D aimPt)
+        //        public static double getAngleDegrees(Dist2D origin, Dist2D aimPt)
         //        {
         //            return getAngleDegrees(origin.X, origin.Y, aimPt.X, aimPt.Y);
         //        }
@@ -446,7 +563,7 @@ namespace OU
 
         //        // Atan2 implicitly makes some direction "angle 0".
         //        // Is that "0" direction (1, 0)?
-        //        public static float headingAsAngleRadians2D(Distance2D heading)
+        //        public static float headingAsAngleRadians2D(Dist2D heading)
         //        {
         //            return headingAsAngleRadians2D(new Unitless2D(heading));
         //        }
@@ -461,15 +578,15 @@ namespace OU
 
         //        //public static void TEST_rotation()
         //        //{
-        //        //    TEST_rotation1(new Distance2D(2, 1));
-        //        //    TEST_rotation1(new Distance2D(2, -1));
-        //        //    TEST_rotation1(new Distance2D(-2, 1));
-        //        //    TEST_rotation1(new Distance2D(-2, -1));
-        //        //    TEST_rotation1(new Distance2D(1, 2));
+        //        //    TEST_rotation1(new Dist2D(2, 1));
+        //        //    TEST_rotation1(new Dist2D(2, -1));
+        //        //    TEST_rotation1(new Dist2D(-2, 1));
+        //        //    TEST_rotation1(new Dist2D(-2, -1));
+        //        //    TEST_rotation1(new Dist2D(1, 2));
 
-        //        //       void TEST_rotation1(Distance2D heading)
+        //        //       void TEST_rotation1(Dist2D heading)
         //        //    {
-        //        //        var landing = new Distance2D(0.5, 0.5) + heading;
+        //        //        var landing = new Dist2D(0.5, 0.5) + heading;
         //        //        var landingDelta = landing - heading;
         //        //        var radians = headingAsAngleRadians2D(heading);
         //        //        var rotatedA = rotateByRadians(heading, -radians);
@@ -631,33 +748,33 @@ namespace OU
         //        }
 
         //        // vector "heading" must have length 1.
-        //        public static Distance2D moveOnHeading(Distance2D origin, Distance2D heading, double distance)
+        //        public static Dist2D moveOnHeading(Dist2D origin, Dist2D heading, double distance)
         //        {
-        //            return new Distance2D(origin.X + distance * heading.X, origin.Y + distance * heading.Y);
+        //            return new Dist2D(origin.X + distance * heading.X, origin.Y + distance * heading.Y);
         //        }
 
-        //        public static Distance2D moveOnAngleRadians(Distance2D origin, float angleRadians, double distance)
+        //        public static Dist2D moveOnAngleRadians(Dist2D origin, float angleRadians, double distance)
         //        {
-        //            Distance2D heading = angleRadiansAsHeading(angleRadians);
+        //            Dist2D heading = angleRadiansAsHeading(angleRadians);
         //            return moveOnHeading(origin, heading, distance);
         //        }
 
         //        // Ignores origin.Z.
-        //        public static Distance2D moveOnAngleRadians(Distance3D origin, float angleRadians, double distance)
+        //        public static Dist2D moveOnAngleRadians(Distance3D origin, float angleRadians, double distance)
         //        {
-        //            Distance2D heading = angleRadiansAsHeading(angleRadians);
-        //            return moveOnHeading(new Distance2D(origin.X, origin.Y), heading, distance);
+        //            Dist2D heading = angleRadiansAsHeading(angleRadians);
+        //            return moveOnHeading(new Dist2D(origin.X, origin.Y), heading, distance);
         //        }
 
 
         //        // ========== absDelta, distance ==========
 
-        //        public static Distance2D absDelta(Distance2D p1, Distance2D p2)
+        //        public static Dist2D absDelta(Dist2D p1, Dist2D p2)
         //        {
         //            double dX = p2.X - p1.X;
         //            double dY = p2.Y - p1.Y;
 
-        //            return new Distance2D(Math.Abs(dX), Math.Abs(dY));
+        //            return new Dist2D(Math.Abs(dX), Math.Abs(dY));
         //        }
 
 
@@ -669,7 +786,7 @@ namespace OU
         //            return (double)Math.Sqrt((double)(dX * dX) + (double)(dY * dY));
         //        }
 
-        //        public static double distance(Distance2D p1, Distance2D p2)
+        //        public static double distance(Dist2D p1, Dist2D p2)
         //        {
         //            double dX = p2.X - p1.X;
         //            double dY = p2.Y - p1.Y;
@@ -679,7 +796,7 @@ namespace OU
 
         //        // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations
         //        // Useful for "threshold" algorithms - DO NOT use this to COMPARE distances.
-        //        public static double distance_approx(Distance2D p1, Distance2D p2)
+        //        public static double distance_approx(Dist2D p1, Dist2D p2)
         //        {
         //            double absDX = Math.Abs(p2.X - p1.X);
         //            double absDY = Math.Abs(p2.Y - p1.Y);
@@ -705,7 +822,7 @@ namespace OU
         //            return (double)(dX * dX) + (double)(dY * dY);
         //        }
 
-        //        public static double distanceSquared(Distance2D p1, Distance2D p2)
+        //        public static double distanceSquared(Dist2D p1, Dist2D p2)
         //        {
         //            double dX = p2.X - p1.X;
         //            double dY = p2.Y - p1.Y;
@@ -722,7 +839,7 @@ namespace OU
         //        }
 
         //        // "scale" gives separate strength to x and y.
-        //        public static double distanceSquared_approx(Distance2D p1, Distance2D p2, Distance2D scale)
+        //        public static double distanceSquared_approx(Dist2D p1, Dist2D p2, Dist2D scale)
         //        {
         //            double dX = scale.X * (p2.X - p1.X);
         //            double dY = scale.Y * (p2.Y - p1.Y);
@@ -734,7 +851,7 @@ namespace OU
 
         //        // x=longitude, y= latitude.
         //        // aka GeoDistance;
-        //        public static double calculateDistanceDD_AED(Distance2D p1, Distance2D p2)
+        //        public static double calculateDistanceDD_AED(Dist2D p1, Dist2D p2)
         //        {
         //            return calculateDistanceDD_AED(p1.X, p1.Y, p2.X, p2.Y);
         //        }
@@ -1046,28 +1163,28 @@ namespace OU
         //            return wgt;
         //        }
 
-        //        // Sets fields of outXY. (Avoids creating a Distance2D.Double instance.)
-        //        public static void lerpXY(double ax, double ay, double bx, double by, double wgtB, Distance2D outXY)
+        //        // Sets fields of outXY. (Avoids creating a Dist2D.Double instance.)
+        //        public static void lerpXY(double ax, double ay, double bx, double by, double wgtB, Dist2D outXY)
         //        {
         //            outXY.X = lerp(ax, bx, wgtB);
         //            outXY.Y = lerp(ay, by, wgtB);
         //        }
 
-        //        public static Distance2D lerpXY(double ax, double ay, double bx, double by, double wgtB)
+        //        public static Dist2D lerpXY(double ax, double ay, double bx, double by, double wgtB)
         //        {
-        //            return new Distance2D(lerp(ax, bx, wgtB), lerp(ay, by, wgtB));
+        //            return new Dist2D(lerp(ax, bx, wgtB), lerp(ay, by, wgtB));
         //        }
 
-        //        public static Distance2D lerpXY(Distance2D a, Distance2D b, double wgtB)
+        //        public static Dist2D lerpXY(Dist2D a, Dist2D b, double wgtB)
         //        {
-        //            return new Distance2D(lerp(a.X, b.X, wgtB), lerp(a.Y, b.Y, wgtB));
+        //            return new Dist2D(lerp(a.X, b.X, wgtB), lerp(a.Y, b.Y, wgtB));
         //        }
 
         //        // xyWgt in (0..1, 0..1).
-        //        public static Distance2D lerp2D(Distance2D xyWgt, Distance2D x0y0, Distance2D x1y0, Distance2D x0y1, Distance2D x1y1)
+        //        public static Dist2D lerp2D(Dist2D xyWgt, Dist2D x0y0, Dist2D x1y0, Dist2D x0y1, Dist2D x1y1)
         //        {
-        //            Distance2D xY0 = lerpXY(x0y0, x1y0, xyWgt.X);
-        //            Distance2D xY1 = lerpXY(x0y1, x1y1, xyWgt.X);
+        //            Dist2D xY0 = lerpXY(x0y0, x1y0, xyWgt.X);
+        //            Dist2D xY1 = lerpXY(x0y1, x1y1, xyWgt.X);
         //            return lerpXY(xY0, xY1, xyWgt.Y);
         //        }
 
@@ -1078,18 +1195,18 @@ namespace OU
 
 
         //        // Returns (x, y), where each coordinate is in (0, 1) if it is within image.
-        //        public static Distance2D inverseLerpWithZ(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y, double originZ, double ZtoY, double altitude)
+        //        public static Dist2D inverseLerpWithZ(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y, double originZ, double ZtoY, double altitude)
         //        {
 
-        //            Distance2D xyWgt = inverseLerp2D(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, x0y1x, x0y1y, x1y1x, x1y1y);
+        //            Dist2D xyWgt = inverseLerp2D(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, x0y1x, x0y1y, x1y1x, x1y1y);
 
         //            //		// Verify
-        //            //		Distance2D xyWgt = lerp2D(new Distance2D(outx[0], outy[0]),
-        //            //				   			   new Distance2D(x0y0x, x0y0y),
-        //            //				   			   new Distance2D(x1y0x, x1y0y),
-        //            //				   			   new Distance2D(x0y1x, x0y1y),
-        //            //				   			   new Distance2D(x1y1x, x1y1y));
-        //            //		if (!nearlyEquals(xyWgt, new Distance2D(ptx, pty), 0.000002))
+        //            //		Dist2D xyWgt = lerp2D(new Dist2D(outx[0], outy[0]),
+        //            //				   			   new Dist2D(x0y0x, x0y0y),
+        //            //				   			   new Dist2D(x1y0x, x1y0y),
+        //            //				   			   new Dist2D(x0y1x, x0y1y),
+        //            //				   			   new Dist2D(x1y1x, x1y1y));
+        //            //		if (!nearlyEquals(xyWgt, new Dist2D(ptx, pty), 0.000002))
         //            //			Dubious();
 
         //            /*
@@ -1121,12 +1238,12 @@ namespace OU
         //            inverseLerp2D(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, x0y1x, x0y1y, x1y1x, x1y1y, outx, outy);
 
         //            //		// Verify
-        //            //		Distance2D xyWgt = lerp2D(new Distance2D(outx[0], outy[0]),
-        //            //				   			   new Distance2D(x0y0x, x0y0y),
-        //            //				   			   new Distance2D(x1y0x, x1y0y),
-        //            //				   			   new Distance2D(x0y1x, x0y1y),
-        //            //				   			   new Distance2D(x1y1x, x1y1y));
-        //            //		if (!nearlyEquals(xyWgt, new Distance2D(ptx, pty), 0.000002))
+        //            //		Dist2D xyWgt = lerp2D(new Dist2D(outx[0], outy[0]),
+        //            //				   			   new Dist2D(x0y0x, x0y0y),
+        //            //				   			   new Dist2D(x1y0x, x1y0y),
+        //            //				   			   new Dist2D(x0y1x, x0y1y),
+        //            //				   			   new Dist2D(x1y1x, x1y1y));
+        //            //		if (!nearlyEquals(xyWgt, new Dist2D(ptx, pty), 0.000002))
         //            //			Dubious();
 
         //            /*
@@ -1169,20 +1286,20 @@ namespace OU
 
 
         //        // Returns xyWgt corresponding to (ptx, pty).
-        //        public static Distance2D inverseLerp2D(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y)
+        //        public static Dist2D inverseLerp2D(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y)
         //        {
 
-        //            Distance2D xyWgt = inverseLerp2D_pass1(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, x0y1x, x0y1y, x1y1x, x1y1y);
+        //            Dist2D xyWgt = inverseLerp2D_pass1(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, x0y1x, x0y1y, x1y1x, x1y1y);
 
         //            // Too much trouble passing around all the individual x's and y's.
         //            // BUT COST: new/GC.
-        //            Distance2D xy = new Distance2D(ptx, pty);
-        //            Distance2D x0y0 = new Distance2D(x0y0x, x0y0y);
-        //            Distance2D x1y0 = new Distance2D(x1y0x, x1y0y);
-        //            Distance2D x0y1 = new Distance2D(x0y1x, x0y1y);
-        //            Distance2D x1y1 = new Distance2D(x1y1x, x1y1y);
+        //            Dist2D xy = new Dist2D(ptx, pty);
+        //            Dist2D x0y0 = new Dist2D(x0y0x, x0y0y);
+        //            Dist2D x1y0 = new Dist2D(x1y0x, x1y0y);
+        //            Dist2D x0y1 = new Dist2D(x0y1x, x0y1y);
+        //            Dist2D x1y1 = new Dist2D(x1y1x, x1y1y);
 
-        //            Distance2D xyVerify = lerp2D(xyWgt, x0y0, x1y0, x0y1, x1y1);
+        //            Dist2D xyVerify = lerp2D(xyWgt, x0y0, x1y0, x0y1, x1y1);
         //            double newError = distance(xy, xyVerify);
         //            // Made it more accurate, for the case where it is oscillating between
         //            // an x-error and a y-error.
@@ -1192,7 +1309,7 @@ namespace OU
         //            int nMorePasses = 12; // 8;
         //            do
         //            {
-        //                Distance2D oldXyWgt = xyWgt;
+        //                Dist2D oldXyWgt = xyWgt;
         //                double oldError = newError;
         //                // Another pass. Project to lines near the point, from the prior
         //                // pass.
@@ -1217,20 +1334,20 @@ namespace OU
         //        }
 
         //        // Sets outx[0], outy[0].
-        //        public static Distance2D inverseLerp2D(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y, double[] outx, double[] outy)
+        //        public static Dist2D inverseLerp2D(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y, double[] outx, double[] outy)
         //        {
 
-        //            Distance2D xyWgt = inverseLerp2D_pass1(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, x0y1x, x0y1y, x1y1x, x1y1y);
+        //            Dist2D xyWgt = inverseLerp2D_pass1(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, x0y1x, x0y1y, x1y1x, x1y1y);
 
         //            // Too much trouble passing around all the individual x's and y's.
         //            // BUT COST: new/GC.
-        //            Distance2D xy = new Distance2D(ptx, pty);
-        //            Distance2D x0y0 = new Distance2D(x0y0x, x0y0y);
-        //            Distance2D x1y0 = new Distance2D(x1y0x, x1y0y);
-        //            Distance2D x0y1 = new Distance2D(x0y1x, x0y1y);
-        //            Distance2D x1y1 = new Distance2D(x1y1x, x1y1y);
+        //            Dist2D xy = new Dist2D(ptx, pty);
+        //            Dist2D x0y0 = new Dist2D(x0y0x, x0y0y);
+        //            Dist2D x1y0 = new Dist2D(x1y0x, x1y0y);
+        //            Dist2D x0y1 = new Dist2D(x0y1x, x0y1y);
+        //            Dist2D x1y1 = new Dist2D(x1y1x, x1y1y);
 
-        //            Distance2D xyVerify = lerp2D(xyWgt, x0y0, x1y0, x0y1, x1y1);
+        //            Dist2D xyVerify = lerp2D(xyWgt, x0y0, x1y0, x0y1, x1y1);
         //            double newError = distance(xy, xyVerify);
         //            // Made it more accurate, for the case where it is oscillating between
         //            // an x-error and a y-error.
@@ -1240,7 +1357,7 @@ namespace OU
         //            int nMorePasses = 12; // 8;
         //            do
         //            {
-        //                Distance2D oldXyWgt = xyWgt;
+        //                Dist2D oldXyWgt = xyWgt;
         //                double oldError = newError;
         //                // Another pass. Project to lines near the point, from the prior
         //                // pass.
@@ -1279,7 +1396,7 @@ namespace OU
 
         //        // Calls pointDistanceToLine_AndT with allowExtendedT=true, so can return a point outside of the image.
         //        // This is needed, because the point BEFORE taking z into account might fall outside.
-        //        private static Distance2D inverseLerp2D_pass1(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y)
+        //        private static Dist2D inverseLerp2D_pass1(double ptx, double pty, double x0y0x, double x0y0y, double x1y0x, double x1y0y, double x0y1x, double x0y1y, double x1y1x, double x1y1y)
         //        {
         //            double distx0 = pointDistanceToLine_AndT(ptx, pty, x0y0x, x0y0y, x1y0x, x1y0y, out double wx0, true);
         //            double distx1 = pointDistanceToLine_AndT(ptx, pty, x0y1x, x0y1y, x1y1x, x1y1y, out double wx1, true);
@@ -1307,19 +1424,19 @@ namespace OU
         //                wy = clamp(wy, .0f, 1.0f);
         //            }
 
-        //            return new Distance2D(wx, wy);
+        //            return new Dist2D(wx, wy);
         //        }
 
         //        // Calls closestPointOnLine_AndT with allowExtendedT=true, so can return a point outside of the image.
         //        // This is needed, because the point BEFORE taking z into account might fall outside.
-        //        private static Distance2D inverseLerp2D_passN(Distance2D xyWgt1, Distance2D xy, Distance2D x0y0, Distance2D x1y0, Distance2D x0y1, Distance2D x1y1)
+        //        private static Dist2D inverseLerp2D_passN(Dist2D xyWgt1, Dist2D xy, Dist2D x0y0, Dist2D x1y0, Dist2D x0y1, Dist2D x1y1)
         //        {
         //            // NOTE: the "x-guess" line yields an improved approximation to yWgt
         //            // (yWgt2);
         //            // the "y-guess" line yields improved xWgt.
         //            double xWgt = xyWgt1.X;
-        //            Distance2D XguessY0 = lerpXY(x0y0, x1y0, xWgt);
-        //            Distance2D XguessY1 = lerpXY(x0y1, x1y1, xWgt);
+        //            Dist2D XguessY0 = lerpXY(x0y0, x1y0, xWgt);
+        //            Dist2D XguessY1 = lerpXY(x0y1, x1y1, xWgt);
         //            // "t" along the X-guess line is adjusted yWgt.
         //            // EXPLAIN: each "constant xWgt" line is drawn from yWgt=0 at one end,
         //            // to yWgt=1 at other end.
@@ -1348,8 +1465,8 @@ namespace OU
         //            closestPointOnLine_AndT(xy, XguessY0, XguessY1, out double yWgt2, true);
 
         //            double yWgt = xyWgt1.Y;
-        //            Distance2D X0Yguess = lerpXY(x0y0, x0y1, yWgt);
-        //            Distance2D X1Yguess = lerpXY(x1y0, x1y1, yWgt);
+        //            Dist2D X0Yguess = lerpXY(x0y0, x0y1, yWgt);
+        //            Dist2D X1Yguess = lerpXY(x1y0, x1y1, yWgt);
         //            // y params => xWgt2 ("x" is not a typo).
         //            closestPointOnLine_AndT(xy, X0Yguess, X1Yguess, out double xWgt2, true);
 
@@ -1357,7 +1474,7 @@ namespace OU
         //            // double Yguess_error = CalcDistance2D(xy, Yguess_closest)
 
         //            // Improved guess.
-        //            return new Distance2D(xWgt2, yWgt2);
+        //            return new Dist2D(xWgt2, yWgt2);
         //        }
 
 
@@ -1382,7 +1499,7 @@ namespace OU
         //        //         altitude may bring them back within visible region.
         //        //         (and if altitude DOESN'T bring them back,
         //        //          we want to correctly determine that they fall outside visible area.)
-        //        public static Distance2D closestPointOnLine_AndT(double ptx, double pty, double p1x, double p1y,
+        //        public static Dist2D closestPointOnLine_AndT(double ptx, double pty, double p1x, double p1y,
         //                                                       double p2x, double p2y, out double t, bool allowExtendedT)
         //        {
         //            double deltax = p2x - p1x;
@@ -1391,7 +1508,7 @@ namespace OU
         //            if (deltax == 0 && deltay == 0)
         //            {
         //                t = .5f;
-        //                return new Distance2D(p1x, p1y);
+        //                return new Dist2D(p1x, p1y);
         //            }
 
         //            t = calcTOfClosestPoint(ptx, pty, p1x, p1y, deltax, deltay);
@@ -1413,10 +1530,10 @@ namespace OU
         //            closestx = p1x + t * deltax;
         //            closesty = p1y + t * deltay;
 
-        //            return new Distance2D(closestx, closesty);
+        //            return new Dist2D(closestx, closesty);
         //        }
 
-        //        public static Distance2D closestPointOnLine_AndT(Distance2D pt, Distance2D p1, Distance2D p2, out double t, bool allowExtendedT)
+        //        public static Dist2D closestPointOnLine_AndT(Dist2D pt, Dist2D p1, Dist2D p2, out double t, bool allowExtendedT)
         //        {
         //            var result = closestPointOnLine_AndT(pt.X, pt.Y, p1.X, p1.Y, p2.X, p2.Y, out t, allowExtendedT);
         //            return result;
@@ -1427,7 +1544,7 @@ namespace OU
         //        public static Distance3D closestPointOnLine_AndT(Distance3D pt, Distance3D p1, Distance3D p2, out double t)
         //        {
         //            bool allowExtendedT = false;
-        //            Distance2D pt2 = closestPointOnLine_AndT(pt.X, pt.Y, p1.X, p1.Y, p2.X, p2.Y, out t, allowExtendedT);
+        //            Dist2D pt2 = closestPointOnLine_AndT(pt.X, pt.Y, p1.X, p1.Y, p2.X, p2.Y, out t, allowExtendedT);
 
 
         //            return new Distance3D(pt2.X, pt2.Y, lerp(p1.Z, p2.Z, t));
@@ -1441,33 +1558,33 @@ namespace OU
         //            // TODO: How pick an appropriate orthographic coordinate system?
         //            throw new NotImplementedException("closestPointOnLine_AndT_geo");
         //            Geo.IContext context;
-        //            Distance2D mayaPt = context.FromWGS84(geoPt.To2D());
-        //            Distance2D mayaP1 = context.FromWGS84(geoP1.To2D());
-        //            Distance2D mayaP2 = context.FromWGS84(geoP2.To2D());
+        //            Dist2D mayaPt = context.FromWGS84(geoPt.To2D());
+        //            Dist2D mayaP1 = context.FromWGS84(geoP1.To2D());
+        //            Dist2D mayaP2 = context.FromWGS84(geoP2.To2D());
 
         //            double t0;
-        //            Distance2D mayaClosest = closestPointOnLine_AndT(mayaPt.X, mayaPt.Y, mayaP1.X, mayaP1.Y, mayaP2.X, mayaP2.Y, out t0, allowExtendedT);
+        //            Dist2D mayaClosest = closestPointOnLine_AndT(mayaPt.X, mayaPt.Y, mayaP1.X, mayaP1.Y, mayaP2.X, mayaP2.Y, out t0, allowExtendedT);
         //            t[0] = t0;
 
-        //            Distance2D geoClosest = context.ToWGS84(mayaClosest);
+        //            Dist2D geoClosest = context.ToWGS84(mayaClosest);
         //            return new Distance3D(geoClosest.X, geoClosest.Y, lerp(geoP1.Z, geoP2.Z, t0));
         //        }
 
-        //        public static Distance2D closestPointOnLine_AndT_geo(Distance2D geoPt, Distance2D geoP1, Distance2D geoP2, double[] t)
+        //        public static Dist2D closestPointOnLine_AndT_geo(Dist2D geoPt, Dist2D geoP1, Dist2D geoP2, double[] t)
         //        {
         //            bool allowExtendedT = false;
         //            // TODO: How pick an appropriate orthographic coordinate system?
         //            throw new NotImplementedException("closestPointOnLine_AndT_geo");
         //            Geo.IContext context;
-        //            Distance2D mayaPt = context.FromWGS84(geoPt);
-        //            Distance2D mayaP1 = context.FromWGS84(geoP1);
-        //            Distance2D mayaP2 = context.FromWGS84(geoP2);
+        //            Dist2D mayaPt = context.FromWGS84(geoPt);
+        //            Dist2D mayaP1 = context.FromWGS84(geoP1);
+        //            Dist2D mayaP2 = context.FromWGS84(geoP2);
 
         //            double t0;
-        //            Distance2D mayaClosest = closestPointOnLine_AndT(mayaPt.X, mayaPt.Y, mayaP1.X, mayaP1.Y, mayaP2.X, mayaP2.Y, out t0, allowExtendedT);
+        //            Dist2D mayaClosest = closestPointOnLine_AndT(mayaPt.X, mayaPt.Y, mayaP1.X, mayaP1.Y, mayaP2.X, mayaP2.Y, out t0, allowExtendedT);
         //            t[0] = t0;
 
-        //            Distance2D geoClosest = context.ToWGS84(mayaClosest);
+        //            Dist2D geoClosest = context.ToWGS84(mayaClosest);
         //            return geoClosest;
         //        }
 
@@ -1475,7 +1592,7 @@ namespace OU
         //        public static double pointDistanceToLine_AndT(double ptx, double pty, double p1x, double p1y, double p2x, double p2y,
         //                                                       out double t, bool allowExtendedT)
         //        {
-        //            Distance2D closest = closestPointOnLine_AndT(ptx, pty, p1x, p1y, p2x, p2y, out t, allowExtendedT);
+        //            Dist2D closest = closestPointOnLine_AndT(ptx, pty, p1x, p1y, p2x, p2y, out t, allowExtendedT);
         //            return distance(ptx, pty, closest.X, closest.Y);
         //        }
 
@@ -1602,7 +1719,7 @@ namespace OU
         //            return ret;
         //        }
 
-        //        public static Distance2D closestPointOnPointSequence(Distance2D loc, Distance2D[] pts)
+        //        public static Dist2D closestPointOnPointSequence(Dist2D loc, Dist2D[] pts)
         //        {
         //            int closestILeg;
         //            double closestT;
@@ -1610,9 +1727,9 @@ namespace OU
         //        }
 
         //        // "loc" in geo coords.
-        //        public static Distance2D closestPointOnPointSequence(Distance2D loc, Distance2D[] pts, out int closestILeg, out double closestT)
+        //        public static Dist2D closestPointOnPointSequence(Dist2D loc, Dist2D[] pts, out int closestILeg, out double closestT)
         //        {
-        //            Distance2D ret = new Distance2D();
+        //            Dist2D ret = new Dist2D();
 
         //            closestILeg = 0;
         //            closestT = 0.0;
@@ -1621,11 +1738,11 @@ namespace OU
 
         //            for (int iLeg = 0; iLeg < pts.Length - 1; iLeg++)
         //            {
-        //                Distance2D p1 = pts[iLeg];
-        //                Distance2D p2 = pts[iLeg + 1];
+        //                Dist2D p1 = pts[iLeg];
+        //                Dist2D p2 = pts[iLeg + 1];
         //                double[] t = new double[1];
 
-        //                Distance2D closestPt1 = closestPointOnLine_AndT_geo(loc, p1, p2, t);
+        //                Dist2D closestPt1 = closestPointOnLine_AndT_geo(loc, p1, p2, t);
         //                double distanceSq1 = distanceSquared(loc, closestPt1);
 
         //                if (distanceSq1 < minDistanceSq)
@@ -1643,7 +1760,7 @@ namespace OU
 
         //        // Caller responsible for not calling when A.Y = B.Y.
         //        // If caller passes in a Y that is beyond either end of span, will get X as if span extended.
-        //        public static double XAtY(double y, Distance2D a, Distance2D b)
+        //        public static double XAtY(double y, Dist2D a, Dist2D b)
         //        {
         //            double dy = b.Y - a.Y;
         //            double dx = b.X - a.X;
@@ -1804,10 +1921,10 @@ namespace OU
 
         //        // returns (minDistance, closestPoint).
         //        // Don't wrap. If want closest polygon, and poly is not already closed, caller must append first point at end of array.
-        //        public static Tuple<double, Distance2D> pointDistanceToPolyline_AndClosestPoint(Distance2D point, Distance2D[] poly)
+        //        public static Tuple<double, Dist2D> pointDistanceToPolyline_AndClosestPoint(Dist2D point, Dist2D[] poly)
         //        {
         //            double minDistanceSq = double.MaxValue;
-        //            Distance2D closestPt = new Distance2D();
+        //            Dist2D closestPt = new Dist2D();
 
         //            int lastIndex = poly.Length - 1;
         //            for (int i = 0; i <= lastIndex - 1; i++)
@@ -1816,7 +1933,7 @@ namespace OU
         //                int j = i + 1;
         //                //If j >= lastIndex Then j = 0
 
-        //                Distance2D closest1 = new Distance2D();
+        //                Dist2D closest1 = new Dist2D();
         //                double distanceSq = pointDistanceSquaredToLine2D(point, poly[i], poly[j], ref closest1);
         //                if (distanceSq < minDistanceSq)
         //                {
@@ -1829,13 +1946,13 @@ namespace OU
         //            if (closestPt != null)
         //                minDistance = Math.Sqrt(minDistanceSq);
 
-        //            return new Tuple<double, Distance2D>(minDistance, closestPt);
+        //            return new Tuple<double, Dist2D>(minDistance, closestPt);
         //        }
 
-        //        public static double pointDistanceSquaredToLine2D(Distance2D pt, Distance2D p1, Distance2D p2, ref Distance2D closestPt)
+        //        public static double pointDistanceSquaredToLine2D(Dist2D pt, Dist2D p1, Dist2D p2, ref Dist2D closestPt)
         //        {
         //            // (distanceSquared, closestPoint).
-        //            Tuple<double, Distance2D> ret = pointDistanceSqToLine2D_AndClosestPt(pt, p1, p2);
+        //            Tuple<double, Dist2D> ret = pointDistanceSqToLine2D_AndClosestPt(pt, p1, p2);
 
         //            // OUT: closestPoint.
         //            closestPt = ret.Item2;
@@ -1844,17 +1961,17 @@ namespace OU
         //        }
 
         //        // returns (distanceSquared, closestPoint).
-        //        public static Tuple<double, Distance2D> pointDistanceSqToLine2D_AndClosestPt(Distance2D pt, Distance2D p1, Distance2D p2)
+        //        public static Tuple<double, Dist2D> pointDistanceSqToLine2D_AndClosestPt(Dist2D pt, Dist2D p1, Dist2D p2)
         //        {
         //            double t;
-        //            Distance2D closestPt = linePointClosestToPoint2D(pt, p1, p2, out t);
+        //            Dist2D closestPt = linePointClosestToPoint2D(pt, p1, p2, out t);
         //            double distanceSq = distanceSquared(pt, closestPt);
-        //            return new Tuple<double, Distance2D>(distanceSq, closestPt);
+        //            return new Tuple<double, Dist2D>(distanceSq, closestPt);
         //        }
 
-        //        public static Distance2D linePointClosestToPoint2D(Distance2D pt, Distance2D p1, Distance2D p2, out double t)
+        //        public static Dist2D linePointClosestToPoint2D(Dist2D pt, Dist2D p1, Dist2D p2, out double t)
         //        {
-        //            Distance2D delta = delta2D(p1, p2);
+        //            Dist2D delta = delta2D(p1, p2);
 
         //            if (delta.X == 0 && delta.Y == 0)
         //            {
@@ -1864,7 +1981,7 @@ namespace OU
 
         //            t = ((pt.X - p1.X) * delta.X + (pt.Y - p1.Y) * delta.Y) / (delta.X * delta.X + delta.Y * delta.Y);
 
-        //            Distance2D closest;
+        //            Dist2D closest;
         //            if (t < 0)
         //            {
         //                t = 0.0;
@@ -1877,7 +1994,7 @@ namespace OU
         //            }
         //            else
         //            {
-        //                closest = new Distance2D(p1.X + t * delta.X, p1.Y + t * delta.Y);
+        //                closest = new Dist2D(p1.X + t * delta.X, p1.Y + t * delta.Y);
         //            }
 
         //            return closest;
@@ -1993,7 +2110,7 @@ namespace OU
 
         //            // 1. Rotate around z-axis, until camera and aim have same x.
         //            Distance3D d3Aim = aimPt - cameraPt;
-        //            Distance2D aimHeadingXY = d3Aim.To2D();
+        //            Dist2D aimHeadingXY = d3Aim.To2D();
         //            float aimAngleRadiansXY = headingAsAngleRadians2D(aimHeadingXY);
         //            float zRotation = ((float)degreesToRadians(90) - aimAngleRadiansXY);
         //            rotateGLMatrixAroundZ(ref m, zRotation);
@@ -2002,7 +2119,7 @@ namespace OU
 
         //            // 2. Rotate around (new) x-axis, until camera and aim (also) have same y,
         //            //    and aim has a more negative z than camera.
-        //            Distance2D aimHeadingYZ_step2 = new Distance2D(d3Aim_step1.Y, d3Aim_step1.Z);
+        //            Dist2D aimHeadingYZ_step2 = new Dist2D(d3Aim_step1.Y, d3Aim_step1.Z);
         //            float aimAngleRadiansYZ_step2 = headingAsAngleRadians2D(aimHeadingYZ_step2);
         //            // NO, neither of these are even close to having 0 in x&y.
         //            //rotateGLMatrixAroundX(m, ((float) degreesToRadians(90) - aimAngleRadiansYZ_step2));
@@ -2153,30 +2270,30 @@ namespace OU
 
 
 
-        //        public static Distance2D delta2D(double dblOrigonX, double dblOrigonY, double dblPointX, double dblPointY)
+        //        public static Dist2D delta2D(double dblOrigonX, double dblOrigonY, double dblPointX, double dblPointY)
         //        {
-        //            return new Distance2D(dblPointX - dblOrigonX, dblPointY - dblOrigonY);
+        //            return new Dist2D(dblPointX - dblOrigonX, dblPointY - dblOrigonY);
         //        }
 
-        //        public static Distance2D delta2D(Distance2D origon, Distance2D point)
+        //        public static Dist2D delta2D(Dist2D origon, Dist2D point)
         //        {
-        //            return new Distance2D(point.X - origon.X, point.Y - origon.Y);
+        //            return new Dist2D(point.X - origon.X, point.Y - origon.Y);
         //        }
 
 
-        //        public static List<Distance2D> intersectionsLineAndPolygon(Distance2D p1, Distance2D p2, IList<Distance2D> polygon)
+        //        public static List<Dist2D> intersectionsLineAndPolygon(Dist2D p1, Dist2D p2, IList<Dist2D> polygon)
         //        {
-        //            List<Distance2D> intersections = new List<Distance2D>();
+        //            List<Dist2D> intersections = new List<Dist2D>();
 
         //            // ASSUME polygon is closed (last point same as first point).
         //            //   (If it isn't, then should add a segment from last point back to first point.)
 
-        //            Distance2D p3 = new Distance2D();
-        //            foreach (Distance2D p4 in polygon)
+        //            Dist2D p3 = new Dist2D();
+        //            foreach (Dist2D p4 in polygon)
         //            {
         //                if (p3 != null)
         //                {
-        //                    Distance2D isect = new Distance2D();
+        //                    Dist2D isect = new Dist2D();
         //                    if (linesIntersectAt(p1, p2, p3, p4, ref isect))
         //                        intersections.Add(isect);
         //                }
@@ -2191,37 +2308,37 @@ namespace OU
 
         //        public static double pointDistanceToLineSegment2D(double x, double y, double x1, double y1, double x2, double y2)
         //        {
-        //            Distance2D closestPt = closestPointOnLineSegment(x, y, x1, y1, x2, y2);
+        //            Dist2D closestPt = closestPointOnLineSegment(x, y, x1, y1, x2, y2);
         //            return distance(x, y, closestPt.X, closestPt.Y);
         //        }
 
-        //        public static Distance2D closestPointOnLineSegment(Distance2D p, Distance2D p1, Distance2D p2)
+        //        public static Dist2D closestPointOnLineSegment(Dist2D p, Dist2D p1, Dist2D p2)
         //        {
         //            return closestPointOnLineSegment(p.X, p.Y, p1.X, p1.Y, p2.X, p2.Y);
         //        }
 
-        //        public static Distance2D closestPointOnLineSegment(double x, double y, double x1, double y1, double x2, double y2)
+        //        public static Dist2D closestPointOnLineSegment(double x, double y, double x1, double y1, double x2, double y2)
         //        {
-        //            Distance2D delta = delta2D(x1, y1, x2, y2);
+        //            Dist2D delta = delta2D(x1, y1, x2, y2);
 
         //            // TBD: Use NearlyEquals?
         //            if ((delta.X == 0.0) & (delta.Y == 0.0))
-        //                return new Distance2D(x1, y1);
+        //                return new Dist2D(x1, y1);
 
         //            double t = (((x - x1) * delta.X) + ((y - y1) * delta.Y)) / ((delta.X * delta.X) + (delta.Y * delta.Y));
 
-        //            Distance2D closestPt;
+        //            Dist2D closestPt;
         //            if (t <= 0.0)
         //            {
-        //                closestPt = new Distance2D(x1, y1);
+        //                closestPt = new Dist2D(x1, y1);
         //            }
         //            else if (t >= 1.0)
         //            {
-        //                closestPt = new Distance2D(x2, y2);
+        //                closestPt = new Dist2D(x2, y2);
         //            }
         //            else
         //            {
-        //                closestPt = new Distance2D(x1 + (t * delta.X),
+        //                closestPt = new Dist2D(x1 + (t * delta.X),
         //                                         y1 + (t * delta.Y));
         //            }
 
@@ -2238,7 +2355,7 @@ namespace OU
         //            x1 *= cosLat;
         //            x2 *= cosLat;
 
-        //            Distance2D delta = delta2D(x1, y1, x2, y2);
+        //            Dist2D delta = delta2D(x1, y1, x2, y2);
 
         //            // Zero-length segment.
         //            if ((delta.X == 0.0) && (delta.Y == 0.0))
@@ -2247,7 +2364,7 @@ namespace OU
         //            // interpolator along segment.
         //            double t = (((px - x1) * delta.X) + ((py - y1) * delta.Y)) / ((delta.X * delta.X) + (delta.Y * delta.Y));
 
-        //            Distance2D ptOnSegment = new Distance2D();
+        //            Dist2D ptOnSegment = new Dist2D();
         //            if (t < 0.0)
         //            {
         //                ptOnSegment.X = x1;
@@ -2275,15 +2392,15 @@ namespace OU
         //            return calculateDistanceDD_AED(px, py, ptOnSegment.X, ptOnSegment.Y, approximate);
         //        }
 
-        //        public static double pointDistanceToLines(Distance2D goalPt, Distance2D[] polygon)
+        //        public static double pointDistanceToLines(Dist2D goalPt, Dist2D[] polygon)
         //        {
-        //            Distance2D closestPt;
+        //            Dist2D closestPt;
         //            return pointDistanceToLines(goalPt, polygon, out closestPt);
         //        }
 
-        //        public static double pointDistanceToLines(Distance2D goalPt, Distance2D[] polygon, out Distance2D closestPt)
+        //        public static double pointDistanceToLines(Dist2D goalPt, Dist2D[] polygon, out Dist2D closestPt)
         //        {
-        //            closestPt = new Distance2D();
+        //            closestPt = new Dist2D();
 
         //            double minDistanceSq = double.MaxValue;
         //            int maxIndex = polygon.LastIndex();
@@ -2293,7 +2410,7 @@ namespace OU
         //                if (i2 > maxIndex)
         //                    break;
 
-        //                Distance2D closestPtOnSegment = closestPointOnLineSegment(goalPt, polygon[i], polygon[i2]);
+        //                Dist2D closestPtOnSegment = closestPointOnLineSegment(goalPt, polygon[i], polygon[i2]);
         //                double distSq = distanceSquared(goalPt, closestPtOnSegment);
 
         //                if (distSq < minDistanceSq)
@@ -2308,7 +2425,7 @@ namespace OU
 
         //        // Perhaps default should be "approximate=true": This is a LOT slower if ask for accurate calculation,
         //        // for little gain (for distances less than 1 km).
-        //        public static double pointDistanceToLines_AED(Distance2D goalPt, Distance2D[] polygon, bool approximate, double cosLat)
+        //        public static double pointDistanceToLines_AED(Dist2D goalPt, Dist2D[] polygon, bool approximate, double cosLat)
         //        {
         //            double minDistance = double.MaxValue;
         //            int lastIndex = polygon.Length - 1;
@@ -2392,13 +2509,13 @@ namespace OU
         //            return diClosest;
         //        }
 
-        //        public static double polygonDistanceToPolygon(Distance2D[] shape1, Distance2D[] shape2)
+        //        public static double polygonDistanceToPolygon(Dist2D[] shape1, Dist2D[] shape2)
         //        {
         //            double diClosest = double.MaxValue;
 
         //            for (int i = 0; i < shape1.Length; i++)
         //            {
-        //                Distance2D p = shape1[i - 1];
+        //                Dist2D p = shape1[i - 1];
 
         //                double di = pointDistanceToLines(p, shape2);
 
@@ -2432,11 +2549,11 @@ namespace OU
         //        // "approximate=true": Calculate approximate geo distance, using a faster formula.
         //        // This should probably ALWAYS be called with "approximate=true": Otherwise it is a LOT slower calculation,
         //        //   for little benefit.
-        //        public static double polygonDistanceToPolygon_AED(Distance2D[] shape1, Distance2D[] shape2, bool approximate, double cosLat)
+        //        public static double polygonDistanceToPolygon_AED(Dist2D[] shape1, Dist2D[] shape2, bool approximate, double cosLat)
         //        {
         //            double diClosest = double.MaxValue;
 
-        //            foreach (Distance2D geoPt in shape1)
+        //            foreach (Dist2D geoPt in shape1)
         //            {
         //                // TBD: Could work in "distance-squared", which saves some time when using "approximate=true".
         //                double di = pointDistanceToLines_AED(geoPt, shape2, approximate, cosLat);
@@ -2481,33 +2598,33 @@ namespace OU
         //            return ret;
         //        }
 
-        //        public static Distance2D extendLine2D(Distance2D p1, Distance2D p2, double di)
+        //        public static Dist2D extendLine2D(Dist2D p1, Dist2D p2, double di)
         //        {
         //            return extendLine2D(p1.X, p1.Y, p2.X, p2.Y, di);
         //        }
 
-        //        public static Distance2D extendLine2D(double p1x, double p1y, double p2x, double p2y, double di)
+        //        public static Dist2D extendLine2D(double p1x, double p1y, double p2x, double p2y, double di)
         //        {
         //            double totDistance = distance(p1x, p1y, p2x, p2y) + di;
         //            double angle = getAngleDegrees(p1x, p1y, p2x, p2y);
 
-        //            return new Distance2D(p1x + totDistance * Math.Cos((angle / 180) * Math.PI), p1y + totDistance * Math.Sin((angle / 180) * Math.PI));
+        //            return new Dist2D(p1x + totDistance * Math.Cos((angle / 180) * Math.PI), p1y + totDistance * Math.Sin((angle / 180) * Math.PI));
         //        }
 
-        //        public static bool linesIntersectAt(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4, ref Distance2D outPt, double tolerance = NearZero)
+        //        public static bool linesIntersectAt(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4, ref Dist2D outPt, double tolerance = NearZero)
         //        {
         //            return linesIntersectAt(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref outPt, tolerance);
         //        }
 
         //        public static bool linesIntersectAt(double x1, double y1, double x2, double y2,
         //                                             double x3, double y3, double x4, double y4,
-        //                                             ref Distance2D outPt, double tolerance = NearZero)
+        //                                             ref Dist2D outPt, double tolerance = NearZero)
         //        {
         //            LineOverlap overlap = LineOverlap.Undefined;
         //            LineOverlap overlap1 = LineOverlap.Undefined;
         //            LineOverlap overlap2 = LineOverlap.Undefined;
 
-        //            Distance2D ret = linesIntersectAt(x1, y1, x2, y2, x3, y3, x4, y4, tolerance, ref overlap, ref overlap1, ref overlap2);
+        //            Dist2D ret = linesIntersectAt(x1, y1, x2, y2, x3, y3, x4, y4, tolerance, ref overlap, ref overlap1, ref overlap2);
 
         //            if (overlap == LineOverlap.Crossing || overlap == LineOverlap.CrossingTouch)
         //            {
@@ -2516,12 +2633,12 @@ namespace OU
         //            }
         //            else
         //            {
-        //                outPt = new Distance2D();
+        //                outPt = new Dist2D();
         //                return false;
         //            }
         //        }
 
-        //        public static Distance2D linesIntersectAt(double x1, double y1, double x2, double y2,
+        //        public static Dist2D linesIntersectAt(double x1, double y1, double x2, double y2,
         //                                                double x3, double y3, double x4, double y4,
         //                                                double tolerance,
         //                                                ref LineOverlap overlap, ref LineOverlap overlap1, ref LineOverlap overlap2)
@@ -2574,7 +2691,7 @@ namespace OU
         //                }
 
         //                double distSq = pointDeltaToLineExtended(
-        //                                    new Distance2D(xd, yd), new Distance2D(xa, ya), new Distance2D(xb, yb)).LengthSquared;
+        //                                    new Dist2D(xd, yd), new Dist2D(xa, ya), new Dist2D(xb, yb)).LengthSquared;
 
         //                if (distSq <= tolerance_scaled * tolerance_scaled)
         //                    asParallel = true;
@@ -2582,9 +2699,9 @@ namespace OU
 
         //            if (asParallel)
         //            {
-        //                Distance2D outP1 = new Distance2D();
+        //                Dist2D outP1 = new Dist2D();
 
-        //                linesOverlapOrTouch_Parallel(new Distance2D(x1, y1), new Distance2D(x2, y2), new Distance2D(x3, y3), new Distance2D(x4, y4), tolerance_scaled, ref overlap, ref overlap1, ref overlap2, ref outP1);
+        //                linesOverlapOrTouch_Parallel(new Dist2D(x1, y1), new Dist2D(x2, y2), new Dist2D(x3, y3), new Dist2D(x4, y4), tolerance_scaled, ref overlap, ref overlap1, ref overlap2, ref outP1);
 
         //                if (overlap != LineOverlap.NotParallel)
         //                    return outP1;
@@ -2609,24 +2726,24 @@ namespace OU
         //            double rx = (xy12 * x34 - x12 * xy34) / determinant;
         //            double ry = (xy12 * y34 - y12 * xy34) / determinant;
 
-        //            Distance2D pr = new Distance2D(rx, ry);
+        //            Dist2D pr = new Dist2D(rx, ry);
         //            bool checkY1 = firstIsShorter(x2 - x1, y2 - y1);
         //            bool checkY2 = firstIsShorter(x4 - x3, y4 - y3);
-        //            Distance2D a = new Distance2D(x1, y1);
-        //            Distance2D b = new Distance2D(x2, y2);
-        //            Distance2D c = new Distance2D(x3, y3);
-        //            Distance2D d = new Distance2D(x4, y4);
+        //            Dist2D a = new Dist2D(x1, y1);
+        //            Dist2D b = new Dist2D(x2, y2);
+        //            Dist2D c = new Dist2D(x3, y3);
+        //            Dist2D d = new Dist2D(x4, y4);
         //            overlap = whichCrossingType(a, b, c, d, tolerance_scaled, pr, checkY1, checkY2, ref overlap1, ref overlap2);
 
         //            if (overlap == LineOverlap.CrossingOutside)
         //            {
         //                double toleranceSq = tolerance_scaled * tolerance_scaled;
-        //                Distance2D prForMinTouch = new Distance2D();
+        //                Dist2D prForMinTouch = new Dist2D();
 
         //                int caseForMinTouch = 0;
         //                double minTouchDistSq = pointDistanceSquaredToLine2D(a, c, d, ref prForMinTouch);
 
-        //                Distance2D tempClosest = new Distance2D();
+        //                Dist2D tempClosest = new Dist2D();
         //                // All 3 cases must be accumulated; they are not mutually-exclusive.
         //                if (accumMin(pointDistanceSquaredToLine2D(b, c, d, ref tempClosest), ref minTouchDistSq))
         //                {
@@ -2661,8 +2778,8 @@ namespace OU
         //                        // Tthis should not happen
         //                    }
 
-        //                    Distance2D pr1;
-        //                    Distance2D pr2 = new Distance2D(double.MaxValue, double.MaxValue);
+        //                    Dist2D pr1;
+        //                    Dist2D pr2 = new Dist2D(double.MaxValue, double.MaxValue);
 
         //                    if (caseForMinTouch < 2)
         //                    {
@@ -2733,32 +2850,32 @@ namespace OU
         //            return false;
         //        }
 
-        //        public static Distance2D pointDeltaToLineExtended(Distance2D pt, Distance2D p1, Distance2D p2)
+        //        public static Dist2D pointDeltaToLineExtended(Dist2D pt, Dist2D p1, Dist2D p2)
         //        {
-        //            Distance2D closest = closestPointOnLineExtended(pt, p1, p2);
+        //            Dist2D closest = closestPointOnLineExtended(pt, p1, p2);
 
         //            if (double.IsNaN(closest.X))
-        //                return new Distance2D(double.NaN, double.NaN);
+        //                return new Dist2D(double.NaN, double.NaN);
 
         //            double deltaX = pt.X - closest.X;
         //            double deltaY = pt.Y - closest.Y;
 
-        //            return new Distance2D(deltaX, deltaY);
+        //            return new Dist2D(deltaX, deltaY);
         //        }
 
-        //        public static Distance2D closestPointOnPolygonExtended(Distance2D pt, Distance2D[] pts)
+        //        public static Dist2D closestPointOnPolygonExtended(Dist2D pt, Dist2D[] pts)
         //        {
-        //            Distance2D closestPt = new Distance2D();
+        //            Dist2D closestPt = new Dist2D();
         //            double closestDi = -1.0;
 
         //            for (int i = 0; i < pts.Length; i++)
         //            {
-        //                Distance2D p1 = pts[i == 0 ? pts.Length - 1 : i - 1];
-        //                Distance2D p2 = pts[i];
+        //                Dist2D p1 = pts[i == 0 ? pts.Length - 1 : i - 1];
+        //                Dist2D p2 = pts[i];
 
-        //                Distance2D close = closestPointOnLineExtended(pt, p1, p2);
+        //                Dist2D close = closestPointOnLineExtended(pt, p1, p2);
 
-        //                double di = Distance2D.DistanceBetween(pt, close);
+        //                double di = Dist2D.DistanceBetween(pt, close);
 
         //                if (closestDi == -1.0 || di < closestDi)
         //                {
@@ -2770,36 +2887,36 @@ namespace OU
         //            return closestPt;
         //        }
 
-        //        public static Distance2D closestPointOnLineExtended(Distance2D pt, Distance2D p1, Distance2D p2)
+        //        public static Dist2D closestPointOnLineExtended(Dist2D pt, Dist2D p1, Dist2D p2)
         //        {
-        //            Distance2D delta = delta2D(p1, p2);
+        //            Dist2D delta = delta2D(p1, p2);
 
         //            if (delta.X == 0 && delta.Y == 0.0)
-        //                return new Distance2D(double.NaN, double.NaN);
+        //                return new Dist2D(double.NaN, double.NaN);
 
         //            double t = calcTOfClosestPoint(pt.X, pt.Y, p1.X, p1.Y, delta.X, delta.Y);
 
         //            return tToPoint(t, p1, delta);
         //        }
 
-        //        public static Distance2D tToPoint(double t, Distance2D p1, Distance2D delta)
+        //        public static Dist2D tToPoint(double t, Dist2D p1, Dist2D delta)
         //        {
         //            double px = p1.X + t * delta.X;
         //            double py = p1.Y + t * delta.Y;
 
-        //            return new Distance2D(px, py);
+        //            return new Dist2D(px, py);
         //        }
 
-        //        public static bool linesOverlapOrTouch_Parallel(Distance2D a, Distance2D b, Distance2D c, Distance2D d, double tolerance, ref LineOverlap overlap, ref LineOverlap overlap1, ref LineOverlap overlap2, ref Distance2D op2)
+        //        public static bool linesOverlapOrTouch_Parallel(Dist2D a, Dist2D b, Dist2D c, Dist2D d, double tolerance, ref LineOverlap overlap, ref LineOverlap overlap1, ref LineOverlap overlap2, ref Dist2D op2)
         //        {
-        //            Distance2D op1 = new Distance2D();
+        //            Dist2D op1 = new Dist2D();
 
         //            return linesOverlapOrTouch_Parallel(a, b, c, d, tolerance, ref overlap, ref overlap1, ref overlap2, ref op1, ref op2);
         //        }
 
-        //        static bool handleZeroLengthLine(Distance2D a, Distance2D c, Distance2D d, double tolerance, out double t, out LineOverlap overlap)
+        //        static bool handleZeroLengthLine(Dist2D a, Dist2D c, Dist2D d, double tolerance, out double t, out LineOverlap overlap)
         //        {
-        //            Distance2D closestPt = closestPointOnLine_AndT(a, c, d, out t, false);
+        //            Dist2D closestPt = closestPointOnLine_AndT(a, c, d, out t, false);
         //            if (closestPt.NearlyEquals(a, tolerance))
         //            {
         //                // TODO: Also test for TouchEnd?  If so, callers may need to test that case also.
@@ -2813,31 +2930,31 @@ namespace OU
         //        }
 
         //        // TODO: Isn't setting overlap1 or overlap2, when one line is zero-length.
-        //        public static bool linesOverlapOrTouch_Parallel(Distance2D a, Distance2D b, Distance2D c, Distance2D d, double tolerance, ref LineOverlap overlap, ref LineOverlap overlap1, ref LineOverlap overlap2, ref Distance2D op1, ref Distance2D op2)
+        //        public static bool linesOverlapOrTouch_Parallel(Dist2D a, Dist2D b, Dist2D c, Dist2D d, double tolerance, ref LineOverlap overlap, ref LineOverlap overlap1, ref LineOverlap overlap2, ref Dist2D op1, ref Dist2D op2)
         //        {
         //            overlap1 = LineOverlap.Undefined;
         //            overlap2 = LineOverlap.Undefined;
-        //            op1 = Distance2D.NaN();
-        //            op2 = Distance2D.NaN();
+        //            op1 = Dist2D.NaN();
+        //            op2 = Dist2D.NaN();
 
 
-        //            Distance2D delta1 = b - a;
-        //            Distance2D delta2 = d - c;
+        //            Dist2D delta1 = b - a;
+        //            Dist2D delta2 = d - c;
 
         //            double t;
         //            // If the zero-length line is very close to the other line,
         //            // then consider them to be touching.
         //            // Otherwise, is bad data (return false).
-        //            if (Distance2D.Equals(delta1, Distance2D.Zero()))
+        //            if (Dist2D.Equals(delta1, Dist2D.Zero()))
         //            {
         //                return handleZeroLengthLine(a, c, d, tolerance, out t, out overlap);
         //            }
-        //            else if (Distance2D.Equals(delta2, Distance2D.Zero()))
+        //            else if (Dist2D.Equals(delta2, Dist2D.Zero()))
         //            {
         //                return handleZeroLengthLine(c, a, b, tolerance, out t, out overlap);
         //            }
         //            //			// -- OLD OLD --
-        //            //			if (Distance2D.Equals( delta1, Distance2D.zero() ) || Distance2D.Equals( delta2, Distance2D.zero() )) {
+        //            //			if (Dist2D.Equals( delta1, Dist2D.zero() ) || Dist2D.Equals( delta2, Dist2D.zero() )) {
         //            //				overlap = LineOverlap.BadData;
         //            //				return false;
         //            //			}
@@ -3101,7 +3218,7 @@ namespace OU
         //            return Math.Abs(dx) < Math.Abs(dy);
         //        }
 
-        //        public static LineOverlap whichCrossingType(Distance2D a, Distance2D b, Distance2D c, Distance2D d, double tolerance, Distance2D r, bool checkY1, bool checkY2, ref LineOverlap overlap1, ref LineOverlap overlap2)
+        //        public static LineOverlap whichCrossingType(Dist2D a, Dist2D b, Dist2D c, Dist2D d, double tolerance, Dist2D r, bool checkY1, bool checkY2, ref LineOverlap overlap1, ref LineOverlap overlap2)
         //        {
         //            double toleranceSq = tolerance * tolerance;
         //            bool withinTol1A = distanceSquared(r, a) <= toleranceSq;
@@ -3314,14 +3431,14 @@ namespace OU
             return ret;
         }
 
-        //public static Distance2D rotateAtByDegrees(Distance2D origo, Distance2D point, double degrees)
+        //public static Dist2D rotateAtByDegrees(Dist2D origo, Dist2D point, double degrees)
         //{
         //    return rotateAtByRadians(origo, point, degreesToRadians(degrees));
         //}
 
-        //        public static Distance2D rotateAtByRadians(Distance2D origo, Distance2D point, double radians)
+        //        public static Dist2D rotateAtByRadians(Dist2D origo, Dist2D point, double radians)
         //        {
-        //            Distance2D ret = new Distance2D(origo);
+        //            Dist2D ret = new Dist2D(origo);
         //            double cosR = Math.Cos(radians);
         //            double sinR = Math.Sin(radians);
 
@@ -3348,7 +3465,7 @@ namespace OU
         //            return ret;
         //        }
 
-        //        public static bool pointInsidePolygon(Distance2D[] pts, Distance2D pt, bool testing = false)
+        //        public static bool pointInsidePolygon(Dist2D[] pts, Dist2D pt, bool testing = false)
         //        {
         //            if (pts == null)
         //                return false;
@@ -3386,12 +3503,12 @@ namespace OU
         //            return odd;
         //        }
 
-        //        public static Distance2D extendLine(Distance2D p1, Distance2D p2, double di)
+        //        public static Dist2D extendLine(Dist2D p1, Dist2D p2, double di)
         //        {
         //            double totalDi = distance(p1, p2) + di;
         //            double angle = getAngleDegrees(p1.X, p1.Y, p2.X, p2.Y);
 
-        //            return new Distance2D(p1.X + totalDi * Math.Cos((angle / 180) * Math.PI), p1.Y + totalDi * Math.Sin((angle / 180) * Math.PI));
+        //            return new Dist2D(p1.X + totalDi * Math.Cos((angle / 180) * Math.PI), p1.Y + totalDi * Math.Sin((angle / 180) * Math.PI));
         //        }
 
         public static double ToRadians(double angle)
@@ -3403,6 +3520,7 @@ namespace OU
         {
             return ((float)Math.PI / 180.0f) * angle;
         }
+        #endregion
 
 
         //        // ========== interpolateThreePoints ==========
@@ -3515,12 +3633,12 @@ namespace OU
         //        // "parametric equations" technique. Each point in plane is a linear combination of vectors (a->b) and (a->c).
         //        // The final line checks whether the coefficients (u, v) of the representation of "pt"
         //        // falls within the unit triangle "A=>(u:0, v:0),  B=>(u:1, v:0),  C=>(u:0, v:1)".
-        //        public static bool IsInsideTriangle(Distance2D pt, Distance2D a, Distance2D b, Distance2D c)
+        //        public static bool IsInsideTriangle(Dist2D pt, Dist2D a, Dist2D b, Dist2D c)
         //        {
         //            // "relative p", "relative b", "relative c": values relative to "a". That is, treat "a" as origin (0, 0).
-        //            Distance2D rP = pt - a;
-        //            Distance2D rB = b - a;
-        //            Distance2D rC = c - a;
+        //            Dist2D rP = pt - a;
+        //            Dist2D rB = b - a;
+        //            Dist2D rC = c - a;
 
         //            double dotBB = rB.X * rB.X + rB.Y * rB.Y;
         //            double dotBC = rB.X * rC.X + rB.Y * rC.Y;

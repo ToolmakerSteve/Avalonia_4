@@ -8159,69 +8159,6 @@
 //        }
 //    }
 
-//    // Before first call,
-//    // caller must initialize minV to New Vector2(Single.MaxValue),
-//    // and maxV to New Vector2(Single.MinValue).
-//    public static void AccumMinMax(Vector2 v, ref Vector2 minV, ref Vector2 maxV)
-//    {
-//        if (v.X < minV.X)
-//            minV.X = v.X;
-//        if (v.Y < minV.Y)
-//            minV.Y = v.Y;
-
-//        if (v.X > maxV.X)
-//            maxV.X = v.X;
-//        if (v.Y > maxV.Y)
-//            maxV.Y = v.Y;
-//    }
-
-//    // Before first call,
-//    // caller must initialize minV to Distance2D.MaxValue,
-//    // and maxV to Distance2D.MinValue.
-//    public static void AccumMinMax(Distance2D v, ref Distance2D minV, ref Distance2D maxV)
-//    {
-//        if (v.X < minV.X)
-//            minV.X = v.X;
-//        if (v.Y < minV.Y)
-//            minV.Y = v.Y;
-
-//        if (v.X > maxV.X)
-//            maxV.X = v.X;
-//        if (v.Y > maxV.Y)
-//            maxV.Y = v.Y;
-//    }
-
-//    // Before first call,
-//    // caller must initialize minV to Distance2D.MaxValue,
-//    // and maxV to Distance2D.MinValue.
-//    public static void AccumMinMax(Rectangle2D rect, ref Distance2D minPt, ref Distance2D maxPt)
-//    {
-//        AccumMinMax(rect.TopLeft, ref minPt, ref maxPt);
-//        AccumMinMax(rect.BottomRight, ref minPt, ref maxPt);
-//    }
-
-//    // Before first call, caller must initialize minPt and maxPt. E.g.:
-//    // Dim minPt As PointF = PointF_MaxValue, maxPt As PointF = PointF_MinValue
-//    public static void AccumMinMax(PointF v, ref PointF minPt, ref PointF maxPt)
-//    {
-//        if (v.X < minPt.X)
-//            minPt.X = v.X;
-//        if (v.Y < minPt.Y)
-//            minPt.Y = v.Y;
-
-//        if (v.X > maxPt.X)
-//            maxPt.X = v.X;
-//        if (v.Y > maxPt.Y)
-//            maxPt.Y = v.Y;
-//    }
-
-//    // Before first call, caller must initialize minPt and maxPt. E.g.:
-//    // Dim minPt As PointF = PointF_MaxValue, maxPt As PointF = PointF_MinValue
-//    public static void AccumMinMax(RectangleF rect, ref PointF minPt, ref PointF maxV)
-//    {
-//        AccumMinMax(rect.Location, minPt, maxV);
-//        AccumMinMax(new PointF(rect.Right, rect.Bottom), minPt, maxV);
-//    }
 
 
 //    // Before first call, caller must initialize:

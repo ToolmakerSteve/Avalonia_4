@@ -31,15 +31,17 @@ namespace SceneSource
         public bool HasNormals { get; private set; }
         public bool HasUVs { get; private set; }
 
-        public Geo.IContext Context { get; set; }
+		private Model _model;
+
+		public Geo.IContext Context { get; set; }
         /// <summary>
         /// Within coord system of a scene, "float" precision is sufficient;
         /// TBD: Make "float" version of Distance2D.
         /// </summary>
         public List<Dist2D> Points { get; private set; }
 		public bool DoDeferPoint { get; set; }
-		private bool HasDeferredPoint;
-		private Dist2D DeferredPoint;
+		private bool _hasDeferredPoint;
+		private Dist2D _deferredPoint;
 
         private float WidthMetersF => (float)Width.Meters;
         //USE_TopMetersF private float HeightMetersF => (float)Height.Value;
@@ -49,7 +51,7 @@ namespace SceneSource
 
         // Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
         // TBD: Start/EndPolys could be combined.
-        private Poly3D TopPoly, BtmPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
+        private Poly3D TopPoly, BottomPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
 
         public GroundLine(bool hasUV = true, bool hasNormals = true) : this(DistD.Zero, DistD.Zero, Geo.NoContext.It, hasUV, hasNormals)
         {
@@ -99,7 +101,26 @@ namespace SceneSource
 
             var it = AvaloniaSample.AvaloniaSample.It;
             CreateGeometryFromPoints(wallNode, wall, it.Terrain);
-        }
+
+			// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
+			UpdateBoundingBox();
+
+		}
+
+		// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
+		private void UpdateBoundingBox()
+		{
+			var bb = TopPoly.BoundingBox;
+			if (!SingleGeometry) {
+				bb.Merge(BottomPoly.BoundingBox);
+				bb.Merge(FirstSidePoly.BoundingBox);
+				bb.Merge(SecondSidePoly.BoundingBox);
+				bb.Merge(StartPoly.BoundingBox);
+				bb.Merge(EndPoly.BoundingBox);
+			}
+
+			_model.BoundingBox = bb;
+		}
         #endregion
 
         #region --- public methods ----------------------------------------
@@ -112,8 +133,8 @@ namespace SceneSource
 			FlushWithSmooth(pt);
 
 			if (DoDeferPoint) {
-				DeferredPoint = pt;
-				HasDeferredPoint = true;
+				_deferredPoint = pt;
+				_hasDeferredPoint = true;
 			} else {
 				Points.Add(pt);
 			}
@@ -160,8 +181,8 @@ namespace SceneSource
                 TopPoly = CreateAndInitPoly(sModel);
                 if (SingleGeometry)
                 {
-                    // HACK as long as we have !SingleGeometry option.
-                    BtmPoly = TopPoly;
+                    // HACK to make !SingleGeometry flag possible.
+                    BottomPoly = TopPoly;
                     FirstSidePoly = TopPoly;
                     SecondSidePoly = TopPoly;
                     StartPoly = TopPoly;
@@ -169,7 +190,7 @@ namespace SceneSource
                 }
                 else
                 {
-                    BtmPoly = CreateAndInitPoly(sModel);
+                    BottomPoly = CreateAndInitPoly(sModel);
                     FirstSidePoly = CreateAndInitPoly(sModel);
                     SecondSidePoly = CreateAndInitPoly(sModel);
                     StartPoly = CreateAndInitPoly(sModel);
@@ -177,22 +198,23 @@ namespace SceneSource
                 }
             }
 
-            var model = sModel.Model;
-            if (model == null)
+			_model = sModel.Model;
+            if (_model == null)
             {
-                model = new Model();
-                model.NumGeometries = SingleGeometry ? 1 : 6;
-                model.SetGeometry(0, 0, TopPoly.Geom);
+                _model = new Model();
+                _model.NumGeometries = SingleGeometry ? 1 : 6;
+                _model.SetGeometry(0, 0, TopPoly.Geom);
                 if (!SingleGeometry)
                 {
-                    model.SetGeometry(1, 0, BtmPoly.Geom);
-                    model.SetGeometry(2, 0, FirstSidePoly.Geom);
-                    model.SetGeometry(3, 0, SecondSidePoly.Geom);
-                    model.SetGeometry(4, 0, StartPoly.Geom);
-                    model.SetGeometry(5, 0, EndPoly.Geom);
+                    _model.SetGeometry(1, 0, BottomPoly.Geom);
+                    _model.SetGeometry(2, 0, FirstSidePoly.Geom);
+                    _model.SetGeometry(3, 0, SecondSidePoly.Geom);
+                    _model.SetGeometry(4, 0, StartPoly.Geom);
+                    _model.SetGeometry(5, 0, EndPoly.Geom);
                 }
-                model.BoundingBox = new BoundingBox(-10000, 10000);
-                sModel.Model = model;
+				// Make sure it is visible, until do better calculation later in code.
+				_model.BoundingBox = new BoundingBox(-10000, 10000);
+				sModel.Model = _model;
 
                 var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
 
@@ -328,7 +350,7 @@ namespace SceneSource
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
 
             // Wall Segment: Top of wall.
-            AddQuad(BtmPoly, groundPair0, groundPair1, ref normBtm, true);
+            AddQuad(BottomPoly, groundPair0, groundPair1, ref normBtm, true);
 
 
             // Wall Segment: First side of wall.
@@ -361,21 +383,21 @@ namespace SceneSource
 
 		internal void Flush()
 		{
-			if (HasDeferredPoint) {
-				Points.Add(DeferredPoint);
-				HasDeferredPoint = false;
+			if (_hasDeferredPoint) {
+				Points.Add(_deferredPoint);
+				_hasDeferredPoint = false;
 			}
 		}
 
 		internal void FlushWithSmooth(Dist2D futurePoint)
 		{
-			if (HasDeferredPoint) {
+			if (_hasDeferredPoint) {
 				if (Points.Count > 0) {
 					// Smooth DeferredPoint to lessen ripples.
 					// TBD: Good algorithm? Limit distance moved by smooth?
 					// TBD: Fit curve through more points. Ideally do that later, so have more future points.
 					Dist2D neighborAvg = U.Average(Points[Points.LastIndex()], futurePoint);
-					DeferredPoint = U.Lerp(DeferredPoint, neighborAvg, 0.7);
+					_deferredPoint = U.Lerp(_deferredPoint, neighborAvg, 0.7);
 				}
 
 				Flush();
@@ -384,7 +406,7 @@ namespace SceneSource
 
 		internal bool HasContents()
 		{
-			return Points.Count > 0 || HasDeferredPoint;
+			return Points.Count > 0 || _hasDeferredPoint;
 		}
 
 

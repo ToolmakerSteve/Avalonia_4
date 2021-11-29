@@ -12,7 +12,16 @@ namespace ModelFrom2DShape
     /// </summary>
     public class Poly3D //: LineLayer3D.LineLayer3D
     {
-        private VertexBuffer VBuffer;
+		#region --- Data ----------------------------------------
+		public BoundingBox BoundingBox {
+			get {
+				// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
+				return UpdateBoundingBox();
+			}
+		}
+		private BoundingBox _boundingBox;
+
+		private VertexBuffer VBuffer;
         private IndexBuffer IBuffer;
         public Geometry Geom;
         private ElementMask ElemMask;
@@ -28,7 +37,7 @@ namespace ModelFrom2DShape
         public int NumQuads
         {
             get => _numQuads;
-            set
+            private set
             {
                 _numQuads = value;
                 // TODO: Optimize so don't have to increase on every quad.
@@ -54,10 +63,11 @@ namespace ModelFrom2DShape
         private uint _usedVertices;
         private uint _usedVFloats;
         private uint _usedIndices;
+		#endregion
 
+		#region --- new, Init, Clear, Update.. ----------------------------------------
 
-
-        public Poly3D()
+		public Poly3D()
         {
 
         }
@@ -116,7 +126,30 @@ namespace ModelFrom2DShape
             }
         }
 
-        private float _textureScale = 0.5f;
+		// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
+		public BoundingBox UpdateBoundingBox()
+		{
+			// May need this when expanding incrementally, to detect it hasn't been set.
+			//bool isEmpty = _boundingBox.Max == _boundingBox.Min;
+
+			if (NumQuads == 0 || _numVertices == 0)
+				// TBD: What should bounds be?
+				return _boundingBox;
+
+			Vector3 minV, maxV;
+			U.InitMinMax(out minV, out maxV);
+
+			foreach (var vec in Positions()) {
+				U.AccumMinMax(vec, ref minV, ref maxV);
+			}
+
+			_boundingBox = new BoundingBox(minV, maxV);
+			return _boundingBox;
+		}
+		#endregion
+
+
+		private float _textureScale = 0.5f;
 
         /// <summary>
         /// TODO: Normals. (Also change ElemMask passed in by client.)
@@ -340,5 +373,16 @@ namespace ModelFrom2DShape
             }
         }
 
+
+		private IEnumerable<Vector3> Positions()
+		{
+			uint offset = 0;
+			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
+				Vector3 vec = new Vector3(
+					VData[offset], VData[offset+1], VData[offset+2]);
+				yield return vec;
+				offset += FloatsPerVertex;
+			}
+		}
     }
 }
