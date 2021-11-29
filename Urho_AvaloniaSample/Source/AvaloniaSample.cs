@@ -385,7 +385,7 @@ namespace AvaloniaSample
 
 			if (doAddPoint) {
 				if (maybeBend) {
-					if (length > 2 * MinWallSegmentLength) {
+					if (CurrentWall.Points.Count > 1 && length > 2 * MinWallSegmentLength) {
 						// Add a short join segment. This "absorbs" any angle change, so long segment has full wall width.
 						// TBD: Calculate angle of direction change. Don't need for small angles.
 						const float JoinLength = 0.1f;
@@ -396,7 +396,7 @@ namespace AvaloniaSample
 					}
 				}
 				// Create or Extend a path, and a corresponding extruded model.
-				CurrentWall.AddPoint(penPosition2D.asDist());
+				CurrentWall.AddPoint((Dist2D)penPosition2D);
 				CurrentWall.OnUpdate();
 
 				LastWallPosition2D = penPosition2D;
