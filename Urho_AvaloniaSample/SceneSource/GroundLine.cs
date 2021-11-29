@@ -107,7 +107,7 @@ namespace SceneSource
         public void AddPoint(Dist2D pt)
         {
             Points.Add(pt);
-			Debug.WriteLine($"--- wall pt={pt} ---");
+			//Debug.WriteLine($"--- wall pt={pt.Round(3)} rel={(pt - Points[0]).Round(3)} ---");
         }
 
         public void AddPoint(Geo.Point2D geoPt)

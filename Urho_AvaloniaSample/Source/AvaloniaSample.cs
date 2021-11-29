@@ -28,6 +28,8 @@ namespace AvaloniaSample
 		const bool ShowWireframe = false;//false;   // TMS
 		const bool ShowTerrainWireframe = false && ShowWireframe;
 		const bool ShowWallWireframe = true && ShowWireframe;
+		const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 1f;//0.5f;   // TBD: Good value.
+
 
 		public Scene Scene;
 		public Octree Octree;
@@ -122,7 +124,6 @@ namespace AvaloniaSample
 		// LastPenPosition2D used to draw short segment when lift pen.
 		// LastWallPosition2D used to measure how far mouse has moved (on the ground).
 		Vector2 LastPenPosition2D, LastWallPosition2D;
-        const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 0.5f;   // TBD: Good value.
 
         private IntVector2 _lastScreenSize;
 
@@ -329,7 +330,7 @@ namespace AvaloniaSample
 			var screenPt = Input.MousePosition;
 			IntRect rect = CurrentViewport.Rect;
 			var normScreenPt = new Vector2((screenPt.X - rect.Left) / rect.Width(), (screenPt.Y - rect.Top) / rect.Height());
-			Debug.WriteLine($"--- screen={screenPt}, rect={rect} -> norm={normScreenPt} ---");
+			//Debug.WriteLine($"--- screen={screenPt}, rect={rect} -> norm={normScreenPt} ---");
 			return normScreenPt;
 		}
 
@@ -402,6 +403,7 @@ namespace AvaloniaSample
             CurrentWall = new GroundLine(2, 8);
             // Uncomment for "floating wall".
             //CurrentWall.BaseAltitude = 8 * Distance.One;   //ttt
+			Debug.WriteLine($"--- StartWall N walls={Walls.Count} ---");
         }
 
         /// <summary>
@@ -667,12 +669,10 @@ namespace AvaloniaSample
             // Set an initial position (for the camera scene node) above the plane.
             if (StartOnLand)
             {
-                float startAltitude = 0;//7.0f;
-                Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 0.0f);
-                Camera1MainNode.Position = new Vector3(0.0f, startAltitude, 0.0f);
+                float startAltitude = ThirdPersonPerspective ? 0 : 7.0f;
+                Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 100.0f);
                 EnforceMinimumAltitudeAboveTerrain(Camera1MainNode, startAltitude);
-                //tttt Yaw = 45;
-                //tttt Yaw = 70;
+                Yaw = 30;
                 Pitch = ThirdPersonPerspective ? 45 : 0;
                 ApplyPitchYawToCamera();
             }
