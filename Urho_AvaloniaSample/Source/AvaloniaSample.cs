@@ -21,6 +21,7 @@ namespace AvaloniaSample
         const bool IncludeAvaloniaLayer = false;
 		const bool UseTerrainScene = true;//true;
 		const bool IncludeWater = false;
+		const bool BoxesHaveShadows = false;//true;  // TMS
 		public const bool StartCameraOnLand = true;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
         public const bool DrawWallPressDrag = true;   // In Top View.
@@ -676,7 +677,7 @@ namespace AvaloniaSample
 
             StaticModel obj = objectNode.CreateComponent<StaticModel>();
             obj.Model = cache.GetModel("Models/Box.mdl");
-            obj.CastShadows = true;
+            obj.CastShadows = BoxesHaveShadows;
             obj.SetMaterial(boxMaterial);
         }
 
