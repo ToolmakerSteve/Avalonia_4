@@ -9,6 +9,7 @@ using Urho.IO;
 using Urho.Urho2D;
 using OU;
 using U = OU.Utils;
+using U2 = Global.Utils;
 using static OU.DistD;
 using System.Diagnostics;
 
@@ -19,7 +20,8 @@ namespace AvaloniaSample
         public static AvaloniaSample It;   // TMS
 
         const bool IncludeAvaloniaLayer = false;
-		const bool UseTerrainScene = true;//true;
+		// False uses MushroomScene, which has a flat plane
+		const bool UseTerrainScene = false;//true;   // TMS
 		const bool IncludeWater = false;
 		const bool BoxesHaveShadows = false;//true;  // TMS
 		public const bool StartCameraOnLand = true;
@@ -482,7 +484,8 @@ namespace AvaloniaSample
             // plane mesh with a "stone" material. Note that naming the scene nodes is optional. Scale the scene node larger
             // (100 x 100 world units)
             var planeNode = scene.CreateChild("Plane");
-            planeNode.Scale = new Vector3(100, 1, 100);
+			const float GroundPlaneSize = 500;
+            planeNode.Scale = new Vector3(GroundPlaneSize, 1, GroundPlaneSize);
             var planeObject = planeNode.CreateComponent<StaticModel>();
             planeObject.Model = ResourceCache.GetModel("Models/Plane.mdl");
             planeObject.SetMaterial(ResourceCache.GetMaterial("Materials/StoneTiled.xml"));
@@ -664,7 +667,7 @@ namespace AvaloniaSample
                 // "boxScale/2": box's position is center; want its bottom to touch ground.
                 // "- small-value": slightly underground so no gap due to uneven ground height. TBD: Proportional to box size?
                 //   TBD: proportional to angle between normal and vertical axis?
-                position.Y = Terrain.GetHeight(position) + boxScale / 2 - 0.1f; //2.25f;
+                position.Y = U2.GetTerrainHeight(Terrain, position) + boxScale / 2 - 0.1f; //2.25f;
             }
             objectNode.Position = position;
 

@@ -8,6 +8,7 @@ using Urho;
 using static OU.DistD;
 using OU;
 using U = OU.Utils;
+using U2 = Global.Utils;
 
 namespace SceneSource
 {
@@ -451,7 +452,7 @@ namespace SceneSource
         /// <returns></returns>
         private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float relAltitude)
         {
-            float altitude = terrain.GetHeight(vec) + relAltitude;
+            float altitude = U2.GetTerrainHeight(terrain, vec) + relAltitude;
             return U.WithAltitude(vec, altitude);
         }
 
@@ -506,8 +507,8 @@ namespace SceneSource
             Vector3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
             Vector3 first = wallCenter - halfPerp;
             Vector3 second = wallCenter + halfPerp;
-            first.Y = terrain.GetHeight(first) + wallTop;
-            second.Y = terrain.GetHeight(second) + wallTop;
+            first.Y = U2.GetTerrainHeight(terrain, first) + wallTop;
+            second.Y = U2.GetTerrainHeight(terrain, second) + wallTop;
 
             return new U.Pair<Vector3>(first, second);
         }

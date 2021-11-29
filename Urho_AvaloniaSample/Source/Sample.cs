@@ -1,7 +1,9 @@
+// portions Copyright (c) 2021 ToolmakerSteve or najak3d
 // Copyright (c) 2020-2021 Eli Aloni (a.k.a  elix22)
 // Copyright (c) 2008-2015 the Urho3D project.
 // Copyright (c) 2015 Xamarin Inc
 //
+// "MIT License":
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -30,6 +32,7 @@ using Urho.Resources;
 using N = System.Numerics;
 using OU;   // For Vector3Exts.
 using U = OU.Utils;
+using U2 = Global.Utils;
 
 namespace AvaloniaSample
 {
@@ -244,7 +247,7 @@ namespace AvaloniaSample
                     moveMult *= ShiftSpeedMult;
                 else
                     moveMult *= NoShiftSpeedMult;
-                float terrainAltitude = Terrain.GetHeight(CurrentCameraMainNode.Position);
+                float terrainAltitude = U2.GetTerrainHeight(Terrain, CurrentCameraMainNode.Position);
                 if (GroundSpeedMultByAltitude)
                 {
                     float sceneAltitude = CurrentCameraMainNode.Position.Altitude();
@@ -321,7 +324,7 @@ namespace AvaloniaSample
 				// "LookAt" Camera1Main.WorldPosition, projected to Terrain.
 				Vector3 lookAt_World = Camera1MainNode.WorldPosition;
                 float mainAltitude = lookAt_World.Altitude();
-                float terrainAltitude = Terrain.GetHeight(lookAt_World);
+                float terrainAltitude = U2.GetTerrainHeight(Terrain, lookAt_World);
                 lookAt_World.SetAltitude(terrainAltitude);
                 
                 // Move camera1Final away from that point, oriented according to pitch/yaw.
@@ -418,7 +421,7 @@ namespace AvaloniaSample
             if (minimumRelativeAltitude > 0)
             {
                 float sceneAltitude = cameraMainNode.Position.Altitude();
-                float terrainAltitude = Terrain.GetHeight(cameraMainNode.Position);
+                float terrainAltitude = U2.GetTerrainHeight(Terrain, cameraMainNode.Position);
                 float relAltitude = sceneAltitude - terrainAltitude;
                 float excess = relAltitude - minimumRelativeAltitude;
                 if (excess < 0)
