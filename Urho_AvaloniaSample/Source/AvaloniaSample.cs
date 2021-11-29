@@ -24,7 +24,7 @@ namespace AvaloniaSample
 		const bool UseTerrainScene = false;//true;   // TMS
 		static float GroundSize = 500;//2000;//500;
 		const bool IncludeWater = false;
-		const bool IncludeScatteredModels = true;//true;
+		const bool IncludeScatteredModels = false;//true;
 		const bool ScatteredModelsAreBoxes = true;
 		const int NScatteredModels = 1000;
 		const bool BoxesHaveShadows = false;//true;  // TMS

@@ -21,7 +21,7 @@ namespace SceneSource
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
         const bool AddOnlyNewQuads = true;
-		const bool AllowShadows = false; //true;
+		const bool AllowShadows = true; //true;
         public const bool SingleGeometry = false;
         public const bool SingleGeometryTEST = false;   // TMS: Temporary changes.
 
