@@ -132,12 +132,16 @@ namespace OU
 			return FromDefaultUnits(Math.Abs(Value));
 		}
 
-		#endregion --- Instance Members -------------------------------------
+        #endregion --- Instance Members -------------------------------------
 
 
-		#region === Static Conversion/Create Methods ===============================================
+        #region === Static Conversion/Create Methods ===============================================
+        public static implicit operator double(DistD it) => it.Value;
+        public static explicit operator DistD(double value) => (DistD)(value);
+        public static explicit operator float(DistD it) => (float)it.Value;
+        public static explicit operator DistD(float value) => (DistD)(value);
 
-		static public DistD FromMeters(double meters)
+        static public DistD FromMeters(double meters)
 		{
 			return new DistD(_defaultUnitsPerMeter * meters);
 		}
@@ -159,7 +163,6 @@ namespace OU
 			double destValue = srcValue * srcUnit.MetersPerUnit * dstUnit.UnitsPerMeter;
 			return destValue;
 		}
-
 		#endregion === Static Conversion/Create Methods ===============================================
 
 
