@@ -224,22 +224,80 @@ namespace AvaloniaSample
         }
 
 
-		private bool wasDrawing;
+		private bool _wasDrawing;
+		private bool _prevModeWasFreehand;
+		// When click-click, this is used to start a new wall.
+		private bool _sawShiftToggleUp;
+		private bool _wasClickDrawing;
 
 		private void OnUpdate_MaybeDrawingWall()
         {
-            bool drawing = Input.GetMouseButtonDown(MouseButton.Left);
+			if (DoDeleteWalls()) {
+				Walls.Clear();
+				CurrentWall = null;
+				WallsNode?.RemoveAllChildren();
+				CurrentWallNode = null;
+				WallDrawStarted = false;
+				return;
+			}
+
+			bool drawing = Input.GetMouseButtonDown(MouseButton.Left);
+			if (Input.GetKeyDown(Key.Shift)) {
+				PointToPointWallDrawing(drawing);
+			} else {
+				// Down-move-up freehand drawing.
+				FreehandWallDrawing(drawing);
+			}
+		}
+
+		private bool DoDeleteWalls()
+		{
+			return Input.GetKeyDown(Key.Shift) && Input.GetKeyDown(Key.Delete);
+		}
+
+		/// <summary>
+		/// Click-click-click: wall segment per mouse press.
+		/// </summary>
+		private void PointToPointWallDrawing(bool drawing)
+		{
 			if (drawing) {
-				if (!wasDrawing)
+				if (_sawShiftToggleUp)// && !_prevModeWasFreehand)
 					StartNewWall();
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
 					ExtendWall(groundPt);
+				_sawShiftToggleUp = false;
+				_prevModeWasFreehand = false;
+				_wasClickDrawing = true;
+			}
+		}
 
-			} else if (wasDrawing) {
-				EndWall();
+		/// <summary>
+		/// Down-move-up freehand drawing.
+		/// </summary>
+		/// <param name="drawing"></param>
+		private void FreehandWallDrawing(bool drawing)
+		{
+			if (drawing) {
+				// So can alternate freehand and click-click without starting new wall.
+				_sawShiftToggleUp = false;
+
+				if (!_wasDrawing)
+					StartNewWall();
+				if (MousePositionOnGroundPlane(out Vector2 groundPt))
+					ExtendWall(groundPt);
+				_prevModeWasFreehand = true;
+
+			} else {
+				// We get here if SHIFT is not down, nor is left-mouse.
+				if (!_prevModeWasFreehand && _wasClickDrawing)
+					_sawShiftToggleUp = true;
+				if (_wasDrawing) {
+					// Maybe.
+					EndWall();
+				}
 			}
 
-			wasDrawing = drawing;
+			_wasDrawing = drawing;
 		}
 
 		/// <summary>
@@ -295,8 +353,8 @@ namespace AvaloniaSample
 				CurrentWall.OnUpdate();
 			}
 
-			// Done with this wall.
-			WallDrawStarted = false;
+			// Done with this wall.  TBD: Interferes with point-to-point drawing?
+			//MAYBE WallDrawStarted = false;
 		}
 
 
