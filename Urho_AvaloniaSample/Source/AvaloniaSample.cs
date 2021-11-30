@@ -28,6 +28,7 @@ namespace AvaloniaSample
 		const int NScatteredModels = 1000;
 		const bool ScatteredModelsAreBoxes = true;
 		const bool BoxesHaveShadows = true;//true;  // TMS
+		const float _ZoneAmbient = 0.35f;//1.0f;//0.35f   TMS ttttt
 
 		public const bool StartCameraOnLand = true;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
@@ -536,7 +537,7 @@ namespace AvaloniaSample
 			var zoneNode = scene.CreateChild("Zone");
 			var zone = zoneNode.CreateComponent<Zone>();
 			zone.SetBoundingBox(new BoundingBox(-1000.0f, 1000.0f));
-			zone.AmbientColor = new Color(0.35f, 0.35f, 0.35f);
+			zone.AmbientColor = new Color(_ZoneAmbient, _ZoneAmbient, _ZoneAmbient);
 			//float fogBrightness = ShowWireframe ? 0.2f : 1.0f;   // TMS
 			float fogBrightness = ShowWireframe ? 0.0f : 1.0f;
 			zone.FogColor = new Color(fogBrightness, fogBrightness, fogBrightness);

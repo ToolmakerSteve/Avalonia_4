@@ -21,7 +21,7 @@ namespace SceneSource
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
         const bool AddOnlyNewQuads = true;
-		const bool AllowShadows = true; //true;
+		const bool CastShadows = true; //true;
         public const bool SingleGeometry = false;
         public const bool SingleGeometryTEST = false;   // TMS: Temporary changes.
 
@@ -221,21 +221,30 @@ namespace SceneSource
 
                 var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
 
-                //sModel.CastShadows = true;
-                //Material mat = Material.FromColor(Color.Magenta, false);
-                Material mat = res.GetMaterial("Materials/StoneWall4.xml");
+				sModel.CastShadows = CastShadows;
+
+				//Material mat = Material.FromColor(Color.Magenta, false);
+
+				// TODO: How add "StoneWall4Normal.xml" such that it is found?
+				Material mat;
+				//if (CastShadows)
+				mat = res.GetMaterial("Materials/StoneWall4.xml");
+				//else
+				//	mat = res.GetMaterial("Materials/StoneWall4Normal.xml");
+
 
 				// ttttt
+				//mat.SetShaderParameter("AmbientColor", Color.White);
+				//mat.SetShaderParameter("AmbientColor", Color.Gray);
 				//mat.SetShaderParameter("AmbientColor", Color.Magenta);
 				//mat.SetShaderParameter("AmbientColor", Color.Black);
-				
+				////
 
+				//mat.PixelShaderDefines("")
 				mat.CullMode = CullMode.Cw; // CullMode.Cw;
-											//mat.SetShaderParameter("AmbientColor", Color.White);
-											//mat.PixelShaderDefines("")
+
 				AvaloniaSample.AvaloniaSample.It.MaybeSetWireframeMaterial(mat);
 
-				sModel.CastShadows = AllowShadows;
 				sModel.SetMaterial(mat);
             }
         }

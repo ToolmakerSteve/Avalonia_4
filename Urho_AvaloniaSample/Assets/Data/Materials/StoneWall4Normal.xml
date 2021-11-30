@@ -1,6 +1,6 @@
 <material>
-    <!--<technique name="Techniques/DiffNormal.xml" quality="0" />-->
-	<technique name="Techniques/Diff.xml" quality="0" />
+    <technique name="Techniques/DiffNormal.xml" quality="0" />
+	<!--<technique name="Techniques/Diff.xml" quality="0" />-->
 	<texture unit="diffuse" name="Textures/StoneWall4/Wall Stone 004_COLOR.jpg" />
 	<!--<texture unit="diffuse" name="Textures/StoneWall4/white.jpg" />-->
 	<texture unit="normal" name="Textures/StoneWall4/Wall Stone 004_NRM.jpg" />
