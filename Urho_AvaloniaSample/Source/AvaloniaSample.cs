@@ -24,13 +24,18 @@ namespace AvaloniaSample
 		const bool UseTerrainScene = true;//true;   // TMS
 		static float GroundSize = 500;//2000;//500;
 		const bool IncludeWater = false;
-		const bool IncludeScatteredModels = false;//true;
-		const int NScatteredModels = 1000;
+		const bool IncludeFog = false;
+
+		const bool IncludeScatteredModels = true;//true;
+		const int NScatteredModels = 100;//1000;
 		const bool ScatteredModelsAreBoxes = true;
 		const bool BoxesHaveShadows = true;//true;  // TMS
+		const bool RandomColorBoxes = false;//true;
+		const float BoxScale = 5.0f;//5.0f;
+
 		const float _ZoneAmbient = 0.35f;//1.0f;//0.35f   TMS ttttt
 
-		public const bool StartCameraOnLand = true;
+		public const bool StartCameraOnLand = IncludeWater;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
         public const bool DrawWallPressDrag = true;   // In Top View.
         public const bool DrawWallAsFly = false && !DrawWallPressDrag;   // In Perspective View. TMS
@@ -538,23 +543,14 @@ namespace AvaloniaSample
 			var zone = zoneNode.CreateComponent<Zone>();
 			zone.SetBoundingBox(new BoundingBox(-1000.0f, 1000.0f));
 			zone.AmbientColor = new Color(_ZoneAmbient, _ZoneAmbient, _ZoneAmbient);
-			//float fogBrightness = ShowWireframe ? 0.2f : 1.0f;   // TMS
-			float fogBrightness = ShowWireframe ? 0.0f : 1.0f;
-			zone.FogColor = new Color(fogBrightness, fogBrightness, fogBrightness);
-			zone.FogStart = 500.0f;
-			zone.FogEnd = 750.0f;
+			if (IncludeFog) {
+				float fogBrightness = ShowWireframe ? 0.0f : 1.0f;
+				zone.FogColor = new Color(fogBrightness, fogBrightness, fogBrightness);
+				zone.FogStart = 500.0f;
+				zone.FogEnd = 750.0f;
+			}
 
-			// Create a directional light to the world. Enable cascaded shadows on it
-			var lightNode = scene.CreateChild("DirectionalLight");
-			lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
-			var light = lightNode.CreateComponent<Light>();
-			light.LightType = LightType.Directional;
-			light.CastShadows = true;
-			light.ShadowBias = new BiasParameters(0.00025f, 0.5f);
-			light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
-			light.SpecularIntensity = 0.5f;
-			// Apply slightly overbright lighting to match the skybox
-			light.Color = new Color(1.2f, 1.2f, 1.2f);
+			AddDirectionalLight(scene);
 
 			if (!ShowWireframe) {
 				// Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
@@ -597,6 +593,24 @@ namespace AvaloniaSample
 			TerrainSceneMainCameraSettings(Camera1FinalNode, Camera1);
 		}
 
+		private static void AddDirectionalLight(Scene scene)
+		{
+			// Create a directional light to the world. Enable cascaded shadows on it
+			var lightNode = scene.CreateChild("DirectionalLight");
+			//lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
+			//lightNode.SetDirection(new Vector3(0.3f, -1.0f, 0.4f));
+			lightNode.SetDirection(new Vector3(0.1f, -1.0f, 0.1f));
+			var light = lightNode.CreateComponent<Light>();
+			light.LightType = LightType.Directional;
+			light.CastShadows = true;
+			light.ShadowBias = new BiasParameters(0.00025f, 0.5f);
+			light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
+			light.SpecularIntensity = 0.5f;
+			// true=Apply slightly overbright lighting to match the skybox
+			float bright = false ? 1.2f : 1.0f;
+			light.Color = new Color(bright, bright, bright);
+		}
+
 		private void ScatterObjects(Scene scene, int nScatteredModels)
 		{
 			if (IncludeScatteredModels) {
@@ -622,29 +636,32 @@ namespace AvaloniaSample
 
 		private void ScatterBoxes(Scene scene, int nScatteredModels)
 		{
-
-			// Have some different color boxes, so can tell them apart (somewhat).
 			var colors = new Color[] {
 					Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta,
 					Color.White, Color.Black
 			};
 			List<Material> materials = new List<Material>();
-			foreach (var color in colors) {
-				var material = ResourceCache.GetMaterial("Materials/Stone.xml").Clone();
-				material.SetShaderParameter("AmbientColor", color);
-				materials.Add(material);
+			if (RandomColorBoxes) {
+				// Have some different color boxes, so can tell them apart (somewhat).
+				foreach (var color in colors) {
+					var material = ResourceCache.GetMaterial(BoxMaterialName()).Clone();
+					// NOTE: This self-lighting lessens effectiveness of Normal map.
+					material.SetShaderParameter("AmbientColor", color);
+					materials.Add(material);
+				}
 			}
 
 			// Create boxes in the terrain. Always face outward along the terrain normal
-			float boxScale = 5.0f;
 			float halfGroundSize = GroundSize / 2;
 			for (int i = 0; i < nScatteredModels; ++i) {
 				Vector3 position = new Vector3(NextRandom(GroundSize) - halfGroundSize, 0.0f, NextRandom(GroundSize) - halfGroundSize);
 
-				// TMS: Make the boxes different.
-				Material boxMaterial = materials[i % colors.Length];
+				Material boxMaterial = null;
+				if (RandomColorBoxes)
+					// TMS: Make the boxes different.
+					boxMaterial = materials[i % colors.Length];
 
-				AddBoxToScene(scene, position, boxScale, true, boxMaterial, ResourceCache);
+				AddBoxToScene(scene, position, BoxScale, true, boxMaterial, ResourceCache);
 			}
 		}
 
@@ -674,24 +691,21 @@ namespace AvaloniaSample
         {
 			if (Terrain == null)
 				terrainRelative = false;
-            if (cache == null)
+
+			if (cache == null)
                 cache = ResourceCache;
             // AFTER set cache.
-            if (boxMaterial == null)
-            {
-                boxMaterial = cache.GetMaterial("Materials/Stone.xml");
-            }
+            if (boxMaterial == null) {
+				boxMaterial = cache.GetMaterial(BoxMaterialName());
+			}
 
-            var objectNode = parent.CreateChild("Box");
+			var objectNode = parent.CreateChild("Box");
 
-            if (terrainRelative)
-            {
-                // "boxScale/2": box's position is center; want its bottom to touch ground.
-                // "- small-value": slightly underground so no gap due to uneven ground height. TBD: Proportional to box size?
-                //   TBD: proportional to angle between normal and vertical axis?
-                position.Y = U2.GetTerrainHeight(Terrain, position) + boxScale / 2 - 0.1f; //2.25f;
-            }
-            objectNode.Position = position;
+			// "boxScale/2": box's position is center; want its bottom to touch ground.
+			// "- small-value": slightly underground so no gap due to uneven ground height. TBD: Proportional to box size?
+			//   TBD: proportional to angle between normal and vertical axis?
+			position.Y = U2.GetTerrainHeight(Terrain, position) + boxScale / 2 - 0.1f; //2.25f;
+			objectNode.Position = position;
 
             if (terrainRelative) {
                 // Create a rotation quaternion from up vector to terrain normal
@@ -706,8 +720,13 @@ namespace AvaloniaSample
             obj.SetMaterial(boxMaterial);
         }
 
+		private static string BoxMaterialName()
+		{
+			//return "Materials/Stone.xml";
+			return "Materials/StoneWall4.xml";
+		}
 
-        bool _wasVisible = false;
+		bool _wasVisible = false;
 
         void SetWireframeVisibility(bool visible)
         {
@@ -738,27 +757,45 @@ namespace AvaloniaSample
         {
             // Set an initial position (for the camera node(s)) above the plane.
             cameraPositionNode.Position = new Vector3(0, 5, 0);
-        }
+			// See shadowed side of box too.
+			Yaw = -20;
+			ApplyPitchYawToCamera();
+			MaybeInitThirdPersonPerspective();
+		}
 
-        private void TerrainSceneMainCameraSettings(Node cameraPositionNode, Camera camera)
+		private void TerrainSceneMainCameraSettings(Node cameraPositionNode, Camera camera)
         {
             camera.FarClip = 750.0f;
-            // Set an initial position (for the camera scene node) above the plane.
-            if (StartCameraOnLand)
+			// Set an initial position (for the camera scene node) above the plane.
+			float startAltitude = 7.0f;
+			if (StartCameraOnLand)
             {
-                float startAltitude = ThirdPersonPerspective ? 0 : 7.0f;
-                Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 100.0f);
-                EnforceMinimumAltitudeAboveTerrain(Camera1MainNode, startAltitude);
-                Yaw = 30;
-                Pitch = ThirdPersonPerspective ? 45 : 0;
-                ApplyPitchYawToCamera();
-            }
-            else
-                Camera1MainNode.Position = new Vector3(0.0f, 7.0f, -20.0f);
+				Yaw = 30;
+				Camera1MainNode.Position = new Vector3(20.0f, startAltitude, 100.0f);
+			} else {
+				if (BoxesHaveShadows)
+					Camera1MainNode.Position = new Vector3(-20.0f, startAltitude, -60.0f);
+				else
+					Camera1MainNode.Position = new Vector3(0.0f, startAltitude, -20.0f);
+			}
+			//if (BoxesHaveShadows)
+			//	Yaw = 210;  // See direction where shadows fall.
 
-            MaybeApplyThirdPersonPerspective();
-
+			EnforceMinimumAltitudeAboveTerrain(Camera1MainNode, startAltitude);
+			ApplyPitchYawToCamera();
+			MaybeInitThirdPersonPerspective();
         }
+
+		private void MaybeInitThirdPersonPerspective()
+		{
+			if (ThirdPersonPerspective) {
+				float altitude = Camera1MainNode.Position.Altitude();
+				Camera1MainNode.Position = U.WithAltitude(Camera1MainNode.Position, 0);
+				Pitch = 45;
+				ApplyPitchYawToCamera();
+				MaybeApplyThirdPersonPerspective();
+			}
+		}
         #endregion
 
 

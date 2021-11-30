@@ -22,8 +22,8 @@ namespace SceneSource
 
         const bool AddOnlyNewQuads = true;
 		const bool CastShadows = true; //true;
-        public const bool SingleGeometry = false;
-        public const bool SingleGeometryTEST = false;   // TMS: Temporary changes.
+        public const bool SingleGeometry = true;
+        public const bool SingleGeometryTEST = true;   // TMS: Temporary changes.
 
 
         #region --- data, new ----------------------------------------
@@ -218,38 +218,40 @@ namespace SceneSource
 				// Make sure it is visible, until do better calculation later in code.
 				_model.BoundingBox = new BoundingBox(-10000, 10000);
 				sModel.Model = _model;
-
-                var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
-
 				sModel.CastShadows = CastShadows;
-
-				//Material mat = Material.FromColor(Color.Magenta, false);
-
-				// TODO: How add "StoneWall4Normal.xml" such that it is found?
-				Material mat;
-				//if (CastShadows)
-				mat = res.GetMaterial("Materials/StoneWall4.xml");
-				//else
-				//	mat = res.GetMaterial("Materials/StoneWall4Normal.xml");
-
-
-				// ttttt
-				//mat.SetShaderParameter("AmbientColor", Color.White);
-				//mat.SetShaderParameter("AmbientColor", Color.Gray);
-				//mat.SetShaderParameter("AmbientColor", Color.Magenta);
-				//mat.SetShaderParameter("AmbientColor", Color.Black);
-				////
-
-				//mat.PixelShaderDefines("")
-				mat.CullMode = CullMode.Cw; // CullMode.Cw;
-
-				AvaloniaSample.AvaloniaSample.It.MaybeSetWireframeMaterial(mat);
-
-				sModel.SetMaterial(mat);
+				sModel.SetMaterial(WallMaterial);
             }
         }
 
-        private Poly3D CreateAndInitPoly(StaticModel sModel)
+		private static Material WallMaterial {
+			get {
+				if (_wallMaterial == null) {
+					var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
+					// Clone to alter parameters, in case we use this material elsewhere.
+					//if (CastShadows)
+					_wallMaterial = res.GetMaterial("Materials/StoneWall4.xml");//ttt .Clone();
+					//else
+					// TODO: How add "StoneWall4Normal.xml" such that it is found?
+					//	_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml").Clone();
+					//_wallMaterial = Material.FromColor(Color.Magenta, false);
+					///
+					//_wallMaterial.SetShaderParameter("AmbientColor", Color.White);
+					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Gray);
+					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Magenta);
+					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Black);
+
+					//_wallMaterial.PixelShaderDefines("")
+					//ttt _wallMaterial.CullMode = CullMode.Cw; // CullMode.Cw;
+
+					AvaloniaSample.AvaloniaSample.It.MaybeSetWireframeMaterial(_wallMaterial);
+				}
+				return _wallMaterial;
+			}
+		}
+		private static Material _wallMaterial;
+
+
+		private Poly3D CreateAndInitPoly(StaticModel sModel)
         {
             var poly = new Poly3D();
             poly.Init(sModel, HasNormals, HasUVs);
@@ -318,12 +320,6 @@ namespace SceneSource
             // Final quad.
             AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
 
-            if (Points.Count == 2)
-            {
-                // Now that we know wall direction, create StartPoly.
-                //CreateStartPoly(cl0, cl1, perp0, perp1, terrain);
-            }
-
             FinishGeometry();
         }
 
@@ -353,6 +349,7 @@ namespace SceneSource
 
             _currentWallSegmentCount++;
 
+			// Accumulate previous values. For averaging adjacent segment normals.
             Vector3? normTop = normals[0];
             Vector3? normBtm = normals[1];
             Vector3? normSide1 = normals[2];
@@ -361,13 +358,13 @@ namespace SceneSource
             // On top of wall.
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
-            // Wall Segment: Top of wall.
-            AddQuad(TopPoly, wallPair0, wallPair1, ref normTop);
+			// Wall Segment: Top of wall.
+			AddQuad(TopPoly, wallPair0, wallPair1, ref normTop);
 
-            U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
+			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
 
-            // Wall Segment: Top of wall.
+            // Wall Segment: Bottom of wall.
             AddQuad(BottomPoly, groundPair0, groundPair1, ref normBtm, true);
 
 

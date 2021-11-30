@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using LineLayer3D;
 using SceneSource;
 using Urho;
@@ -144,12 +145,14 @@ namespace ModelFrom2DShape
 			}
 
 			_boundingBox = new BoundingBox(minV, maxV);
+			//// tmstest: Does it help lighting to be larger?
+			//_boundingBox = new BoundingBox(minV - new Vector3(1,1,1), maxV + new Vector3(1, 1, 1));
 			return _boundingBox;
 		}
 		#endregion
 
 
-		private float _textureScale = 0.5f;
+		private float _textureScale = 1.0f / 8;//0.5f;
 
         /// <summary>
         /// TODO: Normals. (Also change ElemMask passed in by client.)
@@ -261,8 +264,8 @@ namespace ModelFrom2DShape
 		/// <param name="iVFloat"></param>
 		/// <param name="normal"></param>
 		/// <param name="uvScale">Used when updateUV=true</param>
-		/// <param name="updateUV"></param>
-        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat, Vector3 normal, Vector2 uvScale, bool updateUV = true)
+		/// <param name="updateUVAndNormals"></param>
+        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat, Vector3 normal, Vector2 uvScale, bool updateUVAndNormals = true)
         {
             VData[iVFloat++] = position.X;
             VData[iVFloat++] = position.Y;
@@ -270,21 +273,25 @@ namespace ModelFrom2DShape
 
             if (HasNormals)
             {
-                VData[iVFloat++] = normal.X;
-                VData[iVFloat++] = normal.Y;
-                VData[iVFloat++] = normal.Z;
-            }
+				if (updateUVAndNormals) {
+					VData[iVFloat++] = normal.X;
+					VData[iVFloat++] = normal.Y;
+					VData[iVFloat++] = normal.Z;
+				} else {   // Skip over floats for normal.
+					iVFloat += 3;
+				}
+			}
 
-            if (HasUVs)
+			if (HasUVs)
             {
-                if (updateUV)
+                if (updateUVAndNormals)
                 {
                     Vector2 uv = s_UVPerQuad[uvIdx];
                     VData[iVFloat++] = CurrentStartU + uv.X * uvScale.X;
                     VData[iVFloat++] = uv.Y * uvScale.Y;
                 }
                 else
-                {   // Skip over floats for normal.
+                {   // Skip over floats for uv.
                     iVFloat += 2;
                 }
             }
@@ -301,13 +308,14 @@ namespace ModelFrom2DShape
             _usedIndices += len;
         }
 
-        /// <summary>
-        /// Two triangles forming a quad for a line segment.
-        /// </summary>
-        protected int[] _indicesSegment = new int[] { 0, 2, 3, 3, 1, 0 };
+		/// <summary>
+		/// Two triangles forming a quad for a line segment.
+		/// </summary>
+		//protected int[] _indicesSegment = new int[] { 0, 2, 3, 3, 1, 0 };
+		protected int[] _indicesSegment = new int[] { 3, 2, 0, 0, 1, 3 };
 
 
-        private uint NVerticesForQuads(int numQuads)
+		private uint NVerticesForQuads(int numQuads)
         {
             // "4": 4 corners per quad.
             return (uint)(4 * numQuads);
@@ -351,10 +359,29 @@ namespace ModelFrom2DShape
             Geom.SetVertexBuffer(0, VBuffer);
             Geom.IndexBuffer = IBuffer;
             Geom.SetDrawRange(PrimitiveType.TriangleList, 0, _usedIndices, false);
+
+			DumpVData();
         }
 
+		private void DumpVData()
+		{
+			Debug.WriteLine($"\n----- VData n={_numVertices} -----");
+			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
+				GetVertexData(iVertex, out Vector3 position, out Vector3 normal, out Vector2 uv);
+				Debug.WriteLine($"{position}, {normal}, {uv}");
+			}
+			Debug.WriteLine($"-----  -----\n");
+		}
 
-        private void EnsureIndexCapacity(uint numIndices)
+		private void GetVertexData(int iVertex, out Vector3 position, out Vector3 normal, out Vector2 uv)
+		{
+			uint offset = (uint)(iVertex * FloatsPerVertex);
+			position = new Vector3(VData[offset], VData[offset + 1], VData[offset + 2]);
+			normal = new Vector3(VData[offset + 3], VData[offset + 4], VData[offset + 5]);
+			uv = new Vector2(VData[offset + 6], VData[offset + 7]);
+		}
+
+		private void EnsureIndexCapacity(uint numIndices)
         {
             if (numIndices > _numIndices)
             {

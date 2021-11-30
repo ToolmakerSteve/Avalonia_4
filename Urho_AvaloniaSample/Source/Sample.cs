@@ -47,7 +47,7 @@ namespace AvaloniaSample
         protected const bool ThirdPersonPerspective = true;//true;
         protected const bool ShowTwoViewports = true;//true;   // TMS
         // Camera not only goes up as terrain rises, it also goes down as terrain falls.
-        protected const bool TrackAltitude = true;
+        protected const bool TrackAltitude = false;//true;
         // Shift key not down multiplies speed by this.
         protected const float NoShiftSpeedMult = 1;
         // Shift key down multiplies speed by this.
@@ -61,7 +61,7 @@ namespace AvaloniaSample
         protected float CurrentMinimumAltitudeAboveTerrain => OverViewport2 ? MinimumAltitude2AboveTerrain : MinimumAltitude1AboveTerrain;
         protected float OtherMinimumAltitudeAboveTerrain => OverViewport2 ? MinimumAltitude1AboveTerrain : MinimumAltitude2AboveTerrain;
         // When ThirdPerson, want camera significantly farther away than the FirstPerson relAltitude.
-        protected float _extraCameraDistance = 30f;//ttttt 100f;
+        protected float _extraCameraDistance = 50f;//100f;
 
 
         protected const float TouchSensitivity = 2;
