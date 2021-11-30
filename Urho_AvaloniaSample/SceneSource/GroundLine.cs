@@ -223,8 +223,14 @@ namespace SceneSource
 
                 //sModel.CastShadows = true;
                 //Material mat = Material.FromColor(Color.Magenta, false);
-                Material mat = res.GetMaterial("Materials/StoneTiledH.xml");
-                mat.CullMode = CullMode.Cw; // CullMode.Cw;
+                Material mat = res.GetMaterial("Materials/StoneWall4.xml");
+
+				// ttttt
+				//mat.SetShaderParameter("AmbientColor", Color.Magenta);
+				//mat.SetShaderParameter("AmbientColor", Color.Black);
+				
+
+				mat.CullMode = CullMode.Cw; // CullMode.Cw;
 											//mat.SetShaderParameter("AmbientColor", Color.White);
 											//mat.PixelShaderDefines("")
 				AvaloniaSample.AvaloniaSample.It.MaybeSetWireframeMaterial(mat);

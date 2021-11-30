@@ -61,7 +61,7 @@ namespace AvaloniaSample
         protected float CurrentMinimumAltitudeAboveTerrain => OverViewport2 ? MinimumAltitude2AboveTerrain : MinimumAltitude1AboveTerrain;
         protected float OtherMinimumAltitudeAboveTerrain => OverViewport2 ? MinimumAltitude1AboveTerrain : MinimumAltitude2AboveTerrain;
         // When ThirdPerson, want camera significantly farther away than the FirstPerson relAltitude.
-        protected float _extraCameraDistance = 100f;
+        protected float _extraCameraDistance = 30f;//ttttt 100f;
 
 
         protected const float TouchSensitivity = 2;
