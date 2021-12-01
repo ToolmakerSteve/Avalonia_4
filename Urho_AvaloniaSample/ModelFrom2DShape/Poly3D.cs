@@ -39,40 +39,7 @@ namespace ModelFrom2DShape
 		// ONE-TIME WORK.
 		static Poly3D()
 		{
-			var uvTL = new Vector2(0, 0);
-			var uvTR = new Vector2(1, 0);
-			var uvBR = new Vector2(1, 1);
-			var uvBL = new Vector2(0, 1);
-			// Must match CWCorners. Used to calc other orders.
-			CwCornerUVs = new[] { uvTL, uvTR, uvBR, uvBL };
-
-			// Specify in clockwise order. TL=00 TR=10 BR=11 BL=01
-			s_LookupCorners_Default = CwCornersAsLookups(s_Corners_Default);
-			//s_QuadUVs_Default = new[] { vTL, vTR, vBR, vBL };
-			s_QuadUVs_Default = CwCornersAsUVs(s_Corners_Default);
-			VerifyCwCornerVecs(s_Corners_Default, s_LookupCorners_Default, new[] { uvTL, uvTR, uvBR, uvBL });
-
-			s_LookupCorners_ZigZag = CwCornersAsLookups(s_Corners_ZigZag);
-			//s_QuadUVs_ZigZag = CwCornersAsUVs(s_Corners_ZigZag);
-			//VerifyCwCornerVecs(s_Corners_ZigZag, s_LookupCorners_ZigZag, s_QuadUVs_ZigZag);
-
-			s_LookupCorners_ZigZagSwapped = CwCornersAsLookups(s_Corners_ZigZagSwapped);
-
-			s_LookupCorners_Wall1 = CwCornersAsLookups(s_Corners_Wall1);
-			//s_QuadUVs_Wall1 = CwCornersAsUVs(s_Corners_Wall1);
-			//VerifyCwCornerVecs(s_Corners_Wall1, s_LookupCorners_Wall1, s_QuadUVs_Wall1);
-
-			s_LookupCorners_Wall2 = CwCornersAsLookups(s_Corners_Wall2);
-			//s_QuadUVs_Wall2 = CwCornersAsUVs(s_Corners_Wall2);
-			//VerifyCwCornerVecs(s_Corners_Wall2, s_LookupCorners_Wall2, s_QuadUVs_Wall2);
-
-			s_LookupCorners_WallStart = CwCornersAsLookups(s_Corners_WallStart);
-			//s_QuadUVs_WallStart = CwCornersAsUVs(s_Corners_WallStart);
-			//VerifyCwCornerVecs(s_Corners_WallStart, s_LookupCorners_WallStart, s_QuadUVs_WallStart);
-
-			s_LookupCorners_WallEnd = CwCornersAsLookups(s_Corners_WallEnd);
-			//s_QuadUVs_WallEnd = CwCornersAsUVs(s_Corners_WallEnd);
-			//VerifyCwCornerVecs(s_Corners_WallEnd, s_LookupCorners_WallEnd, s_QuadUVs_WallEnd);
+			InitCornerLookups();
 		}
 
 		static private Vector2[] CwCornersAsUVs(CwCorner[] corners)
@@ -169,6 +136,10 @@ namespace ModelFrom2DShape
 		static private CwCorner[] s_Corners_WallStart = new[] { CwCorner.TR, CwCorner.TL, CwCorner.BR, CwCorner.BL };
 		// Zig-zag.
 		static private CwCorner[] s_Corners_WallEnd = new[] { CwCorner.TL, CwCorner.TR, CwCorner.BL, CwCorner.BR };
+		// Zig-zag turned sideways.
+		static private CwCorner[] s_Corners_WallTop = new[] { CwCorner.BL, CwCorner.TL, CwCorner.BR, CwCorner.TR };
+		// Zig-zag turned sideways, x-flipped.
+		static private CwCorner[] s_Corners_WallBottom = new[] { CwCorner.BR, CwCorner.TR, CwCorner.BL, CwCorner.TL };
 
 		static private int[] s_LookupCorners_Default;
 		static private int[] s_LookupCorners_ZigZag;
@@ -177,6 +148,8 @@ namespace ModelFrom2DShape
 		static private int[] s_LookupCorners_Wall2;
 		static private int[] s_LookupCorners_WallStart;
 		static private int[] s_LookupCorners_WallEnd;
+		static private int[] s_LookupCorners_WallTop;
+		static private int[] s_LookupCorners_WallBottom;
 
 		static private Vector2[] s_QuadUVs_Default;
 		//// TBD: No longer needed, because we re-order vertices, so quad is always in Default order.
@@ -185,6 +158,31 @@ namespace ModelFrom2DShape
 		//static private Vector2[] s_QuadUVs_Wall2;
 		//static private Vector2[] s_QuadUVs_WallStart;
 		//static private Vector2[] s_QuadUVs_WallEnd;
+
+		private static void InitCornerLookups()
+		{
+			var uvTL = new Vector2(0, 0);
+			var uvTR = new Vector2(1, 0);
+			var uvBR = new Vector2(1, 1);
+			var uvBL = new Vector2(0, 1);
+			// Must match CWCorners. Used to calc other orders.
+			CwCornerUVs = new[] { uvTL, uvTR, uvBR, uvBL };
+
+			// Specify in clockwise order. TL=00 TR=10 BR=11 BL=01
+			s_LookupCorners_Default = CwCornersAsLookups(s_Corners_Default);
+			//s_QuadUVs_Default = new[] { vTL, vTR, vBR, vBL };
+			s_QuadUVs_Default = CwCornersAsUVs(s_Corners_Default);
+			VerifyCwCornerVecs(s_Corners_Default, s_LookupCorners_Default, new[] { uvTL, uvTR, uvBR, uvBL });
+
+			s_LookupCorners_ZigZag = CwCornersAsLookups(s_Corners_ZigZag);
+			s_LookupCorners_ZigZagSwapped = CwCornersAsLookups(s_Corners_ZigZagSwapped);
+			s_LookupCorners_Wall1 = CwCornersAsLookups(s_Corners_Wall1);
+			s_LookupCorners_Wall2 = CwCornersAsLookups(s_Corners_Wall2);
+			s_LookupCorners_WallStart = CwCornersAsLookups(s_Corners_WallStart);
+			s_LookupCorners_WallEnd = CwCornersAsLookups(s_Corners_WallEnd);
+			s_LookupCorners_WallTop = CwCornersAsLookups(s_Corners_WallTop);
+			s_LookupCorners_WallBottom = CwCornersAsLookups(s_Corners_WallBottom);
+		}
 		#endregion
 
 		#region --- Data ----------------------------------------
@@ -436,6 +434,10 @@ namespace ModelFrom2DShape
 					return s_LookupCorners_WallStart;
 				case QuadVOrder.WallEnd:
 					return s_LookupCorners_WallEnd;
+				case QuadVOrder.WallTop:
+					return s_LookupCorners_WallTop;
+				case QuadVOrder.WallBottom:
+					return s_LookupCorners_WallBottom;
 				case QuadVOrder.ZigZag:
 					return s_LookupCorners_ZigZag;
 				case QuadVOrder.ZigZagSwapped:

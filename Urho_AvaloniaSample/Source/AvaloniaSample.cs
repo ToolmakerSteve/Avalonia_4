@@ -489,8 +489,8 @@ namespace AvaloniaSample
 			WallDrawStarted = true;
             CurrentWall = new GroundLine(2, 8);
 			// Uncomment for "floating wall".
-			//CurrentWall.BaseAltitude = 8 * Distance.One;   // tmstest
-			Debug.WriteLine($"--- StartWall N walls={Walls.Count} ---");
+			//CurrentWall.BaseAltitude = 8 * DistD.OneDefaultUnit;   // tmstest
+			//Debug.WriteLine($"--- StartWall N walls={Walls.Count} ---");
         }
 
         /// <summary>

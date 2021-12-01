@@ -385,17 +385,17 @@ namespace SceneSource
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
 			// Wall Segment: Top of wall.
-			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.ZigZag, ref normTop);
+			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop);
 
 			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
 
-            // Wall Segment: Bottom of wall.
-            AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.ZigZagSwapped, ref normBtm);
+			// Wall Segment: Bottom of wall.
+			//AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.WallBottom, ref normBtm);
+			AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.WallTop, ref normBtm, false, true, true);
 
-
-            // Wall Segment: First side of wall.
-            // Must specify such that the second pair is at far end - these get adjusted when next quad is added.
+			// Wall Segment: First side of wall.
+			// Must specify such that the second pair is at far end - these get adjusted when next quad is added.
 			U.Pair<Vector3> groundFirstSide0 = new U.Pair<Vector3>(wallPair0.First, groundPair0.First);
 			U.Pair<Vector3> groundFirstSide1 = new U.Pair<Vector3>(wallPair1.First, groundPair1.First);
 			// QuadVOrder re-orders the vertices to expected order and orientation (top left first).
