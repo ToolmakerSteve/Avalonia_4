@@ -79,7 +79,7 @@ namespace SceneSource
 
             // Initialized to altitude zero.
             BaseAltitude = DistD.Zero;
-			BaseAltitude = (DistD)1;   // ttttt
+			BaseAltitude = (DistD)3;   // ttttt
 
             if (context == null)
                 context = Geo.NoContext.It;
@@ -322,7 +322,7 @@ namespace SceneSource
 			if (SingleGeometryTEST) {
 				cl0 = new Vector3(-30, 1, -40);
 				cl1 = new Vector3(-30, 1, -45);
-				U.Swap(ref cl0, ref cl1);   // To see what changes.
+				//U.Swap(ref cl0, ref cl1);   // To see what changes.
 				perp0 = CalcPerpendicularXZ(cl0, cl1);
 				perp1 = perp0;
 			}
@@ -367,13 +367,13 @@ namespace SceneSource
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
 			// Wall Segment: Top of wall.
-			//ttt AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.Default, ref normTop, false, false);
+			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.ZigZag, ref normTop);
 
 			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
 
             // Wall Segment: Bottom of wall.
-            AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.Default, ref normBtm, true, false);
+            AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.ZigZagSwapped, ref normBtm);
 
 
             // Wall Segment: First side of wall.
@@ -381,7 +381,7 @@ namespace SceneSource
 			U.Pair<Vector3> groundFirstSide0 = new U.Pair<Vector3>(wallPair0.First, groundPair0.First);
 			U.Pair<Vector3> groundFirstSide1 = new U.Pair<Vector3>(wallPair1.First, groundPair1.First);
 			// QuadVOrder re-orders the vertices to expected order and orientation (top left first).
-			//AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1, Poly3D.QuadVOrder.Wall1, ref normSide1);
+			AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1, Poly3D.QuadVOrder.Wall1, ref normSide1);
 
 			// Wall Segment: Second side of wall.
 			// Must specify such that the second pair is at far end - these get adjusted when next quad is added.
@@ -443,9 +443,8 @@ namespace SceneSource
             if (!GroundLine.SingleGeometryTEST)
                 StartPoly.Clear();
             Vector3? normal = null;
-			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadRotate.None, ref normal, false, false);
-			AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.Default, ref normal, true, true);
-			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadRotate.None, ref normal, false, true);
+			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.Default, ref normal, true, true);
+			AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.WallStart, ref normal, false, false);
 		}
 
 		private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
@@ -453,7 +452,7 @@ namespace SceneSource
             if (!GroundLine.SingleGeometryTEST)
             EndPoly.Clear();
             Vector3? normal = null;
-            AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.Default, ref normal);
+            AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.WallEnd, ref normal);
         }
 
         /// <summary>
