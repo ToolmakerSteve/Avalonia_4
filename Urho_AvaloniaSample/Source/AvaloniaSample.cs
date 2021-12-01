@@ -19,6 +19,7 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
+		const bool HardcodedWall = true; //false; ttttt
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
 		const bool UseTerrainScene = true;//true;   // TMS
@@ -121,6 +122,7 @@ namespace AvaloniaSample
             else
                 SetupOneViewport();
 
+			MaybeHardcodedWall();
 
             UI.Root.SetDefaultStyle(ResourceCache.GetXmlFile("UI/DefaultStyle.xml"));
 
@@ -130,10 +132,33 @@ namespace AvaloniaSample
             if (IncludeAvaloniaLayer)
                 _SetupAvaloniaUI();
         }
-        #endregion
 
-        #region --- OnUpdate ----------------------------------------
-        uint _startTime = 0;
+		private void MaybeHardcodedWall()
+		{
+			if (!HardcodedWall)
+				return;
+
+			Vector2[] points = new[] {
+				new Vector2(-38.4f, -40.0f),
+				new Vector2(-38.0f, -41.3f),
+				new Vector2(-37.4f, -41.6f),
+				new Vector2(-36.8f, -42.0f),
+
+				new Vector2(-36.3f, -42.4f),
+				new Vector2(-35.8f, -42.8f),
+				new Vector2(-35.4f, -43.1f),
+			};
+
+			StartNewWall();
+			foreach (var point in points) {
+				CurrentWall.AddPoint((Dist2D)point);
+			}
+			FlushAndNullWall();
+		}
+		#endregion
+
+		#region --- OnUpdate ----------------------------------------
+		uint _startTime = 0;
         bool WallDrawStarted;   // TMS
         GroundLine CurrentWall;
 		// LastPenPosition2D used to draw short segment when lift pen.
@@ -462,7 +487,7 @@ namespace AvaloniaSample
 			FlushAndNullWall();
 			
 			WallDrawStarted = true;
-            CurrentWall = new GroundLine(2, 4);//8);
+            CurrentWall = new GroundLine(2, 8);
 			// Uncomment for "floating wall".
 			//CurrentWall.BaseAltitude = 8 * Distance.One;   // tmstest
 			Debug.WriteLine($"--- StartWall N walls={Walls.Count} ---");
@@ -599,8 +624,8 @@ namespace AvaloniaSample
 			// Create a directional light to the world. Enable cascaded shadows on it
 			var lightNode = scene.CreateChild("DirectionalLight");
 			//lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
-			//lightNode.SetDirection(new Vector3(0.3f, -1.0f, 0.4f));
-			lightNode.SetDirection(new Vector3(0.1f, -1.0f, 0.1f));
+			lightNode.SetDirection(new Vector3(0.3f, -1.0f, 0.4f));
+			//lightNode.SetDirection(new Vector3(0.1f, -1.0f, 0.1f));
 			var light = lightNode.CreateComponent<Light>();
 			light.LightType = LightType.Directional;
 			light.CastShadows = true;

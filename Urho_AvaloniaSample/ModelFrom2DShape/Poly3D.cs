@@ -39,18 +39,18 @@ namespace ModelFrom2DShape
 		// ONE-TIME WORK.
 		static Poly3D()
 		{
-			var vTL = new Vector2(0, 0);
-			var vTR = new Vector2(1, 0);
-			var vBR = new Vector2(1, 1);
-			var vBL = new Vector2(0, 1);
-			// Must match CWCorners.
-			CwCornerVec = new[] { vTL, vTR, vBR, vBL };
+			var uvTL = new Vector2(0, 0);
+			var uvTR = new Vector2(1, 0);
+			var uvBR = new Vector2(1, 1);
+			var uvBL = new Vector2(0, 1);
+			// Must match CWCorners. Used to calc other orders.
+			CwCornerUVs = new[] { uvTL, uvTR, uvBR, uvBL };
 
 			// Specify in clockwise order. TL=00 TR=10 BR=11 BL=01
 			s_LookupCorners_Default = CwCornersAsLookups(s_Corners_Default);
 			//s_QuadUVs_Default = new[] { vTL, vTR, vBR, vBL };
 			s_QuadUVs_Default = CwCornersAsUVs(s_Corners_Default);
-			VerifyCwCornerVecs(s_Corners_Default, s_LookupCorners_Default, new[] { vTL, vTR, vBR, vBL });
+			VerifyCwCornerVecs(s_Corners_Default, s_LookupCorners_Default, new[] { uvTL, uvTR, uvBR, uvBL });
 
 			s_LookupCorners_ZigZag = CwCornersAsLookups(s_Corners_ZigZag);
 			//s_QuadUVs_ZigZag = CwCornersAsUVs(s_Corners_ZigZag);
@@ -80,7 +80,7 @@ namespace ModelFrom2DShape
 			var vecs = new List<Vector2>(4);
 
 			foreach (var corner in corners) {
-				vecs.Add(CwCornerVec[(int)corner]);
+				vecs.Add(CwCornerUVs[(int)corner]);
 			}
 
 			return vecs.ToArray();
@@ -119,14 +119,14 @@ namespace ModelFrom2DShape
 			for (int ii = 0; ii < lookups.Length; ii++) {
 				int lookup = lookups[ii];
 				Vector2 uv = uvs[lookup];
-				Vector2 cornerVec = CwCornerVec[ii];
+				Vector2 cornerVec = CwCornerUVs[ii];
 				if (cornerVec != uv)
 					throw new InvalidProgramException("VerifyCwCornerVecs");
 			}
 
 			for (int ii2 = 0; ii2 < lookups.Length; ii2++) {
 				CwCorner corner = corners[ii2];
-				Vector2 cornerVec = CwCornerVec[(int)corner];
+				Vector2 cornerVec = CwCornerUVs[(int)corner];
 				Vector2 uv = uvs[ii2];
 				if (cornerVec != uv)
 					throw new InvalidProgramException("VerifyCwCornerVecs");
@@ -153,11 +153,11 @@ namespace ModelFrom2DShape
 		{
 			Vector2 uv;
 			CwCorner corner = corners[ii];
-			uv = CwCornerVec[(int)corner];
+			uv = CwCornerUVs[(int)corner];
 			return uv;
 		}
 
-		static public Vector2[] CwCornerVec;
+		static public Vector2[] CwCornerUVs;
 
 		// This is in same order as CwCorner values.
 		static private CwCorner[] s_Corners_Default = new[] { CwCorner.TL, CwCorner.TR, CwCorner.BR, CwCorner.BL };
@@ -334,7 +334,7 @@ namespace ModelFrom2DShape
         /// <param name="wallPair0"></param>
         /// <param name="wallPair1"></param>
         internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, QuadVOrder quadVOrder,
-							  ref Vector3? normal, bool invertNorm, bool invertWinding)
+							  ref Vector3? normal, bool invertNorm, bool invertU, bool invertWinding)
         {
             NumQuads++;
 
@@ -357,21 +357,22 @@ namespace ModelFrom2DShape
             {
                 avgNormal = newNormal;   // for test, normals are not related.
             }
-            if (NumQuads >= 2 && !GroundLine.SingleGeometryTEST)
-            {
-                // Update the edge of previous quad.
-                // REASON: Adding this quad changes calc of perpendicular between the two quads.
-                if (invertNorm)
-				{
-                    UpdateRecentVertex(wallPair0.First, -1, 3, avgNormal);
-                    UpdateRecentVertex(wallPair0.Second, -2, 2, avgNormal);
-                }
-                else
-                {
-                    UpdateRecentVertex(wallPair0.First, -2, 2, avgNormal);
-                    UpdateRecentVertex(wallPair0.Second, -1, 3, avgNormal);
-                }
-            }
+			//// TODO: Change logic in GroundLine, so quads come in smoothed.
+   //         if (NumQuads >= 2 && !GroundLine.SingleGeometryTEST)
+   //         {
+   //             // Update the edge of previous quad.
+   //             // REASON: Adding this quad changes calc of perpendicular between the two quads.
+   // //            if (invertNorm)
+			//	//{
+   // //                UpdateRecentVertex(wallPair0.First, -1, 3, avgNormal);
+   // //                UpdateRecentVertex(wallPair0.Second, -2, 2, avgNormal);
+   // //            }
+   // //            else
+   //             {
+   //                 UpdateRecentVertex(wallPair0.First, -2, 2, avgNormal);
+   //                 UpdateRecentVertex(wallPair0.Second, -1, 3, avgNormal);
+   //             }
+   //         }
 
             Vector3 vertDelta = vBL - vTL;
             float dy = vertDelta.LengthFast;
@@ -379,8 +380,12 @@ namespace ModelFrom2DShape
             float dx = horizDelta.LengthFast;
 
 			float deltaU = _textureScale * dx;
+			// Moving backwards in texture.
+			//if (invertU)
+			//	deltaU = -deltaU;
 			Vector2 uvScale = new Vector2(deltaU, _textureScale * dy);
-			CurrentEndU = CurrentStartU + deltaU;
+			CurrentEndU = CurrentStartU + (invertU ? -deltaU : deltaU);
+			//CurrentEndU = CurrentStartU + deltaU;
 
 			// Add vertices for quad.
 			var finalNorm = avgNormal;
@@ -388,15 +393,15 @@ namespace ModelFrom2DShape
 			// invertWinding also must invertNorm?
 			//var finalNorm = invertNorm ^ invertWinding ? -avgNormal : avgNormal;
 			if (invertWinding) {
-				AppendVertex(vTR, 0, finalNorm, uvScale, quadVOrder);
-				AppendVertex(vTL, 1, finalNorm, uvScale, quadVOrder);
-				AppendVertex(vBL, 2, finalNorm, uvScale, quadVOrder);
-				AppendVertex(vBR, 3, finalNorm, uvScale, quadVOrder);
+				AppendVertex(vTR, 0, finalNorm, uvScale);
+				AppendVertex(vTL, 1, finalNorm, uvScale);
+				AppendVertex(vBL, 2, finalNorm, uvScale);
+				AppendVertex(vBR, 3, finalNorm, uvScale);
 			} else {
-				AppendVertex(vTL, 0, finalNorm, uvScale, quadVOrder);
-				AppendVertex(vTR, 1, finalNorm, uvScale, quadVOrder);
-				AppendVertex(vBR, 2, finalNorm, uvScale, quadVOrder);
-				AppendVertex(vBL, 3, finalNorm, uvScale, quadVOrder);
+				AppendVertex(vTL, 0, finalNorm, uvScale);
+				AppendVertex(vTR, 1, finalNorm, uvScale);
+				AppendVertex(vBR, 2, finalNorm, uvScale);
+				AppendVertex(vBL, 3, finalNorm, uvScale);
 			}
 			normal = newNormal;
 
@@ -404,12 +409,9 @@ namespace ModelFrom2DShape
             AppendQuadIndices();
 
 
-            // TODO: Need to set normals BEFORE increment these values!
             uint nAddedVertices = 4;  // From above.
             _usedVertices += nAddedVertices;
-            //_usedVFloats += (uint)NFloatsPerVertex() + nAddedVertices;
 
-            // TODO: Do we have to do this whenever we change the data?
             // TODO: If adding many quads, should do this AFTER ALL quads added.
             UpdateBufferData();
 			// Accumulate, for next quad.
@@ -462,13 +464,12 @@ namespace ModelFrom2DShape
 		//	return s_QuadUVs_Default;
 		//}
 
-		private void AppendVertex(Vector3 position, uint uvIdx, Vector3 normal, Vector2 uvScale,
-								  QuadVOrder quadRotate = QuadVOrder.Default)
+		private void AppendVertex(Vector3 position, uint uvIdx, Vector3 normal, Vector2 uvScale)
         {
             if (_usedVertices >= _numVertices)
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
 
-            UpdateVertex(position, uvIdx, _usedVFloats, normal, uvScale, quadRotate);
+            UpdateVertex(position, uvIdx, _usedVFloats, normal, uvScale);
 
             _usedVFloats += FloatsPerVertex;
         }
@@ -479,6 +480,7 @@ namespace ModelFrom2DShape
         /// <param name="relIndex">-1 for previous vertex, -2 for one before that.</param>
         private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx, Vector3 adjNormal)
         {
+			return;   // TODO: No longer valid; vertices have been re-ordered to be quad.
             uint floatIndex = (uint)(_usedVFloats + (FloatsPerVertex * relIndex));
             UpdateVertex(position, uvIdx, floatIndex, adjNormal, null);
         }
@@ -493,7 +495,7 @@ namespace ModelFrom2DShape
 		/// <param name="uvScale">Used when updateUV=true</param>
 		/// <param name="updateUV"></param>
         private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat,
-								  Vector3 normal, Vector2? uvScale, QuadVOrder quadRotate = QuadVOrder.Default)
+								  Vector3 normal, Vector2? uvScale)
         {
             VData[iVFloat++] = position.X;
             VData[iVFloat++] = position.Y;
@@ -515,7 +517,8 @@ namespace ModelFrom2DShape
                 if (uvScale.HasValue)
                 {
 					//Vector2 uv = GetUVsPerQuad(quadRotate)[uvIdx];
-					Vector2 uv = s_QuadUVs_Default[uvIdx];
+					// TBD: Why aren't these COUNTER-clockwise, like our culling mode?
+					Vector2 uv = s_QuadUVs_Default[uvIdx];  // Clockwise; same as CwCorner.
 					VData[iVFloat++] = CurrentStartU + uv.X * uvScale.Value.X;
                     VData[iVFloat++] = uv.Y * uvScale.Value.Y;
                 }
@@ -593,7 +596,7 @@ namespace ModelFrom2DShape
             Geom.IndexBuffer = IBuffer;
             Geom.SetDrawRange(PrimitiveType.TriangleList, 0, _usedIndices, false);
 
-			DumpData();
+			//DumpData();
         }
 
 		private void DumpData()

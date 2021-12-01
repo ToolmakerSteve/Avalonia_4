@@ -22,8 +22,8 @@ namespace SceneSource
 
         const bool AddOnlyNewQuads = true;
 		const bool CastShadows = true; //true;
-        public const bool SingleGeometry = true;
-        public const bool SingleGeometryTEST = true;   // TMS: Temporary changes.
+        public const bool SingleGeometry = false;   // TODO
+        public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
 
 
         #region --- data, new ----------------------------------------
@@ -79,7 +79,7 @@ namespace SceneSource
 
             // Initialized to altitude zero.
             BaseAltitude = DistD.Zero;
-			BaseAltitude = (DistD)3;   // ttttt
+			//BaseAltitude = (DistD)3;   // ttttt
 
             if (context == null)
                 context = Geo.NoContext.It;
@@ -264,6 +264,8 @@ namespace SceneSource
             if (Points.Count < 2)
                 return;
 
+			//DumpPoints();
+
             //Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
             EnsureAndMaybeClearGeometry(node, model);
 
@@ -320,18 +322,28 @@ namespace SceneSource
 
             // Final quad.
 			if (SingleGeometryTEST) {
-				cl0 = new Vector3(-30, 1, -40);
-				cl1 = new Vector3(-30, 1, -45);
-				//U.Swap(ref cl0, ref cl1);   // To see what changes.
-				perp0 = CalcPerpendicularXZ(cl0, cl1);
-				perp1 = perp0;
+				// Hardcoded segment.
+				//cl0 = new Vector3(-30, 1, -40);
+				//cl1 = new Vector3(-30, 1, -45);
+				////U.Swap(ref cl0, ref cl1);   // To see what changes.
+				//perp0 = CalcPerpendicularXZ(cl0, cl1);
+				//perp1 = perp0;
 			}
 			AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
 
 			FinishGeometry();
         }
 
-        private void EnsureAndMaybeClearGeometry(Node node, StaticModel model)
+		private void DumpPoints()
+		{
+			Debug.WriteLine($"\n----- Points n={Points.Count} -----");
+			for (int iPoint = 0; iPoint < Points.Count; iPoint++) {
+				Debug.WriteLine($"{iPoint}: {Points[iPoint]}");
+			}
+			Debug.WriteLine($"-----  -----\n");
+		}
+
+		private void EnsureAndMaybeClearGeometry(Node node, StaticModel model)
         {
             _currentWallSegmentCount = 0;
             EnsureGeometry(model);
@@ -387,7 +399,8 @@ namespace SceneSource
 			// Must specify such that the second pair is at far end - these get adjusted when next quad is added.
 			U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
             U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
-			AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall2, ref normSide2);
+			//AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall2, ref normSide2, true);
+			AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall1, ref normSide2, false, true, true);
 
 			normals[0] = normTop;
             normals[1] = normBtm;
@@ -486,8 +499,11 @@ namespace SceneSource
         private int _currentWallSegmentCount = 0;
 
         private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1,
-							 Poly3D.QuadVOrder quadRotate, ref Vector3? normal, bool invertNorm = false, bool invertWinding = false)
+							 Poly3D.QuadVOrder quadVOrder, ref Vector3? normal,
+							 bool invertNorm = false, bool invertU = false, bool invertWinding = false)
         {
+			//if (!ReferenceEquals(poly, FirstSidePoly)) return;   // ttt
+
 			if (SingleGeometryTEST)
 				poly.ResetU();
             //Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
@@ -496,7 +512,7 @@ namespace SceneSource
             // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
             if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
             {
-                poly.AddQuad(wallPair0, wallPair1, quadRotate, ref normal, invertNorm, invertWinding);
+                poly.AddQuad(wallPair0, wallPair1, quadVOrder, ref normal, invertNorm, invertU, invertWinding);
             }
         }
         #endregion
