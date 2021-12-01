@@ -26,6 +26,7 @@ namespace AvaloniaSample
 		static float GroundSize = 500;//2000;//500;
 		const bool IncludeWater = false;
 		const bool IncludeFog = false;
+		const bool ShadowCascade = true;//TBD
 
 		const bool IncludeScatteredModels = true;//true;
 		const int NScatteredModels = 100;//1000;
@@ -623,15 +624,17 @@ namespace AvaloniaSample
 		{
 			// Create a directional light to the world. Enable cascaded shadows on it
 			var lightNode = scene.CreateChild("DirectionalLight");
-			//lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
-			lightNode.SetDirection(new Vector3(0.3f, -1.0f, 0.4f));
+			lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
+			//lightNode.SetDirection(new Vector3(0.3f, -1.0f, 0.4f));
 			//lightNode.SetDirection(new Vector3(0.1f, -1.0f, 0.1f));
 			var light = lightNode.CreateComponent<Light>();
 			light.LightType = LightType.Directional;
 			light.CastShadows = true;
 			light.ShadowBias = new BiasParameters(0.00025f, 0.5f);
-			light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
-			light.SpecularIntensity = 0.5f;
+			if (ShadowCascade) {
+				light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
+			}
+			//ttttt light.SpecularIntensity = 0.5f;
 			// true=Apply slightly overbright lighting to match the skybox
 			float bright = false ? 1.2f : 1.0f;
 			light.Color = new Color(bright, bright, bright);

@@ -320,7 +320,7 @@ namespace ModelFrom2DShape
 
 			_boundingBox = new BoundingBox(minV, maxV);
 			//// tmstest: Does it help lighting to be larger?
-			//_boundingBox = new BoundingBox(minV - new Vector3(1,1,1), maxV + new Vector3(1, 1, 1));
+			_boundingBox = new BoundingBox(minV - new Vector3(1,1,1), maxV + new Vector3(1, 1, 1));
 			return _boundingBox;
 		}
 		#endregion
@@ -383,8 +383,9 @@ namespace ModelFrom2DShape
 			// Moving backwards in texture.
 			if (invertU) {
 				//deltaU = -deltaU;
-				// TBD: FIRST CurrentStartU might want to adjust by -deltaU.
+				// Adjust CurrentStartU.
 				CurrentStartU -= deltaU;
+				// For next segment.
 				CurrentEndU = CurrentStartU;
 			}
 
