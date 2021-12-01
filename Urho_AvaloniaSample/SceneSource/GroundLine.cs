@@ -20,7 +20,8 @@ namespace SceneSource
     {
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
-        const bool AddOnlyNewQuads = true;
+		// false so we can smooth while creating the quads.
+        const bool AddOnlyNewQuads = false;//true;
 		const bool CastShadows = true; //true;
         public const bool SingleGeometry = false;   // TODO
         public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
@@ -352,9 +353,14 @@ namespace SceneSource
             {
                 // Recreating all quads each time.
                 TopPoly.Clear();
-                // TODO: Other polys also.
-                throw new NotImplementedException("EnsureAndMaybeClearGeometry - clear all polys");
-            }
+				if (!SingleGeometry) {
+					BottomPoly.Clear();
+					FirstSidePoly.Clear();
+					SecondSidePoly.Clear();
+					StartPoly.Clear();
+					EndPoly.Clear();
+				}
+			}
         }
 
         private void FinishGeometry()
