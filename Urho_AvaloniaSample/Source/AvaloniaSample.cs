@@ -19,7 +19,7 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
-		const bool HardcodedWall = true; //false; ttttt
+		const bool HardcodedWall = false;//false; tmstest
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
 		const bool UseTerrainScene = true;//true;   // TMS
@@ -144,9 +144,9 @@ namespace AvaloniaSample
 				new Vector2(-37.4f, -41.6f),
 				new Vector2(-36.8f, -42.0f),
 
-				new Vector2(-36.3f, -42.4f),
-				new Vector2(-35.8f, -42.8f),
-				new Vector2(-35.4f, -43.1f),
+				//new Vector2(-36.3f, -42.4f),
+				//new Vector2(-35.8f, -42.8f),
+				//new Vector2(-35.4f, -43.1f),
 			};
 
 			StartNewWall();

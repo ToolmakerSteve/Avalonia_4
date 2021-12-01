@@ -463,7 +463,7 @@ namespace SceneSource
                 StartPoly.Clear();
             Vector3? normal = null;
 			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.Default, ref normal, true, true);
-			AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.WallStart, ref normal, false, false);
+			AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.WallStart, ref normal, true, false, false);
 		}
 
 		private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
@@ -471,7 +471,7 @@ namespace SceneSource
             if (!GroundLine.SingleGeometryTEST)
             EndPoly.Clear();
             Vector3? normal = null;
-            AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.WallEnd, ref normal);
+            AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.WallEnd, ref normal, true, false, false);
         }
 
         /// <summary>
