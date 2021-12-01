@@ -79,6 +79,7 @@ namespace SceneSource
 
             // Initialized to altitude zero.
             BaseAltitude = DistD.Zero;
+			BaseAltitude = (DistD)1;   // ttttt
 
             if (context == null)
                 context = Geo.NoContext.It;
@@ -318,9 +319,16 @@ namespace SceneSource
             }
 
             // Final quad.
-            AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
+			if (SingleGeometryTEST) {
+				cl0 = new Vector3(-30, 1, -40);
+				cl1 = new Vector3(-30, 1, -45);
+				U.Swap(ref cl0, ref cl1);   // To see what changes.
+				perp0 = CalcPerpendicularXZ(cl0, cl1);
+				perp1 = perp0;
+			}
+			AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
 
-            FinishGeometry();
+			FinishGeometry();
         }
 
         private void EnsureAndMaybeClearGeometry(Node node, StaticModel model)
@@ -359,30 +367,29 @@ namespace SceneSource
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
 			// Wall Segment: Top of wall.
-			AddQuad(TopPoly, wallPair0, wallPair1, ref normTop);
+			//ttt AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.Default, ref normTop, false, false);
 
 			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
 
             // Wall Segment: Bottom of wall.
-            AddQuad(BottomPoly, groundPair0, groundPair1, ref normBtm, true);
+            AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.Default, ref normBtm, true, false);
 
 
             // Wall Segment: First side of wall.
             // Must specify such that the second pair is at far end - these get adjusted when next quad is added.
-            // Swapped order w/i each pair, to flip normal.
-            U.Pair<Vector3> groundFirstSide0 = new U.Pair<Vector3>(groundPair0.First, wallPair0.First);
-            U.Pair<Vector3> groundFirstSide1 = new U.Pair<Vector3>(groundPair1.First, wallPair1.First);
-            AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1, ref normSide1);
+			U.Pair<Vector3> groundFirstSide0 = new U.Pair<Vector3>(wallPair0.First, groundPair0.First);
+			U.Pair<Vector3> groundFirstSide1 = new U.Pair<Vector3>(wallPair1.First, groundPair1.First);
+			// QuadVOrder re-orders the vertices to expected order and orientation (top left first).
+			//AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1, Poly3D.QuadVOrder.Wall1, ref normSide1);
 
-            // Wall Segment: Second side of wall.
-            // Must specify such that the second pair is at far end - these get adjusted when next quad is added.
-            // Swapped order w/i each pair, to flip normal.
-            U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
+			// Wall Segment: Second side of wall.
+			// Must specify such that the second pair is at far end - these get adjusted when next quad is added.
+			U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
             U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
-            AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, ref normSide2);
+			AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall2, ref normSide2);
 
-            normals[0] = normTop;
+			normals[0] = normTop;
             normals[1] = normBtm;
             normals[2] = normSide1;
             normals[3] = normSide2;
@@ -424,22 +431,29 @@ namespace SceneSource
 			return Points.Count > 0 || _hasDeferredPoint;
 		}
 
+		internal void Clear()
+		{
+			Points.Clear();
+			_hasDeferredPoint = false;
+		}
+
 
 		private void CreateStartPoly(U.Pair<Vector3> wallPair0, U.Pair<Vector3> groundPair0, Terrain terrain)
         {
             if (!GroundLine.SingleGeometryTEST)
                 StartPoly.Clear();
-            // Swapped to flip normal.
             Vector3? normal = null;
-            AddQuad(StartPoly, groundPair0, wallPair0, ref normal);
-        }
+			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadRotate.None, ref normal, false, false);
+			AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.Default, ref normal, true, true);
+			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadRotate.None, ref normal, false, true);
+		}
 
-        private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
+		private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
         {
             if (!GroundLine.SingleGeometryTEST)
             EndPoly.Clear();
             Vector3? normal = null;
-            AddQuad(EndPoly, wallPair1, groundPair1, ref normal);
+            AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.Default, ref normal);
         }
 
         /// <summary>
@@ -472,15 +486,18 @@ namespace SceneSource
         private int _prevWallSegmentCount = 0;
         private int _currentWallSegmentCount = 0;
 
-        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, ref Vector3? normal, bool invertNorm = false)
+        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1,
+							 Poly3D.QuadVOrder quadRotate, ref Vector3? normal, bool invertNorm = false, bool invertWinding = false)
         {
+			if (SingleGeometryTEST)
+				poly.ResetU();
             //Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
             //throw new NotImplementedException();
 
             // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
             if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
             {
-                poly.AddQuad(wallPair0, wallPair1, ref normal, invertNorm);
+                poly.AddQuad(wallPair0, wallPair1, quadRotate, ref normal, invertNorm, invertWinding);
             }
         }
         #endregion

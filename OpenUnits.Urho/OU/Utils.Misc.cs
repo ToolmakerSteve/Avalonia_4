@@ -749,61 +749,6 @@ namespace OU
         //            return a1.NearlyEquals(b1) ? a2.CompareTo_WithNearlyEquals(b2) : a1.CompareTo_WithNearlyEquals(b1);
         //        }
 
-        //        public static void Swap(ref double dblFirst, ref double dblSecond)
-        //        {
-        //            double tmp = dblFirst;
-        //            dblFirst = dblSecond;
-        //            dblSecond = tmp;
-        //        }
-
-        //        public static void Swap(ref int intFirst, ref int intSecond)
-        //        {
-        //            int tmp = intFirst;
-        //            intFirst = intSecond;
-        //            intSecond = tmp;
-        //        }
-
-        //        public static void Swap(ref float sngFirst, ref float sngSecond)
-        //        {
-        //            float tmp = sngFirst;
-        //            sngFirst = sngSecond;
-        //            sngSecond = tmp;
-        //        }
-
-        //        public static void Swap(ref PointF ptfFirst, ref PointF ptfSecond)
-        //        {
-        //            PointF tmp = ptfFirst;
-        //            ptfFirst = ptfSecond;
-        //            ptfSecond = tmp;
-        //        }
-
-        //        public static void Swap(ref Distance2D ptdFirst, ref Distance2D ptdSecond)
-        //        {
-        //            Distance2D tmp = ptdFirst;
-        //            ptdFirst = ptdSecond;
-        //            ptdSecond = tmp;
-        //        }
-
-        //        public static void Swap(ref Distance3D ptdFirst, ref Distance3D ptdSecond)
-        //        {
-        //            Distance3D tmp = ptdFirst;
-        //            ptdFirst = ptdSecond;
-        //            ptdSecond = tmp;
-        //        }
-
-        //        public static void Swap(ref object First, ref object Second)
-        //        {
-        //            object tmp = First;
-        //            First = Second;
-        //            Second = tmp;
-        //        }
-
-        //        public static void SwapTyped<T>(ref T First, ref T Second)
-        //        {
-        //            T tmp = First;
-        //            First = Second;
-        //            Second = tmp;
-        //        }
 
 
         //        public static void SmallerFirst(ref double First, ref double Second)

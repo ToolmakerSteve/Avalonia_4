@@ -43,7 +43,7 @@ namespace AvaloniaSample
 		const bool ShowWireframe = false;//false;   // TMS
 		const bool ShowTerrainWireframe = false && ShowWireframe;
 		const bool ShowWallWireframe = true && ShowWireframe;
-		const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 3 : 0.5f;//1f;//0.5f;   // TBD: Good value.
+		const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 5 : 0.5f;//1f;//0.5f;   // TBD: Good value.
 
 
 		public Scene Scene;
@@ -229,6 +229,7 @@ namespace AvaloniaSample
                     // Its empty, so use it. Happens if StartNewWall twice, without adding contents.
                     // Starting over.
                     WallDrawStarted = false;
+					CurrentWall.Clear();
                     return;
                 }
                 else
@@ -321,7 +322,7 @@ namespace AvaloniaSample
 					_suppressWallDraw = true;
 				if (_suppressWallDraw)
 					return;
-				SetDoDeferPoint(true);
+				SetDoDeferPoint(true && !GroundLine.SingleGeometryTEST);
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
 					ExtendWall(groundPt);
 				_prevModeWasFreehand = true;

@@ -137,9 +137,9 @@ namespace OU
 
         #region === Static Conversion/Create Methods ===============================================
         static public implicit operator double(DistD it) => it.Value;
-        static public explicit operator DistD(double value) => (DistD)(value);
+        static public explicit operator DistD(double value) => value.asDist();
         static public explicit operator float(DistD it) => (float)it.Value;
-        static public explicit operator DistD(float value) => (DistD)(value);
+        static public explicit operator DistD(float value) => value.asDist();
 
         static public DistD FromMeters(double meters)
 		{
