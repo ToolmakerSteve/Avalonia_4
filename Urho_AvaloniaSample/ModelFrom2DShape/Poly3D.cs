@@ -286,6 +286,8 @@ namespace ModelFrom2DShape
             _usedIndices = 0;
             _numQuads = 0;
 
+			CurrentStartU = 0;
+
             if (doTruncate)
             {
                 // TODO: Truncate arrays.
