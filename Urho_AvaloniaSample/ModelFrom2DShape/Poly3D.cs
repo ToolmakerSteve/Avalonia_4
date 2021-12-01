@@ -381,10 +381,16 @@ namespace ModelFrom2DShape
 
 			float deltaU = _textureScale * dx;
 			// Moving backwards in texture.
-			//if (invertU)
-			//	deltaU = -deltaU;
+			if (invertU) {
+				//deltaU = -deltaU;
+				// TBD: FIRST CurrentStartU might want to adjust by -deltaU.
+				CurrentStartU -= deltaU;
+				CurrentEndU = CurrentStartU;
+			}
+
 			Vector2 uvScale = new Vector2(deltaU, _textureScale * dy);
-			CurrentEndU = CurrentStartU + (invertU ? -deltaU : deltaU);
+			if (!invertU)
+				CurrentEndU = CurrentStartU + (invertU ? -deltaU : deltaU);
 			//CurrentEndU = CurrentStartU + deltaU;
 
 			// Add vertices for quad.
