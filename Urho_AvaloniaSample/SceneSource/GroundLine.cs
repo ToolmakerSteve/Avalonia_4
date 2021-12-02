@@ -23,8 +23,8 @@ namespace SceneSource
 		// false so we can smooth while creating the quads.
         const bool AddOnlyNewQuads = false;//true;
 		const bool CastShadows = true; //true;
-        public const bool SingleGeometry = false;   // TODO
-        public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
+        public const bool SingleGeometry = true;//false;   // TODO
+        public const bool SingleGeometryTEST = true;//false;   // TMS: Temporary changes.
 
 
         #region --- data, new ----------------------------------------
@@ -32,7 +32,8 @@ namespace SceneSource
         public DistD Height { get; set; }
         public DistD BaseAltitude { get; set; }
         public bool HasNormals { get; private set; }
-        public bool HasUVs { get; private set; }
+		public bool HasUVs { get; private set; }
+		public bool HasTangents { get; private set; }
 
 		private Model _model;
 
@@ -66,17 +67,19 @@ namespace SceneSource
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="context"></param>
-        public GroundLine(double width, double height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
-                : this(new DistD(width), new DistD(height), context)
+        public GroundLine(double width, double height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true, bool hasTangents = true)
+                : this(new DistD(width), new DistD(height), context, hasUV, hasNormals, hasTangents)
         {
         }
 
-        public GroundLine(DistD width, DistD height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true)
+        public GroundLine(DistD width, DistD height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true, bool hasTangents = true)
         {
             Width = width;
             Height = height;
             HasUVs = hasUV;
             HasNormals = hasNormals;
+			HasTangents = hasTangents;
+			HasTangents = false;  // ttt
 
             // Initialized to altitude zero.
             BaseAltitude = DistD.Zero;
@@ -106,12 +109,30 @@ namespace SceneSource
             var it = AvaloniaSample.AvaloniaSample.It;
             CreateGeometryFromPoints(wallNode, wall, it.Terrain);
 
+			UpdateBufferData();
 			// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
 			UpdateBoundingBox();
 
 		}
 
-		// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
+		private void UpdateBufferData()
+		{
+			TopPoly.UpdateBufferData();
+			if (!SingleGeometry) {
+				BottomPoly.UpdateBufferData();
+				FirstSidePoly.UpdateBufferData();
+				SecondSidePoly.UpdateBufferData();
+
+				// These need to be flushed, because only one quad.
+				StartPoly.UpdateBufferData();
+				EndPoly.UpdateBufferData();
+			}
+		}
+
+		/// <summary>
+		/// Call UpdateBufferData FIRST.
+		/// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
+		/// </summary>
 		private void UpdateBoundingBox()
 		{
 			var bb = TopPoly.BoundingBox;
@@ -253,14 +274,18 @@ namespace SceneSource
 		private static Material _wallMaterial;
 
 
-		private Poly3D CreateAndInitPoly(StaticModel sModel)
-        {
-            var poly = new Poly3D();
-            poly.Init(sModel, HasNormals, HasUVs);
-            return poly;
-        }
+		internal bool HasContents()
+		{
+			return Points.Count > 0 || _hasDeferredPoint;
+		}
 
-        public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
+		internal void Clear()
+		{
+			Points.Clear();
+			_hasDeferredPoint = false;
+		}
+
+		public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
         {
             if (Points.Count < 2)
                 return;
@@ -312,6 +337,10 @@ namespace SceneSource
                         // TBD: Adjust for relative distances to those points?
                         perp1 = CalcPerpendicularXZ(cl0, cl2);
 
+						// TODO: Use cl2 to smooth normal.
+						// Easiest might be to calculate each "slice" of 4 points,
+						// Pass "future" points to algorithm.
+						// (But future points not known until have "perp2", right?)
                         AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
                     }
                 }
@@ -323,9 +352,12 @@ namespace SceneSource
 
             // Final quad.
 			if (SingleGeometryTEST) {
-				// Hardcoded segment.
-				//cl0 = new Vector3(-30, 1, -40);
-				//cl1 = new Vector3(-30, 1, -45);
+				//// Hardcoded segment.
+				//float x0 = 0;//-30;
+				//float z0 = 0;//-40;
+				//float dz = 10;//-20;//-5;
+				//cl0 = new Vector3(x0, 1, z0);
+				//cl1 = new Vector3(x0, 1, z0+dz);
 				////U.Swap(ref cl0, ref cl1);   // To see what changes.
 				//perp0 = CalcPerpendicularXZ(cl0, cl1);
 				//perp1 = perp0;
@@ -368,7 +400,17 @@ namespace SceneSource
             _prevWallSegmentCount = _currentWallSegmentCount;
         }
 
-        private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
+		/// <summary>
+		/// CAUTION: No longer tells Poly3D to UpdateBufferData.
+		/// Call UpdateBufferData directly, on all polys, after all segments added.
+		/// </summary>
+		/// <param name="cl0"></param>
+		/// <param name="cl1"></param>
+		/// <param name="perp0"></param>
+		/// <param name="perp1"></param>
+		/// <param name="terrain"></param>
+		/// <param name="normals"></param>
+		private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
         {
             if (SingleGeometryTEST && _currentWallSegmentCount >= 1)
                 return;   // TEST - only one segment
@@ -414,7 +456,7 @@ namespace SceneSource
             normals[3] = normSide2;
 
 
-            if (Points.Count == 2)
+            if (Points.Count >= 2 && !StartPoly.HasContents)
             {
                 // Now that we know wall direction, create StartPoly.
                 CreateStartPoly(wallPair0, groundPair0, terrain);
@@ -445,92 +487,102 @@ namespace SceneSource
 			}
 		}
 
-		internal bool HasContents()
-		{
-			return Points.Count > 0 || _hasDeferredPoint;
-		}
+		//internal void CalcTangents()
+		//{
+		//}
+		#endregion
 
-		internal void Clear()
+		#region --- private methods ----------------------------------------
+		private Poly3D CreateAndInitPoly(StaticModel sModel)
 		{
-			Points.Clear();
-			_hasDeferredPoint = false;
+			var poly = new Poly3D();
+			poly.Init(sModel, HasNormals, HasUVs, HasTangents);
+			return poly;
 		}
-
 
 		private void CreateStartPoly(U.Pair<Vector3> wallPair0, U.Pair<Vector3> groundPair0, Terrain terrain)
-        {
-            if (!GroundLine.SingleGeometryTEST)
-                StartPoly.Clear();
-            Vector3? normal = null;
+		{
+			if (!GroundLine.SingleGeometryTEST)
+				StartPoly.Clear();
+			Vector3? normal = null;
 			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.Default, ref normal, true, true);
 			AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.WallStart, ref normal, true, false, false);
 		}
 
 		private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
-        {
-            if (!GroundLine.SingleGeometryTEST)
-            EndPoly.Clear();
-            Vector3? normal = null;
-            AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.WallEnd, ref normal, true, false, false);
-        }
+		{
+			if (!GroundLine.SingleGeometryTEST)
+				EndPoly.Clear();
+			Vector3? normal = null;
+			AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.WallEnd, ref normal, true, false, false);
+		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="wallPair"></param>
-        /// <param name="terrain"></param>
-        /// <param name="relAltitude">relative altitude: distance above terrain.</param>
-        /// <returns></returns>
-        private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain, float relAltitude)
-        {
-            Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain, relAltitude);
-            Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain, relAltitude);
-            return new U.Pair<Vector3>(groundFirst, groundSecond);
-        }
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="wallPair"></param>
+		/// <param name="terrain"></param>
+		/// <param name="relAltitude">relative altitude: distance above terrain.</param>
+		/// <returns></returns>
+		private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain, float relAltitude)
+		{
+			Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain, relAltitude);
+			Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain, relAltitude);
+			return new U.Pair<Vector3>(groundFirst, groundSecond);
+		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="terrain"></param>
-        /// <param name="relAltitude">relative altitude: distance above terrain.</param>
-        /// <returns></returns>
-        private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float relAltitude)
-        {
-            float altitude = U2.GetTerrainHeight(terrain, vec) + relAltitude;
-            return U.WithAltitude(vec, altitude);
-        }
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="vec"></param>
+		/// <param name="terrain"></param>
+		/// <param name="relAltitude">relative altitude: distance above terrain.</param>
+		/// <returns></returns>
+		private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float relAltitude)
+		{
+			float altitude = U2.GetTerrainHeight(terrain, vec) + relAltitude;
+			return U.WithAltitude(vec, altitude);
+		}
 
-        private int _prevWallSegmentCount = 0;
-        private int _currentWallSegmentCount = 0;
+		private int _prevWallSegmentCount = 0;
+		private int _currentWallSegmentCount = 0;
 
-        private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1,
+		/// <summary>
+		/// CAUTION: No longer tells Poly3D to UpdateBufferData.
+		/// Call UpdateBufferData directly, after all quads added.
+		/// </summary>
+		/// <param name="poly"></param>
+		/// <param name="wallPair0"></param>
+		/// <param name="wallPair1"></param>
+		/// <param name="quadVOrder"></param>
+		/// <param name="normal"></param>
+		/// <param name="invertNorm"></param>
+		/// <param name="invertU"></param>
+		/// <param name="invertWinding"></param>
+		private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1,
 							 Poly3D.QuadVOrder quadVOrder, ref Vector3? normal,
 							 bool invertNorm = false, bool invertU = false, bool invertWinding = false)
-        {
+		{
 			//if (!ReferenceEquals(poly, FirstSidePoly)) return;   // ttt
 
 			if (SingleGeometryTEST)
 				poly.ResetU();
-            //Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
-            //throw new NotImplementedException();
+			//Debug.WriteLine($"--- ({wallPair0}, {wallPair1} ---");
+			//throw new NotImplementedException();
 
-            // ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
-            if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads)
-            {
-                poly.AddQuad(wallPair0, wallPair1, quadVOrder, ref normal, invertNorm, invertU, invertWinding);
-            }
-        }
-        #endregion
+			// ">": Only add if it is a new one. (unless !AddOnlyNewQuads)
+			if (_currentWallSegmentCount > _prevWallSegmentCount || !AddOnlyNewQuads) {
+				poly.AddQuad(wallPair0, wallPair1, quadVOrder, ref normal, invertNorm, invertU, invertWinding, false);
+			}
+		}
 
-        #region --- private methods ----------------------------------------
-        /// <summary>
-        /// Returns a unit vector, perpendicular to pa--pb, and lying in ground plane.
-        /// </summary>
-        /// <param name="pa"></param>
-        /// <param name="pb"></param>
-        /// <returns></returns>
-        private Vector2 CalcPerpendicularXZ(Vector3 pa, Vector3 pb)
+		/// <summary>
+		/// Returns a unit vector, perpendicular to pa--pb, and lying in ground plane.
+		/// </summary>
+		/// <param name="pa"></param>
+		/// <param name="pb"></param>
+		/// <returns></returns>
+		private Vector2 CalcPerpendicularXZ(Vector3 pa, Vector3 pb)
         {
             // CAUTION: Altitude is in Y.
             Vector2 pa2 = pa.XZ();

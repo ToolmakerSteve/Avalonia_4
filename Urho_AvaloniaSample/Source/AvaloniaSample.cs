@@ -19,7 +19,7 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
-		const bool HardcodedWall = false;//false; tmstest
+		const bool HardcodedWall = true;//false; tmstest
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
 		const bool UseTerrainScene = true;//true;   // TMS
@@ -139,16 +139,29 @@ namespace AvaloniaSample
 			if (!HardcodedWall)
 				return;
 
-			Vector2[] points = new[] {
-				new Vector2(-38.4f, -40.0f),
-				new Vector2(-38.0f, -41.3f),
-				new Vector2(-37.4f, -41.6f),
-				new Vector2(-36.8f, -42.0f),
+			Vector2[] points;
+			if (GroundLine.SingleGeometryTEST) {
+				// Hardcoded segment.
+				float x0 = -30;
+				float z0 = -40-20;
+				float dz = 10;//-20;//-5;
+				points = new[] {
+					new Vector2(x0, z0),
+					new Vector2(x0, z0 + dz),
+				};
 
-				//new Vector2(-36.3f, -42.4f),
-				//new Vector2(-35.8f, -42.8f),
-				//new Vector2(-35.4f, -43.1f),
-			};
+			} else {
+				points = new[] {
+					new Vector2(-38.4f, -40.0f),
+					new Vector2(-38.0f, -41.3f),
+					new Vector2(-37.4f, -41.6f),
+					new Vector2(-36.8f, -42.0f),
+
+					//new Vector2(-36.3f, -42.4f),
+					//new Vector2(-35.8f, -42.8f),
+					//new Vector2(-35.4f, -43.1f),
+				};
+			}
 
 			StartNewWall();
 			foreach (var point in points) {
@@ -424,6 +437,8 @@ namespace AvaloniaSample
 				}
 			}
 
+			//MAYBE CurrentWall.CalcTangents();
+
 			// Done with this wall.  TBD: Interferes with point-to-point drawing?
 			//MAYBE WallDrawStarted = false;
 		}
@@ -616,7 +631,7 @@ namespace AvaloniaSample
 				// Set a different viewmask on the water plane to be able to hide it from the reflection camera
 				water.ViewMask = 0x80000000;
 			}
-
+			
 			TerrainSceneMainCameraSettings(Camera1FinalNode, Camera1);
 		}
 

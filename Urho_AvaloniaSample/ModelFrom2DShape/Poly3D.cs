@@ -5,6 +5,7 @@ using LineLayer3D;
 using SceneSource;
 using Urho;
 using U = OU.Utils;
+using U2 = Global.Utils;
 
 namespace ModelFrom2DShape
 {
@@ -186,6 +187,8 @@ namespace ModelFrom2DShape
 		#endregion
 
 		#region --- Data ----------------------------------------
+		private float _textureScale = 1.0f / 4;//8;
+
 		public BoundingBox BoundingBox {
 			get {
 				// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
@@ -202,7 +205,8 @@ namespace ModelFrom2DShape
         private short[] IData;
         public uint FloatsPerVertex { get; private set; }
         public bool HasNormals { get; private set; }
-        public bool HasUVs { get; private set; }
+		public bool HasUVs { get; private set; }
+		public bool HasTangents { get; private set; }
 		// For current wall segment.
 		public float CurrentStartU, CurrentEndU;
 
@@ -219,7 +223,9 @@ namespace ModelFrom2DShape
             }
         }
 
-        private int _numWallSegments;
+		internal bool HasContents => NumQuads > 0;
+
+		private int _numWallSegments;
         public int NumWallSegments
         {
             get => _numWallSegments;
@@ -236,18 +242,19 @@ namespace ModelFrom2DShape
         private uint _usedVertices;
         private uint _usedVFloats;
         private uint _usedIndices;
+
+		const uint PositionOffset = 0;   // REQUiRED to be first. (e.g. by Tangent code).
+		private uint NormalOffset, UVOffset, TangentOffset;
 		#endregion
 
 		#region --- new, Init, Clear, Update.. ----------------------------------------
-
 		public Poly3D()
         {
 
         }
 
-        public void Init(UrhoObject something, bool hasNormals, bool hasUVs)
+        public void Init(UrhoObject something, bool hasNormals, bool hasUVs, bool hasTangents)
         {
-            const uint FloatsForVertexPosition = 3;
             const uint FloatsForVertexNormal = 3;
             const uint FloatsForVertexUV = 2;
 
@@ -256,21 +263,28 @@ namespace ModelFrom2DShape
             Geom = new Geometry();
 
             var eleMask = ElementMask.Position;
-            uint  floatsPerVertex = FloatsForVertexPosition;
+            uint  floatsPerVertex = U2.FloatsForVertexPosition;
 
             if (hasNormals)
             {
                 HasNormals = true;
-                eleMask |= ElementMask.Normal;
-                floatsPerVertex += FloatsForVertexNormal;
+				eleMask |= ElementMask.Normal;
+				NormalOffset = floatsPerVertex;   // Current value.
+				floatsPerVertex += U2.FloatsForVertexNormal;
             }
-            if (hasUVs)
-            {
-                HasUVs = true;
-                eleMask |= ElementMask.TexCoord1;
-                floatsPerVertex += FloatsForVertexUV;
-            }
-            FloatsPerVertex = floatsPerVertex;
+			if (hasUVs) {
+				HasUVs = true;
+				eleMask |= ElementMask.TexCoord1;
+				UVOffset = floatsPerVertex;   // Current value.
+				floatsPerVertex += U2.FloatsForVertexUV;
+			}
+			if (hasTangents) {
+				HasTangents = true;
+				eleMask |= ElementMask.Tangent;
+				TangentOffset = floatsPerVertex;   // Current value.
+				floatsPerVertex += U2.FloatsForVertexTangent;
+			}
+			FloatsPerVertex = floatsPerVertex;
             ElemMask = eleMask;
         }
 
@@ -323,18 +337,29 @@ namespace ModelFrom2DShape
 			_boundingBox = new BoundingBox(minV - new Vector3(1,1,1), maxV + new Vector3(1, 1, 1));
 			return _boundingBox;
 		}
+
+		internal void ResetU()
+		{
+			CurrentStartU = 0;
+		}
 		#endregion
 
 
-		private float _textureScale = 1.0f / 4;//8;
-
-        /// <summary>
-        /// TODO: Normals. (Also change ElemMask passed in by client.)
-        /// </summary>
-        /// <param name="wallPair0"></param>
-        /// <param name="wallPair1"></param>
-        internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, QuadVOrder quadVOrder,
-							  ref Vector3? normal, bool invertNorm, bool invertU, bool invertWinding)
+		#region --- AddQuad, AppendVertex, Ensure..Capacity, UpdateBufferData ----------------------------------------
+		/// <summary>
+		/// TODO: Normals. (Also change ElemMask passed in by client.)
+		/// </summary>
+		/// <param name="wallPair0"></param>
+		/// <param name="wallPair1"></param>
+		/// <param name="quadVOrder"></param>
+		/// <param name="normal"></param>
+		/// <param name="invertNorm"></param>
+		/// <param name="invertU"></param>
+		/// <param name="invertWinding"></param>
+		/// <param name="doUpdateBuffers">default true. Can be false until last quad. Or call UpdateBufferData directly.</param>
+		internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, QuadVOrder quadVOrder,
+							  ref Vector3? normal, bool invertNorm, bool invertU, bool invertWinding,
+							  bool doUpdateBuffers = true)
         {
             NumQuads++;
 
@@ -419,13 +444,14 @@ namespace ModelFrom2DShape
             uint nAddedVertices = 4;  // From above.
             _usedVertices += nAddedVertices;
 
-            // TODO: If adding many quads, should do this AFTER ALL quads added.
-            UpdateBufferData();
 			// Accumulate, for next quad.
 			CurrentStartU = CurrentEndU;
 
+			// NOTE: Only need to do this AFTER ALL quads added.
+			if (doUpdateBuffers)
+				UpdateBufferData();
 		}
-		
+
 		static private int[] GetLookupCorners(QuadVOrder quadVOrder)
 		{
 			switch (quadVOrder) {
@@ -475,6 +501,7 @@ namespace ModelFrom2DShape
 		//	return s_QuadUVs_Default;
 		//}
 
+
 		private void AppendVertex(Vector3 position, uint uvIdx, Vector3 normal, Vector2 uvScale)
         {
             if (_usedVertices >= _numVertices)
@@ -485,11 +512,11 @@ namespace ModelFrom2DShape
             _usedVFloats += FloatsPerVertex;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="relIndex">-1 for previous vertex, -2 for one before that.</param>
-        private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx, Vector3 adjNormal)
+		/// <summary>
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="relIndex">-1 for previous vertex, -2 for one before that.</param>
+		private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx, Vector3 adjNormal)
         {
 			return;   // TODO: No longer valid; vertices have been re-ordered to be quad.
             uint floatIndex = (uint)(_usedVFloats + (FloatsPerVertex * relIndex));
@@ -599,23 +626,56 @@ namespace ModelFrom2DShape
             }
         }
 
-        private void UpdateBufferData()
+		private void EnsureIndexCapacity(uint numIndices)
+		{
+			if (numIndices > _numIndices) {
+				_numIndices = numIndices;
+				IBuffer.SetSize(_numIndices, false, false);
+
+				short[] oldIndices = IData;
+
+				IData = new short[_numIndices];
+
+				if (oldIndices != null)
+					Array.Copy(oldIndices, IData, oldIndices.Length);
+
+				// NO, do this AFTER filling IData with correct content.
+				//IBuffer.SetData(IData);
+			}
+		}
+
+		public void UpdateBufferData()
         {
+			if (!HasContents)
+				return;
+
             VBuffer.SetData(VData);
             IBuffer.SetData(IData);
             Geom.SetVertexBuffer(0, VBuffer);
             Geom.IndexBuffer = IBuffer;
             Geom.SetDrawRange(PrimitiveType.TriangleList, 0, _usedIndices, false);
 
-			//DumpData();
+			//ttt CalcTangents();
+			DumpData();   // ttttt tmstest
         }
 
+		internal void CalcTangents()
+		{
+			if (HasTangents)
+				Tangent1.GenerateTangents(VData, FloatsPerVertex, IData, 0, _numIndices, NormalOffset, UVOffset, TangentOffset);
+			else
+				U.DoNothing();
+		}
+		#endregion
+
+		#region --- DumpData, GetVertex.., Positions ----------------------------------------
 		private void DumpData()
 		{
 			Debug.WriteLine($"\n----- VData n={_numVertices} -----");
 			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
-				GetVertexData(iVertex, out Vector3 position, out Vector3 normal, out Vector2 uv);
-				Debug.WriteLine($"{position}, {normal}, {uv}");
+				GetVertexData(iVertex, out Vector3 position, out Vector3 normal,
+							  out Vector2 uv, out Vector4 tangent);
+				Debug.WriteLine($"{position}, {normal}, {uv}, {tangent}");
 			}
 			Debug.WriteLine($"\n----- IData n={_numIndices} -----");
 			for (int iIndex = 0; iIndex < _numIndices; iIndex++) {
@@ -625,48 +685,66 @@ namespace ModelFrom2DShape
 			Debug.WriteLine($"-----  -----\n");
 		}
 
-		private void GetVertexData(int iVertex, out Vector3 position, out Vector3 normal, out Vector2 uv)
+		private void GetVertexData(int iVertex, out Vector3 position, out Vector3 normal,
+								   out Vector2 uv, out Vector4 tangent)
 		{
-			uint offset = (uint)(iVertex * FloatsPerVertex);
-			position = new Vector3(VData[offset], VData[offset + 1], VData[offset + 2]);
-			normal = new Vector3(VData[offset + 3], VData[offset + 4], VData[offset + 5]);
-			uv = new Vector2(VData[offset + 6], VData[offset + 7]);
+			position = GetVertexPosition(iVertex);
+			normal = GetVertexNormal(iVertex);
+			uv = GetVertexUV(iVertex);
+			tangent = GetVertexTangent(iVertex);
 		}
 
-		private void EnsureIndexCapacity(uint numIndices)
-        {
-            if (numIndices > _numIndices)
-            {
-                _numIndices = numIndices;
-                IBuffer.SetSize(_numIndices, false, false);
+		public Vector3 GetVertexPosition(int iVertex)
+		{
+			return U2.AsVector3(VData, (uint)(FloatsPerVertex * iVertex + PositionOffset));
+		}
 
-                short[] oldIndices = IData;
+		public Vector3 GetVertexNormal(int iVertex)
+		{
+			if (HasNormals)
+				return U2.AsVector3(VData, (uint)(FloatsPerVertex * iVertex + NormalOffset));
+			else
+				return new Vector3();
+		}
 
-                IData = new short[_numIndices];
+		public Vector2 GetVertexUV(int iVertex)
+		{
+			if (HasUVs)
+				return U2.AsVector2(VData, (uint)(FloatsPerVertex * iVertex + UVOffset));
+			else
+				return new Vector2();
+		}
 
-                if (oldIndices != null)
-                    Array.Copy(oldIndices, IData, oldIndices.Length);
-
-                // NO, do this AFTER filling IData with correct content.
-                //IBuffer.SetData(IData);
-            }
-        }
+		public Vector4 GetVertexTangent(int iVertex)
+		{
+			if (HasTangents)
+				return U2.AsVector4(VData, (uint)(FloatsPerVertex * iVertex + TangentOffset));
+			else
+				return new Vector4();
+		}
 
 
 		private IEnumerable<Vector3> Positions()
 		{
-			uint offset = 0;
+			uint offset = PositionOffset;
 			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
 				Vector3 vec = new Vector3(
-					VData[offset], VData[offset+1], VData[offset+2]);
+					VData[offset], VData[offset + 1], VData[offset + 2]);
 				yield return vec;
 				offset += FloatsPerVertex;
 			}
 		}
 
-		internal void ResetU()
+		private IEnumerable<Vector4> Tangents()
 		{
-			CurrentStartU = 0;
+			uint offset = TangentOffset;
+			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
+				Vector4 tan = new Vector4(
+					VData[offset], VData[offset + 1], VData[offset + 2], VData[offset + 3]);
+				yield return tan;
+				offset += FloatsPerVertex;
+			}
 		}
+		#endregion
 	}
 }
