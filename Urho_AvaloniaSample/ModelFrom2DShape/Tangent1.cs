@@ -5,6 +5,11 @@ using Urho;
 
 namespace ModelFrom2DShape
 {
+	/// <summary>
+	/// Translated from https://github.com/urho3d/Urho3D/blob/master/Source/Urho3D/Graphics/Tangent.cpp
+	/// The MIT License (MIT)
+	/// Copyright(c) 2008-2021 the Urho3D project.
+	/// </summary>
 	internal class Tangent1
 	{
 		/// <summary>
