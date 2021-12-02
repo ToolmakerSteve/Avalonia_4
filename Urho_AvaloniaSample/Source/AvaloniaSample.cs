@@ -435,8 +435,9 @@ namespace AvaloniaSample
 					CurrentWall.AddPoint(LastPenPosition2D.asDist());
 					LastWallPosition2D = LastPenPosition2D;
 					CurrentWall.Flush();
-					CurrentWall.OnUpdate(true);
 				}
+				// Always do, for bake.
+				CurrentWall.OnUpdate(true);
 			}
 
 			//MAYBE CurrentWall.CalcTangents();
