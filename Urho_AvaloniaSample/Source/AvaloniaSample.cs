@@ -336,7 +336,7 @@ namespace AvaloniaSample
 		private void PointToPointWallDrawing(bool drawing)
 		{
 			if (drawing) {
-				if (_sawShiftToggleUp)// && !_prevModeWasFreehand)
+				if (_sawShiftToggleUp || CurrentWall == null)// && !_prevModeWasFreehand)
 					StartNewWall();
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
 					ExtendWall(groundPt, true);
@@ -476,7 +476,7 @@ namespace AvaloniaSample
 			}
 
 			if (doAddPoint) {
-				if (maybeBend) {
+				if (maybeBend && CurrentWall != null) {
 					if (CurrentWall.Points.Count > 1 && length > 2 * MinWallSegmentLength) {
 						// Add a short join segment. This "absorbs" any angle change, so long segment has full wall width.
 						// TBD: Calculate angle of direction change. Don't need for small angles.
