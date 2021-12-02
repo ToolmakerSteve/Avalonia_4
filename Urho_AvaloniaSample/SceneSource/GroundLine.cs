@@ -23,8 +23,8 @@ namespace SceneSource
 		// false so we can smooth while creating the quads.
         const bool AddOnlyNewQuads = false;//true;
 		const bool CastShadows = true; //true;
-        public const bool SingleGeometry = true;//false;   // TODO
-        public const bool SingleGeometryTEST = true;//false;   // TMS: Temporary changes.
+        public const bool SingleGeometry = false;//false;   // TODO
+        public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
 
 
         #region --- data, new ----------------------------------------
@@ -79,7 +79,6 @@ namespace SceneSource
             HasUVs = hasUV;
             HasNormals = hasNormals;
 			HasTangents = hasTangents;
-			HasTangents = false;  // ttt
 
             // Initialized to altitude zero.
             BaseAltitude = DistD.Zero;
@@ -94,7 +93,7 @@ namespace SceneSource
         #endregion
 
         #region --- OnUpdate ----------------------------------------
-        internal void OnUpdate()
+        internal void OnUpdate(bool bake = false)
         {
             // TBD: Ideally, add some representation when there is only one point.
             // Given that we don't know what direction wall will go in,
@@ -109,23 +108,22 @@ namespace SceneSource
             var it = AvaloniaSample.AvaloniaSample.It;
             CreateGeometryFromPoints(wallNode, wall, it.Terrain);
 
-			UpdateBufferData();
+			UpdateBufferData(bake);
 			// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
 			UpdateBoundingBox();
 
 		}
 
-		private void UpdateBufferData()
+		public void UpdateBufferData(bool bake = false)
 		{
-			TopPoly.UpdateBufferData();
+			TopPoly.UpdateBufferData(bake);
 			if (!SingleGeometry) {
-				BottomPoly.UpdateBufferData();
-				FirstSidePoly.UpdateBufferData();
-				SecondSidePoly.UpdateBufferData();
-
-				// These need to be flushed, because only one quad.
-				StartPoly.UpdateBufferData();
-				EndPoly.UpdateBufferData();
+				BottomPoly.UpdateBufferData(bake);
+				FirstSidePoly.UpdateBufferData(bake);
+				SecondSidePoly.UpdateBufferData(bake);
+				// These are only one quad each. Start doesn't change as wall extends, but End does.
+				StartPoly.UpdateBufferData(bake);
+				EndPoly.UpdateBufferData(bake);
 			}
 		}
 
@@ -448,7 +446,7 @@ namespace SceneSource
 			U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
             U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
 			//AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall2, ref normSide2, true);
-			AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall1, ref normSide2, false, true, true);
+			AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall1, ref normSide2, true, true, true);
 
 			normals[0] = normTop;
             normals[1] = normBtm;
@@ -456,7 +454,7 @@ namespace SceneSource
             normals[3] = normSide2;
 
 
-            if (Points.Count >= 2 && !StartPoly.HasContents)
+            if (Points.Count >= 2 && (SingleGeometry || !StartPoly.HasContents))
             {
                 // Now that we know wall direction, create StartPoly.
                 CreateStartPoly(wallPair0, groundPair0, terrain);

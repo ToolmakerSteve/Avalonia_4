@@ -33,6 +33,7 @@ namespace AvaloniaSample
 		const bool ScatteredModelsAreBoxes = true;
 		const bool BoxesHaveShadows = true;//true;  // TMS
 		const bool RandomColorBoxes = false;//true;
+		const bool RandomBoxRotation = true;
 		const float BoxScale = 5.0f;//5.0f;
 
 		const float _ZoneAmbient = 0.35f;//1.0f;//0.35f   TMS ttttt
@@ -149,6 +150,7 @@ namespace AvaloniaSample
 					new Vector2(x0, z0),
 					new Vector2(x0, z0 + dz),
 				};
+				//U.Swap(ref points[0], ref points[1]);   // tmstest: Reverse drawing direction; see what that changes.
 
 			} else {
 				points = new[] {
@@ -433,7 +435,7 @@ namespace AvaloniaSample
 					CurrentWall.AddPoint(LastPenPosition2D.asDist());
 					LastWallPosition2D = LastPenPosition2D;
 					CurrentWall.Flush();
-					CurrentWall.OnUpdate();
+					CurrentWall.OnUpdate(true);
 				}
 			}
 
@@ -447,7 +449,7 @@ namespace AvaloniaSample
 		{
 			if (CurrentWall != null && CurrentWall.HasContents()) {
 				CurrentWall.Flush();
-				CurrentWall.OnUpdate();
+				CurrentWall.OnUpdate(true);
 				CurrentWall = null;
 			}
 		}
@@ -639,8 +641,8 @@ namespace AvaloniaSample
 		{
 			// Create a directional light to the world. Enable cascaded shadows on it
 			var lightNode = scene.CreateChild("DirectionalLight");
-			lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
-			//lightNode.SetDirection(new Vector3(0.3f, -1.0f, 0.4f));
+			//lightNode.SetDirection(new Vector3(0.6f, -1.0f, 0.8f));
+			lightNode.SetDirection(new Vector3(0.3f, -1.0f, 0.4f));
 			//lightNode.SetDirection(new Vector3(0.1f, -1.0f, 0.1f));
 			var light = lightNode.CreateComponent<Light>();
 			light.LightType = LightType.Directional;
@@ -751,18 +753,26 @@ namespace AvaloniaSample
 			position.Y = U2.GetTerrainHeight(Terrain, position) + boxScale / 2 - 0.1f; //2.25f;
 			objectNode.Position = position;
 
-            if (terrainRelative) {
+            if (terrainRelative && !RandomBoxRotation) {
                 // Create a rotation quaternion from up vector to terrain normal
                 objectNode.Rotation = Quaternion.FromRotationTo(new Vector3(0.0f, 1.0f, 0.0f), Terrain.GetNormal(position));
-            }
+				// TBD: How ALSO rotate around vertical axis?
+            } else if (RandomBoxRotation) {
+				objectNode.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, U.RandomNextInt(360));
+			}
 
-            objectNode.SetScale(boxScale);
+			objectNode.SetScale(boxScale);
 
             StaticModel obj = objectNode.CreateComponent<StaticModel>();
             obj.Model = cache.GetModel("Models/Box.mdl");
             obj.CastShadows = BoxesHaveShadows;
             obj.SetMaterial(boxMaterial);
         }
+
+		private static float RandomM1ToP1()
+		{
+			return (float)U.RandomPlusMinus(1);
+		}
 
 		private static string BoxMaterialName()
 		{

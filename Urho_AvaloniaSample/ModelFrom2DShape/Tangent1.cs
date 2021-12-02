@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using Urho;
+using U = OU.Utils;
 
 namespace ModelFrom2DShape
 {
 	/// <summary>
 	/// Translated from https://github.com/urho3d/Urho3D/blob/master/Source/Urho3D/Graphics/Tangent.cpp
-	/// The MIT License (MIT)
 	/// Copyright(c) 2008-2021 the Urho3D project.
+	/// The MIT License (MIT)
 	/// </summary>
 	internal class Tangent1
 	{
@@ -109,11 +110,21 @@ namespace ModelFrom2DShape
 				// Calculate handedness
 				w = Vector3.Dot(Vector3.Cross(n, t), tan1[iTan2 + i]) < 0.0f ? -1.0f : 1.0f;
 
+				if (false) {
+					// Random values, to see if anything other than gray shows up.
+					xyz = new Vector3(RandomM1ToP1(), RandomM1ToP1(), RandomM1ToP1());
+					w = -w;
+				}
 				Vector4 tangent = new Vector4(xyz, w);
 				SetVector4(vertexData, (uint)(i * vertexSize + tangentOffset), tangent);
 			}
 
 			tan1 = null;   // OPTIONAL; goes away when exit scope.
+		}
+
+		private static float RandomM1ToP1()
+		{
+			return (float)U.RandomPlusMinus(1);
 		}
 
 

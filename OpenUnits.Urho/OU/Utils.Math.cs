@@ -42,29 +42,39 @@ namespace OU
         public const float VerySmallF = 0.00001f;
 
 
-        //        #region -- random --
-        //        static Random rand = new Random();
+        #region -- random --
+        public static Random Rand = new Random();
 
-        //        /// <summary>
-        //        /// Returns "true" with likeliness "probability".
-        //        /// "probability = 0" => always false.
-        //        /// "probability = 1" => always true.
-        //        /// "probability = 0.5" => true half the time.
-        //        /// </summary>
-        //        /// <param name="probability"></param>
-        //        /// <returns></returns>
-        //        public static bool ProbabilityTrue(double probability)
-        //        {
-        //            lock (rand)
-        //                return rand.NextDouble() <= probability;
-        //        }
+        /// <summary>
+        /// Returns "true" with likeliness "probability".
+        /// "probability = 0" => always false.
+        /// "probability = 1" => always true.
+        /// "probability = 0.5" => true half the time.
+        /// </summary>
+        /// <param name="probability"></param>
+        /// <returns></returns>
+        public static bool ProbabilityTrue(double probability)
+        {
+            lock (Rand)
+                return Rand.NextDouble() <= probability;
+        }
 
-        //        public static int RandomNextInt(int limit)
-        //        {
-        //            lock (rand)
-        //                return rand.Next(limit);
-        //        }
-        //        #endregion
+        public static int RandomNextInt(int limit)
+        {
+            lock (Rand)
+                return Rand.Next(limit);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="limit"></param>
+        /// <returns>value in range ([-limit, +limit)</returns>
+        public static double RandomPlusMinus(double limit)
+        {
+            limit = Math.Abs(limit);
+            return Rand.NextDouble() * 2 * limit - limit;
+        }
+        #endregion
 
 
         //        // ========== isBad, clamp, nearlyEquals ==========

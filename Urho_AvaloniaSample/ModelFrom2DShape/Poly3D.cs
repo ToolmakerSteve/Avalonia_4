@@ -644,21 +644,22 @@ namespace ModelFrom2DShape
 			}
 		}
 
-		public void UpdateBufferData()
+		public void UpdateBufferData(bool bake = false)
         {
 			if (!HasContents)
 				return;
 
-            VBuffer.SetData(VData);
+			if (bake)
+				CalcTangents();
+			//DumpData();   // ttttt tmstest
+
+			VBuffer.SetData(VData);
             IBuffer.SetData(IData);
             Geom.SetVertexBuffer(0, VBuffer);
             Geom.IndexBuffer = IBuffer;
             Geom.SetDrawRange(PrimitiveType.TriangleList, 0, _usedIndices, false);
-
-			//ttt CalcTangents();
-			DumpData();   // ttttt tmstest
         }
-
+		
 		internal void CalcTangents()
 		{
 			if (HasTangents)
