@@ -643,7 +643,7 @@ namespace ModelFrom2DShape
 				//IBuffer.SetData(IData);
 			}
 		}
-
+		
 		public void UpdateBufferData(bool bake = false)
         {
 			if (!HasContents)
