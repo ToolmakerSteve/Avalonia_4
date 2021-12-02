@@ -19,7 +19,7 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
-		const bool HardcodedWall = true;//false; tmstest
+		const bool HardcodedWall = false;//false; tmstest
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
 		const bool UseTerrainScene = true;//true;   // TMS
@@ -778,7 +778,8 @@ namespace AvaloniaSample
 		private static string BoxMaterialName()
 		{
 			//return "Materials/Stone.xml";
-			return "Materials/StoneWall4.xml";
+			//return "Materials/StoneWall4.xml";
+			return "Materials/StoneWall4Normal.xml";
 		}
 
 		bool _wasVisible = false;

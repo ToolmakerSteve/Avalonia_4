@@ -118,7 +118,7 @@ namespace ModelFrom2DShape
 				Vector4 tangent = new Vector4(xyz, w);
 				SetVector4(vertexData, (uint)(i * vertexSize + tangentOffset), tangent);
 			}
-
+			
 			tan1 = null;   // OPTIONAL; goes away when exit scope.
 		}
 

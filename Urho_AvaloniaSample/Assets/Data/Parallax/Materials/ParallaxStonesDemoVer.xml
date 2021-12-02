@@ -1,0 +1,14 @@
+<material>
+    <technique name="Techniques/DiffNormalSpecParallaxDemoVer.xml" quality="2" />
+	<technique name="Techniques/DiffNormalSpecParallax2Iters.xml" quality="1" />
+	<technique name="Techniques/DiffNormalSpec.xml" quality="0" />
+    <texture unit="diffuse" name="Textures/photosculpt-graystonewall-diffuse.jpg" />
+    <texture unit="normal" name="Textures/photosculpt-graystonewall-normal.jpg" />
+	<texture unit="specular" name ="Textures/photosculpt-graystonewall-specular.jpg" />
+	<texture unit="emissive" name ="Textures/photosculpt-graystonewall-displace.jpg" />
+	<parameter name="ParallaxIters" value="2" />
+	<parameter name="ParallaxDisplacement" value=".045" />
+	<parameter name="OffsetLimit" value=".45" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+    <parameter name="MatSpecColor" value=".6 .6 .6 16" />
+</material>

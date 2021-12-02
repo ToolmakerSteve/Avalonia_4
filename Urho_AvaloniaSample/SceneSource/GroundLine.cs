@@ -253,7 +253,7 @@ namespace SceneSource
 					_wallMaterial = res.GetMaterial("Materials/StoneWall4.xml");//ttt .Clone();
 					//else
 					// TODO: How add "StoneWall4Normal.xml" such that it is found?
-					//	_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml").Clone();
+					_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml");//.Clone();
 					//_wallMaterial = Material.FromColor(Color.Magenta, false);
 					///
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.White);
