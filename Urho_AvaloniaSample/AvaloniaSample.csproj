@@ -108,7 +108,6 @@
     <AssetsSourceFiles Remove="Assets\Data\DotNet\ios\System.Numerics.dll" />
     <AssetsSourceFiles Remove="Assets\Data\DotNet\ios\System.Xml.dll" />
     <AssetsSourceFiles Remove="Assets\Data\DotNet\ios\System.Core.dll" />
-    <AssetsSourceFiles Remove="Assets\Data\Materials\StoneWall4Normal.xml" />
   </ItemGroup>
   
 

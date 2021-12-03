@@ -1,5 +1,5 @@
 <material>
-	<technique name="Techniques/DiffNormal.xml" quality="0" />
+    <technique name="Techniques/DiffNormal.xml" quality="0" />
 	<!--<technique name="Techniques/Diff.xml" quality="0" />-->
 
 	<!--<texture unit="diffuse" name="Textures/StoneWall4/Wall Stone 004_COLOR.jpg" />-->
@@ -11,7 +11,7 @@
 	<!--<texture unit="normal" name="Textures/StoneWall4/black.jpg" />-->
 	<!--<texture unit="normal" name="Textures/StoneWall4/gray.jpg" />-->
 	<!--<texture unit="normal" name="Textures/StoneWall4/white.jpg" />-->
-
+	
 	<!--<texture unit="specular" name="Textures/StoneWall4/Wall Stone 004_SPEC.jpg" />-->
 	<!--<shader psdefines="PACKEDNORMAL" />-->
 	<!--<parameter name="AmbientColor" value="1.0 1.0 1.0 1.0" />-->

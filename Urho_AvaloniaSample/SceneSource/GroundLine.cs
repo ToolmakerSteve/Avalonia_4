@@ -260,7 +260,7 @@ namespace SceneSource
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Gray);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Magenta);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Black);
-
+					
 					//_wallMaterial.PixelShaderDefines("")
 					//ttt _wallMaterial.CullMode = CullMode.Cw; // CullMode.Cw;
 

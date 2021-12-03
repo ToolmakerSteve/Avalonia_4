@@ -779,6 +779,7 @@ namespace AvaloniaSample
 		{
 			//return "Materials/Stone.xml";
 			//return "Materials/StoneWall4.xml";
+			//return "Materials/StoneWall4b.xml";
 			return "Materials/StoneWall4Normal.xml";
 		}
 
