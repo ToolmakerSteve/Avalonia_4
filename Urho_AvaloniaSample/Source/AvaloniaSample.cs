@@ -66,8 +66,7 @@ namespace AvaloniaSample
 		// private SampleAvaloniaWindow _window;
         [Preserve]
         public AvaloniaSample() : base(
-			//new ApplicationOptions(assetsFolder: "Data;CoreData")
-			new ApplicationOptions(assetsFolder: "CoreData;Data")
+			new ApplicationOptions(assetsFolder: "Parallax;Data;CoreData")
             {
                 ResizableWindow = true,
 				AutoloadCoreData = false
@@ -777,12 +776,19 @@ namespace AvaloniaSample
 			return (float)U.RandomPlusMinus(1);
 		}
 
-		private static string BoxMaterialName()
+		public static string BoxMaterialName()
 		{
 			//return "Materials/Stone.xml";
 			//return "Materials/StoneWall4.xml";
 			//return "Materials/StoneWall4Normal.xml";
-			return "Parallax/Materials/ParallaxStonesDemoVer.xml";
+			//return "Parallax/Materials/ParallaxStonesDemoVer.xml";
+			//return "Materials/BricksNormal.xml";
+			//return "Materials/BricksParallaxOffset.xml";
+			//return "Materials/BricksParallaxOcclusion.xml";
+			//return "Materials/StonesParallaxOffset.xml";
+			//return "Materials/StonesParallaxOcclusion.xml";
+			//return "Materials/StoneWall4ParallaxOffset.xml";
+			return "Materials/StoneWall4ParallaxOcclusion.xml";
 		}
 
 		bool _wasVisible = false;

@@ -1,0 +1,16 @@
+<material>
+    <!-- The engine will automatically assign the refraction (viewport) texture to the environment unit during refract pass -->
+    <technique name="Techniques/DiffParallaxOffset.xml" />
+
+	<!--<texture unit="diffuse" name="Textures/StoneWall4/Wall Stone 004_COLOR.jpg" />-->
+	<texture unit="diffuse" name="Textures/StoneWall4/Wall Stone 004_COLOR - ORIG.jpg" />
+	<!--<texture unit="diffuse" name="Textures/StoneWall4/white.jpg" />-->
+
+	<texture unit="normal" name="Textures/StoneWall4/Wall Stone 004_NRM.jpg" />
+	<!--<texture unit="normal" name="Textures/StoneWall4/Wall Stone 004_NRM_invertG.jpg" />-->
+	
+	<texture unit="specular" name="Textures/StoneWall4/Wall Stone 004_DISP.png" />
+	<parameter name="HeightScale" value="0.1" />
+	<!--<parameter name="HeightScale" value="0.03" />-->
+	<cull value="none" />
+</material>

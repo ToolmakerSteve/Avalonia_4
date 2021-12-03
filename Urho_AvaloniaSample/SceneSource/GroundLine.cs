@@ -250,9 +250,10 @@ namespace SceneSource
 					var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
 					// Clone to alter parameters, in case we use this material elsewhere.
 					//_wallMaterial = res.GetMaterial("Materials/StoneWall4.xml").Clone();
-					_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml").Clone();
 					//_wallMaterial = Material.FromColor(Color.Magenta, false);
-					///
+					//_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml").Clone();
+					_wallMaterial = res.GetMaterial(AvaloniaSample.AvaloniaSample.BoxMaterialName()).Clone();
+					
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.White);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Gray);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Magenta);
