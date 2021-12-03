@@ -108,7 +108,7 @@ namespace AvaloniaSample
 				Debugger.Break();
 			e.Handled = true;
 		}
-
+		
 		protected bool IsLogoVisible
 		{
 			get { return logoSprite.Visible; }

@@ -26,7 +26,7 @@ namespace SceneSource
         public const bool SingleGeometry = false;//false;   // TODO
         public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
 
-
+		
         #region --- data, new ----------------------------------------
         public DistD Width { get; set; }
         public DistD Height { get; set; }
@@ -249,18 +249,15 @@ namespace SceneSource
 				if (_wallMaterial == null) {
 					var res = AvaloniaSample.AvaloniaSample.It.ResourceCache;
 					// Clone to alter parameters, in case we use this material elsewhere.
-					//if (CastShadows)
-					_wallMaterial = res.GetMaterial("Materials/StoneWall4.xml");//ttt .Clone();
-					//else
-					// TODO: How add "StoneWall4Normal.xml" such that it is found?
-					_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml");//.Clone();
+					//_wallMaterial = res.GetMaterial("Materials/StoneWall4.xml").Clone();
+					_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml").Clone();
 					//_wallMaterial = Material.FromColor(Color.Magenta, false);
 					///
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.White);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Gray);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Magenta);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Black);
-					
+
 					//_wallMaterial.PixelShaderDefines("")
 					//ttt _wallMaterial.CullMode = CullMode.Cw; // CullMode.Cw;
 

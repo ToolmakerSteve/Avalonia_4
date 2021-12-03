@@ -66,9 +66,11 @@ namespace AvaloniaSample
 		// private SampleAvaloniaWindow _window;
         [Preserve]
         public AvaloniaSample() : base(
-            new ApplicationOptions(assetsFolder: "Data;CoreData")
+			//new ApplicationOptions(assetsFolder: "Data;CoreData")
+			new ApplicationOptions(assetsFolder: "CoreData;Data")
             {
-                ResizableWindow = true
+                ResizableWindow = true,
+				AutoloadCoreData = false
             })
         {
             It = this;
@@ -779,8 +781,8 @@ namespace AvaloniaSample
 		{
 			//return "Materials/Stone.xml";
 			//return "Materials/StoneWall4.xml";
-			//return "Materials/StoneWall4b.xml";
-			return "Materials/StoneWall4Normal.xml";
+			//return "Materials/StoneWall4Normal.xml";
+			return "Parallax/Materials/ParallaxStonesDemoVer.xml";
 		}
 
 		bool _wasVisible = false;
