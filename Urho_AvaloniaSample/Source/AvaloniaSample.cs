@@ -87,11 +87,12 @@ namespace AvaloniaSample
         protected override void Setup()
         {
             base.Setup();
-        }
+		}
 
 		protected override void Start()
 		{
 			base.Start ();
+			//TBD_HOW_SET var multi = Application.Current.Graphics.MultiSample;
 
 			VGRendering.LoadResources();
 
@@ -780,7 +781,7 @@ namespace AvaloniaSample
 
 		public static string BoxMaterialName()
 		{
-			return "Materials/BrickWall19ParallaxOcclusion.xml";
+			//return "Materials/BrickWall19ParallaxOcclusion.xml";
 			return U2.MaterialNameFor(BoxTexture);
 		}
 
