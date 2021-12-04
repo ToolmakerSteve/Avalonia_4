@@ -22,7 +22,7 @@ namespace AvaloniaSample
 		const bool HardcodedWall = false;//false; tmstest
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
-		const bool UseTerrainScene = true;//true;   // TMS
+		const bool UseTerrainScene = false;//true;   // TMS
 		static float GroundSize = 500;//2000;//500;
 		const bool IncludeWater = false;
 		const bool IncludeFog = false;
@@ -787,8 +787,8 @@ namespace AvaloniaSample
 			//return "Materials/BricksParallaxOcclusion.xml";
 			//return "Materials/StonesParallaxOffset.xml";
 			//return "Materials/StonesParallaxOcclusion.xml";
-			//return "Materials/StoneWall4ParallaxOffset.xml";
-			return "Materials/StoneWall4ParallaxOcclusion.xml";
+			return "Materials/StoneWall4ParallaxOffset.xml";
+			//return "Materials/StoneWall4ParallaxOcclusion.xml";
 		}
 
 		bool _wasVisible = false;
