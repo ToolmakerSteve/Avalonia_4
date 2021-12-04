@@ -389,151 +389,155 @@ namespace OU
         //            return a[0];
         //        }
 
-        //        // Exception if a.Length = 0. Same as "NearEndElement(a, -1)".
-        //        public static T LastElement<T>(T[] a)
-        //        {
-        //            return a[LastIndex(a)];
-        //        }
-        //        // Exception if a.Length = 0. Same as "NearEndElement(a, -1)".
-        //        public static T LastElement<T>(List<T> a)
-        //        {
-        //            return a[LastIndex(a)];
-        //        }
-        //        // Exception if a.Length = 0. Same as "NearEndElement(a, -1)".
-        //        public static T LastElement<T>(IList<T> a)
-        //        {
-        //            return a[LastIndex(a)];
-        //        }
-        //        // Exception if a.Length = 0.
-        //        public static char LastElement(string a)
-        //        {
-        //            return a[LastIndex(a)];
-        //        }
+        // Exception if a.Length = 0. Same as "NearEndElement(a, -1)".
+        public static T LastElement<T>(T[] a)
+        {
+            return a[LastIndex(a)];
+        }
+        // Exception if a.Length = 0. Same as "NearEndElement(a, -1)".
+        public static T LastElement<T>(List<T> a)
+        {
+            return a[LastIndex(a)];
+        }
+        // Exception if a.Length = 0. Same as "NearEndElement(a, -1)".
+        public static T LastElement<T>(IList<T> a)
+        {
+            return a[LastIndex(a)];
+        }
+        // Exception if a.Length = 0.
+        public static char LastElement(string a)
+        {
+            return a[LastIndex(a)];
+        }
 
-        //        // "index=-1" for last element, "-2" for preceding element, "-3" is before "-2", ..
-        //        public static T NearEndElement<T>(T[] a, int index)
-        //        {
-        //            if (index >= 0)
-        //                throw new InvalidProgramException("NearEndElement index must be negative.");
-        //            // 
-        //            return a[a.Length + index];
-        //        }
-        //        // "index=-1" for last element, "-2" for preceding element, "-3" is before "-2", ..
-        //        public static T NearEndElement<T>(List<T> a, int index)
-        //        {
-        //            if (index >= 0)
-        //                throw new InvalidProgramException("NearEndElement index must be negative.");
-        //            // 
-        //            return a[a.Count + index];
-        //        }
-        //        // "index=-1" for last element, "-2" for preceding element, "-3" is before "-2", ..
-        //        public static T NearEndElement<T>(IList<T> a, int index)
-        //        {
-        //            if (index >= 0)
-        //                throw new InvalidProgramException("NearEndElement index must be negative.");
-        //            // 
-        //            return a[a.Count + index];
-        //        }
+        // "index=-1" for last element, "-2" for preceding element, "-3" is before "-2", ..
+        public static T NearEndElement<T>(T[] a, int index)
+        {
+            if (index >= 0)
+                throw new InvalidProgramException("NearEndElement index must be negative.");
+            // 
+            return a[a.Length + index];
+        }
+        // "index=-1" for last element, "-2" for preceding element, "-3" is before "-2", ..
+        public static T NearEndElement<T>(List<T> a, int index)
+        {
+            if (index >= 0)
+                throw new InvalidProgramException("NearEndElement index must be negative.");
+            // 
+            return a[a.Count + index];
+        }
+        // "index=-1" for last element, "-2" for preceding element, "-3" is before "-2", ..
+        public static T NearEndElement<T>(IList<T> a, int index)
+        {
+            if (index >= 0)
+                throw new InvalidProgramException("NearEndElement index must be negative.");
+            // 
+            return a[a.Count + index];
+        }
 
-        //        // SIDE-EFFECT: Modifies the last element of "a".
-        //        // Exception if a.Length = 0.
-        //        public static void SetLastElement<T>(T[] a, T value)
-        //        {
-        //            a[LastIndex(a)] = value;
-        //        }
-        //        // SIDE-EFFECT: Modifies the last element of "a".
-        //        // Exception if a.Length = 0.
-        //        public static void SetLastElement<T>(List<T> a, T value)
-        //        {
-        //            a[LastIndex(a)] = value;
-        //        }
-        //        // SIDE-EFFECT: Modifies the last element of "a".
-        //        // Exception if a.Length = 0.
-        //        public static void SetLastElement<T>(IList<T> a, T value)
-        //        {
-        //            a[LastIndex(a)] = value;
-        //        }
+        // SIDE-EFFECT: Modifies the last element of "a".
+        // Exception if a.Length = 0.
+        public static void SetLastElement<T>(T[] a, T value)
+        {
+            a[LastIndex(a)] = value;
+        }
+        // SIDE-EFFECT: Modifies the last element of "a".
+        // Exception if a.Length = 0.
+        public static void SetLastElement<T>(List<T> a, T value)
+        {
+            a[LastIndex(a)] = value;
+        }
+        // SIDE-EFFECT: Modifies the last element of "a".
+        // Exception if a.Length = 0.
+        public static void SetLastElement<T>(IList<T> a, T value)
+        {
+            a[LastIndex(a)] = value;
+        }
 
-        //        // "n=1" returns LastElement; "n=2" returns element before LastElement, etc.
-        //        // Exception if no such element.
-        //        public static T LastElementN<T>(IList<T> a, int n)
-        //        {
-        //            return a[a.Count - n];
-        //        }
+        // "n=1" returns LastElement; "n=2" returns element before LastElement, etc.
+        // Exception if no such element.
+        public static T LastElementN<T>(IList<T> a, int n)
+        {
+            return a[a.Count - n];
+        }
 
-        //        // Return N elements, from end of a.
-        //        public static List<T> CopyLastN<T>(List<T> a, int n)
-        //        {
-        //            int startIndex = a.Count - n;
-        //            return a.GetRange(startIndex, n);
-        //        }
+        // Return N elements, from end of a.
+        public static List<T> CopyLastN<T>(List<T> a, int n)
+        {
+            int startIndex = a.Count - n;
+            return a.GetRange(startIndex, n);
+        }
 
-        //        // Return elements of a, starting with a(index), through last element of a.
-        //        public static List<T> CopyIToEnd<T>(List<T> a, int index)
-        //        {
-        //            int keepCount = a.Count - index;
-        //            return a.GetRange(index, keepCount);
-        //        }
+        // Return elements of a, starting with a(index), through last element of a.
+        public static List<T> CopyIToEnd<T>(List<T> a, int index)
+        {
+            int keepCount = a.Count - index;
+            return a.GetRange(index, keepCount);
+        }
 
-        //        // Insert before final "n" elements of list.
-        //        // E.g. "n=1" inserts before last element, "n=2" inserts before last 2 elements.
-        //        public static void InsertBeforeLastN<T>(this IList<T> a, int n, T value)
-        //        {
-        //            int insertIndex = a.Count - n;
-        //            a.Insert(insertIndex, value);
-        //        }
+        // Insert before final "n" elements of list.
+        // E.g. "n=1" inserts before last element, "n=2" inserts before last 2 elements.
+        public static void InsertBeforeLastN<T>(this IList<T> a, int n, T value)
+        {
+            int insertIndex = a.Count - n;
+            a.Insert(insertIndex, value);
+        }
 
-        //        /// <summary>
-        //        ///     ''' Remove final "n" elements of list.
-        //        ///     ''' </summary>
-        //        ///     ''' <typeparam name="T"></typeparam>
-        //        ///     ''' <param name="a"></param>
-        //        ///     ''' <param name="n"></param>
-        //        public static void RemoveLastN<T>(this List<T> a, int n)
-        //        {
-        //            a.RemoveRange(a.Count - n, n);
-        //        }
+        /// <summary>
+        ///     ''' Remove final "n" elements of list.
+        ///     ''' </summary>
+        ///     ''' <typeparam name="T"></typeparam>
+        ///     ''' <param name="a"></param>
+        ///     ''' <param name="n"></param>
+        public static void RemoveLastN<T>(this List<T> a, int n)
+        {
+            a.RemoveRange(a.Count - n, n);
+        }
 
-        //        // Remove element at index "index". Result is one element shorter.
-        //        // Similar to List.RemoveAt, but for arrays.
-        //        public static void RemoveAt<T>(this T[] a, int index)
-        //        {
-        //            // Move elements after "index" down 1 position.
-        //            Array.Copy(a, index + 1, a, index, Information.UBound(a) - index);
-        //            var oldA = a;
-        //            a = new T[Information.UBound(a) - 1 + 1];
-        //            // Shorten by 1 element.
-        //            if (oldA != null)
-        //                Array.Copy(oldA, a, Math.Min(Information.UBound(a) - 1 + 1, oldA.Length));
-        //        }
+        // Remove element at index "index". Result is one element shorter.
+        // Similar to List.RemoveAt, but for arrays.
+        public static void RemoveAt<T>(this T[] a, int index)
+        {
+            var oldA = a;
+            var lastIndexOld = oldA.LastIndex();
+            // Shorten by 1 element. (last index = count - 1)
+            a = new T[lastIndexOld];
+            // Copy data before element.
+            Array.Copy(oldA, a, index);
+            // Copy data after element.
+            if (lastIndexOld > index)
+                // Copy elements after "index", but move down 1 position.
+                Array.Copy(a, index + 1, oldA, index, lastIndexOld - index);
+        }
 
-        //        public static void DropFirstElement<T>(this T[] a)
-        //        {
-        //            a.RemoveAt(0);
-        //        }
+        public static void DropFirstElement<T>(this T[] a)
+        {
+            a.RemoveAt(0);
+        }
 
-        //        public static void DropLastElement<T>(this T[] a)
-        //        {
-        //            a.RemoveAt(Information.UBound(a));
-        //        }
+        public static void DropLastElement<T>(this T[] a)
+        {
+            a.RemoveAt(a.LastIndex());
+        }
 
-        //        // SIDE-EFFECT: a is increased in length, with value as new final element.
-        //        public static void Append<T>(this T[] a, T value)
-        //        {
-        //            var oldA = a;
-        //            a = new T[Information.UBound(a) + 1 + 1];
-        //            // Lengthen by 1 element. SIDE-EFFECT: Increases UBound by 1.
-        //            if (oldA != null)
-        //                Array.Copy(oldA, a, Math.Min(Information.UBound(a) + 1 + 1, oldA.Length));
-        //            // Set value of (new) final element.
-        //            a[Information.UBound(a)] = value;
-        //        }
+        // SIDE-EFFECT: a is increased in length, with value as new final element.
+        public static void Append<T>(this T[] a, T value)
+        {
+            var oldA = a;
+            var oldLength = oldA.Length;
+            // Lengthen by 1 element.
+            a = new T[oldLength + 1];
+            if (oldLength > 0)
+                Array.Copy(oldA, a, oldLength);
+            // Set value of (new) final element.
+            SetLastElement(a, value);
+        }
 
 
-        //        public static bool Contains(Array list, object target)
-        //        {
-        //            return (Array.IndexOf(list, target) >= 0);
-        //        }
+        public static bool Contains(Array list, object target)
+        {
+            return (Array.IndexOf(list, target) >= 0);
+        }
 
 
         //        // For displaying list elements, e.g. "{11, 22, 333}".

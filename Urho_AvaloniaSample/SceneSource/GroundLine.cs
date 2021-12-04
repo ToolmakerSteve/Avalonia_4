@@ -20,8 +20,8 @@ namespace SceneSource
     {
         //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
 
-		// false so we can smooth while creating the quads.
-        const bool AddOnlyNewQuads = false;//true;
+		// false to smooth while creating the quads.
+        public const bool AddOnlyNewQuads = false;//true;
 		const bool CastShadows = true; //true;
         public const bool SingleGeometry = false;//false;   // TODO
         public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
@@ -481,9 +481,15 @@ namespace SceneSource
 		private void _AddPointNow(Dist2D pt)
 		{
 			Points.Add(pt);
-			//FixRecentPoints();
+			FixRecentPoints();
 		}
 
+		private void FixRecentPoints()
+		{
+			if (Points.Count > 2) {
+				// Check for recent corner.
+			}
+		}
 
 		internal void Flush()
 		{
@@ -497,15 +503,30 @@ namespace SceneSource
 		{
 			if (_hasDeferredPoint) {
 				if (Points.Count > 0) {
-					// Smooth DeferredPoint to lessen ripples.
-					// TBD: Good algorithm? Limit distance moved by smooth?
-					// TBD: Fit curve through more points. Ideally do that later, so have more future points.
-					Dist2D neighborAvg = U.Average(Points[Points.LastIndex()], futurePoint);
-					_deferredPoint = U.Lerp(_deferredPoint, neighborAvg, 0.7);
+					_deferredPoint = SmoothPoint(Points[Points.LastIndex()],
+												 _deferredPoint, futurePoint);
 				}
 
 				Flush();
 			}
+		}
+
+		/// <summary>
+		/// Smooth pt2 (based on its neighbors) to lessen ripples.
+		/// TBD: Good algorithm? Limit distance moved by smooth?
+		/// TBD: Fit curve through more points. Ideally do that later, so have more future points.
+		/// </summary>
+		/// <param name="pt1"></param>
+		/// <param name="pt2"></param>
+		/// <param name="pt3"></param>
+		/// <returns></returns>
+		private Dist2D SmoothPoint(Dist2D pt1, Dist2D pt2, Dist2D pt3)
+		{
+			Dist2D neighborAvg = U.Average(pt1, pt3);
+			// In range [0, 1]. Larger value smooths more (moves closer to average of neighbors).
+			double neighborWgt = 0.7;
+			var smoothedPt2 = U.Lerp(pt2, neighborAvg, neighborWgt);
+			return smoothedPt2;
 		}
 		#endregion
 

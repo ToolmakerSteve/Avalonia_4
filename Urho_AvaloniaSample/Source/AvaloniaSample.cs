@@ -371,7 +371,7 @@ namespace AvaloniaSample
 					_suppressWallDraw = true;
 				if (_suppressWallDraw)
 					return;
-				SetDoDeferPoint(true && !GroundLine.SingleGeometryTEST);
+				SetDoDeferPoint(GroundLine.AddOnlyNewQuads && !GroundLine.SingleGeometryTEST);
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
 					ExtendWall(groundPt);
 				_prevModeWasFreehand = true;
