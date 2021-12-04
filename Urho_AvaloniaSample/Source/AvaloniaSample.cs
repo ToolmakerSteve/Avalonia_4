@@ -782,13 +782,16 @@ namespace AvaloniaSample
 			//return "Materials/StoneWall4.xml";
 			//return "Materials/StoneWall4Normal.xml";
 			//return "Parallax/Materials/ParallaxStonesDemoVer.xml";
+			//return "Materials/StonesParallaxOffset.xml";
+			//return "Materials/StonesParallaxOcclusion.xml";
+			//return "Materials/StoneWall4ParallaxOffset.xml";
+			//return "Materials/StoneWall4ParallaxOcclusion.xml";
+
 			//return "Materials/BricksNormal.xml";
 			//return "Materials/BricksParallaxOffset.xml";
 			//return "Materials/BricksParallaxOcclusion.xml";
-			//return "Materials/StonesParallaxOffset.xml";
-			//return "Materials/StonesParallaxOcclusion.xml";
-			return "Materials/StoneWall4ParallaxOffset.xml";
-			//return "Materials/StoneWall4ParallaxOcclusion.xml";
+			//return "Materials/BrickWall19.xml";
+			return "Materials/BrickWall19ParallaxOcclusion.xml";
 		}
 
 		bool _wasVisible = false;

@@ -1,0 +1,8 @@
+<material>
+    <technique name="Techniques/DiffParallaxOcclusion.xml" quality="0" />
+	<texture unit="diffuse" name="Textures/Brick_Wall_019_SD/Brick_Wall_019_basecolor.jpg" />
+	<texture unit="normal" name="Textures/Brick_Wall_019_SD/Brick_Wall_019_normal.jpg" />	
+	<texture unit="specular" name="Textures/Brick_Wall_019_SD/Brick_Wall_019_height.png" />
+	<parameter name="HeightScale" value="0.05" />
+	<cull value="none" />
+</material>
