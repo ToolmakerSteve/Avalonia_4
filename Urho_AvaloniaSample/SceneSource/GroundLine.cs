@@ -422,7 +422,8 @@ namespace SceneSource
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
 			// Wall Segment: Top of wall.
-			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, true, false);
+			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, false, false);
+			//AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, true, false);
 
 			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);

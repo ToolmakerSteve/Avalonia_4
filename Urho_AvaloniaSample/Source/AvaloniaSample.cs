@@ -36,7 +36,7 @@ namespace AvaloniaSample
 		const bool RandomColorBoxes = false;//true;
 		const bool RandomBoxRotation = true;
 		const float BoxScale = 5.0f;//5.0f;
-		internal const WallTexture BoxTexture = WallTexture.BrickWall19;//.StoneWall4;
+		internal const WallTexture BoxTexture = WallTexture.BrickWall19;//BrickWall19;//.StoneWall4;
 
 		const float _ZoneAmbient = 0.35f;//1.0f;//0.35f   TMS ttttt
 
