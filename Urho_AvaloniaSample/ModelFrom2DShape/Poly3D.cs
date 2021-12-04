@@ -400,10 +400,12 @@ namespace ModelFrom2DShape
    //             }
    //         }
 
-            Vector3 vertDelta = vBL - vTL;
-            float dy = vertDelta.LengthFast;
-            Vector3 horizDelta = vBR - vBL;
-            float dx = horizDelta.LengthFast;
+			float dy1 = (vBL - vTL).LengthFast;
+			float dy2 = (vBR - vTR).LengthFast;
+            float dy = Math.Max(dy1, dy2);
+			float dx1 = (vTR - vTL).LengthFast;
+			float dx2 = (vBR - vBL).LengthFast;
+			float dx = Math.Max(dx1, dx2);
 
 			float deltaU = TextureScale * dx;
 			// Moving backwards in texture.

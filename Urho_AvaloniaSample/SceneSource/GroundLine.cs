@@ -520,8 +520,13 @@ namespace SceneSource
 					joinLength = (float)(Math.Min(Width, lengthAfterCorner / 2));   // TBD: Good value?
 					joinWgt = joinLength / lengthAfterCorner;
 					joinPt = U.Lerp(p2, p3, joinWgt);
-					// "-2": replace p2.
-					Points[Points.Count - 2] = joinPt;
+					if (true) {
+						// "1": Insert after p2.
+						Points.InsertBeforeLastN(1, joinPt);
+					} else {
+						// "-2": replace p2.
+						Points[Points.Count - 2] = joinPt;
+					}
 				}
 
 				// Technically, we checked a corner at NearEndElement(-2).
