@@ -38,6 +38,8 @@ namespace SceneSource
 
 		public Geo.IContext Context { get; set; }
         /// <summary>
+		/// CAUTION: Other classes are not allowed to alter Points directly;
+		/// call "AddPoint" instead. TBD Future: "RemovePointAt" needed.
         /// Within coord system of a scene, "float" precision is sufficient;
         /// TBD: Make "float" version of Distance2D.
         /// </summary>
@@ -143,14 +145,27 @@ namespace SceneSource
 
 			_model.BoundingBox = bb;
 		}
-        #endregion
+		#endregion
 
-        #region --- public methods ----------------------------------------
-        /// <summary>
-        /// ASSUMES in same Context.
-        /// </summary>
-        /// <param name="pt"></param>
-        public void AddPoint(Dist2D pt)
+		#region --- public methods ----------------------------------------
+		/// <summary>
+		/// May defer adding the point.
+		/// </summary>
+		/// <param name="geoPt"></param>
+		public void AddPoint(Geo.Point2D geoPt)
+		{
+			if (geoPt.Context != Context)
+				throw new NotImplementedException("AddPoint from a different Context");
+
+			AddPoint(geoPt.Pt);
+		}
+
+		/// <summary>
+		/// May defer adding the point.
+		/// ASSUMES pt is in same GeoContext.
+		/// </summary>
+		/// <param name="pt"></param>
+		public void AddPoint(Dist2D pt)
         {
 			//return;   // tmstest: Can we get a lockup when no walls are drawn?
 			FlushWithSmooth(pt);
@@ -159,20 +174,47 @@ namespace SceneSource
 				_deferredPoint = pt;
 				_hasDeferredPoint = true;
 			} else {
-				Points.Add(pt);
+				_AddPointNow(pt);
 			}
 			//Debug.WriteLine($"--- wall pt={pt.Round(3)} rel={(pt - Points[0]).Round(3)} ---");
 		}
 
-        public void AddPoint(Geo.Point2D geoPt)
-        {
-            if (geoPt.Context != Context)
-                throw new NotImplementedException("AddPoint from a different Context");
+		/// <summary>
+		/// Perform the Add NOW. This is the ONLY place that should do "Points.Add".
+		/// Most callers should call "AddPoint" instead.
+		/// </summary>
+		/// <param name="pt"></param>
+		private void _AddPointNow(Dist2D pt)
+		{
+			Points.Add(pt);
+			//FixRecentPoints();
+		}
 
-            AddPoint(geoPt.Pt);
-        }
+		internal void Flush()
+		{
+			if (_hasDeferredPoint) {
+				_AddPointNow(_deferredPoint);
+				_hasDeferredPoint = false;
+			}
+		}
 
-        private Node EnsureWallNode()
+		internal void FlushWithSmooth(Dist2D futurePoint)
+		{
+			if (_hasDeferredPoint) {
+				if (Points.Count > 0) {
+					// Smooth DeferredPoint to lessen ripples.
+					// TBD: Good algorithm? Limit distance moved by smooth?
+					// TBD: Fit curve through more points. Ideally do that later, so have more future points.
+					Dist2D neighborAvg = U.Average(Points[Points.LastIndex()], futurePoint);
+					_deferredPoint = U.Lerp(_deferredPoint, neighborAvg, 0.7);
+				}
+
+				Flush();
+			}
+		}
+
+
+		private Node EnsureWallNode()
         {
             var it = AvaloniaSample.AvaloniaSample.It;
             if (it.WallsNode == null)
@@ -459,29 +501,6 @@ namespace SceneSource
             }
             CreateEndPoly(wallPair1, groundPair1, terrain);
         }
-
-		internal void Flush()
-		{
-			if (_hasDeferredPoint) {
-				Points.Add(_deferredPoint);
-				_hasDeferredPoint = false;
-			}
-		}
-
-		internal void FlushWithSmooth(Dist2D futurePoint)
-		{
-			if (_hasDeferredPoint) {
-				if (Points.Count > 0) {
-					// Smooth DeferredPoint to lessen ripples.
-					// TBD: Good algorithm? Limit distance moved by smooth?
-					// TBD: Fit curve through more points. Ideally do that later, so have more future points.
-					Dist2D neighborAvg = U.Average(Points[Points.LastIndex()], futurePoint);
-					_deferredPoint = U.Lerp(_deferredPoint, neighborAvg, 0.7);
-				}
-
-				Flush();
-			}
-		}
 
 		//internal void CalcTangents()
 		//{

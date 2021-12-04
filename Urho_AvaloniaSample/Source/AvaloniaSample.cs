@@ -221,10 +221,14 @@ namespace AvaloniaSample
                 OverViewport2 = overViewport2;
             }
 
-            if (WallKeys && Input.GetKeyPress(Key.N))
-                StartNewWall();
+			if (WallKeys) {
+				if (Input.GetKeyPress(Key.N))
+					StartNewWall();
+				if (Input.GetKeyPress(Key.Space))
+					EndWall();
+			}
 
-            if (DrawWallPressDrag)   //OverViewport2 && 
+			if (DrawWallPressDrag)   //OverViewport2 && 
 				OnUpdate_MaybeDrawingWall();
 
             if (MoveCamera3DFirstOrThirdPerson(timeStep, 10.0f, OverViewport2) && DrawWallAsFly)
