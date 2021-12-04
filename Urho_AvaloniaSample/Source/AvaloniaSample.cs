@@ -45,9 +45,8 @@ namespace AvaloniaSample
         public const bool DrawWallPressDrag = true;   // In Top View.
         public const bool DrawWallAsFly = false && !DrawWallPressDrag;   // In Perspective View. TMS
 		const float InitialAltitude2 = 250;//tmstest 100;
-		const bool ShowWireframe = false;//false;   // TMS
-		const bool ShowTerrainWireframe = false && ShowWireframe;
-		const bool ShowWallWireframe = true && ShowWireframe;
+		static public bool ShowWireframe = false;//false;   // TMS
+		static public bool WireframeMaterialIsWall = true;   // However it won't show until set "ShowWireframe".
 		const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 5 : 0.5f;//1f;//0.5f;   // TBD: Good value.
 
 
@@ -226,6 +225,8 @@ namespace AvaloniaSample
 					StartNewWall();
 				if (Input.GetKeyPress(Key.Space))
 					EndWall();
+				if (Input.GetKeyPress(Key.T))
+					ToggleWireframeVisibility();
 			}
 
 			if (DrawWallPressDrag)   //OverViewport2 && 
@@ -238,7 +239,12 @@ namespace AvaloniaSample
             }
         }
 
-        private void OnUpdate_Wireframe()
+		public void ToggleWireframeVisibility()
+		{
+			ShowWireframe = !ShowWireframe;
+		}
+
+		private void OnUpdate_Wireframe()
         {
 			SetWireframeVisibility(ShowWireframe);
 
@@ -484,17 +490,19 @@ namespace AvaloniaSample
 			}
 
 			if (doAddPoint) {
-				if (maybeBend && CurrentWall != null) {
-					if (CurrentWall.Points.Count > 1 && length > 2 * MinWallSegmentLength) {
-						// Add a short join segment. This "absorbs" any angle change, so long segment has full wall width.
-						// TBD: Calculate angle of direction change. Don't need for small angles.
-						const float JoinLength = 0.1f;
-						float joinWgt = JoinLength / length;
-						// End of short join segment.
-						var joinPt = U.Lerp(LastWallPosition2D, penPosition2D, joinWgt);
-						CurrentWall.AddPoint((Dist2D)joinPt);
-					}
-				}
+				// --- GroundLine now handles automatically in FixRecentPoints. ---
+				//if (maybeBend && CurrentWall != null) {
+				//	if (CurrentWall.Points.Count > 1 && length > 2 * MinWallSegmentLength) {
+				//		// Add a short join segment. This "absorbs" any angle change, so long segment has full wall width.
+				//		// TBD: Calculate angle of direction change. Don't need for small angles.
+				//		const float JoinLength = 0.1f;
+				//		float joinWgt = JoinLength / length;
+				//		// End of short join segment.
+				//		var joinPt = U.Lerp(LastWallPosition2D, penPosition2D, joinWgt);
+				//		CurrentWall.AddPoint((Dist2D)joinPt);
+				//	}
+				//}
+
 				// Create or Extend a path, and a corresponding extruded model.
 				CurrentWall.AddPoint((Dist2D)penPosition2D);
 				CurrentWall.OnUpdate();
@@ -628,7 +636,8 @@ namespace AvaloniaSample
 			// The terrain consists of large triangles, which fits well for occlusion rendering, as a hill can occlude all
 			// terrain patches and other objects behind it
 			Terrain.Occluder = true;
-			MaybeSetWireframeMaterial();
+			if (!WireframeMaterialIsWall)
+				SetWireframeMaterial(Terrain.Material);
 			ScatterObjects(scene, NScatteredModels);
 
 			if (IncludeWater) {
@@ -720,16 +729,9 @@ namespace AvaloniaSample
 			}
 		}
 
-		public void MaybeSetWireframeMaterial(Material mat = null)
+		public void SetWireframeMaterial(Material mat)
 		{
-			if (ShowWireframe) {
-				if (ShowTerrainWireframe)
-					WireframeMaterial = Terrain.Material;   // To show terrain's wireframe.
-				else if (ShowWallWireframe && mat != null) {
-					WireframeMaterial = mat;
-				}
-			}
-
+			WireframeMaterial = mat;
 		}
 
 		/// <summary>
@@ -791,7 +793,7 @@ namespace AvaloniaSample
 
 		bool _wasVisible = false;
 
-        void SetWireframeVisibility(bool visible)
+        public void SetWireframeVisibility(bool visible)
         {
 			if (WireframeMaterial == null)
 				return;

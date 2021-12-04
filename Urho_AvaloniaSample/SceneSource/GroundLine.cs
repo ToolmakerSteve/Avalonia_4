@@ -228,7 +228,7 @@ namespace SceneSource
 					//_wallMaterial = Material.FromColor(Color.Magenta, false);
 					//_wallMaterial = res.GetMaterial("Materials/StoneWall4Normal.xml").Clone();
 					_wallMaterial = res.GetMaterial(AvaloniaSample.AvaloniaSample.BoxMaterialName()).Clone();
-					
+
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.White);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Gray);
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Magenta);
@@ -237,7 +237,8 @@ namespace SceneSource
 					//_wallMaterial.PixelShaderDefines("")
 					//ttt _wallMaterial.CullMode = CullMode.Cw; // CullMode.Cw;
 
-					AvaloniaSample.AvaloniaSample.It.MaybeSetWireframeMaterial(_wallMaterial);
+					if (AvaloniaSample.AvaloniaSample.WireframeMaterialIsWall)
+						AvaloniaSample.AvaloniaSample.It.SetWireframeMaterial(_wallMaterial);
 				}
 				return _wallMaterial;
 			}
@@ -480,14 +481,52 @@ namespace SceneSource
 		/// <param name="pt"></param>
 		private void _AddPointNow(Dist2D pt)
 		{
+			if (Points.Count > 0 && pt.NearlyEquals(Points.LastElement()))
+				// Don't allow adjacent points to be (nearly) identical.
+				return;
+
 			Points.Add(pt);
 			FixRecentPoints();
 		}
 
+		// Highest index that has been checked for adding a corner.
+		private int _iCornerChecked = -1;
+		const float SmallBendDegreesLimit = 30;   // TBD: Good value?
+
 		private void FixRecentPoints()
 		{
-			if (Points.Count > 2) {
+			// Takes 3 points to form a corner.
+			if (Points.Count >= 3 && _iCornerChecked < Points.LastIndex()) {
 				// Check for recent corner.
+				var p1 = Points.NearEndElement(-3);
+				var p2 = Points.NearEndElement(-2);
+				var p3 = Points.LastElement();
+				// In range [-180,+180].
+				double signedDegrees = U2.CalcBendDegrees(p1, p2, p3);
+				// When there is no bend, angle is 180 degrees.
+				double degreesFromStraight = 180 - Math.Abs(signedDegrees);
+				if (degreesFromStraight > SmallBendDegreesLimit) {
+					// Add a new point, to have a segment within-which the bend is handled.
+					float lengthBeforeCorner = (float)(p2 - p1).Length.Value;
+					float joinLength = (float)(Math.Min(Width, lengthBeforeCorner / 2));   // TBD: Good value?
+					float joinWgt = 1 - (joinLength / lengthBeforeCorner);
+					// End of short join segment. Add this before p2.
+					var joinPt = U.Lerp(p1, p2, joinWgt);
+					// "2": Insert before p2.
+					Points.InsertBeforeLastN(2, joinPt);
+
+					// Move p2 so (p2,p3) starts outside the join area.
+					float lengthAfterCorner = (float)(p3 - p2).Length.Value;
+					joinLength = (float)(Math.Min(Width, lengthAfterCorner / 2));   // TBD: Good value?
+					joinWgt = joinLength / lengthAfterCorner;
+					joinPt = U.Lerp(p2, p3, joinWgt);
+					// "-2": replace p2.
+					Points[Points.Count - 2] = joinPt;
+				}
+
+				// Technically, we checked a corner at NearEndElement(-2).
+				// But this matches the if-test done at start of this method.
+				_iCornerChecked = Points.LastIndex();
 			}
 		}
 

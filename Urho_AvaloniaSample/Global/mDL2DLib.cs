@@ -1,6 +1,8 @@
-//using System;
-//using System.Collections.Generic;
+using OU;
+using System;
+using System.Collections.Generic;
 //using System.Diagnostics;
+using System.Drawing;
 //using System.Globalization;
 //using System.IO;
 //using System.Linq;
@@ -11,22 +13,22 @@
 //using System.Threading.Tasks;
 //using Microsoft.VisualBasic;
 //using System.Runtime.InteropServices;
+using U = OU.Utils;
 
-//using static Global.Utils;
-//using static System.Math;
-//using System.Drawing;
+namespace Global
+{
+	public static partial class Utils
+	{
 
-//public static class mDL2DLib
-//{
 //    // A zig-zag rectangle-as-points has LR corner in (3).
 //    // (Zig-zag Order is UL-UR-LL-LR.) (Clockwise order is UL-UR-LR-LL).
 //    // CAUTION: DO NOT call on WGS-84: the variable scaling sometimes breaks the "DistanceSquared2D" test.
-//    public static bool IsZigZag(Distance2D[] rectPoints)
+//    public static bool IsZigZag(Dist2D[] rectPoints)
 //    {
 //        // TMS HACK: Some exports have LR corner in (3). Can tell which it is, by finding which is farther from UL corner.
-//        Distance2D p0 = rectPoints[0];
-//        Distance2D p2 = rectPoints[2];
-//        Distance2D p3 = rectPoints[3];
+//        Dist2D p0 = rectPoints[0];
+//        Dist2D p2 = rectPoints[2];
+//        Dist2D p3 = rectPoints[3];
 //        return (DistanceSquared2D(p0, p2) < DistanceSquared2D(p0, p3));
 //    }
 
@@ -34,11 +36,11 @@
 //    // TECHNICALLY: result might be "counterclockwise"; we don't testing winding order.
 //    // ASSUMES input has 4 elements.
 //    // CAUTION: DO NOT call on WGS-84: the variable scaling breaks the "IsZigZag" test.
-//    public static Distance2D[] EnsureClockwise(Distance2D[] rectPoints)
+//    public static Dist2D[] EnsureClockwise(Dist2D[] rectPoints)
 //    {
 //        if (IsZigZag(rectPoints))
 //        {
-//            Distance2D[] rectPoints2 = new Distance2D[LastIndex(rectPoints) + 1];
+//            Dist2D[] rectPoints2 = new Dist2D[LastIndex(rectPoints) + 1];
 //            // Swap (2) with (3).
 //            rectPoints2[0] = rectPoints[0];
 //            rectPoints2[1] = rectPoints[1];
@@ -92,27 +94,27 @@
 //    }
 
 
-//    public delegate Distance2D Point2DUnaryDeleg(Distance2D value);
+//    public delegate Dist2D Point2DUnaryDeleg(Dist2D value);
 
 
 
-//    public struct Distance2D : IEquatable<Distance2D>
+//    public struct Dist2D : IEquatable<Dist2D>
 //    {
-//        public static Distance2D[] OneElementArray(Distance2D point)
+//        public static Dist2D[] OneElementArray(Dist2D point)
 //        {
-//            Distance2D[] points = new Distance2D[1];
+//            Dist2D[] points = new Dist2D[1];
 //            points[0] = point;
 //            return points;
 //        }
 
-//        public static Distance2D Average(Distance2D p0, Distance2D p1)
+//        public static Dist2D Average(Dist2D p0, Dist2D p1)
 //        {
-//            return new Distance2D(mDLMiscellaneous.Average(p0.X, p1.X), mDLMiscellaneous.Average(p0.Y, p1.Y));
+//            return new Dist2D(mDLMiscellaneous.Average(p0.X, p1.X), mDLMiscellaneous.Average(p0.Y, p1.Y));
 //        }
 
-//        public static Distance2D Average3(Distance2D p0, Distance2D p1, Distance2D p2)
+//        public static Dist2D Average3(Dist2D p0, Dist2D p1, Dist2D p2)
 //        {
-//            return new Distance2D(mDLMiscellaneous.Average3(p0.X, p1.X, p2.X), mDLMiscellaneous.Average3(p0.Y, p1.Y, p2.Y));
+//            return new Dist2D(mDLMiscellaneous.Average3(p0.X, p1.X, p2.X), mDLMiscellaneous.Average3(p0.Y, p1.Y, p2.Y));
 //        }
 
 
@@ -120,43 +122,43 @@
 //        public double Y;
 
 
-//        public Distance2D(PointF ptfPoint)
+//        public Dist2D(PointF ptfPoint)
 //        {
 //            this.X = ptfPoint.X;
 //            this.Y = ptfPoint.Y;
 //        }
 
-//        public Distance2D(Distance3D ptdPoint)
+//        public Dist2D(Dist3D ptdPoint)
 //        {
 //            this.X = ptdPoint.X;
 //            this.Y = ptdPoint.Y;
 //        }
 
-//        public Distance2D(double dblValue)
+//        public Dist2D(double dblValue)
 //        {
 //            this.X = dblValue;
 //            this.Y = dblValue;
 //        }
 
-//        public Distance2D(double dblX, double dblY)
+//        public Dist2D(double dblX, double dblY)
 //        {
 //            this.X = dblX;
 //            this.Y = dblY;
 //        }
 
-//        public Distance2D(Vector2 v2)
+//        public Dist2D(Vector2 v2)
 //        {
 //            this.X = v2.X;
 //            this.Y = v2.Y;
 //        }
 
-//        public Distance2D(Size2D size)
+//        public Dist2D(Size2D size)
 //        {
 //            this.X = size.Width;
 //            this.Y = size.Height;
 //        }
 
-//        public Distance2D(SizeF size)
+//        public Dist2D(SizeF size)
 //        {
 //            this.X = size.Width;
 //            this.Y = size.Height;
@@ -235,7 +237,7 @@
 //        }
 
 //        // Return point with unit length (or zero, if Me is zero).
-//        public Distance2D Normalize
+//        public Dist2D Normalize
 //        {
 //            get
 //            {
@@ -254,9 +256,9 @@
 //            return new PointF(System.Convert.ToSingle(this.X), System.Convert.ToSingle(this.Y));
 //        }
 
-//        public Distance3D ToPoint3D()
+//        public Dist3D ToPoint3D()
 //        {
-//            return new Distance3D(this.X, this.Y);
+//            return new Dist3D(this.X, this.Y);
 //        }
 
 //        public Drawing.Point ToPoint()
@@ -274,12 +276,12 @@
 //        }
 
 
-//        public Distance2D SwapXY()
+//        public Dist2D SwapXY()
 //        {
-//            return new Distance2D(Y, X);
+//            return new Dist2D(Y, X);
 //        }
 
-//        public new bool Equals(Distance2D other)
+//        public new bool Equals(Dist2D other)
 //        {
 //            return (this.X == other.X) && (this.Y == other.Y);
 //        }
@@ -320,7 +322,7 @@
 //        // Public Shared Operator <>(ByVal left As PointD, ByVal right As PointD) As PointD
 //        // End Operator
 
-//        public void Add(Distance2D ptdPoint)
+//        public void Add(Dist2D ptdPoint)
 //        {
 //            this.X += ptdPoint.X;
 //            this.Y += ptdPoint.Y;
@@ -332,165 +334,165 @@
 //            this.Y += ptfPoint.Y;
 //        }
 
-//        public Distance2D Round(int digits)
+//        public Dist2D Round(int digits)
 //        {
-//            return new Distance2D(Math.Round(this.X, digits), Math.Round(this.Y, digits));
+//            return new Dist2D(Math.Round(this.X, digits), Math.Round(this.Y, digits));
 //        }
 
-//        public Distance2D Map(UnaryDeleg action)
+//        public Dist2D Map(UnaryDeleg action)
 //        {
-//            return new Distance2D(action(this.X), action(this.Y));
+//            return new Dist2D(action(this.X), action(this.Y));
 //        }
 
-//        public double Cross(Distance2D p1, Distance2D p2)
+//        public double Cross(Dist2D p1, Dist2D p2)
 //        {
 //            return (p1.Y - this.Y) * (p2.X - this.X) - (p1.X - this.X) * (p2.Y - this.Y);
 //        }
 
 //        // Return Normal to segment between Me and p2.
-//        public Distance2D SegmentNormal(Distance2D p2)
+//        public Dist2D SegmentNormal(Dist2D p2)
 //        {
-//            Distance2D normal1 = new Distance2D(-(p2.Y - this.Y), p2.X - this.X);
+//            Dist2D normal1 = new Dist2D(-(p2.Y - this.Y), p2.X - this.X);
 //            normal1 = normal1.Normalize;
 //            return normal1;
 //        }
 
-//        public new static bool operator ==(Distance2D ptd1, Distance2D ptd2)
+//        public new static bool operator ==(Dist2D ptd1, Dist2D ptd2)
 //        {
 //            return (ptd1.X == ptd2.X) && (ptd1.Y == ptd2.Y);
 //        }
 
-//        public new static bool operator !=(Distance2D ptd1, Distance2D ptd2)
+//        public new static bool operator !=(Dist2D ptd1, Dist2D ptd2)
 //        {
 //            return !(ptd1 == ptd2);
 //        }
 
 
-//        public new static Distance2D operator +(Distance2D p1, Distance2D p2)
+//        public new static Dist2D operator +(Dist2D p1, Dist2D p2)
 //        {
-//            return new Distance2D(p1.X + p2.X, p1.Y + p2.Y);
+//            return new Dist2D(p1.X + p2.X, p1.Y + p2.Y);
 //        }
 
-//        public new static Distance2D operator +(Distance2D p1, Size2D size2)
+//        public new static Dist2D operator +(Dist2D p1, Size2D size2)
 //        {
-//            return new Distance2D(p1.X + size2.Width, p1.Y + size2.Height);
+//            return new Dist2D(p1.X + size2.Width, p1.Y + size2.Height);
 //        }
 
-//        public new static Distance2D operator +(Distance2D p1, int n2)
+//        public new static Dist2D operator +(Dist2D p1, int n2)
 //        {
-//            return new Distance2D(p1.X + n2, p1.Y + n2);
+//            return new Dist2D(p1.X + n2, p1.Y + n2);
 //        }
 
-//        public new static Distance2D operator +(Distance2D p1, float n2)
+//        public new static Dist2D operator +(Dist2D p1, float n2)
 //        {
-//            return new Distance2D(p1.X + n2, p1.Y + n2);
+//            return new Dist2D(p1.X + n2, p1.Y + n2);
 //        }
 
-//        public new static Distance2D operator +(Distance2D p1, double n2)
+//        public new static Dist2D operator +(Dist2D p1, double n2)
 //        {
-//            return new Distance2D(p1.X + n2, p1.Y + n2);
+//            return new Dist2D(p1.X + n2, p1.Y + n2);
 //        }
 
 
-//        public new static Distance2D operator -(Distance2D p1, Distance2D p2)
+//        public new static Dist2D operator -(Dist2D p1, Dist2D p2)
 //        {
-//            return new Distance2D(p1.X - p2.X, p1.Y - p2.Y);
+//            return new Dist2D(p1.X - p2.X, p1.Y - p2.Y);
 //        }
 
-//        public new static Distance2D operator -(Distance2D p1, int int2)
+//        public new static Dist2D operator -(Dist2D p1, int int2)
 //        {
-//            return new Distance2D(p1.X - int2, p1.Y - int2);
+//            return new Dist2D(p1.X - int2, p1.Y - int2);
 //        }
 
-//        public new static Distance2D operator -(Distance2D p1, float sng2)
+//        public new static Dist2D operator -(Dist2D p1, float sng2)
 //        {
-//            return new Distance2D(p1.X - sng2, p1.Y - sng2);
+//            return new Dist2D(p1.X - sng2, p1.Y - sng2);
 //        }
 
-//        public new static Distance2D operator -(Distance2D p1, double dbl2)
+//        public new static Dist2D operator -(Dist2D p1, double dbl2)
 //        {
-//            return new Distance2D(p1.X - dbl2, p1.Y - dbl2);
+//            return new Dist2D(p1.X - dbl2, p1.Y - dbl2);
 //        }
 
 //        // Negate (unary)
-//        public new static Distance2D operator -(Distance2D ptd1)
+//        public new static Dist2D operator -(Dist2D ptd1)
 //        {
-//            return new Distance2D(-ptd1.X, -ptd1.Y);
+//            return new Dist2D(-ptd1.X, -ptd1.Y);
 //        }
 
 //        // "Dot Product"
-//        public double Dot(Distance2D b)
+//        public double Dot(Dist2D b)
 //        {
 //            return (this.X * b.X) + (this.Y * b.Y);
 //        }
 
 //        // Q: When is this meaningful?
 //        // See Also "Dot" and "Cross" (where?)
-//        public new static Distance2D operator *(Distance2D ptd1, Distance2D ptd2)
+//        public new static Dist2D operator *(Dist2D ptd1, Dist2D ptd2)
 //        {
-//            return new Distance2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
+//            return new Dist2D(ptd1.X * ptd2.X, ptd1.Y * ptd2.Y);
 //        }
 
-//        public new static Distance2D operator *(Distance2D ptd1, int int2)
+//        public new static Dist2D operator *(Dist2D ptd1, int int2)
 //        {
-//            return new Distance2D(ptd1.X * int2, ptd1.Y * int2);
+//            return new Dist2D(ptd1.X * int2, ptd1.Y * int2);
 //        }
 
-//        public new static Distance2D operator *(Distance2D ptd1, float sng2)
+//        public new static Dist2D operator *(Dist2D ptd1, float sng2)
 //        {
-//            return new Distance2D(ptd1.X * sng2, ptd1.Y * sng2);
+//            return new Dist2D(ptd1.X * sng2, ptd1.Y * sng2);
 //        }
 
-//        public new static Distance2D operator *(Distance2D ptd1, double dbl2)
+//        public new static Dist2D operator *(Dist2D ptd1, double dbl2)
 //        {
-//            return new Distance2D(ptd1.X * dbl2, ptd1.Y * dbl2);
+//            return new Dist2D(ptd1.X * dbl2, ptd1.Y * dbl2);
 //        }
 
-//        public new static Distance2D operator *(double dbl1, Distance2D ptd2)
+//        public new static Dist2D operator *(double dbl1, Dist2D ptd2)
 //        {
-//            return new Distance2D(dbl1 * ptd2.X, dbl1 * ptd2.Y);
+//            return new Dist2D(dbl1 * ptd2.X, dbl1 * ptd2.Y);
 //        }
 
 
-//        public new static Distance2D operator /(Distance2D p1, Distance2D p2)
+//        public new static Dist2D operator /(Dist2D p1, Dist2D p2)
 //        {
-//            return new Distance2D(p1.X / p2.X, p1.Y / p2.Y);
+//            return new Dist2D(p1.X / p2.X, p1.Y / p2.Y);
 //        }
 
-//        public new static Distance2D operator /(Distance2D p1, int int2)
+//        public new static Dist2D operator /(Dist2D p1, int int2)
 //        {
-//            return new Distance2D(p1.X / int2, p1.Y / int2);
+//            return new Dist2D(p1.X / int2, p1.Y / int2);
 //        }
 
-//        public new static Distance2D operator /(Distance2D p1, float sng2)
+//        public new static Dist2D operator /(Dist2D p1, float sng2)
 //        {
-//            return new Distance2D(p1.X / sng2, p1.Y / sng2);
+//            return new Dist2D(p1.X / sng2, p1.Y / sng2);
 //        }
 
-//        public new static Distance2D operator /(Distance2D p1, double dbl2)
+//        public new static Dist2D operator /(Dist2D p1, double dbl2)
 //        {
-//            return new Distance2D(p1.X / dbl2, p1.Y / dbl2);
+//            return new Dist2D(p1.X / dbl2, p1.Y / dbl2);
 //        }
 
 //        // Used for "inverse"; e.g. "1 / point".
-//        public new static Distance2D operator /(double dbl1, Distance2D p2)
+//        public new static Dist2D operator /(double dbl1, Dist2D p2)
 //        {
-//            return new Distance2D(dbl1 / p2.X, dbl1 / p2.Y);
+//            return new Dist2D(dbl1 / p2.X, dbl1 / p2.Y);
 //        }
 
 
-//        public static Distance2D Zero()
+//        public static Dist2D Zero()
 //        {
-//            return new Distance2D();
+//            return new Dist2D();
 //        }
 
-//        public static Distance2D NaN()
+//        public static Dist2D NaN()
 //        {
-//            return new Distance2D(double.NaN, double.NaN);
+//            return new Dist2D(double.NaN, double.NaN);
 //        }
 
-//        public static readonly Distance2D MinValue = new Distance2D(double.MinValue, double.MinValue);
-//        public static readonly Distance2D MaxValue = new Distance2D(double.MaxValue, double.MaxValue);
+//        public static readonly Dist2D MinValue = new Dist2D(double.MinValue, double.MinValue);
+//        public static readonly Dist2D MaxValue = new Dist2D(double.MaxValue, double.MaxValue);
 
 //        public static bool CoordIsValid(double xOrY)
 //        {
@@ -503,30 +505,30 @@
 //            return !double.IsNaN(this.X);
 //        }
 
-//        public Distance2D Abs()
+//        public Dist2D Abs()
 //        {
-//            return new Distance2D(Math.Abs(X), Math.Abs(Y));
+//            return new Dist2D(Math.Abs(X), Math.Abs(Y));
 //        }
 
 //        // Return Min of (each coordinate of) Me and p2.
-//        public Distance2D Min(Distance2D p2)
+//        public Dist2D Min(Dist2D p2)
 //        {
-//            return new Distance2D(Math.Min(this.X, p2.X), Math.Min(this.Y, p2.Y));
+//            return new Dist2D(Math.Min(this.X, p2.X), Math.Min(this.Y, p2.Y));
 //        }
 //        // Return Max of (each coordinate of) Me and p2.
-//        public Distance2D Max(Distance2D p2)
+//        public Dist2D Max(Dist2D p2)
 //        {
-//            return new Distance2D(Math.Max(this.X, p2.X), Math.Max(this.Y, p2.Y));
+//            return new Dist2D(Math.Max(this.X, p2.X), Math.Max(this.Y, p2.Y));
 //        }
 
-//        // Compare two Distance2D's for "equal within a tolerance".
-//        public bool NearlyEquals(Distance2D p2)
+//        // Compare two Dist2D's for "equal within a tolerance".
+//        public bool NearlyEquals(Dist2D p2)
 //        {
 //            return this.X.NearlyEquals(p2.X) && this.Y.NearlyEquals(p2.Y);
 //        }
 
-//        // Compare two Distance2D's for "equal within a tolerance".
-//        public bool NearlyEquals(Distance2D p2, double tolerance)
+//        // Compare two Dist2D's for "equal within a tolerance".
+//        public bool NearlyEquals(Dist2D p2, double tolerance)
 //        {
 //            return this.X.NearlyEquals(p2.X, tolerance) && this.Y.NearlyEquals(p2.Y, tolerance);
 //        }
@@ -538,45 +540,45 @@
 //        }
 
 
-//        public static Distance2D[] ArrayFromPointFs(PointF[] points)
+//        public static Dist2D[] ArrayFromPointFs(PointF[] points)
 //        {
 //            int nPoints = points.Length;
-//            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
+//            Dist2D[] Point2Ds = new Dist2D[nPoints - 1 + 1];
 
 //            for (int index = 0; index <= nPoints - 1; index++)
-//                Point2Ds[index] = new Distance2D(points[index]);
+//                Point2Ds[index] = new Dist2D(points[index]);
 
 //            return Point2Ds;
 //        }
 
-//        public static Distance2D[] ArrayFromDouble2s(double[,] points)
+//        public static Dist2D[] ArrayFromDouble2s(double[,] points)
 //        {
 //            int lastIndex = points.GetUpperBound(0);
-//            Distance2D[] Point2Ds = new Distance2D[lastIndex + 1];
+//            Dist2D[] Point2Ds = new Dist2D[lastIndex + 1];
 
 //            for (int index = 0; index <= lastIndex; index++)
-//                Point2Ds[index] = new Distance2D(points[index, 0], points[index, 1]);
+//                Point2Ds[index] = new Dist2D(points[index, 0], points[index, 1]);
 
 //            return Point2Ds;
 //        }
 
 //        // NOTE: "point3Ds" might be List or Array.
-//        public static Distance2D[] ListFromPoint3Ds(IList<Distance3D> point3Ds)
+//        public static Dist2D[] ListFromPoint3Ds(IList<Dist3D> point3Ds)
 //        {
 //            int nPoints = point3Ds.Count;
-//            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
+//            Dist2D[] Point2Ds = new Dist2D[nPoints - 1 + 1];
 
 //            for (int index = 0; index <= nPoints - 1; index++)
-//                Point2Ds[index] = new Distance2D(point3Ds[index]);
+//                Point2Ds[index] = new Dist2D(point3Ds[index]);
 
 //            return Point2Ds;
 //        }
 
 //        // NOTE: "point3Ds" might be List or Array.
-//        public static Distance2D[] ListFromPointXZs(IList<Distance3D> point3Ds)
+//        public static Dist2D[] ListFromPointXZs(IList<Dist3D> point3Ds)
 //        {
 //            int nPoints = point3Ds.Count;
-//            Distance2D[] Point2Ds = new Distance2D[nPoints - 1 + 1];
+//            Dist2D[] Point2Ds = new Dist2D[nPoints - 1 + 1];
 
 //            for (int index = 0; index <= nPoints - 1; index++)
 //                Point2Ds[index] = point3Ds[index].XZ();
@@ -585,14 +587,14 @@
 //        }
 
 //        // NOTE: "point2Ds" might be List or Array.
-//        public static PointF[] ListToPointFs(IList<Distance2D> point2Ds)
+//        public static PointF[] ListToPointFs(IList<Dist2D> point2Ds)
 //        {
 //            int nPoints = point2Ds.Count;
 //            PointF[] PointFs = new PointF[nPoints - 1 + 1];
 
 //            for (int index = 0; index <= nPoints - 1; index++)
 //            {
-//                Distance2D p = point2Ds[index];
+//                Dist2D p = point2Ds[index];
 //                PointFs[index] = new PointF(System.Convert.ToSingle(p.X), System.Convert.ToSingle(p.Y));
 //            }
 
@@ -600,17 +602,17 @@
 //        }
 
 
-//        public static List<Distance2D> CalcDeltas(IList<Distance2D> points)
+//        public static List<Dist2D> CalcDeltas(IList<Dist2D> points)
 //        {
-//            List<Distance2D> deltas = new List<Distance2D>();
+//            List<Dist2D> deltas = new List<Dist2D>();
 
-//            Distance2D priorPt = default(Distance2D);
+//            Dist2D priorPt = default(Dist2D);
 //            bool hasPriorPt = false;
-//            foreach (Distance2D point in points)
+//            foreach (Dist2D point in points)
 //            {
 //                if (hasPriorPt)
 //                {
-//                    Distance2D delta = point - priorPt;
+//                    Dist2D delta = point - priorPt;
 //                    deltas.Add(delta);
 //                }
 //                priorPt = point;
@@ -631,16 +633,16 @@
 
 //    // True if points are in clockwise order;
 //    // False if points are in anti-clockwise (counter-clockwise) order.
-//    public static bool AreClockwise(IList<Distance2D> points)
+//    public static bool AreClockwise(IList<Dist2D> points)
 //    {
 //        double sum = 0;
 //        for (int index = 0; index <= LastIndex(points); index++)
 //        {
-//            Distance2D p1 = points[index];
+//            Dist2D p1 = points[index];
 
 //            // TBD: Maybe should leave off the wrap angle - suppose it is an "open" sequence of points?
 //            int nextIndex = (index + 1) % points.Count;
-//            Distance2D p2 = points[nextIndex];
+//            Dist2D p2 = points[nextIndex];
 
 //            sum += p1.X * p2.Y - p2.X * p1.Y;
 //        }
@@ -663,7 +665,7 @@
 //    }
 
 //    // True if rectAsPts has zero size, or is nothing.
-//    public static bool Rect_Empty(Distance2D[] rectAsPts)
+//    public static bool Rect_Empty(Dist2D[] rectAsPts)
 //    {
 //        if (rectAsPts == null)
 //            return true;
@@ -691,15 +693,15 @@
 //    }
 
 
-//    public static Distance2D[] BoundsAtAngleDegrees(IList<Distance2D> points, double angleDegrees, bool zigZag, bool highXFirst, double extendBy = 0)
+//    public static Dist2D[] BoundsAtAngleDegrees(IList<Dist2D> points, double angleDegrees, bool zigZag, bool highXFirst, double extendBy = 0)
 //    {
-//        Distance2D minRotatedPt = Distance2D.MaxValue;
-//        Distance2D maxRotatedPt = Distance2D.MinValue;
+//        Dist2D minRotatedPt = Dist2D.MaxValue;
+//        Dist2D maxRotatedPt = Dist2D.MinValue;
 
-//        foreach (Distance2D pt in points)
+//        foreach (Dist2D pt in points)
 //        {
 //            // UNROTATE (if angleDegrees relative to x-axis, then this places points along x-axis).
-//            Distance2D rotatedPt = RotateByDegrees2D_New(pt, -angleDegrees);
+//            Dist2D rotatedPt = RotateByDegrees2D_New(pt, -angleDegrees);
 //            AccumMinMax(rotatedPt, ref minRotatedPt, ref maxRotatedPt);
 //        }
 
@@ -708,7 +710,7 @@
 //        double y0 = minRotatedPt.Y - extendBy;
 //        double y1 = maxRotatedPt.Y + extendBy;
 
-//        Distance2D[] bounds = MakeRectAsPoints(x0, y0, x1, y1, zigZag, highXFirst);
+//        Dist2D[] bounds = MakeRectAsPoints(x0, y0, x1, y1, zigZag, highXFirst);
 
 //        for (int i = 0; i <= 4 - 1; i++)
 //            // ROTATE.
@@ -720,18 +722,18 @@
 //    // Return list of points, representing the rectangle as its four corners.
 //    // If zigZag=True, then points are in "zig-zag" order:    TopLeft-TopRight-BottomLeft-BottomRight.
 //    // If zigZag=False, then points are in "clockwise" order: TopLeft-TopRight-BottomRight-BottomLeft.
-//    public static Distance2D[] MakeRectAsPoints(double x0, double y0, double x1, double y1, bool zigZag, bool highXFirst)
+//    public static Dist2D[] MakeRectAsPoints(double x0, double y0, double x1, double y1, bool zigZag, bool highXFirst)
 //    {
-//        Distance2D[] pts = new Distance2D[4];
+//        Dist2D[] pts = new Dist2D[4];
 
 //        if (highXFirst)
 //        {
 //            // Rectangle "top" edge is at x1, from y1..y0.
 //            // This is different than "default" case, whose top edge is a constant y.
-//            pts[0] = new Distance2D(x1, y0); // y1)
-//            pts[1] = new Distance2D(x1, y1); // y0)
-//            pts[2] = new Distance2D(x0, y1); // y0)
-//            pts[3] = new Distance2D(x0, y0); // y1)
+//            pts[0] = new Dist2D(x1, y0); // y1)
+//            pts[1] = new Dist2D(x1, y1); // y0)
+//            pts[2] = new Dist2D(x0, y1); // y0)
+//            pts[3] = new Dist2D(x0, y0); // y1)
 
 //            if (zigZag)
 //                Swap(pts[2], pts[3]);
@@ -745,13 +747,13 @@
 //    // Return list of points, representing the rectangle as its four corners.
 //    // If zigZag=True, then points are in "zig-zag" order:    TopLeft-TopRight-BottomLeft-BottomRight.
 //    // If zigZag=False, then points are in "clockwise" order: TopLeft-TopRight-BottomRight-BottomLeft.
-//    public static void FillRectAsPoints(ref Distance2D[] pts, double x0, double y0, double x1, double y1, bool zigZag)
+//    public static void FillRectAsPoints(ref Dist2D[] pts, double x0, double y0, double x1, double y1, bool zigZag)
 //    {
-//        pts = new Distance2D[4];
-//        pts[0] = new Distance2D(x0, y0);
-//        pts[1] = new Distance2D(x1, y0);
-//        pts[2] = new Distance2D(x1, y1);
-//        pts[3] = new Distance2D(x0, y1);
+//        pts = new Dist2D[4];
+//        pts[0] = new Dist2D(x0, y0);
+//        pts[1] = new Dist2D(x1, y0);
+//        pts[2] = new Dist2D(x1, y1);
+//        pts[3] = new Dist2D(x0, y1);
 
 //        if (zigZag)
 //            Swap(pts[2], pts[3]);
@@ -761,9 +763,9 @@
 //    // REQUIRES rectAsPts to Exist. (So we know whether should be y-flipped, zig-zag)
 //    // Like Rectangle2D.Add, but rectangle is represented as list of 4 points.
 //    // Maintains xFlip, yFlip, zigZag as needed (implicit in the ordering of the four corners).
-//    public static Distance2D[] AddRect_To_RectAsPoints(Distance2D[] rectAsPts, Rectangle2D addedRect)
+//    public static Dist2D[] AddRect_To_RectAsPoints(Dist2D[] rectAsPts, Rectangle2D addedRect)
 //    {
-//        // Dim r1 As Distance2D() = CType(rectAsPts.Clone(), Distance2D())   ' tmstest
+//        // Dim r1 As Dist2D() = CType(rectAsPts.Clone(), Dist2D())   ' tmstest
 
 //        // Maintain flip.
 //        bool zigZag = IsZigZag(rectAsPts);
@@ -776,10 +778,10 @@
 //        // FOR NOW, expands Me to non-rotated rectangle, then does union. TODO: Is there a better algorithm?
 //        rect = rect.Union(addedRect);
 
-//        Distance2D[] expandedRect = rect.ToRectAsPoints(xFlip, yFlip, zigZag);
+//        Dist2D[] expandedRect = rect.ToRectAsPoints(xFlip, yFlip, zigZag);
 
 //        // 'tmstest - verify rectangle conversions (Comment out the "Add rectangle" logic.)
-//        // Dim r2 As Distance2D() = expandedRect
+//        // Dim r2 As Dist2D() = expandedRect
 //        // If (r1(0) <> r2(0)) OrElse (r1(1) <> r2(1)) OrElse (r1(2) <> r2(2)) OrElse (r1(3) <> r2(3)) Then
 //        // Dim trouble = 0
 //        // End If
@@ -798,7 +800,7 @@
 //        return RectangleCenter(PointFRect_To_RectangleF(ptfRec));
 //    }
 
-//    public static Distance2D RectangleCenter(Distance2D[] ptdRec)
+//    public static Dist2D RectangleCenter(Dist2D[] ptdRec)
 //    {
 //        return Average(ptdRec[0], ptdRec[2]);
 //    }
@@ -820,9 +822,9 @@
 //        return !rotationDegrees.NearlyEquals(0.0);
 //    }
 
-//    public static Distance3D RotateAtByDegrees2D(Distance3D ptdOrigo, Distance3D ptdPoint, double dblAngleDegrees)
+//    public static Dist3D RotateAtByDegrees2D(Dist3D ptdOrigo, Dist3D ptdPoint, double dblAngleDegrees)
 //    {
-//        // Dim ptdRet As Distance3D
+//        // Dim ptdRet As Dist3D
 //        // Dim dblCurrentAngle As Double = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y)
 //        // Dim dblDI As Double = m2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y)
 
@@ -832,7 +834,7 @@
 
 //        // Return ptdRet
 
-//        Distance3D ptdRet = ptdOrigo;
+//        Dist3D ptdRet = ptdOrigo;
 //        float dblAngle = System.Convert.ToSingle(dblAngleDegrees * Math.PI / 180);
 
 //        ptdRet.X += (ptdPoint.X - ptdOrigo.X) * Math.Cos(dblAngle) - (ptdPoint.Y - ptdOrigo.Y) * Math.Sin(dblAngle);
@@ -843,9 +845,9 @@
 //        return ptdRet;
 //    }
 
-//    public static Distance2D RotateAtByDegrees2D(Distance2D ptdOrigo, Distance2D ptdPoint, double dblAngleDegrees)
+//    public static Dist2D RotateAtByDegrees2D(Dist2D ptdOrigo, Dist2D ptdPoint, double dblAngleDegrees)
 //    {
-//        Distance2D ptdRet;
+//        Dist2D ptdRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 //        double dblDI = mDL2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 
@@ -871,9 +873,9 @@
 //        return ptfRet;
 //    }
 
-//    public static Distance3D RotateAtByRadians2D(Distance3D ptdOrigo, Distance3D ptdPoint, double dblAngleRadians)
+//    public static Dist3D RotateAtByRadians2D(Dist3D ptdOrigo, Dist3D ptdPoint, double dblAngleRadians)
 //    {
-//        Distance3D ptdRet;
+//        Dist3D ptdRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 //        double dblDI = mDL2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 
@@ -884,9 +886,9 @@
 //        return ptdRet;
 //    }
 
-//    public static Distance2D RotateAtByRadians2D(Distance2D ptdOrigo, Distance2D ptdPoint, double dblAngleRadians)
+//    public static Dist2D RotateAtByRadians2D(Dist2D ptdOrigo, Dist2D ptdPoint, double dblAngleRadians)
 //    {
-//        Distance2D ptdRet;
+//        Dist2D ptdRet;
 //        double dblCurrentAngle = GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 //        double dblDI = mDL2DLib.CalcDistance2D(ptdOrigo.X, ptdOrigo.Y, ptdPoint.X, ptdPoint.Y);
 
@@ -913,19 +915,19 @@
 //        return new PointF(ptfPoint.X - ptfOrigon.X, ptfPoint.Y - ptfOrigon.Y);
 //    }
 
-//    public static Distance2D Delta2D(Distance2D ptdOrigon, Distance2D ptdPoint)
+//    public static Dist2D Delta2D(Dist2D ptdOrigon, Dist2D ptdPoint)
 //    {
-//        return new Distance2D(ptdPoint.X - ptdOrigon.X, ptdPoint.Y - ptdOrigon.Y);
+//        return new Dist2D(ptdPoint.X - ptdOrigon.X, ptdPoint.Y - ptdOrigon.Y);
 //    }
 
-//    public static Distance3D Delta2D(Distance3D ptdOrigon, Distance3D ptdPoint)
+//    public static Dist3D Delta2D(Dist3D ptdOrigon, Dist3D ptdPoint)
 //    {
-//        return new Distance3D(ptdPoint.X - ptdOrigon.X, ptdPoint.Y - ptdOrigon.Y, 0);
+//        return new Dist3D(ptdPoint.X - ptdOrigon.X, ptdPoint.Y - ptdOrigon.Y, 0);
 //    }
 
-//    public static Distance2D Delta2D(double dblOrigonX, double dblOrigonY, double dblPointX, double dblPointY)
+//    public static Dist2D Delta2D(double dblOrigonX, double dblOrigonY, double dblPointX, double dblPointY)
 //    {
-//        return new Distance2D(dblPointX - dblOrigonX, dblPointY - dblOrigonY);
+//        return new Dist2D(dblPointX - dblOrigonX, dblPointY - dblOrigonY);
 //    }
 
 //    public static float DeltaX2D(PointF ptfOrigon, PointF ptfPoint)
@@ -933,12 +935,12 @@
 //        return ptfPoint.X - ptfOrigon.X;
 //    }
 
-//    public static double DeltaX2D(Distance2D ptdOrigon, Distance2D ptdPoint)
+//    public static double DeltaX2D(Dist2D ptdOrigon, Dist2D ptdPoint)
 //    {
 //        return ptdPoint.X - ptdOrigon.X;
 //    }
 
-//    public static double DeltaX2D(Distance3D ptdOrigon, Distance3D ptdPoint)
+//    public static double DeltaX2D(Dist3D ptdOrigon, Dist3D ptdPoint)
 //    {
 //        return ptdPoint.X - ptdOrigon.X;
 //    }
@@ -953,12 +955,12 @@
 //        return ptfPoint.Y - ptfOrigon.Y;
 //    }
 
-//    public static double DeltaY2D(Distance2D ptdOrigon, Distance2D ptdPoint)
+//    public static double DeltaY2D(Dist2D ptdOrigon, Dist2D ptdPoint)
 //    {
 //        return ptdPoint.Y - ptdOrigon.Y;
 //    }
 
-//    public static double DeltaY2D(Distance3D ptdOrigon, Distance3D ptdPoint)
+//    public static double DeltaY2D(Dist3D ptdOrigon, Dist3D ptdPoint)
 //    {
 //        return ptdPoint.Y - ptdOrigon.Y;
 //    }
@@ -986,7 +988,7 @@
 //    }
 
 //    // PERFORMANCE: Quicker than Distance, because does not need SQRT.
-//    public static double DistanceSquared3D(Distance3D p1, Distance3D p2)
+//    public static double DistanceSquared3D(Dist3D p1, Dist3D p2)
 //    {
 //        return DistanceSquared3D(p1.X, p1.Y, p1.Z, p2.X, p2.Y, p2.Z);
 //    }
@@ -1021,13 +1023,13 @@
 //    }
 
 //    // PERFORMANCE: Quicker than Distance, because does not need SQRT.
-//    public static double DistanceSquared2D(Distance2D ptdP1, Distance2D ptdP2)
+//    public static double DistanceSquared2D(Dist2D ptdP1, Dist2D ptdP2)
 //    {
 //        return DistanceSquared2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
 //    }
 
 //    // PERFORMANCE: Quicker than Distance, because does not need SQRT.
-//    public static double DistanceSquared2D(Distance3D p1, Distance3D p2)
+//    public static double DistanceSquared2D(Dist3D p1, Dist3D p2)
 //    {
 //        return DistanceSquared2D(p1.X, p1.Y, p2.X, p2.Y);
 //    }
@@ -1048,12 +1050,12 @@
 //        return System.Convert.ToSingle(Math.Sqrt(DistanceSquared2D(sngX1, sngY1, sngX2, sngY2)));
 //    }
 
-//    public static double CalcDistance2D(Distance2D ptdP1, Distance2D ptdP2)
+//    public static double CalcDistance2D(Dist2D ptdP1, Dist2D ptdP2)
 //    {
 //        return Math.Sqrt(DistanceSquared2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y));
 //    }
 
-//    public static double CalcDistance2D(Distance3D ptdP1, Distance3D ptdP2)
+//    public static double CalcDistance2D(Dist3D ptdP1, Dist3D ptdP2)
 //    {
 //        return CalcDistance2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
 //    }
@@ -1068,7 +1070,7 @@
 //        return CalcDistance2D(p1.X, p1.Y, p2.X, p2.Y);
 //    }
 
-//    public static double CalcDistance2D(Distance2D[] pts)
+//    public static double CalcDistance2D(Dist2D[] pts)
 //    {
 //        if (!Exists(pts))
 //            return -1;
@@ -1082,7 +1084,7 @@
 //    }
 
 //    // 2D distance calculation, in X and Z.
-//    public static double DistanceXZ(Distance3D ptdP1, Distance3D ptdP2)
+//    public static double DistanceXZ(Dist3D ptdP1, Dist3D ptdP2)
 //    {
 //        return CalcDistance2D(ptdP1.X, ptdP1.Z, ptdP2.X, ptdP2.Z);
 //    }
@@ -1152,23 +1154,23 @@
 //    // (Assumes the rectangle is intended to be grid aligned, not rotated?)
 //    // If rectangle is rotated, expands it to surrounding unrotated rectangle.
 //    // RESULT is clockwise (not zig-zag).
-//    public static void FixRectangle(ref Distance2D[] rectAsPts)
+//    public static void FixRectangle(ref Dist2D[] rectAsPts)
 //    {
 //        if (rectAsPts.Length < 4)
 //            throw new InvalidProgramException("FixRectangle - missing point(s)");
 
-//        Distance2D maxPt;
-//        Distance2D minPt = Calculate_MinMax(rectAsPts, ref maxPt);
+//        Dist2D maxPt;
+//        Dist2D minPt = Calculate_MinMax(rectAsPts, ref maxPt);
 
 //        rectAsPts[0] = minPt;
-//        rectAsPts[1] = new Distance2D(maxPt.X, minPt.Y);
+//        rectAsPts[1] = new Dist2D(maxPt.X, minPt.Y);
 //        // RESULT is clockwise (not zig-zag).
 //        rectAsPts[2] = maxPt;
-//        rectAsPts[3] = new Distance2D(minPt.X, maxPt.Y);
+//        rectAsPts[3] = new Dist2D(minPt.X, maxPt.Y);
 //    }
 
 //    // SIDE-EFFECT: If rectangle is rotated, expands it to surrounding unrotated rectangled.
-//    public static bool PointInsideRectangle2D(Distance2D ptdPoint, RectangleF rcfRectangle)
+//    public static bool PointInsideRectangle2D(Dist2D ptdPoint, RectangleF rcfRectangle)
 //    {
 //        FixRectangle(rcfRectangle);
 
@@ -1178,7 +1180,7 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangle2D(Distance3D ptdPoint, RectangleF rcfRectangle)
+//    public static bool PointInsideRectangle2D(Dist3D ptdPoint, RectangleF rcfRectangle)
 //    {
 //        FixRectangle(rcfRectangle);
 
@@ -1194,7 +1196,7 @@
 //    // "tolerance": must not be negative.
 //    // If > 0, then points must be that amount inside the rect bounds,
 //    // to be considered inside.
-//    public static bool PointInsideRectangle2D_Strict(Distance2D point, Rectangle2D rect, double tolerance = 0)
+//    public static bool PointInsideRectangle2D_Strict(Dist2D point, Rectangle2D rect, double tolerance = 0)
 //    {
 //        return _PointInsideRectangle2D(point, rect, false, tolerance);
 //    }
@@ -1205,7 +1207,7 @@
 //    // "tolerance": must not be negative.
 //    // If > 0, then points can be up to that amount outside of the rect bounds,
 //    // and will still be considered inside.
-//    public static bool PointInsideRectangle2D_Inclusive(Distance2D point, Rectangle2D rect, double tolerance = 0)
+//    public static bool PointInsideRectangle2D_Inclusive(Dist2D point, Rectangle2D rect, double tolerance = 0)
 //    {
 //        return _PointInsideRectangle2D(point, rect, true, tolerance);
 //    }
@@ -1214,7 +1216,7 @@
 //    // Tolerance either expands or shrinks "rect", depending on "inclusive".
 //    // See comments on PointInsideRectangle2D_Strict and PointInsideRectangle2D_Inclusive.
 //    // TODO: "tolerance" is ignored when rect.IsRotated.
-//    private static bool _PointInsideRectangle2D(Distance2D point, Rectangle2D rect, bool inclusive, double tolerance = 0)
+//    private static bool _PointInsideRectangle2D(Dist2D point, Rectangle2D rect, bool inclusive, double tolerance = 0)
 //    {
 //        // tolerance < 0 would be meaningless; ignore.
 //        tolerance = ClampMin(tolerance, 0);
@@ -1224,12 +1226,12 @@
 //            if (tolerance > 0)
 //                throw new NotImplementedException("_PointInsideRectangle2D with rotated rect - tolerance is not supported.");
 //            // Using A as origin, project point onto vectors forming two sides of rectangle adjacent to origin.
-//            Distance2D A = rect.TopLeft;
+//            Dist2D A = rect.TopLeft;
 //            // "Basis Vectors": two adjacent sides of rectangle, surrounding origin.
-//            Distance2D AB = rect.TopRight - A;
-//            Distance2D AD = rect.BottomLeft - A;
+//            Dist2D AB = rect.TopRight - A;
+//            Dist2D AD = rect.BottomLeft - A;
 //            // Vector representing point.
-//            Distance2D AP = point - A;
+//            Dist2D AP = point - A;
 //            // Project AP on to basis vectors. Compare its magnitude (k) along each vector to the magnitude of vector endpoint.
 //            // NOTE: "0" is "AA.Dot(AA)" - the projection of A onto itself.
 //            // The "k" values must fall between this and the other end of vector.
@@ -1247,7 +1249,7 @@
 //            return BetweenExclusive_WithTolerance(point.X, rect.X, rect.X + rect.Width, tolerance) && BetweenExclusive_WithTolerance(point.Y, rect.Y, rect.Y + rect.Height, tolerance);
 //    }
 
-//    public static bool PointInsideRectangle2D_WithTolerance(Distance2D point, Rectangle2D rect, double tolerance)
+//    public static bool PointInsideRectangle2D_WithTolerance(Dist2D point, Rectangle2D rect, double tolerance)
 //    {
 //        if (rect.IsRotated)
 //            throw new NotImplementedException("PointInsideRectangle2D_Tolerance: rect.IsRotated");
@@ -1257,13 +1259,13 @@
 //    }
 
 //    // NOTE: "Strict": Excludes boundary points of rectangle. ("<" not "<=")
-//    public static bool PointInsideRectangle2D_Strict(Distance3D point, Rectangle2D rectangle)
+//    public static bool PointInsideRectangle2D_Strict(Dist3D point, Rectangle2D rectangle)
 //    {
 //        return PointInsideRectangle2D_Strict(point.ToPoint2D(), rectangle);
 //    }
 
 //    // TODO: Appears to be incomplete (doesn't have logic for ptdOrigoVector < 0).
-//    public static bool PointInsideRectangle2D(double dblX, double dblY, Rectangle2D rcdRectangle, Distance3D ptdOrigoVector)
+//    public static bool PointInsideRectangle2D(double dblX, double dblY, Rectangle2D rcdRectangle, Dist3D ptdOrigoVector)
 //    {
 //        FixRectangle(ref rcdRectangle);
 
@@ -1285,7 +1287,7 @@
 //        return bolIsectX && bolIsectY;
 //    }
 
-//    public static bool PointInsideRectangleX2D(Distance2D ptdPoint, RectangleF rcfRectangle)
+//    public static bool PointInsideRectangleX2D(Dist2D ptdPoint, RectangleF rcfRectangle)
 //    {
 //        FixRectangle(rcfRectangle);
 
@@ -1295,7 +1297,7 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangleX2D(Distance3D ptdPoint, RectangleF rcfRectangle)
+//    public static bool PointInsideRectangleX2D(Dist3D ptdPoint, RectangleF rcfRectangle)
 //    {
 //        FixRectangle(rcfRectangle);
 
@@ -1305,7 +1307,7 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangleY2D(Distance2D ptdPoint, RectangleF rcfRectangle)
+//    public static bool PointInsideRectangleY2D(Dist2D ptdPoint, RectangleF rcfRectangle)
 //    {
 //        FixRectangle(rcfRectangle);
 
@@ -1349,18 +1351,18 @@
 
 //    // Bounding rectangle is not rotated, so can do quicker check.
 //    // "Loose": Falling exactly on boundary is considered "inside".
-//    public static bool PointInsideBoundingRectangle2D_Loose(Distance2D pt, Distance2D[] rectangleAsPoints)
+//    public static bool PointInsideBoundingRectangle2D_Loose(Dist2D pt, Dist2D[] rectangleAsPoints)
 //    {
-//        Distance2D rectMin = rectangleAsPoints[0];
-//        Distance2D rectMax = rectangleAsPoints[2];
+//        Dist2D rectMin = rectangleAsPoints[0];
+//        Dist2D rectMax = rectangleAsPoints[2];
 //        // ">=" and "<=": Falling exactly on boundary is considered "inside".
 //        return (pt.X >= rectMin.X) && (pt.X <= rectMax.X) && (pt.Y >= rectMin.Y) && (pt.Y <= rectMax.Y);
 //    }
 
 //    // Low performance
-//    public static bool PointInsideRectangle2D(Distance2D ptdPoint, Distance2D[] ptdRectangle)
+//    public static bool PointInsideRectangle2D(Dist2D ptdPoint, Dist2D[] ptdRectangle)
 //    {
-//        Distance2D[] ptdBounds = (Distance2D[])ptdRectangle.Clone();
+//        Dist2D[] ptdBounds = (Dist2D[])ptdRectangle.Clone();
 
 //        if (ptdBounds == null)
 //            return false;
@@ -1368,7 +1370,7 @@
 //        if (!ptdBounds[0].Y == ptdBounds[1].Y | !ptdBounds[1].X == ptdBounds[2].X)
 //        {
 //            double dblAngle = GetAngleDegrees2D(ptdBounds[0], ptdBounds[1]);
-//            Distance2D ptdOrigon;
+//            Dist2D ptdOrigon;
 
 //            ptdOrigon = ptdBounds[0];
 //            ptdPoint = Delta2D(ptdOrigon, ptdPoint);
@@ -1400,9 +1402,9 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangle2D(Distance3D ptdPoint, Distance3D[] ptdRectangle)
+//    public static bool PointInsideRectangle2D(Dist3D ptdPoint, Dist3D[] ptdRectangle)
 //    {
-//        Distance3D[] ptdBounds = (Distance3D[])ptdRectangle.Clone();
+//        Dist3D[] ptdBounds = (Dist3D[])ptdRectangle.Clone();
 
 //        if (ptdBounds == null)
 //            return false;
@@ -1410,7 +1412,7 @@
 //        if (!ptdBounds[0].Y == ptdBounds[1].Y | !ptdBounds[1].X == ptdBounds[2].X)
 //        {
 //            double dblAngle = GetAngleDegrees2D(ptdBounds[0], ptdBounds[1]);
-//            Distance3D ptdOrigon;
+//            Dist3D ptdOrigon;
 
 //            ptdOrigon = ptdBounds[0];
 //            ptdPoint = Delta2D(ptdOrigon, ptdPoint);
@@ -1442,9 +1444,9 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangleX2D(Distance2D ptdPoint, Distance2D[] ptdRectangle)
+//    public static bool PointInsideRectangleX2D(Dist2D ptdPoint, Dist2D[] ptdRectangle)
 //    {
-//        Distance2D[] ptdBounds = (Distance2D[])ptdRectangle.Clone();
+//        Dist2D[] ptdBounds = (Dist2D[])ptdRectangle.Clone();
 
 //        if (ptdBounds == null)
 //            return false;
@@ -1452,7 +1454,7 @@
 //        if (!ptdBounds[0].Y == ptdBounds[1].Y | !ptdBounds[1].X == ptdBounds[2].X)
 //        {
 //            double dblAngle = GetAngleDegrees2D(ptdBounds[0], ptdBounds[1]);
-//            Distance2D ptdOrigon;
+//            Dist2D ptdOrigon;
 
 //            ptdOrigon = ptdBounds[0];
 //            ptdPoint = Delta2D(ptdOrigon, ptdPoint);
@@ -1478,9 +1480,9 @@
 //        return false;
 //    }
 
-//    public static bool PointInsideRectangleY2D(Distance2D ptdPoint, Distance2D[] ptdRectangle)
+//    public static bool PointInsideRectangleY2D(Dist2D ptdPoint, Dist2D[] ptdRectangle)
 //    {
-//        Distance2D[] ptdBounds = (Distance2D[])ptdRectangle.Clone();
+//        Dist2D[] ptdBounds = (Dist2D[])ptdRectangle.Clone();
 
 //        if (ptdBounds == null)
 //            return false;
@@ -1488,7 +1490,7 @@
 //        if (!ptdBounds[0].Y == ptdBounds[1].Y | !ptdBounds[1].X == ptdBounds[2].X)
 //        {
 //            double dblAngle = GetAngleDegrees2D(ptdBounds[0], ptdBounds[1]);
-//            Distance2D ptdOrigon;
+//            Dist2D ptdOrigon;
 
 //            ptdOrigon = ptdBounds[0];
 //            ptdPoint = Delta2D(ptdOrigon, ptdPoint);
@@ -1773,7 +1775,7 @@
 //    }
 
 //    // Two rectangles, each represented by min and max. Return True if intersect.
-//    public static bool MinMaxIntersect(Distance2D min1, Distance2D max1, Distance2D min2, Distance2D max2)
+//    public static bool MinMaxIntersect(Dist2D min1, Dist2D max1, Dist2D min2, Dist2D max2)
 //    {
 //        // Calc intersection.
 //        double minX = Math.Max(min1.X, min2.X);
@@ -1808,10 +1810,10 @@
 //    // True if 2 rectangles intersect.
 //    // REQUIRES: NON-ROTATED rectangles!
 //    // Low Performance.
-//    public static bool RectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Distance3D ptdOrigoVector)
+//    public static bool RectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Dist3D ptdOrigoVector)
 //    {
-//        Distance2D[] ptdRect1 = new Distance2D[4];
-//        Distance2D[] ptdRect2 = new Distance2D[4];
+//        Dist2D[] ptdRect1 = new Dist2D[4];
+//        Dist2D[] ptdRect2 = new Dist2D[4];
 
 //        if (ptdOrigoVector.X < 0)
 //        {
@@ -1893,7 +1895,7 @@
 //    }
 
 //    // Low Performance.
-//    public static bool RectanglesIntersects2D(Distance2D[] ptdRec1, Distance2D[] ptdRec2)
+//    public static bool RectanglesIntersects2D(Dist2D[] ptdRec1, Dist2D[] ptdRec2)
 //    {
 //        if (ptdRec1 == null | ptdRec2 == null)
 //            return false;
@@ -1933,7 +1935,7 @@
 //    }
 
 //    // TODO FIXA DENNA ASAP
-//    // Public Function RectanglesIntersects2D(ByVal ptdRec1() As Distance3D, ByVal ptdRec2() As Distance3D) As Boolean
+//    // Public Function RectanglesIntersects2D(ByVal ptdRec1() As Dist3D, ByVal ptdRec2() As Dist3D) As Boolean
 //    // If ptdRec1 Is Nothing Or ptdRec2 Is Nothing Then Return False
 //    // If ptdRec1.Length < 3 Or ptdRec2.Length < 3 Then Return False
 
@@ -2000,7 +2002,7 @@
 
 //    // True if 2 rectangles intersect -- this only works on rectangles without any form of rotation.
 //    // High performance.
-//    public static bool BoundsRectanglesIntersects2D(Distance2D[] rect1, Distance2D[] rect2)
+//    public static bool BoundsRectanglesIntersects2D(Dist2D[] rect1, Dist2D[] rect2)
 //    {
 //        // rect(0) contains minX,Y; rect(2) contains maxX,Y.
 //        // Calc intersection.
@@ -2019,7 +2021,7 @@
 //    // If each rectangle has its own tolerance, caller should pass in maximum of the two tolerances.
 //    // Used as quick "miss"check by algorithms that need to report "touch" of shapes.
 //    // High performance.
-//    public static bool BoundsRectanglesIntersectOrTouch(Distance2D[] rect1, Distance2D[] rect2, double tolerance)
+//    public static bool BoundsRectanglesIntersectOrTouch(Dist2D[] rect1, Dist2D[] rect2, double tolerance)
 //    {
 //        // rect(0) contains minX,Y; rect(2) contains maxX,Y.
 //        // Calc intersection.
@@ -2039,44 +2041,44 @@
 
 //    public static bool LinesIntersects2D(PointF p1, PointF p2, PointF p3, PointF p4)
 //    {
-//        Distance2D p2Isect;
+//        Dist2D p2Isect;
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref p2Isect);
 //    }
 
 //    // Legacy behavior: parallel lines return False, even if colinear and touching.
-//    public static bool LinesIntersects2D(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4)
+//    public static bool LinesIntersects2D(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4)
 //    {
 //        if (p1.IsBad || p2.IsBad || p3.IsBad || p4.IsBad)
 //            throw new InvalidDataException("LinesIntersects2D - bad point");
-//        Distance2D pIsect;
+//        Dist2D pIsect;
 //        LineOverlap overlap;
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, false, ref pIsect, ref overlap);
 //    }
 
 //    // Legacy behavior: parallel lines return Nothing, even if colinear and touching.
-//    public static Distance2D? LinesIntersection2D(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4)
+//    public static Dist2D? LinesIntersection2D(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4)
 //    {
 //        if (p1.IsBad || p2.IsBad || p3.IsBad || p4.IsBad)
 //            throw new InvalidDataException("LinesIntersects2D - bad point");
-//        Distance2D pIsect;
+//        Dist2D pIsect;
 //        LineOverlap overlap;
 //        bool result = LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, false, ref pIsect, ref overlap);
-//        // BUG: This shorthand returns a Distance2D with default value, instead of a Nullable with Nothing.
+//        // BUG: This shorthand returns a Dist2D with default value, instead of a Nullable with Nothing.
 //        // BUG Return If(result, pIsect, Nothing)
 //        if (result)
 //            return pIsect;
 //        else
-//            return default(Distance2D?);
+//            return default(Dist2D?);
 //    }
 
-//    public static bool LinesIntersects2D_AllowColinearTouch(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4)
+//    public static bool LinesIntersects2D_AllowColinearTouch(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4)
 //    {
-//        Distance2D pIsect;
+//        Dist2D pIsect;
 //        LineOverlap overlap;
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, true, ref pIsect, ref overlap);
 //    }
 
-//    public static bool LinesIntersects2D_AllowColinearTouch(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4, ref Distance2D pIsect)
+//    public static bool LinesIntersects2D_AllowColinearTouch(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4, ref Dist2D pIsect)
 //    {
 //        LineOverlap overlap;
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, true, ref pIsect, ref overlap);
@@ -2084,55 +2086,55 @@
 
 //    // Parallel segments which Overlap (by more than a single point) Return False,
 //    // because returning one of the (multiple) points of contact could mislead the caller.
-//    // If fails, pIsect=Distance2D.MaxValue.
-//    public static bool LinesIntersects2D_AllowColinearTouch(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4, ref Distance2D pIsect, out LineOverlap overlap, double tolerance = 0)
+//    // If fails, pIsect=Dist2D.MaxValue.
+//    public static bool LinesIntersects2D_AllowColinearTouch(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4, ref Dist2D pIsect, out LineOverlap overlap, double tolerance = 0)
 //    {
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, true, ref pIsect, ref overlap, tolerance);
 //    }
 
 //    // True if segment(p1, p2) intersects segment(p3, p4)
-//    public static bool LinesIntersects2D(Distance3D p1, Distance3D p2, Distance3D p3, Distance3D p4)
+//    public static bool LinesIntersects2D(Dist3D p1, Dist3D p2, Dist3D p3, Dist3D p4)
 //    {
-//        Distance2D p2Isect;
+//        Dist2D p2Isect;
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref p2Isect);
 //    }
 
 //    public static bool LinesIntersects2D(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy)
 //    {
-//        Distance2D pIsect;
+//        Dist2D pIsect;
 //        return LinesIntersects2D(ax, ay, bx, by, cx, cy, dx, dy, ref pIsect);
 //    }
 
 
 //    // Z coords ignored; Returned z is zero.
-//    public static bool LinesIntersects2D(Distance3D p1, Distance3D p2, Distance3D p3, Distance3D p4, out Distance3D pIsect)
+//    public static bool LinesIntersects2D(Dist3D p1, Dist3D p2, Dist3D p3, Dist3D p4, out Dist3D pIsect)
 //    {
-//        Distance2D p2Isect;
+//        Dist2D p2Isect;
 //        bool result = LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref p2Isect);
-//        pIsect = new Distance3D(p2Isect.X, p2Isect.Y);
+//        pIsect = new Dist3D(p2Isect.X, p2Isect.Y);
 //        return result;
 //    }
 
-//    public static bool LinesIntersects2D(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4, out Distance2D intersectionPt)
+//    public static bool LinesIntersects2D(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4, out Dist2D intersectionPt)
 //    {
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref intersectionPt);
 //    }
 
-//    public static bool LinesIntersects2D(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4, out Distance2D pIsect, out LineOverlap overlap)
+//    public static bool LinesIntersects2D(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4, out Dist2D pIsect, out LineOverlap overlap)
 //    {
 //        return LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, false, ref pIsect, ref overlap);
 //    }
 
 //    public static bool LinesIntersects2D(PointF p1, PointF p2, PointF p3, PointF p4, ref PointF pIsect)
 //    {
-//        Distance2D p2Isect;
+//        Dist2D p2Isect;
 //        bool result = LinesIntersects2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, ref p2Isect);
 //        pIsect = new PointF(System.Convert.ToSingle(p2Isect.X), System.Convert.ToSingle(p2Isect.Y));
 //        return result;
 //    }
 
 //    // Legacy behavior: parallel lines return False, even if colinear and touching.
-//    public static bool LinesIntersects2D(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, out Distance2D pIsect)
+//    public static bool LinesIntersects2D(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, out Dist2D pIsect)
 //    {
 //        LineOverlap overlap;
 //        return LinesIntersects2D(ax, ay, bx, by, cx, cy, dx, dy, false, ref pIsect, ref overlap);
@@ -2141,28 +2143,28 @@
 //    // allowColinearTouch=False => Legacy behavior: parallel lines return False, even if colinear and touching.
 //    // Parallel segments which Overlap (by more than a single point) Return False,
 //    // because returning one of the (multiple) points of contact could mislead the caller.
-//    // If fails, pIsect=Distance2D.MaxValue.
-//    public static bool LinesIntersects2D(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, bool allowColinearTouch, out Distance2D pIsect, out LineOverlap overlap, double tolerance = 0)
+//    // If fails, pIsect=Dist2D.MaxValue.
+//    public static bool LinesIntersects2D(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, bool allowColinearTouch, out Dist2D pIsect, out LineOverlap overlap, double tolerance = 0)
 //    {
 //        // Default tolerance=NearZero.
 //        if (tolerance == 0)
 //            tolerance = NearZero;
 
 //        LineOverlap overlap1, overlap2;
-//        Distance2D outP2;
+//        Dist2D outP2;
 //        pIsect = LinesIntersectsAt2D(ax, ay, bx, by, cx, cy, dx, dy, tolerance, ref overlap, ref overlap1, ref overlap2, ref outP2);
 
 //        // ' verify
 //        // Dim result As Boolean = (overlap = LineOverlap.Crossing) OrElse (overlap = LineOverlap.CrossingTouch)
-//        // Dim oldIsect As Distance2D
+//        // Dim oldIsect As Dist2D
 //        // Dim oldResult As Boolean = LinesIntersects2D_OLD(ax, ay, bx, by, cx, cy, dx, dy, oldIsect)
 //        // If result <> oldResult OrElse (result AndAlso Not oldIsect.NearlyEquals(pIsect)) Then
 //        // If result AndAlso (Not oldResult) AndAlso (overlap = LineOverlap.CrossingTouch) AndAlso oldIsect.NearlyEquals(pIsect) Then
 //        // ' Check whether new is better answer.
-//        // If pIsect.NearlyEquals(New Distance2D(ax, ay)) OrElse _
-//        // pIsect.NearlyEquals(New Distance2D(bx, by)) OrElse _
-//        // pIsect.NearlyEquals(New Distance2D(cx, cy)) OrElse _
-//        // pIsect.NearlyEquals(New Distance2D(dx, dy)) Then
+//        // If pIsect.NearlyEquals(New Dist2D(ax, ay)) OrElse _
+//        // pIsect.NearlyEquals(New Dist2D(bx, by)) OrElse _
+//        // pIsect.NearlyEquals(New Dist2D(cx, cy)) OrElse _
+//        // pIsect.NearlyEquals(New Dist2D(dx, dy)) Then
 //        // Dim better = 0
 //        // Else
 //        // Dim trouble = 0
@@ -2179,17 +2181,17 @@
 //        return (overlap == LineOverlap.Crossing) || (overlap == LineOverlap.CrossingTouch) || (allowColinearTouch && (overlap == LineOverlap.TouchEnd));
 //    }
 
-//    public static bool LinesIntersects2D_OLD(double dblP1X, double dblP1Y, double dblP2X, double dblP2Y, double dblP3X, double dblP3Y, double dblP4X, double dblP4Y, ref Distance2D ptdIsect)
+//    public static bool LinesIntersects2D_OLD(double dblP1X, double dblP1Y, double dblP2X, double dblP2Y, double dblP3X, double dblP3Y, double dblP4X, double dblP4Y, ref Dist2D ptdIsect)
 //    {
 //        ptdIsect = LinesIntersectsAt2D_OLD(dblP1X, dblP1Y, dblP2X, dblP2Y, dblP3X, dblP3Y, dblP4X, dblP4Y);
-//        Distance2D ptdDelta = Delta2D(dblP1X, dblP1Y, dblP2X, dblP2Y);
+//        Dist2D ptdDelta = Delta2D(dblP1X, dblP1Y, dblP2X, dblP2Y);
 
 
 //        if (Math.Abs(ptdDelta.X) > Math.Abs(ptdDelta.Y))
 //        {
 //            if (ptdIsect.X >= Math.Min(dblP1X, dblP2X) & ptdIsect.X <= Math.Max(dblP1X, dblP2X))
 //            {
-//                Distance2D ptdDelta2 = Delta2D(dblP3X, dblP3Y, dblP4X, dblP4Y);
+//                Dist2D ptdDelta2 = Delta2D(dblP3X, dblP3Y, dblP4X, dblP4Y);
 
 //                if (Math.Abs(ptdDelta2.X) > Math.Abs(ptdDelta2.Y))
 //                {
@@ -2202,7 +2204,7 @@
 //        }
 //        else if (ptdIsect.Y >= Math.Min(dblP1Y, dblP2Y) & ptdIsect.Y <= Math.Max(dblP1Y, dblP2Y))
 //        {
-//            Distance2D ptdDelta2 = Delta2D(dblP3X, dblP3Y, dblP4X, dblP4Y);
+//            Dist2D ptdDelta2 = Delta2D(dblP3X, dblP3Y, dblP4X, dblP4Y);
 
 //            if (Math.Abs(ptdDelta2.X) > Math.Abs(ptdDelta2.Y))
 //            {
@@ -2218,35 +2220,35 @@
 
 
 //    // "allowColinear=False": Legacy behavior: parallel lines return False, even if colinear and touching.
-//    // Returns crossing point. If no valid crossing point, returns Distance2D.MaxValue.
-//    public static Distance2D LinesIntersectsAt2D(Distance2D a, Distance2D b, Distance2D c, Distance2D d, bool allowColinear = false)
+//    // Returns crossing point. If no valid crossing point, returns Dist2D.MaxValue.
+//    public static Dist2D LinesIntersectsAt2D(Dist2D a, Dist2D b, Dist2D c, Dist2D d, bool allowColinear = false)
 //    {
 //        return LinesIntersectsAt2D(a.X, a.Y, b.X, b.Y, c.X, c.Y, d.X, d.Y, allowColinear);
 //    }
 
-//    // Returns crossing point. If no valid crossing point, returns Distance2D.MaxValue.
+//    // Returns crossing point. If no valid crossing point, returns Dist2D.MaxValue.
 //    // "allowColinear=False": Legacy behavior: parallel lines return False, even if colinear and touching.
 //    // Like previous version, may return a point that extends the segments (each segment is extended into a near-infinite line).
-//    public static Distance2D LinesIntersectsAt2D(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, bool allowColinear)
+//    public static Dist2D LinesIntersectsAt2D(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, bool allowColinear)
 //    {
 //        LineOverlap overlap, overlap1, overlap2;
-//        Distance2D outP2;
-//        Distance2D outP = LinesIntersectsAt2D(ax, ay, bx, by, cx, cy, dx, dy, NearZero, ref overlap, ref overlap1, ref overlap2, ref outP2);
+//        Dist2D outP2;
+//        Dist2D outP = LinesIntersectsAt2D(ax, ay, bx, by, cx, cy, dx, dy, NearZero, ref overlap, ref overlap1, ref overlap2, ref outP2);
 //        bool result = (overlap == LineOverlap.Crossing) || (overlap == LineOverlap.CrossingTouch);
 //        if (allowColinear)
 //            // TODO: When InsideTouchEnd, the intersection point is ambiguous. What is "outP" set to in this case?
 //            result = result || (overlap == LineOverlap.TouchEnd) || (overlap == LineOverlap.InsideTouchEnd);
 
 //        // ' verify
-//        // Dim oldIsect As Distance2D
+//        // Dim oldIsect As Dist2D
 //        // Dim oldResult As Boolean = LinesIntersects2D_OLD(ax, ay, bx, by, cx, cy, dx, dy, oldIsect)
 //        // If result <> oldResult OrElse (result AndAlso Not oldIsect.NearlyEquals(outP)) Then
 //        // If result AndAlso (Not oldResult) AndAlso (overlap = LineOverlap.CrossingTouch) AndAlso oldIsect.NearlyEquals(outP) Then
 //        // ' Check whether new is better answer.
-//        // If outP.NearlyEquals(New Distance2D(ax, ay)) OrElse _
-//        // outP.NearlyEquals(New Distance2D(bx, by)) OrElse _
-//        // outP.NearlyEquals(New Distance2D(cx, cy)) OrElse _
-//        // outP.NearlyEquals(New Distance2D(dx, dy)) Then
+//        // If outP.NearlyEquals(New Dist2D(ax, ay)) OrElse _
+//        // outP.NearlyEquals(New Dist2D(bx, by)) OrElse _
+//        // outP.NearlyEquals(New Dist2D(cx, cy)) OrElse _
+//        // outP.NearlyEquals(New Dist2D(dx, dy)) Then
 //        // Dim better = 0
 //        // Else
 //        // Dim trouble = 0
@@ -2263,12 +2265,12 @@
 //        // Like previous version, may return a point that extends the segments (each segment is extended into a near-infinite line).
 //        if (result || (overlap == LineOverlap.CrossingOutside))
 //            return outP;
-//        return Distance2D.MaxValue; // Consider invalid.
+//        return Dist2D.MaxValue; // Consider invalid.
 //    }
 
 //    // segment "1" is (a,b); segment "2" is (c,d).
 //    // The returned point MIGHT BE OUTSIDE of (a, b) and (c, d) -- it is the intersection of the infinite lines extended from those segments.
-//    // Returns Distance2D.MaxValue if fails (A result which can be compared, and will always fall outside of the segments.)
+//    // Returns Dist2D.MaxValue if fails (A result which can be compared, and will always fall outside of the segments.)
 //    // Sets "overlap1" to status of segment 1, "overlap2" to status of segment 2, "overlap" to combined status.
 //    // 
 //    // Note: Consider overlap=Outside, overlap1=Touch, overlap2=Outside. This indicates that overlap1 touches THE EXTENSION OF segment 2.
@@ -2278,10 +2280,10 @@
 //    // TODO PERFORMANCE: If caller doesn't care about cause of non-intersect (e.g. whether is parallel or crossing outside),
 //    // could first check whether rect bounds w/i tolerance of each other. If not, immediately fail, with overlap=BoundsNoOverlap.
 //    // Based on http://en.wikipedia.org/wiki/Line-line_intersection; "Given two points on each line".
-//    public static Distance2D LinesIntersectsAt2D(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Distance2D outP2)
+//    public static Dist2D LinesIntersectsAt2D(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Dist2D outP2)
 //    {
 //        overlap1 = LineOverlap.Undefined; overlap2 = LineOverlap.Undefined;
-//        outP2 = Distance2D.MaxValue;    // i.e. undefined.
+//        outP2 = Dist2D.MaxValue;    // i.e. undefined.
 
 //        // NOTE: None of these are affected by the origX1/Y1 translation later, so safe to compute now.
 //        // (Didn't want to modify x's and y's until sure we aren't calling LinesOverlapOrTouch.)
@@ -2319,7 +2321,7 @@
 //                // (p3,p4) is shorter.
 //                xd = x34; yd = y34; xa = 0; ya = 0; xb = x12; yb = y12;
 //            }
-//            double distSq = PointDeltaToLineExtended2D(new Distance2D(xd, yd), new Distance2D(xa, ya), new Distance2D(xb, yb)).LengthSquared;
+//            double distSq = PointDeltaToLineExtended2D(new Dist2D(xd, yd), new Dist2D(xa, ya), new Dist2D(xb, yb)).LengthSquared;
 //            // If within tolerance, treat as parallel.
 //            if (distSq <= tolerance_scaled * tolerance_scaled)
 //                asParallel = true;
@@ -2330,7 +2332,7 @@
 //        // If asParallel Then Return LinesOverlapOrTouch(x1, y1, x2, y2, x3, y3, x4, y4, tolerance_scaled, overlap, overlap1, overlap2, outP2)
 //        if (asParallel)
 //        {
-//            Distance2D outP1 = LinesOverlapOrTouch(x1, y1, x2, y2, x3, y3, x4, y4, tolerance_scaled, ref overlap, ref overlap1, ref overlap2, ref outP2);
+//            Dist2D outP1 = LinesOverlapOrTouch(x1, y1, x2, y2, x3, y3, x4, y4, tolerance_scaled, ref overlap, ref overlap1, ref overlap2, ref outP2);
 //            if (overlap != LineOverlap.NotParallel)
 //                return outP1;
 //            else
@@ -2365,9 +2367,9 @@
 //        if (fail)
 //        {
 //            overlap = LineOverlap.Undefined;
-//            return Distance2D.MaxValue;    // i.e. undefined.
+//            return Dist2D.MaxValue;    // i.e. undefined.
 //        }
-//        Distance2D pr = new Distance2D(rx, ry);
+//        Dist2D pr = new Dist2D(rx, ry);
 
 //        // It is more reliable to check the axis with longer projection,
 //        // especially when other projection is near zero. (And necessary, when is zero.)
@@ -2380,13 +2382,13 @@
 //            // Even though the exact intersection point is outside of both segments,
 //            // Check whether any endpoint is within tolerance_scaled of the other line segment.
 //            double toleranceSq = tolerance_scaled * tolerance_scaled;
-//            Distance2D p1 = new Distance2D(x1, y1); Distance2D p2 = new Distance2D(x2, y2);
-//            Distance2D p3 = new Distance2D(x3, y3); Distance2D p4 = new Distance2D(x4, y4);
+//            Dist2D p1 = new Dist2D(x1, y1); Dist2D p2 = new Dist2D(x2, y2);
+//            Dist2D p3 = new Dist2D(x3, y3); Dist2D p4 = new Dist2D(x4, y4);
 
-//            Distance2D prForMinTouch;
+//            Dist2D prForMinTouch;
 //            double minTouchDistSq = PointDistanceSquaredToLine2D(p1, p3, p4, ref prForMinTouch);
 //            int caseForMinTouch = 0;
-//            Distance2D pClosest;
+//            Dist2D pClosest;
 //            if (AccumMin(PointDistanceSquaredToLine2D(p2, p3, p4, ref pClosest), ref minTouchDistSq))
 //            {
 //                caseForMinTouch = 1; prForMinTouch = pClosest;
@@ -2440,8 +2442,8 @@
 
 //                // Set appropriate overlap codes.
 //                // Is prForMinTouch within touching distance of an endpoint on other segment?
-//                Distance2D pr1;
-//                Distance2D pr2 = Distance2D.MaxValue;
+//                Dist2D pr1;
+//                Dist2D pr2 = Dist2D.MaxValue;
 //                if (caseForMinTouch < 2)
 //                {
 //                    pr1 = caseForMinTouch == 0 ? p1 : p2;
@@ -2538,7 +2540,7 @@
 //    // Return overlap, set overlap1 & 2.
 //    // overlap1 is relationship between r and segment (1)..(2).
 //    // overlap2 is relationship between r and segment (3)..(4). 
-//    private static LineOverlap WhichCrossingType(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double tolerance, Distance2D r, bool checkY1, bool checkY2, out LineOverlap overlap1, out LineOverlap overlap2)
+//    private static LineOverlap WhichCrossingType(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double tolerance, Dist2D r, bool checkY1, bool checkY2, out LineOverlap overlap1, out LineOverlap overlap2)
 //    {
 
 //        // Check within tolerance of each endpoint.
@@ -2578,10 +2580,10 @@
 
 //    // Reference: http://www.geog.ubcca/courses/klink/gis.notes/ncgia/u32.html
 //    // y = kx + m
-//    public static Distance2D LinesIntersectsAt2D_OLD2(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Distance2D outP2)
+//    public static Dist2D LinesIntersectsAt2D_OLD2(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Dist2D outP2)
 //    {
 //        overlap1 = LineOverlap.Undefined; overlap2 = LineOverlap.Undefined;
-//        outP2 = Distance2D.MaxValue;    // i.e. undefined.
+//        outP2 = Dist2D.MaxValue;    // i.e. undefined.
 
 //        // Both lines parallel to Y-axis. Test ensures at least one of (b1, b2) is good.
 //        if (x1 == x2 & x3 == x4)
@@ -2599,7 +2601,7 @@
 //        double m = k1 - k2;
 //        double n = a2 - a1;
 
-//        Distance2D r = new Distance2D();
+//        Dist2D r = new Dist2D();
 //        bool checkY1, checkY2;
 //        if (x1 == x2)
 //        {
@@ -2626,7 +2628,7 @@
 //        return r;
 //    }
 
-//    public static Distance2D LinesIntersectsAt2D_OLD(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy)
+//    public static Dist2D LinesIntersectsAt2D_OLD(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy)
 //    {
 //        // Referens: http://www.geog.ubcca/courses/klink/gis.notes/ncgia/u32.html
 //        // y = kx + m
@@ -2634,17 +2636,17 @@
 //        // Dim foo As Boolean
 //        // foo = m2DLibLinesIntersects2D(aX, aY, bX, bY, cX, cY, dX, dY)
 //        double a1, a2, b1, b2, m, n;
-//        Distance2D r = new Distance2D();
+//        Dist2D r = new Dist2D();
 
 //        if (ax == bx & cx == dx & ax == cx)
-//            return default(Distance2D);
+//            return default(Dist2D);
 
 //        // If cX = dX Then dX += 0.001
 
 //        b1 = (by - ay) / (bx - ax);
 //        b2 = (dy - cy) / (dx - cx);
 //        if (b1 == b2)
-//            return default(Distance2D); // Paralella linjer
+//            return default(Dist2D); // Paralella linjer
 //        a1 = ay - (b1 * ax);
 //        a2 = cy - (b2 * cx);
 //        m = b1 - b2;
@@ -2667,7 +2669,7 @@
 
 
 //    // PERFORMANCE: Caller should check polygon BOUNDS first.
-//    public static bool LineIntersectsWithLines(Distance2D ptdP1, Distance2D ptdP2, Distance2D[] ptdLines)
+//    public static bool LineIntersectsWithLines(Dist2D ptdP1, Dist2D ptdP2, Dist2D[] ptdLines)
 //    {
 //        for (int i = 0; i <= ptdLines.Length - 2; i++)
 //        {
@@ -2687,7 +2689,7 @@
 //    ///     ''' <param name="ptdP2"></param>
 //    ///     ''' <param name="ptdPol"></param>
 //    ///     ''' <returns></returns>
-//    public static bool LineIntersectsWithPolygon(Distance2D ptdP1, Distance2D ptdP2, Distance2D[] ptdPol)
+//    public static bool LineIntersectsWithPolygon(Dist2D ptdP1, Dist2D ptdP2, Dist2D[] ptdPol)
 //    {
 //        for (int i = 0; i <= ptdPol.Length - 1; i++)
 //        {
@@ -2701,9 +2703,9 @@
 //    }
 
 //    // PERFORMANCE: Caller should check polygon BOUNDS first.
-//    public static Distance2D[] LineIntersectsWithLinesAt(Distance2D p1, Distance2D p2, Distance2D[] linePts)
+//    public static Dist2D[] LineIntersectsWithLinesAt(Dist2D p1, Dist2D p2, Dist2D[] linePts)
 //    {
-//        Distance2D[] result = null;
+//        Dist2D[] result = null;
 
 //        for (int i = 0; i <= linePts.Length - 2; i++)
 //        {
@@ -2712,18 +2714,18 @@
 
 //            if (mDL2DLib.LinesIntersects2D(p1, p2, linePts[i], linePts[j]))
 //            {
-//                Distance2D isect = mDL2DLib.LinesIntersectsAt2D(p1, p2, linePts[i], linePts[j]);
+//                Dist2D isect = mDL2DLib.LinesIntersectsAt2D(p1, p2, linePts[i], linePts[j]);
 
 //                // Check for final point near to first point.
 //                if (HasElements(result) && isect.NearlyEquals(result[0], VerySmall))
 //                    continue;
 
 //                if (result == null)
-//                    result = new Distance2D[1];
+//                    result = new Dist2D[1];
 //                else
 //                {
 //                    var oldResult = result;
-//                    result = new Distance2D[result.Length + 1];
+//                    result = new Dist2D[result.Length + 1];
 //                    if (oldResult != null)
 //                        Array.Copy(oldResult, result, Math.Min(result.Length + 1, oldResult.Length));
 //                }
@@ -2736,7 +2738,7 @@
 //    }
 
 
-//    public static Distance2D[] LineIntersectsWithPolygonAt(Distance2D p1, Distance2D p2, IList<Distance2D> polyPts)
+//    public static Dist2D[] LineIntersectsWithPolygonAt(Dist2D p1, Dist2D p2, IList<Dist2D> polyPts)
 //    {
 //        return LineIntersectsWithPolygonAt(p1, p2, polyPts, ref null);
 //    }
@@ -2747,9 +2749,9 @@
 //    // "segmentIFs": If not Nothing, contains "indexAndFraction" (aka "IndexFrac") identifying position along polyPts, per returned point.
 //    // ASSERT: segmentIFs 1:1 with result points.
 //    // REQUIRE: polyPts does NOT have final point that is duplicate of first point.
-//    public static Distance2D[] LineIntersectsWithPolygonAt(Distance2D p1, Distance2D p2, IList<Distance2D> polyPts, ref IList<float> segmentIFs)
+//    public static Dist2D[] LineIntersectsWithPolygonAt(Dist2D p1, Dist2D p2, IList<Dist2D> polyPts, ref IList<float> segmentIFs)
 //    {
-//        Distance2D[] result = null;
+//        Dist2D[] result = null;
 
 //        if (Exists(segmentIFs))
 //            segmentIFs.Clear();
@@ -2761,18 +2763,18 @@
 
 //            if (mDL2DLib.LinesIntersects2D(p1, p2, polyPts[i], polyPts[j]))
 //            {
-//                Distance2D isect = mDL2DLib.LinesIntersectsAt2D(p1, p2, polyPts[i], polyPts[j]);
+//                Dist2D isect = mDL2DLib.LinesIntersectsAt2D(p1, p2, polyPts[i], polyPts[j]);
 
 //                // Check for final point near to first point.
 //                if (HasElements(result) && isect.NearlyEquals(result[0], VerySmall))
 //                    continue;
 
 //                if (result == null)
-//                    result = new Distance2D[1];
+//                    result = new Dist2D[1];
 //                else
 //                {
 //                    var oldResult = result;
-//                    result = new Distance2D[result.Length + 1];
+//                    result = new Dist2D[result.Length + 1];
 //                    if (oldResult != null)
 //                        Array.Copy(oldResult, result, Math.Min(result.Length + 1, oldResult.Length));
 //                }
@@ -2798,13 +2800,13 @@
 //    }
 
 //    // True if both endpoints common. They might be swapped.
-//    public static bool LinesIdentical2D(Distance3D ptdP1, Distance3D ptdP2, Distance3D ptdP3, Distance3D ptdP4)
+//    public static bool LinesIdentical2D(Dist3D ptdP1, Dist3D ptdP2, Dist3D ptdP3, Dist3D ptdP4)
 //    {
 //        return LinesIdentical2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y, ptdP3.X, ptdP3.Y, ptdP4.X, ptdP4.Y);
 //    }
 
 //    // True if both endpoints common. They might be swapped.
-//    public static bool LinesIdentical2D(Distance2D ptdP1, Distance2D ptdP2, Distance2D ptdP3, Distance2D ptdP4)
+//    public static bool LinesIdentical2D(Dist2D ptdP1, Dist2D ptdP2, Dist2D ptdP3, Dist2D ptdP4)
 //    {
 //        return LinesIdentical2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y, ptdP3.X, ptdP3.Y, ptdP4.X, ptdP4.Y);
 //    }
@@ -2825,11 +2827,11 @@
 //    public static void Test_Line2InsideLine1()
 //    {
 //        List<bool> results = new List<bool>();
-//        Distance2D p0 = new Distance2D(0, 0);
-//        Distance2D p1 = new Distance2D(1, 1);
-//        Distance2D p2 = new Distance2D(2, 2);
-//        Distance2D p3 = new Distance2D(3, 3);
-//        Distance2D p4 = new Distance2D(4, 4);
+//        Dist2D p0 = new Dist2D(0, 0);
+//        Dist2D p1 = new Dist2D(1, 1);
+//        Dist2D p2 = new Dist2D(2, 2);
+//        Dist2D p3 = new Dist2D(3, 3);
+//        Dist2D p4 = new Dist2D(4, 4);
 //        results.Add(Line2InsideLine1(p1, p4, p2, p3, false));   // True
 //        results.Add(Line2InsideLine1(p2, p3, p1, p4, false));   // False
 //        results.Add(Line2InsideLine1(p1, p4, p2, p4, false));   // True
@@ -2845,11 +2847,11 @@
 //    // True if line (p3,p4) is inside of line (p1,p2).
 //    // If the two lines are identical, then the value of "allowIdentical" is returned.
 //    // If one line is a point, False will be returned (LinesIntersectsAt2D rejects as BadData).
-//    public static bool Line2InsideLine1(Distance2D p1, Distance2D p2, Distance2D p3, Distance2D p4, bool allowIdentical)
+//    public static bool Line2InsideLine1(Dist2D p1, Dist2D p2, Dist2D p3, Dist2D p4, bool allowIdentical)
 //    {
 //        LineOverlap overlap, overlap1, overlap2;
-//        Distance2D outP2;
-//        Distance2D pIsect = LinesIntersectsAt2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, NearZero, ref overlap, ref overlap1, ref overlap2, ref outP2);
+//        Dist2D outP2;
+//        Dist2D pIsect = LinesIntersectsAt2D(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y, NearZero, ref overlap, ref overlap1, ref overlap2, ref outP2);
 
 //        if (overlap == LineOverlap.Identical)
 //            return allowIdentical;
@@ -2860,12 +2862,12 @@
 //    // Tolerance of VerySmall allows for segments that are based on Singles rather than Doubles, or conversions that might cause small errors.
 //    // NearZero, or TolerablyNearZero, are useful choices, if Single.Epsilon is too strict, but VerySmall is too lax.
 //    // NOTE: If Lines are identical, returns FALSE. If this is undesirable, comment out the first two lines, and identical segments will return True (because endpoint is zero distance from segment).
-//    public static bool LinesCommonEndAndOverlap2D(Distance2D a, Distance2D b, Distance2D c, Distance2D d, double tolerance)
+//    public static bool LinesCommonEndAndOverlap2D(Dist2D a, Dist2D b, Dist2D c, Dist2D d, double tolerance)
 //    {
 //        if (LinesIdentical2D(a, b, c, d))
 //            return false;
 
-//        Distance2D p1, p2;
+//        Dist2D p1, p2;
 //        if (a.NearlyEquals(c, tolerance))
 //        {
 //            p1 = b; p2 = d;
@@ -3175,10 +3177,10 @@
 //    }
 
 //    // Returns op1 (first point of overlap).
-//    public static Distance2D LinesOverlapOrTouch(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Distance2D op2)
+//    public static Dist2D LinesOverlapOrTouch(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Dist2D op2)
 //    {
-//        Distance2D op1;
-//        bool doesOverlap = LinesOverlapOrTouch(new Distance2D(ax, ay), new Distance2D(bx, by), new Distance2D(cx, cy), new Distance2D(dx, dy), tolerance, ref overlap, ref overlap1, ref overlap2, ref op1, ref op2);
+//        Dist2D op1;
+//        bool doesOverlap = LinesOverlapOrTouch(new Dist2D(ax, ay), new Dist2D(bx, by), new Dist2D(cx, cy), new Dist2D(dx, dy), tolerance, ref overlap, ref overlap1, ref overlap2, ref op1, ref op2);
 //        return op1;
 //    }
 
@@ -3189,17 +3191,17 @@
 //    // NOTE IMPORTANT: If returns False, but overlap=NotParallel, then these might be crossing/touching non-parallel lines.
 //    // Results in overlap, op1, and op2.
 //    // If overlap=LineOverlap.Identical, then op1=a, op2=b. Note that c&d might be reversed compared to a&b.
-//    // If ...TouchEnd, then op1=(the common endpoint), op2=Distance2D.Nan.
+//    // If ...TouchEnd, then op1=(the common endpoint), op2=Dist2D.Nan.
 //    // If ...InsideAndTouchEnd, Inside, or Overlap, then op1 & op2 describe the shared portion (intersection).
-//    public static bool LinesOverlapOrTouch(Distance2D a, Distance2D b, Distance2D c, Distance2D d, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Distance2D op1, out Distance2D op2)
+//    public static bool LinesOverlapOrTouch(Dist2D a, Dist2D b, Dist2D c, Dist2D d, double tolerance, out LineOverlap overlap, out LineOverlap overlap1, out LineOverlap overlap2, out Dist2D op1, out Dist2D op2)
 //    {
 //        overlap1 = LineOverlap.Undefined; overlap2 = LineOverlap.Undefined;
-//        op1 = Distance2D.NaN(); op2 = Distance2D.NaN();
+//        op1 = Dist2D.NaN(); op2 = Dist2D.NaN();
 
-//        Distance2D delta1 = b - a;
-//        Distance2D delta2 = d - c;
+//        Dist2D delta1 = b - a;
+//        Dist2D delta2 = d - c;
 
-//        if (delta1 == Distance2D.Zero() || delta2 == Distance2D.Zero())
+//        if (delta1 == Dist2D.Zero() || delta2 == Dist2D.Zero())
 //        {
 //            overlap = LineOverlap.BadData; return false;
 //        }
@@ -3389,19 +3391,19 @@
 //    }
 
 //    // Set "point" to itself rotated around "origin" by "degrees.
-//    public static void RotateByDegrees2D_Origin(ref Distance2D point, Distance2D origin, double degrees)
+//    public static void RotateByDegrees2D_Origin(ref Dist2D point, Dist2D origin, double degrees)
 //    {
 //        point = RotateByDegrees2D_Origin_New(point, origin, degrees);
 //    }
 
 //    // Return "point" rotated around "origin" by "degrees".
-//    public static Distance2D RotateByDegrees2D_Origin_New(Distance2D point, Distance2D origin, double degrees)
+//    public static Dist2D RotateByDegrees2D_Origin_New(Dist2D point, Dist2D origin, double degrees)
 //    {
 //        return RotateByDegrees2D_New(point - origin, degrees) + origin;
 //    }
 
 //    // Return "point" rotated around "(0, 0)" by "degrees".
-//    public static Distance2D RotateByDegrees2D_New(Distance2D point, double degrees)
+//    public static Dist2D RotateByDegrees2D_New(Dist2D point, double degrees)
 //    {
 //        if (degrees == 0)
 //            return point;
@@ -3410,14 +3412,14 @@
 //    }
 
 //    // Set "point" to its rotated value.
-//    public static void RotateByDegrees2D(ref Distance2D point, double degrees)
+//    public static void RotateByDegrees2D(ref Dist2D point, double degrees)
 //    {
 //        if (degrees == 0)
 //            return;
 //        RotateByRadians2D(ref point, DegreesToRadians(degrees));
 //    }
 
-//    public static void RotateByDegrees2D(ref Distance3D point, double degrees)
+//    public static void RotateByDegrees2D(ref Dist3D point, double degrees)
 //    {
 //        if (degrees == 0)
 //            return;
@@ -3449,17 +3451,17 @@
 //    }
 
 //    // Return the rotated point.
-//    public static Distance2D RotateByRadians2D_New(Distance2D point, double radians)
+//    public static Dist2D RotateByRadians2D_New(Dist2D point, double radians)
 //    {
 //        if (radians == 0)
 //            return point;
 //        double tx;
 //        double ty = RotateByRadians2D_A(point.X, point.Y, radians, ref tx);
-//        return new Distance2D(tx, ty);
+//        return new Dist2D(tx, ty);
 //    }
 
 //    // Set "point" to its rotated value.
-//    public static void RotateByRadians2D(ref Distance2D point, double radians)
+//    public static void RotateByRadians2D(ref Dist2D point, double radians)
 //    {
 //        if (radians == 0)
 //            return;
@@ -3468,7 +3470,7 @@
 //        point.X = tx; point.Y = ty;
 //    }
 
-//    public static void RotateByRadians2D(ref Distance3D point, double radians)
+//    public static void RotateByRadians2D(ref Dist3D point, double radians)
 //    {
 //        if (radians == 0)
 //            return;
@@ -3523,7 +3525,7 @@
 //    }
 
 //    // Returns unit vector in direction "angleDegrees", where x-axis is considered angle 0.
-//    public static Distance2D AngleDegrees_To_DirectionVector(double angleDegrees)
+//    public static Dist2D AngleDegrees_To_DirectionVector(double angleDegrees)
 //    {
 //        return AngleRadians_To_DirectionVector(DegreesToRadians(angleDegrees));
 //    }
@@ -3531,21 +3533,21 @@
 //    // Returns unit vector in direction "angleRadians", where x-axis is considered angle 0.
 //    // Inverse of GetAngleRadians2D.
 //    // That is, GetAngleRadians2D(AngleRadians_To_DirectionVector(angleRadians)) ~= angleRadians.
-//    public static Distance2D AngleRadians_To_DirectionVector(double angleRadians)
+//    public static Dist2D AngleRadians_To_DirectionVector(double angleRadians)
 //    {
-//        return new Distance2D(Math.Cos(angleRadians), Math.Sin(angleRadians));
+//        return new Dist2D(Math.Cos(angleRadians), Math.Sin(angleRadians));
 //    }
 
 //    // "deltaPt" should be a difference between two points; e.g. "ptB - ptA".
 //    // x-axis is considered angle 0.
-//    public static double DirectionVector_To_AngleDegrees(Distance2D deltaPt)
+//    public static double DirectionVector_To_AngleDegrees(Dist2D deltaPt)
 //    {
 //        return RadiansToDegrees(DirectionVector_To_AngleRadians(deltaPt));
 //    }
 
 //    // "deltaPt" should be a difference between two points; e.g. "ptB - ptA".
 //    // x-axis is considered angle 0.
-//    public static double DirectionVector_To_AngleRadians(Distance2D deltaPt)
+//    public static double DirectionVector_To_AngleRadians(Dist2D deltaPt)
 //    {
 //        return GetAngleRadians2D(deltaPt.X, deltaPt.Y);
 //    }
@@ -3555,11 +3557,11 @@
 //    ///     ''' </summary>
 //    ///     ''' <param name="originAndAim"></param>
 //    ///     ''' <returns></returns>
-//    public static Distance2D DirectionVectorFromOriginAndAim(Pair<Distance2D> originAndAim)
+//    public static Dist2D DirectionVectorFromOriginAndAim(Pair<Dist2D> originAndAim)
 //    {
-//        Distance2D origin = originAndAim.First;
-//        Distance2D aim = originAndAim.Second;
-//        Distance2D deltaPt = aim - origin;
+//        Dist2D origin = originAndAim.First;
+//        Dist2D aim = originAndAim.Second;
+//        Dist2D deltaPt = aim - origin;
 //        return deltaPt;
 //    }
 
@@ -3590,6087 +3592,6084 @@
 //    }
 
 
-//    // Angle change or "bend" at the middle point of a sequence of three points p0-p1-p2 (forming two line segments).
-//    // Zero when the points are all on a straight line. +-90 when they form a right angle.
-//    // This is "180 - central-angle". (The central angle p0-p1-p2 is 180 degrees when points are on a straight line.)
-//    public static double CalcBendDegrees(Distance2D p0, Distance2D p1, Distance2D p2)
-//    {
-//        double heading01 = GetAngleDegrees2D(p0, p1);
-//        double heading12 = GetAngleDegrees2D(p1, p2);
-//        // From -180 to +180.
-//        return AngleDegreesAsShorterDirection(heading12 - heading01);
-//    }
-
-//    // This calculation works if angle change <= 90 degrees. Beyond that, is +-"180 - correct_answer".
-//    // Due to ambiguity in arc-sine?
-//    // Private Function CalcBendDegrees(p0 As Distance2D, p1 As Distance2D, p2 As Distance2D) As Double
-//    // Dim crossProduct As Double = p1.Cross(p0, p2)
-//    // Dim magnitudeProduct As Double = Math.Sqrt(DistanceSquared2D(p0, p1) * DistanceSquared2D(p1, p2))
-
-//    // Dim sinA As Double = crossProduct / magnitudeProduct
-//    // Return RadiansToDegrees(Math.Asin(sinA))
-//    // End Function
-
-//    public static double GetAngleDegrees2D(Distance3D ptdOrigo, Distance3D ptdHeading)
-//    {
-//        return GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdHeading.X, ptdHeading.Y);
-//    }
-
-//    public static double GetAngleDegrees2D(Distance2D ptdOrigo, Distance2D ptdHeading)
-//    {
-//        return GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdHeading.X, ptdHeading.Y);
-//    }
-
-//    public static double GetAngleDegrees2D(PointF ptfOrigo, PointF ptfHeading)
-//    {
-//        return GetAngleDegrees2D(ptfOrigo.X, ptfOrigo.Y, ptfHeading.X, ptfHeading.Y);
-//    }
-
-//    // A better name might be "vector direction": it is based on a single vector (it is not an angle between two vectors).
-//    // Calculate Rotation given AimPoint and Origin By Simple ArcTangent^2 . Right Mid Square Zero Deg
-//    // I believe this is rotation relative to X-axis.
-//    public static double GetAngleDegrees2D(double originX, double originY, double aimPointX, double aimPointY)
-//    {
-//        if ((originX == m_cacheOrigoX) && (originY == m_cacheOrigoY) && (aimPointX == m_cachePointX) && (aimPointY == m_cachePointY))
-//        {
-//            t_nAngleFast += 1;
-//            return m_cacheAngle;
-//        }
-
-//        double angle = Math.Atan2(aimPointY - originY, aimPointX - originX) * (180 / Math.PI);
-//        if (angle < 0)
-//            angle += 360;
-
-//        m_cacheAngle = angle;
-//        m_cacheOrigoX = originX; m_cacheOrigoY = originY; m_cachePointX = aimPointX; m_cachePointY = aimPointY;
-
-//        t_nAngleSlow += 1;
-//        return angle;
-//    }
-
-//    private static double m_cacheOrigoX, m_cacheOrigoY, m_cachePointX, m_cachePointY, m_cacheAngle;
-//    private static int t_nAngleFast, t_nAngleSlow;
-
-//    // E.g. returns "45" If the angles differ by 45 degrees, regardless of which is greater,
-//    // and taking into account wrapping at +-180 or +-360.
-//    // Always takes SHORTER direction around the circle, so answer is in range 0..180.
-//    public static double AbsDifferenceTwoAngleDegrees2D(double angleDegrees1, double angleDegrees2)
-//    {
-//        // This takes any possible angle values, and yields a (wrapped) delta of 0..360.
-//        double absDeltaAngleDegrees = Math.Abs(angleDegrees2 - angleDegrees1) % 360;
-//        if (absDeltaAngleDegrees > 180)
-//            // Take the shorter direction. 0..180.
-//            absDeltaAngleDegrees = 360 - absDeltaAngleDegrees;
-//        return absDeltaAngleDegrees;
-//    }
-
-//    // Input might be from -360 to +360.
-//    // Return angle, from -180 to +180 degrees.
-//    // For Sweep angle, assuming sweep is less than 180 degrees,
-//    // but might be in either direction.
-//    public static double AngleDegreesAsShorterDirection(double deltaAngleDegrees)
-//    {
-//        return DeltaArcAsShorterDirection(deltaAngleDegrees, 360);
-//    }
-
-//    // "Arc" generalized to any wrapping coordinate.
-//    public static double DeltaArcAsShorterDirection(double deltaArc, double wrapAt)
-//    {
-//        // Just in case, reduce large range.
-//        deltaArc = deltaArc % wrapAt;
-//        double halfWrapAt = wrapAt / 2.0;
-
-//        if (deltaArc > halfWrapAt)
-//            deltaArc -= wrapAt;
-//        else if (deltaArc <= -halfWrapAt)
-//            deltaArc += wrapAt;
-//        else
-//        {
-//        }
-
-//        // Verify
-//        if ((deltaArc < -halfWrapAt) || (deltaArc > halfWrapAt))
-//            Trouble();
-
-//        return deltaArc;
-//    }
-
-//    // Convert any angle (in degrees) to value in 0..360.
-//    // Negative values become positive values.
-//    public static double Wrap360(double angleDegrees)
-//    {
-//        // Reduce large range.
-//        angleDegrees = angleDegrees % 360;
-//        if (angleDegrees < 0)
-//            angleDegrees += 360;
-
-//        return angleDegrees;
-//    }
-
-//    public static void Test_AngleDegreesAsShorterDirection()
-//    {
-//        if (!AngleDegreesAsShorterDirection(360).NearlyEquals(0) || !AngleDegreesAsShorterDirection(359).NearlyEquals(-1) || !AngleDegreesAsShorterDirection(200).NearlyEquals(-160) || !AngleDegreesAsShorterDirection(560).NearlyEquals(-160) || !AngleDegreesAsShorterDirection(180.01).NearlyEquals(-179.99) || !AngleDegreesAsShorterDirection(180).NearlyEquals(180) || !AngleDegreesAsShorterDirection(179.99).NearlyEquals(179.99) || !AngleDegreesAsShorterDirection(179).NearlyEquals(179) || !AngleDegreesAsShorterDirection(1).NearlyEquals(1) || !AngleDegreesAsShorterDirection(0.01).NearlyEquals(0.01) || !AngleDegreesAsShorterDirection(0).NearlyEquals(0) || !AngleDegreesAsShorterDirection(-360).NearlyEquals(0) || !AngleDegreesAsShorterDirection(-359).NearlyEquals(1) || !AngleDegreesAsShorterDirection(-200).NearlyEquals(160) || !AngleDegreesAsShorterDirection(-560).NearlyEquals(160) || !AngleDegreesAsShorterDirection(-180.01).NearlyEquals(179.99) || !(AngleDegreesAsShorterDirection(-180).NearlyEquals(180) || AngleDegreesAsShorterDirection(-180).NearlyEquals(-180)) || !AngleDegreesAsShorterDirection(-179.99).NearlyEquals(-179.99) || !AngleDegreesAsShorterDirection(-179).NearlyEquals(-179) || !AngleDegreesAsShorterDirection(-1).NearlyEquals(-1) || !AngleDegreesAsShorterDirection(-0.01).NearlyEquals(-0.01))
-//            Trouble();
-//    }
-
-//    // By "sorted", we mean ordered such that the angle from #1 to #2 is <= 180 degrees --
-//    // the shorter distance around the circle.
-//    public static void SortTwoAnglesSoShorterDistance(ref double angleDegrees1, ref double angleDegrees2)
-//    {
-//        double deltaAngleDegrees = (angleDegrees2 - angleDegrees1);
-//        if (deltaAngleDegrees < -180)
-//            // E.g. (350, 10) -- keep same order.
-//            return;
-//        else if (deltaAngleDegrees < 0)
-//        {
-//        }
-//        else if (deltaAngleDegrees <= 180)
-//            // E.g. (170, 190) -- keep same order.
-//            return;
-//        else
-//        {
-//        }
-
-//        // Swap them.
-//        Swap(angleDegrees1, angleDegrees2);
-//    }
-
-//    // Given Two angles (in degrees), are they pointing "more away from each other" than "towards each other"?
-//    public static bool AngleDegrees_Are_Opposite(double angleDegrees1, double angleDegrees2)
-//    {
-//        // AbsDifferenceTwoAngleDegrees2D is in range 0..180.
-//        // Half that is "90".
-//        return (AbsDifferenceTwoAngleDegrees2D(angleDegrees1, angleDegrees2) > 90);
-//    }
-
-
-//    public static double GetAngleRadians2D(Distance2D ptdOrigo, Distance2D ptdHeading)
-//    {
-//        return GetAngleRadians2D(ptdOrigo.X, ptdOrigo.Y, ptdHeading.X, ptdHeading.Y);
-//    }
-
-//    public static double GetAngleRadians2D(PointF ptfOrigo, PointF ptfHeading)
-//    {
-//        return GetAngleRadians2D(ptfOrigo.X, ptfOrigo.Y, ptfHeading.X, ptfHeading.Y);
-//    }
-
-//    // Calculate Rotation given Point and Origo By Simple ArcTangent^2 . Right Mid Square Zero Deg
-//    public static double GetAngleRadians2D(double originX, double originY, double pointX, double pointY)
-//    {
-//        double angleRadians = Math.Atan2(pointY - originY, pointX - originX);
-//        return angleRadians;
-//    }
-
-//    // "deltaPt" should be a difference between two points; e.g. "ptB - ptA".
-//    // aka "DirectionVector To AngleRadians".
-//    public static double GetAngleRadians2D(Distance2D deltaPt)
-//    {
-//        return GetAngleRadians2D(deltaPt.X, deltaPt.Y);
-//    }
-//    public static double GetAngleRadians2D(Size2D twist)
-//    {
-//        return GetAngleRadians2D(twist.Width, twist.Height);
-//    }
-//    public static double GetAngleRadians2D(double dx, double dy)
-//    {
-//        double angleRadians = Math.Atan2(dy, dx);
-//        return angleRadians;
-//    }
-
-
-
-//    // From origin, move in direction of secondPoint, by specified distance.
-//    // The result may be either nearer or farther from origin than secondPoint is.
-//    // secondPoint is merely used to give a direction.
-//    public static Distance2D MoveOnHeading(Distance2D origin, Distance2D secondPoint, double distance)
-//    {
-//        Distance2D delta = secondPoint - origin;
-//        return MoveOnHeading_GivenDelta(origin, delta, distance);
-//    }
-
-//    // Move away from origin, starting at currentPt, by specified distance.
-//    // The result is on the line from origin through currentPt, but farther away by "distance".
-//    // NOTE: Negative distance => move towards "origin".
-//    public static Distance2D MoveFartherOnHeading(Distance2D origin, Distance2D currentPt, double distance)
-//    {
-//        // NOTE: Alternative implementation would be similar to code in "Distance3D" version.
-
-//        Distance2D delta = currentPt - origin;
-//        return MoveOnHeading_GivenDelta(currentPt, delta, distance);
-//    }
-
-//    // Move away from origin, starting at currentPt, by specified distance.
-//    // The result is on the line from origin through currentPt, but farther away by "distance".
-//    // NOTE: Negative distance => move towards "origin".
-//    public static Distance3D MoveFartherOnHeading(Distance3D origin, Distance3D currentPt, double distance)
-//    {
-//        double totalDistance = Distance3D(origin, currentPt) + distance;
-//        return MoveOnHeading(origin, currentPt, totalDistance);
-//    }
-
-//    // Move from startPoint, by specified distance, at RIGHT ANGLE TO line towards origin.
-//    public static Distance2D MoveRightAngleToHeading(Distance2D startPoint, double distance, Distance2D origin)
-//    {
-//        Distance2D delta = startPoint - origin;
-//        return MoveRightAngleToHeading_GivenDelta(startPoint, delta, distance);
-//    }
-
-//    // Use this if you already have the delta between two points.
-//    // Moves in direction of delta, by specified distance.
-//    public static Distance2D MoveOnHeading_GivenDelta(Distance2D startPoint, Distance2D delta, double distance)
-//    {
-//        double deltaLength = delta.Length;
-//        if (deltaLength == 0)
-//            return startPoint; // Cannot determine direction to move, so don't.
-
-//        Distance2D result = startPoint + (distance / deltaLength) * delta;
-//        // ' test - verify
-//        // Dim verifyDistanceSq As Double = DistanceSquared2D(startPoint, result)
-//        // If Not verifyDistanceSq.NearlyEquals(distance * distance) Then
-//        // Test()
-//        // End If
-
-//        return result;
-//    }
-
-//    // Use this if you already have the delta between two points.
-//    // Moves at RIGHT ANGLE TO delta, by specified distance.
-//    public static Distance2D MoveRightAngleToHeading_GivenDelta(Distance2D startPoint, Distance2D delta, double distance)
-//    {
-//        double deltaLength = delta.Length;
-//        if (deltaLength == 0)
-//            return startPoint; // Cannot determine direction to move, so don't.
-
-//        Distance2D result = startPoint + (distance / deltaLength) * RightAngleToDelta(delta);
-//        return result;
-//    }
-
-//    // ARBITRARILY pick one of the right angles.
-//    public static Distance2D RightAngleToDelta(Distance2D delta)
-//    {
-//        return (new Distance2D(-delta.Y, delta.X));
-//    }
-
-
-//    public static Distance2D MoveOnHeadingDegrees(Distance2D origin, double angleDegrees, double distance)
-//    {
-//        return MoveOnHeadingRadians(origin, DegreesToRadians(angleDegrees), distance);
-//    }
-
-//    public static Distance2D MoveOnHeadingRadians(Distance2D origin, double angleRadians, double distance)
-//    {
-//        Distance2D directionVector = AngleRadians_To_DirectionVector(angleRadians);
-//        Distance2D result = origin + distance * directionVector;
-//        return result;
-//    }
-
-//    // Move in direction of secondPoint, specified distance from origin.
-//    // (Put in 2D lib, next to 2D version, so callers don't have to specify which module to reference.)
-//    public static Distance3D MoveOnHeading(Distance3D origin, Distance3D secondPoint, double distance)
-//    {
-//        Distance3D delta = secondPoint - origin;
-//        double deltaLength = delta.Length;
-//        if (deltaLength == 0)
-//            return origin; // Cannot determine direction to move, so don't.
-
-//        Distance3D result = origin + delta * (distance / deltaLength);
-//        // ' test - verify
-//        // Dim verify As Double = DistanceSquared2D(result, origin)
-//        // If Not verify.NearlyEquals(distance * distance) Then
-//        // Test()
-//        // End If
-//        return result;
-//    }
-
-
-//    public static double LinearInterpolationX2D(double dblY, PointF ptfP1, PointF ptfP2)
-//    {
-//        return LinearInterpolationX2D(dblY, ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
-//    }
-
-//    public static double LinearInterpolationX2D(double dblY, Distance2D ptdP1, Distance2D ptdP2)
-//    {
-//        return LinearInterpolationX2D(dblY, ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
-//    }
-
-//    public static double LinearInterpolationX2D(double dblY, double dblP1X, double dblP1Y, double dblP2X, double dblP2Y)
-//    {
-//        return ((dblP1X - dblP2X) * dblY - (dblP1X * dblP2Y) + (dblP2X * dblP1Y)) / (dblP1Y - dblP2Y);
-//    }
-
-//    public static double LinearInterpolationY2D(double dblX, PointF ptfP1, PointF ptfP2)
-//    {
-//        return LinearInterpolationY2D(dblX, ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
-//    }
-
-//    public static double LinearInterpolationY2D(double dblX, Distance2D ptdP1, Distance2D ptdP2)
-//    {
-//        return LinearInterpolationY2D(dblX, ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
-//    }
-
-//    public static double LinearInterpolationY2D(double dblX, double dblP1X, double dblP1Y, double dblP2X, double dblP2Y)
-//    {
-//        return dblP1Y + (((dblX - dblP1X) * (dblP2Y - dblP1Y)) / (dblP2X - dblP1X));
-//    }
-
-//    public static double PointFurthestDistanceToRectangle2D(PointF ptfPoint, PointF[] ptfRec)
-//    {
-//        if (ptfRec == null)
-//            return -1;
-
-//        double dblFurthestDI = -1;
-
-//        for (int intIdx = 0; intIdx <= 3; intIdx++)
-//        {
-//            double dblDI = CalcDistance2D(ptfPoint, ptfRec[intIdx]);
-
-//            if (dblDI > dblFurthestDI)
-//                dblFurthestDI = dblDI;
-//        }
-
-//        return dblFurthestDI;
-//    }
-
-//    public static double PointFurthestDistanceToRectangle2D(Distance2D ptdPoint, Distance2D[] ptdRec)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-
-//        double dblFurthestDI = -1;
-
-//        for (int intIdx = 0; intIdx <= 3; intIdx++)
-//        {
-//            double dblDI = CalcDistance2D(ptdPoint, ptdRec[intIdx]);
-
-//            if (dblDI > dblFurthestDI)
-//                dblFurthestDI = dblDI;
-//        }
-
-//        return dblFurthestDI;
-//    }
-
-//    public static double PointFurthestDistanceToRectangle2D(Distance3D ptdPoint, Distance3D[] ptdRec)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-
-//        double dblFurthestDI = -1;
-
-//        for (int intIdx = 0; intIdx <= 3; intIdx++)
-//        {
-//            double dblDI = CalcDistance2D(ptdPoint, ptdRec[intIdx]);
-
-//            if (dblDI > dblFurthestDI)
-//                dblFurthestDI = dblDI;
-//        }
-
-//        return dblFurthestDI;
-//    }
-
-//    public static void PointFurthestAndClosestToShape(PointF point, PointF[] shape, bool closed, out PointF closestPt, out double closestDI, out PointF furthestPt, out double furthestDI)
-//    {
-//        if (shape == null)
-//            return;
-
-//        closestDI = -1;
-//        furthestDI = -1;
-
-//        int length = shape.Length - 1;
-
-//        if (!closed || (shape.Length > 1 && shape[0] == shape[shape.Length - 1]))
-//            length = shape.Length - 2;
-
-//        for (int i = 0; i <= length; i++)
-//        {
-//            int j = (i + 1) % length;
-
-//            double dic = PointDistanceToLine2D(point, shape[i], shape[j]);
-//            PointF ptc = LinePointClosestToPoint2D(point, shape[i], shape[j]);
-
-//            double dif;
-//            PointF ptf = PointFurthestToLine(point, shape[i], shape[j], out dif);
-
-//            if (furthestDI == -1 || dif > furthestDI)
-//            {
-//                furthestDI = dif;
-//                furthestPt = ptf;
-//            }
-
-//            if (closestDI == -1 || dic < closestDI)
-//            {
-//                closestDI = dic;
-//                closestPt = ptc;
-//            }
-//        }
-//    }
-
-//    public static PointF PointFurthestToLine(PointF point, PointF p1, PointF p2, out double di)
-//    {
-//        double di1 = CalcDistance2D(point, p1);
-//        double di2 = CalcDistance2D(point, p2);
-
-//        if (di1 > di2)
-//        {
-//            di = di1;
-//            return p1;
-//        }
-//        else
-//        {
-//            di = di2;
-//            return p2;
-//        }
-//    }
-
-//    public static double PointDistanceToRectangle2D(PointF ptfPoint, PointF[] ptfRec)
-//    {
-//        if (ptfRec == null)
-//            return -1;
-
-//        double dblClosestDI = -1;
-
-//        for (int intIdx = 0; intIdx <= 3; intIdx++)
-//        {
-//            PointF ptfP1;
-//            PointF ptfP2 = ptfRec[intIdx];
-
-//            if (intIdx == 0)
-//                ptfP1 = ptfRec[3];
-//            else
-//                ptfP1 = ptfRec[intIdx - 1];
-
-//            double dblDI = PointDistanceToLine2D(ptfPoint, ptfP1, ptfP2);
-
-//            if (dblClosestDI < 0)
-//                dblClosestDI = dblDI;
-//            else if (dblDI < dblClosestDI)
-//                dblClosestDI = dblDI;
-//        }
-
-//        return dblClosestDI;
-//    }
-
-//    public static double PointDistanceToRectangle2D(Distance2D ptdPoint, Distance2D[] ptdRec)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-
-//        double dblClosestDI = -1;
-
-//        for (int intIdx = 0; intIdx <= 3; intIdx++)
-//        {
-//            Distance2D ptdP1;
-//            Distance2D ptdP2 = ptdRec[intIdx];
-
-//            if (intIdx == 0)
-//                ptdP1 = ptdRec[3];
-//            else
-//                ptdP1 = ptdRec[intIdx - 1];
-
-//            double dblDI = PointDistanceToLine2D(ptdPoint, ptdP1, ptdP2);
-
-//            if (dblClosestDI < 0)
-//                dblClosestDI = dblDI;
-//            else if (dblDI < dblClosestDI)
-//                dblClosestDI = dblDI;
-//        }
-
-//        return dblClosestDI;
-//    }
-
-//    public static double PointDistanceToRectangle2D(Distance3D ptdPoint, Distance3D[] ptdRec)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-
-//        double dblClosestDI = -1;
-
-//        for (int intIdx = 0; intIdx <= 3; intIdx++)
-//        {
-//            Distance3D ptdP1;
-//            Distance3D ptdP2 = ptdRec[intIdx];
-
-//            if (intIdx == 0)
-//                ptdP1 = ptdRec[3];
-//            else
-//                ptdP1 = ptdRec[intIdx - 1];
-
-//            double dblDI = PointDistanceToLine2D(ptdPoint, ptdP1, ptdP2);
-
-//            if (dblClosestDI < 0)
-//                dblClosestDI = dblDI;
-//            else if (dblDI < dblClosestDI)
-//                dblClosestDI = dblDI;
-//        }
-
-//        return dblClosestDI;
-//    }
-
-//    public static double PointDistanceToLine2D(PointF ptfPoint, PointF ptfP1, PointF ptfP2)
-//    {
-//        PointF ptfDelta;
-//        PointF ptfClosest;
-//        float t;
-
-//        ptfDelta = Delta2D(ptfP1, ptfP2);
-
-//        if (ptfDelta.X == 0 & ptfDelta.Y == 0)
-//            return mDL2DLib.CalcDistance2D(ptfPoint, ptfP1);
-
-//        // Calculate the t that minimizes the Distance.
-//        t = ((ptfPoint.X - ptfP1.X) * ptfDelta.X + (ptfPoint.Y - ptfP1.Y) * ptfDelta.Y) / (double)(ptfDelta.X * ptfDelta.X + ptfDelta.Y * ptfDelta.Y);
-
-//        // See if this represents one of the segment's
-//        // end points or a point in the middle.
-//        if (t < 0)
-//        {
-//            ptfDelta.X = ptfPoint.X - ptfP1.X;
-//            ptfDelta.Y = ptfPoint.Y - ptfP1.Y;
-//            ptfClosest.X = ptfP1.X;
-//            ptfClosest.Y = ptfP1.Y;
-//        }
-//        else if (t > 1)
-//        {
-//            ptfDelta.X = ptfPoint.X - ptfP2.X;
-//            ptfDelta.Y = ptfPoint.Y - ptfP2.Y;
-//            ptfClosest.X = ptfP2.X;
-//            ptfClosest.Y = ptfP2.Y;
-//        }
-//        else
-//        {
-//            ptfClosest.X = ptfP1.X + t * ptfDelta.X;
-//            ptfClosest.Y = ptfP1.Y + t * ptfDelta.Y;
-//            ptfDelta.X = ptfPoint.X - ptfClosest.X;
-//            ptfDelta.Y = ptfPoint.Y - ptfClosest.Y;
-//        }
-
-//        return mDL2DLib.CalcDistance2D(ptfPoint, ptfClosest);
-//    }
-//    // Performance: Avoids Sqrt.
-//    public static double PointDistanceSquaredToLine2D(PointF point, PointF p1, PointF p2)
-//    {
-//        PointF delta = Delta2D(p1, p2);
-//        if (delta.X == 0 & delta.Y == 0)
-//            return mDL2DLib.DistanceSquared2D(point, p1);
-
-//        // Calculate the t that minimizes the Distance.
-//        float t = ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (double)(delta.X * delta.X + delta.Y * delta.Y);
-
-//        // See if this represents one of the segment's
-//        // end points or a point inbetween.
-//        PointF closest;
-//        if (t <= 0)
-//        {
-//            closest.X = p1.X;
-//            closest.Y = p1.Y;
-//        }
-//        else if (t >= 1)
-//        {
-//            closest.X = p2.X;
-//            closest.Y = p2.Y;
-//        }
-//        else
-//        {
-//            closest.X = p1.X + t * delta.X;
-//            closest.Y = p1.Y + t * delta.Y;
-//        }
-
-//        return mDL2DLib.DistanceSquared2D(point, closest);
-//    }
-
-//    // p1 & p2 define the line. Allow the line to extend beyond the two points; find shortest delta from a point on that extended line.
-//    // If p1 = p2, the result is undefined; represent as (Double.NaN, Double.NaN).
-//    public static Distance2D PointDeltaToLineExtended2D(Distance2D point, Distance2D p1, Distance2D p2)
-//    {
-//        // Because we are allowing the line to extend, we don't clamp "closest" to be between p1 and p2.
-//        // (Contrast with PointDistanceToLine2D.)
-//        Distance2D closest = ClosestPointOnLineExtended2D(point, p1, p2);
-//        if (double.IsNaN(closest.X))
-//            return new Distance2D(double.NaN, double.NaN); // Undefined.
-
-//        double deltaX = point.X - closest.X;
-//        double deltaY = point.Y - closest.Y;
-//        return new Distance2D(deltaX, deltaY);
-//    }
-
-//    // p1 & p2 define the line. Allow the line to extend beyond the two points; find closest point on that extended line.
-//    // If p1 = p2, the result is undefined; represent as (Double.NaN, Double.NaN).
-//    public static Distance2D ClosestPointOnLineExtended2D(Distance2D point, Distance2D p1, Distance2D p2)
-//    {
-//        Distance2D delta = Delta2D(p1, p2);
-
-//        if (delta.X == 0 && delta.Y == 0)
-//            return new Distance2D(double.NaN, double.NaN); // Undefined.
-
-//        // Calculate the t that minimizes the Distance.
-//        double t = CalcTOfClosestPoint(point, p1, delta);
-
-//        // Because we are allowing the line to extend, we don't clamp "closest" to be between p1 and p2.
-//        // That is, we don't clip t to be between 0 and 1.
-//        return TToPoint(t, p1, delta);
-//    }
-
-//    // Allows extension beyond original endpoints;
-//    // I.E. may return value outside of 0..1.
-//    // CAUTION: The last parameter is "delta"; it is NOT p2!
-//    public static double CalcTOfClosestPoint(Distance2D point, Distance2D p1, Distance2D delta)
-//    {
-//        return ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (delta.X * delta.X + delta.Y * delta.Y);
-//    }
-
-//    // Allows extension beyond original endpoints;
-//    // I.E. may return value outside of 0..1.
-//    public static float CalcTOfClosestPoint(PointF point, PointF p1, PointF delta)
-//    {
-//        double dx = System.Convert.ToDouble(delta.X);
-//        // For accuracy, intermediate values are Double.
-//        double dy = System.Convert.ToDouble(delta.Y);
-//        return System.Convert.ToSingle(((System.Convert.ToDouble(point.X) - p1.X) * dx + (System.Convert.ToDouble(point.Y) - p1.Y) * dy) / (dx * dx + dy * dy));
-//    }
-
-//    // t=0 => p1, t=1 => p1+delta.
-//    public static Distance2D TToPoint(double t, Distance2D p1, Distance2D delta)
-//    {
-//        double px = p1.X + t * delta.X;
-//        double py = p1.Y + t * delta.Y;
-//        return new Distance2D(px, py);
-//    }
-
-
-//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
-//    public static double PointDistanceToLine2D(Distance2D point, Distance2D p1, Distance2D p2)
-//    {
-//        double t;
-//        return PointDistanceToLine2D_AndT(point, p1, p2, out t);
-//    }
-
-//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
-//    // PERFORMANCE: Avoids Sqrt, by returning distance-squared rather than distance.
-//    public static double PointDistanceSqToLine2D(Distance2D point, Distance2D p1, Distance2D p2)
-//    {
-//        double t;
-//        return PointDistanceSqToLine2D_AndT(point, p1, p2, out t);
-//    }
-
-//    public static double PointDistanceSqToLine2D_AndClosestPoint(Distance2D point, Distance2D p1, Distance2D p2, out Distance2D closest)
-//    {
-//        double t;
-//        closest = ClosestPointOnLine2D_AndT(point, p1, p2, ref t);
-//        return mDL2DLib.DistanceSquared2D(point, closest);
-//    }
-
-//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
-//    // "t" is "weight" of point on line that is closest to "point";
-//    // it is 0 at p1, 1 at p2.
-//    public static double PointDistanceToLine2D_AndT(Distance2D point, Distance2D p1, Distance2D p2, out double t)
-//    {
-//        Distance2D closest = ClosestPointOnLine2D_AndT(point, p1, p2, ref t);
-//        return mDL2DLib.CalcDistance2D(point, closest);
-//    }
-
-//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
-//    // "t" is "weight" of point on line that is closest to "point";
-//    // it is 0 at p1, 1 at p2.
-//    // PERFORMANCE: Avoids Sqrt, by returning distance-squared rather than distance.
-//    public static double PointDistanceSqToLine2D_AndT(Distance2D point, Distance2D p1, Distance2D p2, out double t)
-//    {
-//        Distance2D closest = ClosestPointOnLine2D_AndT(point, p1, p2, ref t);
-//        return mDL2DLib.DistanceSquared2D(point, closest);
-//    }
-
-//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
-//    // "t" is "weight" of point on line that is closest to "point";
-//    // it is 0 at p1, 1 at p2.
-//    public static Distance2D ClosestPointOnLine2D_AndT(Distance2D point, Distance2D p1, Distance2D p2, out double t)
-//    {
-//        Distance2D delta = Delta2D(p1, p2);
-
-//        if (delta.X == 0 & delta.Y == 0)
-//        {
-//            // Line is a single point; take distance from "point" to that point.
-//            // All "t"s would yield same answer. (Or maybe there would be divide-by-zero.) Treat it as "half-way".
-//            t = 0.5;
-//            // p1 and p2 are the same; there is only one possible answer to "closest point".
-//            return p1;
-//        }
-
-//        // ----> Main Work <----
-//        // Out "t".
-//        // Calculate the t that minimizes the Distance.
-//        t = CalcTOfClosestPoint(point, p1, delta);
-
-
-//        // See if "t" represents one of the segment's end points, or a point in-between.
-//        // NOTE: Alternative implementation would be t = Clamp(t, 0, 1), then always use t * delta.
-//        // However, that would have a (small) numerical error at t=1.
-//        Distance2D closest;
-//        if (t <= 0)
-//        {
-//            t = 0;
-//            closest = p1;
-//        }
-//        else if (t >= 1)
-//        {
-//            t = 1;
-//            closest = p2;
-//        }
-//        else
-//        {
-//            closest.X = p1.X + t * delta.X;
-//            closest.Y = p1.Y + t * delta.Y;
-//        }
-
-//        return closest;
-//    }
-
-//    // "2D" because "point" has no Z; calculating in XY plane.
-//    // Return value then interpolates Z based on p1 and p2.
-//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
-//    // "t" is "weight" of point on line that is closest to "point";
-//    // it is 0 at p1, 1 at p2.
-//    public static Distance3D ClosestPointOnLine2D_AndT(Distance2D point, Distance3D p1, Distance3D p2, out double t)
-//    {
-//        Distance2D p1Flat = p1.ToPoint2D();
-//        Distance2D p2Flat = p2.ToPoint2D();
-//        Distance2D delta = Delta2D(p1Flat, p2Flat);
-
-//        if (delta.X == 0 & delta.Y == 0)
-//        {
-//            // Line is a single point; take distance from "point" to that point.
-//            // All "t"s would yield same answer. (Or maybe there would be divide-by-zero.) Treat it as "half-way".
-//            t = 0.5;
-//            // p1 and p2 are the same; there is only one possible answer to "closest point".
-//            return p1;
-//        }
-
-//        // ----> Main Work <----
-//        // Out "t".
-//        // Calculate the t that minimizes the Distance.
-//        t = CalcTOfClosestPoint(point, p1Flat, delta);
-
-
-//        // See if "t" represents one of the segment's end points, or a point in-between.
-//        // NOTE: Alternative implementation would be t = Clamp(t, 0, 1), then always use t * delta.
-//        // However, that would have a (small) numerical error at t=1.
-//        Distance3D closest;
-//        if (t <= 0)
-//        {
-//            t = 0;
-//            closest = p1;
-//        }
-//        else if (t >= 1)
-//        {
-//            t = 1;
-//            closest = p2;
-//        }
-//        else
-//        {
-//            closest.X = p1.X + t * delta.X;
-//            closest.Y = p1.Y + t * delta.Y;
-//            double deltaZ = p2.Z - p1.Z;
-//            closest.Z = p1.Z + t * deltaZ;
-//            Test();
-//        }
-
-//        return closest;
-//    }
-
-
-
-//    // Finds closest points on the two segments; able to interpolate along either segment (but not both simultaneously).
-//    // TODO: Currently can't simultaneously interpolate both segments; if segments intersect, should find that intersection point.
-//    // PERFORMANCE: Interpolates all 4 pairs of "one end and the other full segment"; a lot of that work is redundant.
-//    // "p1a..p1b" and "p2a..p2b" are the two segments. Do not extend beyond ends of segments.
-//    public static double ClosestPointsOnSegments_Distance(Distance2D p1a, Distance2D p1b, Distance2D p2a, Distance2D p2b, out Distance2D closestP1, out Distance2D closestP2)
-//    {
-//        double minDistanceSq = double.MaxValue;
-
-//        // Check all 4 segment ends for distance; closest end will be closest overall.
-//        AccumClosestPointPairAndDistanceSq(p1a, p2a, p2b, ref minDistanceSq, ref closestP1, ref closestP2);
-//        AccumClosestPointPairAndDistanceSq(p1b, p2a, p2b, ref minDistanceSq, ref closestP1, ref closestP2);
-//        // CAUTION: "closestP1" corresponds to "p1a", so caller must change parameter order when testing a point from segment 2.
-//        AccumClosestPointPairAndDistanceSq(p2a, p1a, p1b, ref minDistanceSq, ref closestP2, ref closestP1);
-//        AccumClosestPointPairAndDistanceSq(p2b, p1a, p1b, ref minDistanceSq, ref closestP2, ref closestP1);
-
-//        return Math.Sqrt(minDistanceSq);
-//    }
-
-//    // CAUTION: "closestP1" corresponds to "p1a", so caller must change parameter order when testing a point from segment 2.
-//    private static void AccumClosestPointPairAndDistanceSq(Distance2D p1a, Distance2D p2a, Distance2D p2b, ref double minDistanceSq, ref Distance2D closestP1, ref Distance2D closestP2)
-//    {
-//        Distance2D partnerPt;
-//        double distanceSq = PointDistanceSqToLine2D_AndClosestPoint(p1a, p2a, p2b, out partnerPt);
-
-//        if (distanceSq < minDistanceSq)
-//        {
-//            minDistanceSq = distanceSq;
-//            closestP1 = p1a;
-//            closestP2 = partnerPt;
-//        }
-//    }
-
-
-//    // Don't wrap. If want closest polygon, and poly is not already closed, caller must append first point at end of array.
-//    public static double PointDistanceToPolyline(Distance2D point, Distance2D[] poly)
-//    {
-//        Distance2D closestPt = default(Distance2D);
-//        return PointDistanceToPolyline_AndClosestPoint(point, poly, out closestPt);
-//    }
-
-//    // Don't wrap. If want closest polygon, and poly is not already closed, caller must append first point at end of array.
-//    public static double PointDistanceToPolyline_AndClosestPoint(Distance2D point, Distance2D[] poly, out Distance2D closestPt)
-//    {
-//        double minDistanceSq = double.MaxValue;
-//        // OUT: closestPt
-//        closestPt = default(Distance2D);
-
-
-//        int lastIndex = poly.Length - 1;
-//        // Don't wrap. If want closest polygon, and poly is not already closed, caller must append first point at end of array.
-//        for (int i = 0; i <= lastIndex - 1; i++)
-//        {
-//            int j = i + 1;
-//            // If j >= lastIndex Then j = 0
-
-//            Distance2D closest1 = default(Distance2D);
-//            double distanceSq = PointDistanceSqToLine2D_AndClosestPoint(point, poly[i], poly[j], out closest1);
-
-//            if (distanceSq < minDistanceSq)
-//            {
-//                minDistanceSq = distanceSq;
-//                // OUT: closestPt
-//                closestPt = closest1;
-//            }
-//        }
-
-
-//        double minDistance = double.MaxValue;
-//        if (Exists(closestPt))
-//            minDistance = Math.Sqrt(minDistanceSq);
-//        return minDistance;
-//    }
-
-//    // Performance: Avoids Sqrt.
-//    public static double PointDistanceSquaredToLine2D(Distance2D point, Distance2D p1, Distance2D p2)
-//    {
-//        Distance2D closest = LinePointClosestToPoint2D(point, p1, p2);
-//        return DistanceSquared2D(point, closest);
-//    }
-//    // Performance: Avoids Sqrt.
-//    public static double PointDistanceSquaredToLine2D(Distance2D point, Distance2D p1, Distance2D p2, out Distance2D closest)
-//    {
-//        closest = LinePointClosestToPoint2D(point, p1, p2);
-//        return DistanceSquared2D(point, closest);
-//    }
-//    // Performance: Avoids Sqrt.
-//    public static double PointDistanceSquaredToLine2D(Distance2D point, Distance2D p1, Distance2D p2, out double t)
-//    {
-//        Distance2D closest = LinePointClosestToPoint2D(point, p1, p2, ref t);
-//        return DistanceSquared2D(point, closest);
-//    }
-
-//    public static Distance2D LinePointClosestToPoint2D(Distance2D point, Distance2D p1, Distance2D p2)
-//    {
-//        double t;
-//        return LinePointClosestToPoint2D(point, p1, p2, ref t);
-//    }
-
-//    // Set t to 0 if p1 is closest, 1 if p2 is closest, value between 0..1 to represent closest point in middle.
-//    public static Distance2D LinePointClosestToPoint2D(Distance2D point, Distance2D p1, Distance2D p2, out double t)
-//    {
-//        Distance2D delta = Delta2D(p1, p2);
-
-//        // Test for zero-length line segment. If so, return that segment's only point.
-//        if (delta.X == 0 & delta.Y == 0)
-//            return p1;
-
-//        // Calculate the t that minimizes the Distance.
-//        t = ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (delta.X * delta.X + delta.Y * delta.Y);
-
-//        // See if this represents one of the segment's
-//        // end points or a point in the middle.
-//        Distance2D closest;
-//        if (t < 0)
-//        {
-//            t = 0;
-//            closest = p1;
-//        }
-//        else if (t > 1)
-//        {
-//            t = 1;
-//            closest = p2;
-//        }
-//        else
-//        {
-//            closest.X = p1.X + t * delta.X;
-//            closest.Y = p1.Y + t * delta.Y;
-//        }
-
-//        // ' Verify
-//        // Dim deltaPt As Distance2D = Delta2D(point, closest)
-//        // Dim dist As Single = deltaPt.Length
-//        // Dim verify As Distance2D = Lerp(p1, p2, t)
-
-//        return closest;
-//    }
-
-
-//    public static PointF LinePointClosestToPoint2D(PointF point, PointF p1, PointF p2)
-//    {
-//        float t;
-//        return LinePointClosestToPoint2D(point, p1, p2, t);
-//    }
-//    // Set t to 0 if p1 is closest, 1 if p2 is closest, value between 0..1 to represent closest point in middle.
-//    public static PointF LinePointClosestToPoint2D(PointF point, PointF p1, PointF p2, out float t)
-//    {
-//        PointF delta = Delta2D(p1, p2);
-
-//        // Test for zero-length line segment. If so, return that segment's only point.
-//        if (delta.X == 0 & delta.Y == 0)
-//            return p1;
-
-//        // Calculate the t that minimizes the Distance.
-//        t = ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (double)(delta.X * delta.X + delta.Y * delta.Y);
-
-//        // See if this represents one of the segment's
-//        // end points or a point in the middle.
-//        PointF closest;
-//        if (t < 0)
-//        {
-//            t = 0;
-//            closest = p1;
-//        }
-//        else if (t > 1)
-//        {
-//            t = 1;
-//            closest = p2;
-//        }
-//        else
-//        {
-//            closest.X = p1.X + t * delta.X;
-//            closest.Y = p1.Y + t * delta.Y;
-//        }
-
-//        // ' Verify
-//        // Dim deltaPt As Distance2D = Delta2D(point, closest)
-//        // Dim dist As Single = deltaPt.Length
-//        // Dim verify As Distance2D = Lerp(p1, p2, t)
-
-//        return closest;
-//    }
-
-//    // Public Function PointDistanceToLine2D(ByVal ptdPoint As Distance2D, ByVal ptdP1 As Distance2D, ByVal ptdP2 As Distance2D) As Double
-//    // Dim ptdDelta As Distance2D
-//    // Dim ptdClosest As Distance2D
-//    // Dim t As Double
-
-//    // ptdDelta = Delta2D(ptdP1, ptdP2)
-
-//    // If ptdDelta.X = 0 And ptdDelta.Y = 0 Then _
-//    // Return m2DLib.CalcDistance2D(ptdPoint, ptdP1)
-
-//    // ' Calculate the t that minimizes the Distance.
-//    // t = ((ptdPoint.X - ptdP1.X) * ptdDelta.X + (ptdPoint.Y - ptdP1.Y) * ptdDelta.Y) / (ptdDelta.X * ptdDelta.X + ptdDelta.Y * _
-//    // ptdDelta.Y)
-
-//    // ' See if this represents one of the segment's
-//    // ' end points or a point in the middle.
-//    // If t < 0 Then
-//    // ptdDelta.X = ptdPoint.X - ptdP1.X
-//    // ptdDelta.Y = ptdPoint.Y - ptdP1.Y
-//    // ptdClosest.X = ptdP1.X
-//    // ptdClosest.Y = ptdP1.Y
-//    // ElseIf t > 1 Then
-//    // ptdDelta.X = ptdPoint.X - ptdP2.X
-//    // ptdDelta.Y = ptdPoint.Y - ptdP2.Y
-//    // ptdClosest.X = ptdP2.X
-//    // ptdClosest.Y = ptdP2.Y
-//    // Else
-//    // ptdClosest.X = ptdP1.X + t * ptdDelta.X
-//    // ptdClosest.Y = ptdP1.Y + t * ptdDelta.Y
-//    // ptdDelta.X = ptdPoint.X - ptdClosest.X
-//    // ptdDelta.Y = ptdPoint.Y - ptdClosest.Y
-//    // End If
-
-//    // Return m2DLib.CalcDistance2D(ptdPoint, ptdClosest)
-//    // End Function
-
-//    public static double PointDistanceToLine2D(double dblPointX, double dblPointY, double dblP1X, double dblP1Y, double dblP2X, double dblP2Y)
-//    {
-//        Distance2D ptdDelta;
-//        Distance2D ptdClosest;
-//        double t;
-
-//        ptdDelta = Delta2D(dblP1X, dblP1Y, dblP2X, dblP2Y);
-
-//        if (ptdDelta.X == 0 & ptdDelta.Y == 0)
-//            return mDL2DLib.CalcDistance2D(dblPointX, dblPointY, dblP1X, dblP1Y);
-
-//        // Calculate the t that minimizes the Distance.
-//        t = ((dblPointX - dblP1X) * ptdDelta.X + (dblPointY - dblP1Y) * ptdDelta.Y) / (ptdDelta.X * ptdDelta.X + ptdDelta.Y * ptdDelta.Y);
-
-//        // See if this represents one of the segment's
-//        // end points or a point in the middle.
-//        if (t < 0)
-//        {
-//            ptdClosest.X = dblP1X;
-//            ptdClosest.Y = dblP1Y;
-//        }
-//        else if (t > 1)
-//        {
-//            ptdClosest.X = dblP2X;
-//            ptdClosest.Y = dblP2Y;
-//        }
-//        else
-//        {
-//            ptdClosest.X = dblP1X + t * ptdDelta.X;
-//            ptdClosest.Y = dblP1Y + t * ptdDelta.Y;
-//        }
-
-//        return mDL2DLib.CalcDistance2D(dblPointX, dblPointY, ptdClosest.X, ptdClosest.Y);
-//    }
-
-//    public static double PointDistanceToLine2D(Distance3D ptdPoint, Distance3D ptdP1, Distance3D ptdP2)
-//    {
-//        Distance3D ptdDelta;
-//        Distance3D ptdClosest;
-//        double t;
-
-//        ptdDelta = Delta2D(ptdP1, ptdP2);
-
-//        if (ptdDelta.X == 0 & ptdDelta.Y == 0)
-//            return mDL2DLib.CalcDistance2D(ptdPoint, ptdP1);
-
-//        // Calculate the t that minimizes the Distance.
-//        t = ((ptdPoint.X - ptdP1.X) * ptdDelta.X + (ptdPoint.Y - ptdP1.Y) * ptdDelta.Y) / (double)(ptdDelta.X * ptdDelta.X + ptdDelta.Y * ptdDelta.Y);
-
-//        // See if this represents one of the segment's
-//        // end points or a point in the middle.
-//        if (t < 0)
-//        {
-//            ptdDelta.X = ptdPoint.X - ptdP1.X;
-//            ptdDelta.Y = ptdPoint.Y - ptdP1.Y;
-//            ptdClosest.X = ptdP1.X;
-//            ptdClosest.Y = ptdP1.Y;
-//        }
-//        else if (t > 1)
-//        {
-//            ptdDelta.X = ptdPoint.X - ptdP2.X;
-//            ptdDelta.Y = ptdPoint.Y - ptdP2.Y;
-//            ptdClosest.X = ptdP2.X;
-//            ptdClosest.Y = ptdP2.Y;
-//        }
-//        else
-//        {
-//            ptdClosest.X = ptdP1.X + t * ptdDelta.X;
-//            ptdClosest.Y = ptdP1.Y + t * ptdDelta.Y;
-//            ptdDelta.X = ptdPoint.X - ptdClosest.X;
-//            ptdDelta.Y = ptdPoint.Y - ptdClosest.Y;
-//        }
-
-//        return mDL2DLib.CalcDistance2D(ptdPoint, ptdClosest);
-//    }
-
-
-//    public static double ClosestIndexFracAlongPoints(Distance2D goalLocation, IList<Distance2D> pts)
-//    {
-//        Distance2D closestPt;
-//        return ClosestIndexFracAlongPoints(goalLocation, pts, ref closestPt);
-//    }
-
-//    /// <summary> aka Closest IndexAndFraction AlongPoints.
-//    ///     ''' Integer part of result is index of point at start of a segment,
-//    ///     ''' Fraction part of result is (0..1) along segment which ends at pts(index+1).
-//    ///     ''' </summary>
-//    ///     ''' <param name="goalLocation">Goal to get near to.</param>
-//    ///     ''' <param name="pts">Boundary of a closed shape. NO duplicate at end of first point.</param>
-//    ///     ''' <param name="closestPt">corresponds to indexFrac; point along segment closest to "goalLocation".</param>
-//    ///     ''' <returns></returns>
-//    public static double ClosestIndexFracAlongPoints(Distance2D goalLocation, IList<Distance2D> pts, out Distance2D closestPt)
-//    {
-//        int closestILeg;
-//        double closestT;
-//        closestPt = ClosestPointOnPointSequence(goalLocation, pts, out closestILeg, out closestT);
-
-//        double closestIndexFrac = closestILeg + closestT;
-//        return closestIndexFrac;
-//    }
-
-//    // Return "index", set "frac".
-//    public static int SeparateIndexFrac(double indexFrac, int wrapAt, out double frac)
-//    {
-//        int index = System.Convert.ToInt32(Math.Floor(indexFrac));
-//        frac = indexFrac - index;
-
-//        // Simplify when round off error moves away from an index.
-//        if (frac.NearlyEquals(1, VerySmall))
-//        {
-//            index += 1;
-//            frac = 0;
-//        }
-
-//        if (wrapAt == int.MaxValue)
-//            return index;
-//        else
-//            return (index % wrapAt);
-//    }
-
-//    // Returns a point along line segments between sequence of points (not just one of the pts; may be anywhere between two adjacent ones).
-//    // E.g. "pts" might be line-of-play points from tee(s) to (start/center) green.
-//    // closestILeg is 0, for the leg from pts(0) to pts(1). Etc.
-//    // closestT (aka "closestFrac") is fraction (lerp weight) along the leg: it is 0 at the start of the leg; 1 at the end of the leg.
-//    // The returned value "closestPt" can be calculated from closestILeg and closestT:
-//    // = pts(closestILeg) + lerp(pts(closestILeg), pts(closestILeg+1), closestT)
-//    // Special case when "closestILeg = LastIndex(pts)", because there is no "pts(closestILeg+1)":
-//    // = pts(closestILeg)
-//    // = LastElement(pts)
-//    public static Distance2D ClosestPointOnPointSequence(Distance2D location, IList<Distance2D> pts, out int closestILeg, out double closestT)
-//    {
-//        Distance2D closestPt = pts[0];
-//        closestILeg = 0;
-//        closestT = 0;
-//        double minDistanceSq = double.MaxValue;
-
-//        // "- 1": Uses next point.
-//        for (int iLeg = 0; iLeg <= LastIndex(pts) - 1; iLeg++)
-//        {
-//            Distance2D p1 = pts[iLeg];
-//            Distance2D p2 = pts[iLeg + 1];
-//            double t;
-//            Distance2D closestPt1 = ClosestPointOnLine2D_AndT(location, p1, p2, ref t);
-//            double distanceSq1 = DistanceSquared2D(location, closestPt1);
-//            if (distanceSq1 < minDistanceSq)
-//            {
-//                minDistanceSq = distanceSq1;
-//                closestPt = closestPt1;
-//                closestILeg = iLeg;
-//                closestT = t;
-//            }
-//        }
-
-//        return closestPt;
-//    }
-
-//    // Given an initial position along one leg of a sequence of points,
-//    // "startILeg" and "startT" (e.g. ClosestPointOnPointSequence > closestILeg & closestT),
-//    // and a distance to move, calculates where to move to.
-//    // Won't go beyond end of sequence.
-//    // "endILeg" is the START of the final leg that is used. (But if reach very end, it will be the final point.)
-//    public static Distance2D MoveAlongPointSequence(int startILeg, double startT, double moveDistance, Distance2D[] pts, out int endILeg, out double endT)
-//    {
-//        // At start; these will be moved along below.
-//        // "endILeg" is the START of the final leg that is used.
-//        endILeg = startILeg;
-//        endT = startT;
-//        Distance2D endPt = pts[startILeg];
-//        // additional distance we need to move, from current endPt.
-//        double remainingMoveDistance = moveDistance;
-
-//        // Special case if we are already at end.
-//        if (startILeg == LastIndex(pts))
-//            return endPt;
-
-
-//        // "<" rather than "<=", because to move, there must be another pt after this.
-//        while (endILeg < LastIndex(pts))
-//        {
-//            // Move along the segment.
-//            double legDistance = CalcDistance2D(pts[endILeg], pts[endILeg + 1]);
-//            // The current point is this distance along the start leg.
-//            // ("endT" will be 0, except on start leg.)
-//            double tDistance = endT * legDistance;
-//            double remainingDistanceOnLeg = legDistance - tDistance;
-
-//            if (remainingDistanceOnLeg > remainingMoveDistance)
-//            {
-//                // The move can be completed on the current leg.
-//                double deltaT = remainingMoveDistance / legDistance;
-//                endT += deltaT;
-//                endPt = Lerp(endPt, pts[endILeg + 1], endT);
-//                return endPt;
-//            }
-//            else
-//            {
-//                // Move to end of leg; which is beginning of next leg.
-//                remainingMoveDistance -= remainingDistanceOnLeg;
-//                // At beginning of next leg.
-//                endILeg += 1;
-//                endPt = pts[endILeg];
-//                endT = 0;
-//            }
-//        }
-
-
-//        // We reached the end of sequence; even if remainingMoveDistance > 0,
-//        // we cannot move any farther.
-//        return endPt;
-//    }
-
-//    // From "startLocation", moves to closest point along sequence of "pts", then moves along that sequence by "moveDistance".
-//    public static Distance2D PointAheadOnPointSequence(Distance2D startLocation, Distance2D[] pts, double moveDistance)
-//    {
-//        int startILeg = 0;
-//        // Sets startILeg and startT. startPtOnSequence can be calculated from these (= pts(startILeg) + lerp(pts(startILeg), pts(startILeg+1), startT)).
-//        double startT = 0.0;
-//        Distance2D startPtOnSequence = ClosestPointOnPointSequence(startLocation, pts, out startILeg, out startT);
-//        int endILeg = 0;
-
-//        // If will need to move again from endPt, then endILeg and endT would be the input to another call to MoveAlongPointSequence.
-//        // Or can simply call PointAheadOnPointSequence again, with endPt as startLocation.
-//        // If endILeg = LastIndex(pts) Then
-//        // endPt = LastElement(pts)
-//        // Else endPt = pts(endILeg) + lerp(pts(endILeg), pts(endILeg+1), endT)
-//        double endT = 0.0;
-//        Distance2D endPt = MoveAlongPointSequence(startILeg, startT, moveDistance, pts, out endILeg, out endT);
-//        return endPt;
-//    }
-
-//    // Used to calculate landing point along a line-of-play (LOP).
-//    // Player is standing at "startLocation".
-//    // From "startLocation", moves to closest point along sequence of "lopPts",
-//    // then moves along that sequence until we are "landingDistance" from startLocation.
-//    // (The final point of lopPts is CG.)
-//    // This is different than "PointAheadOnPointSequence", in that the distance is calculated from startLocation, rather than measuring along LOP.
-//    public static Distance2D HitLineOfPlayAtDistance(Distance2D startLocation, Distance2D[] lopPts, double landingDistance)
-//    {
-//        int startILeg;
-//        double startT;
-//        Distance2D closestPtOnSequence = ClosestPointOnPointSequence(startLocation, lopPts, out startILeg, out startT);
-
-//        Distance2D guessPt = closestPtOnSequence;
-//        double guessDistance = CalcDistance2D(startLocation, guessPt);
-
-//        // If we are > landingDistance from LOP, then the best answer is to hit straight towards LOP.
-//        // NOTE: This won't happen in golf, because we would be way out of bounds,
-//        // but included for completeness, in case a small landingDistance is passed in.
-//        if (guessDistance >= landingDistance)
-//            return guessPt;
-
-//        // Examine each point on LOP, until find one that is farther than landingDistance.
-//        // The answer will be on the leg leading to that point.
-//        // TBD: Is there ever a situation where there is A SECOND solution?
-//        Distance2D longPt = guessPt;
-//        double longDistance = guessDistance;
-//        int endILeg = startILeg + 1;
-//        while (endILeg <= LastIndex(lopPts))
-//        {
-//            longPt = lopPts[endILeg];
-//            longDistance = CalcDistance2D(startLocation, longPt);
-//            // This leg has a point at desired distance.
-//            if (longDistance >= landingDistance)
-//                break;
-//            // Prep Next
-//            endILeg += 1;
-//        }
-
-//        if (longDistance < landingDistance)
-//            // We reached end of LOP, without reaching landingDistance.
-//            // Return end of LOP.
-//            return LastElement(lopPts);
-
-//        // There is some point along this leg that is at landingDistance.
-//        Distance2D shortPt = lopPts[endILeg - 1];
-//        double shortDistance = CalcDistance2D(startLocation, shortPt);
-
-//        double t;
-//        Distance2D closestPtOnLeg = ClosestPointOnLine2D_AndT(startLocation, shortPt, longPt, ref t);
-//        double closestPtOnLegDistance = CalcDistance2D(startLocation, closestPtOnLeg);
-//        if (closestPtOnLegDistance < landingDistance)
-//        {
-//            // The usual case: closest point on leg falls short.
-//            shortPt = closestPtOnLeg;
-//            shortDistance = closestPtOnLegDistance;
-//        }
-//        else
-//        {
-//            // Don't think this can happen, but just in case:
-//            // closest point on leg is long.
-//            longPt = closestPtOnLeg;
-//            longDistance = closestPtOnLegDistance;
-//        }
-
-//        // Theoretically possible, though unlikely to ever happen in practice.
-//        // Avoids divide by zero in WgtFromResult.
-//        if (shortDistance == longDistance)
-//            return longPt;
-
-//        double wgt = WgtFromResult(shortDistance, longDistance, landingDistance);
-//        // Point along the leg.
-//        // CAUTION: Not exact, because distance calculation from startPoint isn't a linear function along the segment.
-//        guessPt = Lerp(shortPt, longPt, wgt);
-//        guessDistance = CalcDistance2D(startLocation, guessPt);
-
-//        // Iterate to get more accurate answer.
-//        int nMore = 5;
-//        while ((nMore > 0))
-//        {
-//            if (guessDistance > landingDistance + 0.5)
-//            {
-//                // overshot
-//                longPt = guessPt;
-//                longDistance = guessDistance;
-//            }
-//            else if (guessDistance < landingDistance - 0.5)
-//            {
-//                // undershot
-//                shortPt = guessPt;
-//                shortDistance = guessDistance;
-//            }
-//            else
-//                // Close enough.
-//                break;
-
-//            // Prep Next
-//            nMore -= 1;
-//            wgt = WgtFromResult(shortDistance, longDistance, landingDistance);
-//            guessPt = Lerp(shortPt, longPt, wgt);
-//            guessDistance = CalcDistance2D(startLocation, guessPt);
-//        }
-
-//        return guessPt;
-//    }
-
-
-//    public static bool IsPointCloseToLine2D(PointF ptfPt, PointF[] ptfPoints, float dblErr)
-//    {
-//        if (ptfPoints == null)
-//            return false;
-
-//        double errDbl = System.Convert.ToDouble(dblErr);
-//        double errSquared = errDbl * errDbl;
-
-//        for (int intIdx = 1; intIdx <= ptfPoints.Length - 1; intIdx++)
-//        {
-//            // Performance: Avoids Sqrt.
-//            if (PointDistanceSquaredToLine2D(ptfPt, ptfPoints[intIdx - 1], ptfPoints[intIdx]) < errSquared)
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    public static bool IsPointCloseToLine2D(Distance2D ptdPt, Distance2D[] ptdPoints, double dblErr)
-//    {
-//        if (ptdPoints == null)
-//            return false;
-
-//        for (int intIdx = 1; intIdx <= ptdPoints.Length - 1; intIdx++)
-//        {
-//            if (PointDistanceToLine2D(ptdPt, ptdPoints[intIdx - 1], ptdPoints[intIdx]) < dblErr)
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    public static bool IsPointCloseToLine2D(Distance3D ptdPt, Distance3D[] ptdPoints, double dblErr)
-//    {
-//        if (ptdPoints == null)
-//            return false;
-
-//        for (int intIdx = 1; intIdx <= ptdPoints.Length - 1; intIdx++)
-//        {
-//            if (PointDistanceToLine2D(ptdPt, ptdPoints[intIdx - 1], ptdPoints[intIdx]) < dblErr)
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    // http://alienryderflex.com/polygon/
-//    public static bool IsPointWithinPolygon2D(PointF[] polygon, PointF point)
-//    {
-//        if (polygon == null)
-//            return false;
-
-//        int length = GetLength_ExcludingDuplicateEndpoint(polygon);
-
-//        // Process points
-//        bool odd = false;
-//        double x = point.X;
-//        double y = point.Y;
-//        for (int i = 0; i <= length - 1; i++)
-//        {
-//            int j = (i + 1) % length;
-//            double iy = polygon[i].Y;
-//            double jy = polygon[j].Y;
-//            if ((iy < y && jy >= y) || (jy < y && iy >= y))
-//            {
-//                double ix = polygon[i].X;
-//                double jx = polygon[j].X;
-//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                    odd = !odd;
-//            }
-//        }
-
-//        return odd;
-//    }
-
-//    // For performance, the tolerance calculation is approximate. Allows somewhat longer diagonal distance.
-//    public static bool IsPointWithinToleranceOfPolygon(PointF[] polygon, PointF point, float tolerance)
-//    {
-//        if (polygon == null)
-//            return false;
-
-//        int length = GetLength_ExcludingDuplicateEndpoint(polygon);
-
-//        // Process points
-//        bool odd = false;
-//        double x = point.X;
-//        double y = point.Y;
-//        for (int i = 0; i <= length - 1; i++)
-//        {
-//            int j = (i + 1) % length;
-
-//            PointF pi = polygon[i];
-//            PointF pj = polygon[j];
-
-//            double iy = pi.Y;
-//            double jy = pj.Y;
-
-//            double minY, maxY;
-//            if (jy < iy)
-//            {
-//                minY = jy; maxY = iy;
-//            }
-//            else
-//            {
-//                minY = iy; maxY = jy;
-//            }
-
-//            if ((y < minY - tolerance) || (y > maxY + tolerance))
-//                continue;
-
-//            double ix = pi.X;
-//            double jx = pj.X;
-
-//            // point may be near this span.
-//            double minX, maxX;
-//            if (ix <= jx)
-//            {
-//                minX = ix; maxX = jx;
-//            }
-//            else
-//            {
-//                minX = jx; maxX = ix;
-//            }
-
-//            if (x < minX - tolerance)
-//                // Point is safe distance to left. Not within tolerance of this segment.
-//                // Not counted as crossing.
-//                var toleft = 0;
-//            else if (x > maxX + tolerance)
-//            {
-//                // Point is safe distance to right. Not within tolerance of this segment.
-//                // Counts as crossing, if within y-span (not merely within tolerance).
-//                // CAUTION: To avoid double-counting at endpoint, one test is "<", other test is "<=".
-//                if ((minY < y) && (y <= maxY))
-//                    odd = !odd;
-//            }
-//            else
-//            {
-//                // This is only time we need thorough check for "within tolerance" of segment.
-//                // CAUTION: To avoid double-counting at endpoint, one test is "<", other test is "<=".
-//                // (Also avoids divide-by-zero.)
-
-//                PointF delta = Delta2D(pi, pj);
-
-//                // If we get here, we are within tolerance of bounding box surrounding segment.
-//                // Avoid Divide By Zero.
-//                if (delta.Y == 0)
-//                    // SPECIAL CASE: Segment is a point, or a horizontal line.
-//                    // We are within tolerance. Approximately; might be slightly longer diagonal distance.
-//                    return true;
-
-//                Distance2D closest = LinePointClosestToPoint2D(new Distance2D(point), new Distance2D(pi), new Distance2D(pj));
-//                // We only need approximate distance to compare to tolerance. The longer edge is an approximation to distance.
-//                float approxDistance = System.Convert.ToSingle(Math.Max(Math.Abs(closest.X - x), Math.Abs(closest.Y - y)));
-//                if (approxDistance < tolerance)
-//                    return true;
-
-//                if ((minY < y) && (y <= maxY))
-//                {
-//                    if ((ix + ((y - iy) / (jy - iy)) * (jx - ix)) < x)
-//                        // Counts as crossing.
-//                        odd = !odd;
-//                }
-//            }
-//        }
-
-//        return odd;
-//    }
-
-//    // Check if the first point and the last point are equal
-//    private static int GetLength_ExcludingDuplicateEndpoint(PointF[] polygon)
-//    {
-//        int length;
-
-//        int lastIndex1 = LastIndex(polygon);
-//        if (polygon[0].X == polygon[lastIndex1].X & polygon[0].Y == polygon[lastIndex1].Y)
-//            length = polygon.Length - 1;
-//        else
-//            length = polygon.Length;
-
-//        return length;
-//    }
-
-//    public static bool IsPointWithinPolygon2D(Distance2D[] ptdPolygon, Distance2D point)
-//    {
-//        // http://alienryderflex.com/ptdPolygon/
-
-//        if (ptdPolygon == null)
-//            return false;
-
-//        bool odd = false;
-//        int length;
-//        int i, j;
-//        double ix, iy, jx, jy, x, y;
-
-//        // Check if the first point and the last point are equal
-//        if (ptdPolygon[0].X == ptdPolygon[ptdPolygon.Length - 1].X & ptdPolygon[0].Y == ptdPolygon[ptdPolygon.Length - 1].Y)
-//            length = ptdPolygon.Length - 1;
-//        else
-//            length = ptdPolygon.Length;
-
-//        // Process points
-//        for (i = 0; i <= length - 1; i++)
-//        {
-//            j = (i + 1) % length;
-//            ix = ptdPolygon[i].X;
-//            iy = ptdPolygon[i].Y;
-//            jx = ptdPolygon[j].X;
-//            jy = ptdPolygon[j].Y;
-//            x = point.X;
-//            y = point.Y;
-//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
-//            {
-//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                    odd = !odd;
-//            }
-//        }
-
-//        return odd;
-//    }
-
-//    public static bool IsPointWithinPolygon2D(Distance3D[] ptdPolygon, Distance3D point)
-//    {
-//        // http://alienryderflex.com/ptdPolygon/
-
-//        if (ptdPolygon == null)
-//            return false;
-
-//        bool odd = false;
-//        int length;
-//        int i, j;
-//        double ix, iy, jx, jy, x, y;
-
-//        // Check if the first point and the last point are equal
-//        if (ptdPolygon[0].X == ptdPolygon[ptdPolygon.Length - 1].X & ptdPolygon[0].Y == ptdPolygon[ptdPolygon.Length - 1].Y)
-//            length = ptdPolygon.Length - 1;
-//        else
-//            length = ptdPolygon.Length;
-
-//        // Process points
-//        for (i = 0; i <= length - 1; i++)
-//        {
-//            j = (i + 1) % length;
-//            ix = ptdPolygon[i].X;
-//            iy = ptdPolygon[i].Y;
-//            jx = ptdPolygon[j].X;
-//            jy = ptdPolygon[j].Y;
-//            x = point.X;
-//            y = point.Y;
-//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
-//            {
-//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                    odd = !odd;
-//            }
-//        }
-
-//        return odd;
-//    }
-
-//    public static bool IsPointWithinPolygon2D_Test_If_Faster(ref Distance3D[] ptdPolygon, Distance3D point, int intStartIdx, int intEndIdx)
-//    {
-//        // http://alienryderflex.com/ptdPolygon/
-
-//        if (ptdPolygon == null)
-//            return false;
-
-//        bool odd = false;
-//        int length;
-//        int i, j;
-//        double ix, iy, jx, jy, x, y;
-
-//        // Check if the first point and the last point are equal
-//        if (ptdPolygon[0].X == ptdPolygon[ptdPolygon.Length - 1].X & ptdPolygon[0].Y == ptdPolygon[ptdPolygon.Length - 1].Y)
-//            // length = ptdPolygon.Length - 1
-//            length = intEndIdx - intStartIdx;
-//        else
-//            // length = ptdPolygon.Length
-//            length = intEndIdx - intStartIdx + 1;
-
-//        // Process points
-//        for (i = intStartIdx; i <= intEndIdx; i++)
-//        {
-//            j = (i + 1) % length;
-//            ix = ptdPolygon[i].X;
-//            iy = ptdPolygon[i].Y;
-//            jx = ptdPolygon[j].X;
-//            jy = ptdPolygon[j].Y;
-//            x = point.X;
-//            y = point.Y;
-//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
-//            {
-//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                    odd = !odd;
-//            }
-//        }
-
-//        return odd;
-//    }
-
-//    public static bool IsPointsWithinRectangle2D(PointF[] ptfRec, PointF[] ptfPts)
-//    {
-//        if (ptfRec == null)
-//            return false;
-
-//        for (int intIdx = 0; intIdx <= ptfPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptfPts[intIdx], ptfRec))
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    public static bool IsPointsWithinRectangle2D(Distance2D[] ptdRec, Distance2D[] ptdPts)
-//    {
-//        if (ptdRec == null)
-//            return false;
-
-//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    public static bool IsPointsWithinRectangle2D(Distance3D[] ptdRec, Distance3D[] ptdPts)
-//    {
-//        if (ptdRec == null)
-//            return false;
-
-//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    // PERFORMANCE: Caller should do polygon (rectangular) bounds check before calling this, to quickly handle case where ptfRec is entirely outside that bounds.
-//    public static bool DoesRectangleIntersectPolygon2DInterior(PointF[] ptfPolygon, PointF[] ptfRec)
-//    {
-//        // Cheap check: center and 4 corners.
-//        foreach (PointF p in ptfRec)
-//        {
-//            if (IsPointWithinPolygon2D(ptfPolygon, p))
-//                return true;
-//        }
-
-//        if (IsPointWithinPolygon2D(ptfPolygon, PointFRect_Center(ptfRec)))
-//            return true;
-
-//        // TODO: Check intersection of any of 4 lines with polygon interior. How?
-//        // NOTE: Only matters if line passes ACROSS the polygon (with none of the rect corners inside the polygon -- those were tested above).
-//        // HACK: Check 4 middles of lines. If those all miss, consider that "good enough" test.
-//        if (IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[0], ptfRec[1])) || IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[1], ptfRec[2])) || IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[2], ptfRec[3])) || IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[3], ptfRec[0])))
-//            return true;
-
-//        return false;
-//    }
-
-//    // VERY SLOW.
-//    // CAUTION: Won't detect case where one polygon completely encloses the other one.
-//    public static bool PolygonsIntersects2D(PointF[] ptfPoly1, PointF[] ptfPoly2)
-//    {
-//        if (ptfPoly1 == null | ptfPoly2 == null)
-//            return false;
-
-//        for (int intIdx = 1; intIdx <= ptfPoly1.Length - 1; intIdx++)
-//        {
-//            for (int intIdx2 = 1; intIdx2 <= ptfPoly2.Length - 1; intIdx2++)
-//            {
-//                if (LinesIntersects2D(ptfPoly1[intIdx - 1], ptfPoly1[intIdx], ptfPoly2[intIdx2 - 1], ptfPoly2[intIdx2]))
-//                    return true;
-//            }
-//        }
-
-//        return false;
-//    }
-
-//    // VERY SLOW.
-//    // Closed = include a segment between last point and first point.
-//    public static bool PolygonClosedIntersects2D(PointF[] poly1, PointF[] poly2)
-//    {
-//        if ((poly1 == null) || (poly2 == null))
-//            return false;
-
-//        for (int index1 = 1; index1 <= poly1.Length; index1++)
-//        {
-//            for (int index2 = 1; index2 <= poly2.Length; index2++)
-//            {
-//                int index1wrap = !index1 == poly1.Length ? index1 : 0;
-//                int index2wrap = !index2 == poly2.Length ? index2 : 0;
-//                if (LinesIntersects2D(poly1[index1 - 1], poly1[index1wrap], poly2[index2 - 1], poly2[index2wrap]))
-//                    return true;
-//            }
-//        }
-
-//        return false;
-//    }
-
-//    // VERY SLOW.
-//    // CAUTION: Won't detect case where one polygon completely encloses the other one.
-//    public static bool PolygonsIntersects2D(Distance2D[] ptdPoly1, Distance2D[] ptdPoly2)
-//    {
-//        if (ptdPoly1 == null | ptdPoly2 == null)
-//            return false;
-
-//        for (int intIdx = 1; intIdx <= ptdPoly1.Length - 1; intIdx++)
-//        {
-//            for (int intIdx2 = 1; intIdx2 <= ptdPoly2.Length - 1; intIdx2++)
-//            {
-//                if (LinesIntersects2D(ptdPoly1[intIdx - 1], ptdPoly1[intIdx], ptdPoly2[intIdx2 - 1], ptdPoly2[intIdx2]))
-//                    return true;
-//            }
-//        }
-
-//        return false;
-//    }
-
-//    // VERY SLOW.
-//    // CAUTION: Won't detect case where one polygon completely encloses the other one.
-//    public static bool PolygonsIntersects2D(Distance3D[] ptdPoly1, Distance3D[] ptdPoly2)
-//    {
-//        if (ptdPoly1 == null | ptdPoly2 == null)
-//            return false;
-
-//        for (int intIdx = 1; intIdx <= ptdPoly1.Length - 1; intIdx++)
-//        {
-//            for (int intIdx2 = 1; intIdx2 <= ptdPoly2.Length - 1; intIdx2++)
-//            {
-//                if (LinesIntersects2D(ptdPoly1[intIdx - 1], ptdPoly1[intIdx], ptdPoly2[intIdx2 - 1], ptdPoly2[intIdx2]))
-//                    return true;
-//            }
-//        }
-
-//        return false;
-//    }
-
-//    // True if line segment (p1, p2) intersects any edge segment of polygon represented by polyPts.
-//    public static bool SegmentIntersectsPolygon2D(Distance2D p1, Distance2D p2, IList<Distance2D> polyPts)
-//    {
-//        Distance2D minP = p1.Min(p2);
-//        Distance2D maxP = p1.Max(p2);
-
-//        Distance2D priorPt = polyPts[0];
-//        for (int i = 1; i <= LastIndex(polyPts); i++)
-//        {
-//            Distance2D pt = polyPts[i];
-//            if (mDL2DLib.MinMaxIntersect(minP, maxP, pt.Min(priorPt), pt.Max(priorPt)))
-//            {
-//                if (LinesIntersects2D(p1, p2, priorPt, pt))
-//                    return true;
-//            }
-//            // Prep Next
-//            priorPt = pt;
-//        }
-
-//        return false;
-//    }
-
-
-//    public static Distance2D ExtendLine2D(Distance2D ptdP1, Distance2D ptdP2, double dblDistance)
-//    {
-//        double dblTotalDistance = mDL2DLib.CalcDistance2D(ptdP1, ptdP2) + dblDistance;
-//        double dblDAngle = GetAngleDegrees2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
-
-//        return new Distance2D(ptdP1.X + dblTotalDistance * Math.Cos((dblDAngle / 180) * Math.PI), ptdP1.Y + dblTotalDistance * Math.Sin((dblDAngle / 180) * Math.PI));
-//    }
-
-//    public static PointF ExtendLine2D(PointF ptfP1, PointF ptfP2, float sngDistance)
-//    {
-//        double dblTotalDistance = mDL2DLib.CalcDistance2D(ptfP1, ptfP2) + sngDistance;
-//        double dblDAngle = GetAngleDegrees2D(ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
-
-//        return new PointF(System.Convert.ToSingle(ptfP1.X + dblTotalDistance * Math.Cos((dblDAngle / 180) * Math.PI)), System.Convert.ToSingle(ptfP1.Y + dblTotalDistance * Math.Sin((dblDAngle / 180) * Math.PI)));
-//    }
-
-//    public static double ReverseAngle(double dblAngle)
-//    {
-//        return 360 - dblAngle;
-//    }
-
-//    public static float ReverseAngle(float sngAngle)
-//    {
-//        return 360 - sngAngle;
-//    }
-
-//    public static int ReverseAngle(int intAngle)
-//    {
-//        return 360 - intAngle;
-//    }
-
-//    // Given an arbitrary angle in degrees, move it into range (-180, +180].
-//    public static double Degrees_Signed180(double degrees)
-//    {
-//        degrees = degrees % 360;
-
-//        if (degrees <= -180)
-//            degrees += 360;
-//        else if (degrees > 180)
-//            degrees -= 360;
-
-//        return degrees;
-//    }
-
-//    // Convert radians to degrees; return within range (-180, +180].
-//    public static double RadiansToDegrees_Signed180(double radians)
-//    {
-//        return Degrees_Signed180(RadiansToDegrees(radians));
-//    }
-
-//    public static double RadiansToDegrees(double dblRadians)
-//    {
-//        return dblRadians * 180 / Math.PI;
-//    }
-
-//    public static double DegreesToRadians(double dblDegrees)
-//    {
-//        return dblDegrees * Math.PI / 180;
-//    }
-
-//    public const double TwoPI = 2 * Math.PI;
-
-//    public const double Degrees90AsRadians = Math.PI / 2.0;
-//    public const double Degrees89_9AsRadians = Degrees90AsRadians * 89.9 / 90;
-//    public const double Degrees180AsRadians = Math.PI;
-//    public const double Degrees270AsRadians = 3 * Math.PI / 2.0;
-//    public const double Degrees360AsRadians = TwoPI;
-
-
-
-//    // Returnerar antalet punkter ur ptdPts som ligger inom ptfRec
-//    public static int PointsCountInRectangle2D(PointF[] ptfRec, PointF[] ptfPts)
-//    {
-//        if (ptfRec == null)
-//            return -1;
-//        if (ptfPts == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        for (int intIdx = 0; intIdx <= ptfPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptfPts[intIdx], ptfRec))
-//                intPtsCtr += 1;
-//        }
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(Distance2D[] ptdRec, Distance2D[] ptdPts)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-//        if (ptdPts == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
-//                intPtsCtr += 1;
-//        }
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(Distance3D[] ptdRec, Distance3D[] ptdPts)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-//        if (ptdPts == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
-//                intPtsCtr += 1;
-//        }
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(RectangleF rcfRec, PointF[] ptfPts)
-//    {
-//        if (ptfPts == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        for (int intIdx = 0; intIdx <= ptfPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptfPts[intIdx], rcfRec))
-//                intPtsCtr += 1;
-//        }
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(RectangleF rcfRec, Distance2D[] ptdPts)
-//    {
-//        if (ptdPts == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptdPts[intIdx], rcfRec))
-//                intPtsCtr += 1;
-//        }
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(RectangleF rcfRec, Distance3D[] ptdPts)
-//    {
-//        if (ptdPts == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
-//        {
-//            if (PointInsideRectangle2D(ptdPts[intIdx], rcfRec))
-//                intPtsCtr += 1;
-//        }
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(RectangleF rcfRec, RectangleF rcfPts)
-//    {
-//        int intPtsCtr = 0;
-
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y), rcfRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y), rcfRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), rcfRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y + rcfPts.Height), rcfRec))
-//            intPtsCtr += 1;
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(PointF[] ptfRec, RectangleF rcfPts)
-//    {
-//        if (ptfRec == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y), ptfRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y), ptfRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptfRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y + rcfPts.Height), ptfRec))
-//            intPtsCtr += 1;
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(Distance2D[] ptdRec, RectangleF rcfPts)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        if (PointInsideRectangle2D(new Distance2D(rcfPts.X, rcfPts.Y), ptdRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Distance2D(rcfPts.X + rcfPts.Width, rcfPts.Y), ptdRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Distance2D(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptdRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Distance2D(rcfPts.X, rcfPts.Y + rcfPts.Height), ptdRec))
-//            intPtsCtr += 1;
-
-//        return intPtsCtr;
-//    }
-
-//    public static int PointsCountInRectangle2D(Distance3D[] ptdRec, RectangleF rcfPts)
-//    {
-//        if (ptdRec == null)
-//            return -1;
-
-//        int intPtsCtr = 0;
-
-//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X, rcfPts.Y), ptdRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X + rcfPts.Width, rcfPts.Y), ptdRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptdRec))
-//            intPtsCtr += 1;
-//        if (PointInsideRectangle2D(new Distance3D(rcfPts.X, rcfPts.Y + rcfPts.Height), ptdRec))
-//            intPtsCtr += 1;
-
-//        return intPtsCtr;
-//    }
-
-//    public static Distance2D PolygonCentroid2D(Distance2D[] ptdPolygon, double dblDivider)
-//    {
-//        if (ptdPolygon == null || ptdPolygon.Length < 1)
-//            return new Distance2D(double.NegativeInfinity, double.NegativeInfinity);
-//        if (ptdPolygon.Length == 1)
-//            return ptdPolygon[0];
-//        if (ptdPolygon.Length == 2)
-//            return Average(ptdPolygon[0], ptdPolygon[1]);
-//        try
-//        {
-//            double dblA = 0;
-//            double dblXC = 0;
-//            double dblYC = 0;
-//            var dblMinX = ptdPolygon[0].X;
-//            double dblMinY = ptdPolygon[0].Y;
-
-//            for (int intIdx = 1; intIdx <= ptdPolygon.Length - 1; intIdx++)
-//            {
-//                double dblX = ptdPolygon[intIdx].X;
-//                double dblY = ptdPolygon[intIdx].Y;
-
-//                if (dblX < dblMinX)
-//                    dblMinX = dblX;
-//                if (dblY < dblMinY)
-//                    dblMinY = dblY;
-//            }
-
-//            Distance2D ptdMin = new Distance2D(dblMinX / dblDivider, dblMinY / dblDivider);
-
-//            for (int intIdx = 0; intIdx <= ptdPolygon.Length - 1; intIdx++)
-//            {
-//                Distance2D ptdP1 = ptdPolygon[intIdx];
-//                Distance2D ptdP2 = ptdPolygon[(intIdx + 1) % ptdPolygon.Length];
-//                if (ptdP2 == ptdP1)
-//                    continue; // E.g. if final point is same as first point.
-
-//                ptdP1.X /= dblDivider; ptdP1.Y /= dblDivider;
-//                ptdP2.X /= dblDivider; ptdP2.Y /= dblDivider;
-
-//                ptdP1 -= ptdMin;
-//                ptdP2 -= ptdMin;
-
-//                double dblP = ptdP1.X * ptdP2.Y - ptdP2.X * ptdP1.Y;
-
-//                dblA += dblP;
-//                dblXC += (ptdP1.X + ptdP2.X) * dblP;
-//                dblYC += (ptdP1.Y + ptdP2.Y) * dblP;
-//            }
-
-//            Distance2D ptdRet;
-//            if (dblA == 0.0)
-//            {
-//                // Failed - simply average the points. (Happens if only two points.)
-//                Distance2D pSum = new Distance2D(0, 0);
-//                int len = ptdPolygon.Length;
-//                if (LastElement(ptdPolygon) == ptdPolygon[0])
-//                    len -= 1;
-//                for (int i = 0; i <= len - 1; i++)
-//                    pSum += ptdPolygon[i];
-//                ptdRet = pSum / (double)len;
-//            }
-//            else
-//            {
-//                dblA /= 2;
-//                ptdRet = new Distance2D(dblXC / (6 * dblA), dblYC / (6 * dblA)) + ptdMin;
-//                ptdRet.X *= dblDivider; ptdRet.Y *= dblDivider;
-//            }
-
-//            return ptdRet;
-//        }
-//        catch (Exception ex)
-//        {
-//            return new Distance2D(double.NegativeInfinity, double.NegativeInfinity);
-//        }
-//    }
-
-//    public static Distance2D PolygonFindBestCentroidOnObject(Distance2D[] ptdPolygon, Distance2D ptdOrigo)
-//    {
-//        if (ptdPolygon == null)
-//            return Distance2D.Zero();
-//        var dblMinX = ptdPolygon[0].X;
-//        double dblMinY = ptdPolygon[0].Y;
-//        var dblMaxX = ptdPolygon[0].X;
-//        double dblMaxY = ptdPolygon[0].Y;
-//        double dblFurthest;
-
-//        for (int intIdx = 0; intIdx <= ptdPolygon.Length - 1; intIdx++)
-//        {
-//            if (ptdPolygon[intIdx].X < dblMinX)
-//                dblMinX = ptdPolygon[intIdx].X;
-//            if (ptdPolygon[intIdx].Y < dblMinY)
-//                dblMinY = ptdPolygon[intIdx].Y;
-
-//            if (ptdPolygon[intIdx].X < dblMaxX)
-//                dblMaxX = ptdPolygon[intIdx].X;
-//            if (ptdPolygon[intIdx].Y < dblMaxY)
-//                dblMaxY = ptdPolygon[intIdx].Y;
-
-//            double dblDistance = CalcDistance2D(ptdOrigo, ptdPolygon[intIdx]);
-
-//            if (dblDistance > dblFurthest)
-//                dblFurthest = dblDistance;
-//        }
-
-//        dblFurthest *= 2;
-
-//        Distance2D ptdMin = new Distance2D(dblMinX - 1, dblMinY - 1);
-//        Distance2D ptdMax = new Distance2D(dblMaxX - 1, dblMaxY - 1);
-//        Distance2D ptdOrigoD = ptdOrigo - ptdMin;
-//        Distance2D[] ptdHits = null;
-//        int intAcc = 8;
-
-//        for (int intIdxAngle = 1; intIdxAngle <= intAcc; intIdxAngle++)
-//        {
-//            Distance2D ptdRay;
-
-//            ptdRay = RotateAtByDegrees2D(ptdOrigo, ptdOrigo + dblFurthest, 360 / (double)intAcc * intIdxAngle);
-
-//            for (int intIdx = 0; intIdx <= ptdPolygon.Length - 1; intIdx++)
-//            {
-//                Distance2D ptdP1 = ptdPolygon[intIdx] - ptdMin;
-//                Distance2D ptdP2 = ptdPolygon[(intIdx + 1) % ptdPolygon.Length] - ptdMin;
-
-//                if (LinesIntersects2D(ptdP1, ptdP2, ptdOrigoD, ptdRay - ptdMin))
-//                {
-//                    Distance2D ptdIsect = LinesIntersectsAt2D(ptdP1, ptdP2, ptdOrigoD, ptdRay - ptdMin);
-
-//                    if (!(ptdIsect.X == 0 && ptdIsect.Y == 0))
-//                    {
-//                        if (ptdHits == null)
-//                            ptdHits = new Distance2D[1];
-//                        else
-//                        {
-//                            var oldPtdHits = ptdHits;
-//                            ptdHits = new Distance2D[ptdHits.Length + 1];
-//                            if (oldPtdHits != null)
-//                                Array.Copy(oldPtdHits, ptdHits, Math.Min(ptdHits.Length + 1, oldPtdHits.Length));
-//                        }
-
-//                        ptdHits[ptdHits.Length - 1] = ptdIsect + ptdMin;
-//                    }
-//                }
-//            }
-//        }
-
-//        if (!ptdHits == null)
-//        {
-//            double dblClosestDI = double.NegativeInfinity;
-//            int intClosestIdx = -1;
-
-//            for (int intIdx = 0; intIdx <= ptdHits.Length - 1; intIdx++)
-//            {
-//                double dblDistance = CalcDistance2D(ptdOrigo, ptdHits[intIdx]);
-
-//                if (double.IsInfinity(dblClosestDI) || dblDistance < dblClosestDI)
-//                {
-//                    dblClosestDI = dblDistance;
-//                    intClosestIdx = intIdx;
-//                }
-//            }
-
-//            if (intClosestIdx >= 0)
-//                return ptdHits[intClosestIdx];
-//        }
-
-//        return Distance2D.Zero();
-//    }
-
-//    // Public Function DistanceBetweenRectangles2D(ByVal ptfRec1() As PointF, ByVal ptfRec2() As PointF) As Double
-//    // If ptfRec1 Is Nothing Then Return -1
-//    // If ptfRec2 Is Nothing Then Return -1
-
-//    // Dim dblDi As Double = -1
-
-//    // ' Returns 0 if the both rectangles intersects
-
-//    // If RectanglesIntersects2D(ptfRec1, ptfRec2) Then Return 0
-
-//    // For intIdx As Integer = 0 To 3
-//    // For intIdx2 As Integer = 0 To 3
-//    // Dim dblDI1 As Double = PointDistanceToLine2D(ptfRec1(intIdx2), ptfRec2(IIf(intIdx = 0, 3, intIdx - 1)), ptfRec2(intIdx))
-//    // Dim dblDI2 As Double = PointDistanceToLine2D(ptfRec2(intIdx2), ptfRec1(IIf(intIdx = 0, 3, intIdx - 1)), ptfRec1(intIdx))
-
-//    // If dblDi = -1 Or dblDI1 < dblDi Then dblDi = dblDI1
-//    // If dblDi = -1 Or dblDI2 < dblDi Then dblDi = dblDI2
-//    // Next
-//    // Next
-
-//    // Return dblDi
-//    // End Function
-
-//    // Public Function DistanceBetweenRectangles2D(ByVal ptdRec1() As Distance2D, ByVal ptdRec2() As Distance2D) As Double
-//    // If ptdRec1 Is Nothing Then Return -1
-//    // If ptdRec2 Is Nothing Then Return -1
-
-//    // Dim dblDi As Double = -1
-
-//    // ' Returns 0 if the both rectangles intersects
-
-//    // If RectanglesIntersects2D(ptdRec1, ptdRec2) Then Return 0
-
-//    // For intIdx As Integer = 0 To 3
-//    // For intIdx2 As Integer = 0 To 3
-//    // Dim dblDI1 As Double = PointDistanceToLine2D(ptdRec1(intIdx2), ptdRec2(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec2(intIdx))
-//    // Dim dblDI2 As Double = PointDistanceToLine2D(ptdRec2(intIdx2), ptdRec1(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec1(intIdx))
-
-//    // If dblDi = -1 Or dblDI1 < dblDi Then dblDi = dblDI1
-//    // If dblDi = -1 Or dblDI2 < dblDi Then dblDi = dblDI2
-//    // Next
-//    // Next
-
-//    // Return dblDi
-//    // End Function
-
-//    // Public Function DistanceBetweenRectangles2D(ByVal ptdRec1() As Distance3D, ByVal ptdRec2() As Distance3D) As Double
-//    // If ptdRec1 Is Nothing Then Return -1
-//    // If ptdRec2 Is Nothing Then Return -1
-
-//    // Dim dblDi As Double = -1
-
-//    // ' Returns 0 if the both rectangles intersects
-
-//    // 'HACK FIXA DENNA ASAP
-//    // 'If RectanglesIntersects2D(ptdRec1, ptdRec2) Then Return 0
-
-//    // For intIdx As Integer = 0 To 3
-//    // For intIdx2 As Integer = 0 To 3
-//    // Dim dblDI1 As Double = PointDistanceToLine2D(ptdRec1(intIdx2), ptdRec2(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec2(intIdx))
-//    // Dim dblDI2 As Double = PointDistanceToLine2D(ptdRec2(intIdx2), ptdRec1(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec1(intIdx))
-
-//    // If dblDi = -1 Or dblDI1 < dblDi Then dblDi = dblDI1
-//    // If dblDi = -1 Or dblDI2 < dblDi Then dblDi = dblDI2
-//    // Next
-//    // Next
-
-//    // Return dblDi
-//    // End Function
-
-//    public static Distance2D[] Create_LinesByControlPoints(Distance2D[] ptdPoints)
-//    {
-//        if (ptdPoints == null)
-//            return null;
-//        // ptdPoints = ptdPoints.Clone
-
-//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
-//        PointF[] ptfPoints = new PointF[ptdPoints.Length - 1 + 1];
-
-//        Distance2D ptdRP = ptdPoints[0];
-
-//        for (int intIdx = 0; intIdx <= ptdPoints.GetUpperBound(0); intIdx++)
-//            ptfPoints[intIdx] = new PointF(System.Convert.ToSingle((ptdPoints[intIdx].X - ptdRP.X) * 10), System.Convert.ToSingle((ptdPoints[intIdx].Y - ptdRP.Y) * 10));
-
-//        gfpSplines.AddLines(ptfPoints);
-
-//        Distance2D[] ptdRetPoints = new Distance2D[gfpSplines.PathPoints.GetUpperBound(0) + 1];
-//        PointF[] ptfPathPoints = gfpSplines.PathPoints;
-//        for (int intIdx = 0; intIdx <= ptdRetPoints.GetUpperBound(0); intIdx++)
-//            ptdRetPoints[intIdx] = new Distance2D((ptfPathPoints[intIdx].X / (double)10) + ptdRP.X, (ptfPathPoints[intIdx].Y / (double)10) + ptdRP.Y);
-
-//        return ptdRetPoints;
-//    }
-
-//    public static PointF[] Create_LinesByControlPoints(PointF[] ptfPoints)
-//    {
-//        if (ptfPoints == null)
-//            return null;
-
-//        return (PointF[])ptfPoints.Clone();
-//    }
-
-//    public static Distance2D[] Create_PolygonByControlPoints(Distance2D[] ptdPoints)
-//    {
-//        if (ptdPoints == null)
-//            return null;
-//        // ptdPoints = ptdPoints.Clone
-
-//        // Dim gfpSplines As New Drawing2D.GraphicsPath
-//        // Dim ptfPoints(ptdPoints.Length - 1) As PointF
-
-//        // Dim ptdRP As Distance2D = ptdPoints(0)
-
-//        // For intIdx As Integer = 0 To ptdPoints.GetUpperBound(0)
-//        // ptdPoints(intIdx).X -= ptdRP.X ' This is a fix for when the Distance2D are to big numbers
-//        // ptdPoints(intIdx).Y -= ptdRP.Y
-//        // ptfPoints(intIdx) = ptdPoints(intIdx).ToPointF
-//        // ptfPoints(intIdx).X *= 10
-//        // ptfPoints(intIdx).Y *= 10
-//        // Next
-
-//        // gfpSplines.AddPolygon(ptfPoints)
-
-//        // Dim ptdRetPoints(gfpSplines.PathPoints.GetUpperBound(0)) As Distance2D
-
-//        // For intIdx As Integer = 0 To ptdRetPoints.GetUpperBound(0)
-//        // ptdRetPoints(intIdx) = New Distance2D(gfpSplines.PathPoints(intIdx).X, gfpSplines.PathPoints(intIdx).Y)
-//        // ptdRetPoints(intIdx).X /= 10
-//        // ptdRetPoints(intIdx).Y /= 10
-//        // ptdRetPoints(intIdx).X += ptdRP.X
-//        // ptdRetPoints(intIdx).Y += ptdRP.Y
-//        // Next
-
-//        if (!ptdPoints[0].X == ptdPoints[ptdPoints.GetUpperBound(0)].X | !ptdPoints[0].Y == ptdPoints[ptdPoints.GetUpperBound(0)].Y)
-//        {
-//            var oldPtdPoints = ptdPoints;
-//            ptdPoints = new Distance2D[ptdPoints.GetUpperBound(0) + 1 + 1];
-//            if (oldPtdPoints != null)
-//                Array.Copy(oldPtdPoints, ptdPoints, Math.Min(ptdPoints.GetUpperBound(0) + 1 + 1, oldPtdPoints.Length));
-//            ptdPoints[ptdPoints.GetUpperBound(0)] = ptdPoints[0];
-//        }
-
-//        return ptdPoints;
-//    }
-
-//    public static PointF[] Create_PolygonByControlPoints(PointF[] ptfPoints)
-//    {
-//        if (ptfPoints == null)
-//            return null;
-
-//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
-
-//        gfpSplines.AddPolygon(ptfPoints);
-
-//        return gfpSplines.PathPoints;
-//    }
-
-//    private static int intSmoothness = 80;
-//    private static int intPrecision = 1;
-
-//    public static Distance2D[] Create_ClosedSimplyfiedCardinalByControlPoints(Distance2D[] ptdPoints)
-//    {
-//        if (ptdPoints == null)
-//            return null;
-//        // ptdPoints = ptdPoints.Clone
-
-//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
-//        PointF[] ptfPoints = new PointF[ptdPoints.Length - 1 + 1];
-
-//        Distance2D ptdRP = ptdPoints[0];
-
-//        for (int intIdx = 0; intIdx <= ptdPoints.GetUpperBound(0); intIdx++)
-//        {
-//            // ptdPoints(intIdx).X -= ptdRP.X ' This is a fix for when the Distance2D are to big numbers
-//            // ptdPoints(intIdx).Y -= ptdRP.Y
-//            // ptfPoints(intIdx) = ptdPoints(intIdx).ToPointF
-//            ptfPoints[intIdx].X = System.Convert.ToSingle(ptdPoints[intIdx].X - ptdRP.X);
-//            ptfPoints[intIdx].Y = System.Convert.ToSingle(ptdPoints[intIdx].Y - ptdRP.Y);
-//        }
-
-//        gfpSplines.AddClosedCurve(ptfPoints);
-//        gfpSplines.Flatten();
-
-//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
-//        Distance2D[] ptdRetPoints;
-
-//        ptdRetPoints = new Distance2D[ptfRetPoints.GetUpperBound(0) + 1];
-
-//        for (int intIdx = 0; intIdx <= ptfRetPoints.GetUpperBound(0); intIdx++)
-//        {
-//            ptdRetPoints[intIdx] = new Distance2D(ptfRetPoints[intIdx].X, ptfRetPoints[intIdx].Y);
-//            ptdRetPoints[intIdx].X += ptdRP.X;
-//            ptdRetPoints[intIdx].Y += ptdRP.Y;
-//        }
-
-//        return ptdRetPoints;
-//    }
-
-//    public static PointF[] Create_ClosedSimplyfiedCardinalByControlPoints(PointF[] ptfPoints)
-//    {
-//        if (ptfPoints == null)
-//            return null;
-
-//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
-
-//        gfpSplines.AddClosedCurve(ptfPoints);
-//        gfpSplines.Flatten();
-
-//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
-
-//        return ptfRetPoints;
-//    }
-
-//    public static Distance2D[] Create_SimplyfiedCardinalByControlPoints(Distance2D[] ptdPoints)
-//    {
-//        if (ptdPoints == null)
-//            return null;
-//        // ptdPoints = ptdPoints.Clone
-
-//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
-//        PointF[] ptfPoints = new PointF[ptdPoints.Length - 1 + 1];
-
-//        Distance2D ptdRP = ptdPoints[0];
-
-//        for (int intIdx = 0; intIdx <= ptdPoints.GetUpperBound(0); intIdx++)
-//            ptfPoints[intIdx] = new PointF(System.Convert.ToSingle(ptdPoints[intIdx].X - ptdRP.X), System.Convert.ToSingle(ptdPoints[intIdx].Y - ptdRP.Y));
-
-//        gfpSplines.AddCurve(ptfPoints);
-//        gfpSplines.Flatten();
-
-//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
-//        Distance2D[] ptdRetPoints = new Distance2D[ptfRetPoints.GetUpperBound(0) + 1];
-
-//        for (int intIdx = 0; intIdx <= ptfRetPoints.GetUpperBound(0); intIdx++)
-//            ptdRetPoints[intIdx] = new Distance2D(ptfRetPoints[intIdx].X + ptdRP.X, ptfRetPoints[intIdx].Y + ptdRP.Y);
-
-//        return ptdRetPoints;
-//    }
-
-//    public static PointF[] Create_SimplyfiedCardinalByControlPoints(PointF[] ptfPoints)
-//    {
-//        if (ptfPoints == null)
-//            return null;
-
-//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
-
-//        gfpSplines.AddCurve(ptfPoints);
-//        gfpSplines.Flatten();
-
-//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
-
-//        return ptfRetPoints;
-//    }
-
-//    public static Distance2D[] Create_ClosedCardinalByControlPoints(Distance2D[] ptdPts)
-//    {
-//        if (ptdPts == null)
-//            return null;
-//        Distance2D[] ptdRet;
-//        int intRetCtr = 0;
-
-//        if (ptdPts.Length < 2)
-//            return null;
-//        else if (ptdPts.Length == 2)
-//        {
-//            ptdRet = new Distance2D[4];
-
-//            ptdRet[0] = ptdPts[0];
-//            ptdRet[1] = ptdPts[0];
-//            ptdRet[2] = ptdPts[1];
-//            ptdRet[3] = ptdPts[1];
-
-//            return ptdRet;
-//        }
-
-//        float tension = 0.5;
-//        float control_scale;
-//        Distance2D pt;
-//        Distance2D pt_before;
-//        Distance2D pt_after;
-//        Distance2D pt_after2;
-//        Distance2D Di;
-//        Distance2D DiPlus1;
-//        Distance2D p1, p2, p3, p4;
-//        int intPts = ptdPts.Length;
-
-//        control_scale = System.Convert.ToSingle(tension / 0.5 * 0.175);
-
-//        ptdRet = new Distance2D[(intPts - 1) * 3 + 3 + 1];
-
-//        ptdRet[0] = ptdPts[0];
-
-//        for (int intIdx = 0; intIdx <= Information.UBound(ptdPts); intIdx++)
-//        {
-//            pt_before = ptdPts[(intIdx - 1 + intPts) % intPts];
-//            pt = ptdPts[intIdx];
-//            pt_after = ptdPts[(intIdx + 1) % intPts];
-//            pt_after2 = ptdPts[(intIdx + 2) % intPts];
-
-//            p1 = pt;
-//            p4 = pt_after;
-
-//            Di.X = pt_after.X - pt_before.X;
-//            Di.Y = pt_after.Y - pt_before.Y;
-//            p2.X = pt.X + control_scale * Di.X;
-//            p2.Y = pt.Y + control_scale * Di.Y;
-
-//            DiPlus1.X = pt_after2.X - ptdPts[intIdx].X;
-//            DiPlus1.Y = pt_after2.Y - ptdPts[intIdx].Y;
-//            p3.X = pt_after.X - control_scale * DiPlus1.X;
-//            p3.Y = pt_after.Y - control_scale * DiPlus1.Y;
-
-//            // ptdRet(intRetCtr) = p1
-//            ptdRet[intRetCtr + 1] = p2;
-//            ptdRet[intRetCtr + 2] = p3;
-//            ptdRet[intRetCtr + 3] = p4;
-
-//            intRetCtr += 3;
-//        }
-
-//        return ptdRet;
-//    }
-
-//    public static Distance2D[] Create_CardinalByControlPoints(Distance2D[] ptdPts)
-//    {
-//        if (ptdPts == null)
-//            return null;
-//        Distance2D[] ptdRet;
-//        int intRetCtr = 0;
-
-//        if (ptdPts.Length < 2)
-//            return null;
-//        else if (ptdPts.Length == 2)
-//        {
-//            ptdRet = new Distance2D[4];
-
-//            ptdRet[0] = ptdPts[0];
-//            ptdRet[1] = ptdPts[0];
-//            ptdRet[2] = ptdPts[1];
-//            ptdRet[3] = ptdPts[1];
-
-//            return ptdRet;
-//        }
-
-//        float tension = 0.5;
-//        float control_scale;
-//        Distance2D pt;
-//        Distance2D pt_before;
-//        Distance2D pt_after;
-//        Distance2D pt_after2;
-//        Distance2D Di;
-//        Distance2D DiPlus1;
-//        Distance2D p1, p2, p3, p4;
-//        int intPts = ptdPts.Length;
-
-//        control_scale = System.Convert.ToSingle(tension / 0.5 * 0.175);
-
-//        ptdRet = new Distance2D[(intPts - 1) * 3 + 1];
-
-//        ptdRet[0] = ptdPts[0];
-
-//        for (int intIdx = 0; intIdx <= intPts - 2; intIdx++)
-//        {
-//            pt_before = ptdPts[Math.Max(intIdx - 1, 0)];
-//            pt = ptdPts[intIdx];
-//            pt_after = ptdPts[intIdx + 1];
-//            pt_after2 = ptdPts[Math.Min(intIdx + 2, Information.UBound(ptdPts))];
-
-//            p1 = ptdPts[intIdx];
-//            p4 = ptdPts[intIdx + 1];
-
-//            Di.X = pt_after.X - pt_before.X;
-//            Di.Y = pt_after.Y - pt_before.Y;
-//            p2.X = pt.X + control_scale * Di.X;
-//            p2.Y = pt.Y + control_scale * Di.Y;
-
-//            DiPlus1.X = pt_after2.X - ptdPts[intIdx].X;
-//            DiPlus1.Y = pt_after2.Y - ptdPts[intIdx].Y;
-//            p3.X = pt_after.X - control_scale * DiPlus1.X;
-//            p3.Y = pt_after.Y - control_scale * DiPlus1.Y;
-
-//            ptdRet[intRetCtr + 1] = p2;
-//            ptdRet[intRetCtr + 2] = p3;
-//            ptdRet[intRetCtr + 3] = p4;
-
-//            intRetCtr += 3;
-//        }
-
-//        return ptdRet;
-//    }
-
-//    // Returns 2 Distance2D
-//    public static Distance2D[] Get_CrossingLine2D(Distance2D ptdP1, Distance2D ptdP2, double dblRadius)
-//    {
-//        Distance2D[] ptdCross = new Distance2D[2]; // (0) = "Left" side     (1) = "Right" side
-//        double dblAngle = mDL2DLib.GetAngleDegrees2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
-
-//        ptdCross[0].X = dblRadius;
-//        ptdCross[1].X = dblRadius;
-
-//        RotateByDegrees2D(ref ptdCross[0], dblAngle + 90);
-//        RotateByDegrees2D(ref ptdCross[1], dblAngle - 90);
-//        ptdCross[0].X += ptdP2.X;
-//        ptdCross[0].Y += ptdP2.Y;
-//        ptdCross[1].X += ptdP2.X;
-//        ptdCross[1].Y += ptdP2.Y;
-
-//        return ptdCross;
-//    }
-
-//    public static double CalculatePolygonArea2D(PointF[] ptfPts)
-//    {
-//        if (ptfPts == null)
-//            return -1;
-//        double dblArea = 0;
-
-//        for (int intIdx = 1; intIdx <= ptfPts.Length - 1; intIdx++)
-//        {
-//            if (intIdx == 0)
-//                dblArea += (ptfPts[intIdx].X - ptfPts[ptfPts.Length - 1].X) * (ptfPts[intIdx].Y + ptfPts[ptfPts.Length - 1].Y) / (double)2;
-//            else
-//                dblArea += (ptfPts[intIdx].X - ptfPts[intIdx - 1].X) * (ptfPts[intIdx].Y + ptfPts[intIdx - 1].Y) / (double)2;
-//        }
-
-//        return Math.Abs(dblArea);
-//    }
-
-//    // E.g. http://www.mathopenref.com/coordpolygonarea2.html
-//    // Take area from line segment to X-axis, as traverse the polygon.
-//    // On side where X's are increasing, is adding the area.
-//    // On side where X's are decreasing, is subtracting the area.
-//    // The area between polygon and axis is adding and subtracted, so cancels out,
-//    // leaving the area of the polygon as the result.
-//    // Abs is needed because order of points might yield negative of area.
-//    public static double CalculatePolygonArea2D(IList<Distance2D> pts)
-//    {
-//        if (pts == null)
-//            return 0;
-
-//        double area = 0;
-//        Distance2D prevPt = LastElement(pts);
-
-//        foreach (Distance2D pt in pts)
-//        {
-//            area += (pt.X - prevPt.X) * (pt.Y + prevPt.Y) / 2;
-//            // Prep Next
-//            prevPt = pt;
-//        }
-
-//        return Math.Abs(area);
-//    }
-
-//    public static double CalculatePolygonArea2D(Distance3D[] ptdPts)
-//    {
-//        if (ptdPts == null)
-//            return -1;
-//        double dblArea = 0;
-
-//        for (int intIdx = 1; intIdx <= ptdPts.Length - 1; intIdx++)
-//        {
-//            if (intIdx == 0)
-//                dblArea += (ptdPts[intIdx].X - ptdPts[ptdPts.Length - 1].X) * (ptdPts[intIdx].Y + ptdPts[ptdPts.Length - 1].Y) / (double)2;
-//            else
-//                dblArea += (ptdPts[intIdx].X - ptdPts[intIdx - 1].X) * (ptdPts[intIdx].Y + ptdPts[intIdx - 1].Y) / (double)2;
-//        }
-
-//        return Math.Abs(dblArea);
-//    }
-
-//    // When "autoClose", adds distance between last and first point.
-//    // (For our polygons, those are usually the same location, so autoClose is not needed.)
-//    public static double Perimeter(IList<Distance2D> pts, bool autoClose = false)
-//    {
-//        double result = 0;
-//        // "- 2" (rather than "- 1") because calculation uses "i + 1".
-//        for (int i = 0; i <= pts.Count - 2; i++)
-//        {
-//            Distance2D p1 = pts[i];
-//            Distance2D p2 = pts[i + 1];
-//            double segmentLength = CalcDistance2D(p1, p2);
-//            result += segmentLength;
-//        }
-
-//        if (autoClose)
-//        {
-//            double segmentLength = CalcDistance2D(LastElement(pts), FirstElement(pts));
-//            result += segmentLength;
-//        }
-
-//        return result;
-//    }
-
-
-//    public static Distance2D[] ExtendPolygon2D(Distance2D[] ptdPolyPts, double dblRange) // Created By Kimpa 070227
-//    {
-//        if (ptdPolyPts == null)
-//            return null;
-//        if (ptdPolyPts.Length < 2)
-//            return null;
-
-//        double tmpV1, tmpV2;
-//        Distance2D tmpP1, tmpP2;
-//        Distance2D[] ptd = null;
-//        double tmpVadd1, tmpVadd2;
-
-//        tmpVadd1 = 0; tmpVadd2 = 0;
-
-//        if (!ptdPolyPts[0].X == ptdPolyPts[ptdPolyPts.Length - 1].X | !ptdPolyPts[0].Y == ptdPolyPts[ptdPolyPts.Length - 1].Y)
-//        {
-//            var oldPtdPolyPts = ptdPolyPts;
-//            ptdPolyPts = new Distance2D[ptdPolyPts.Length + 1];
-//            if (oldPtdPolyPts != null)
-//                Array.Copy(oldPtdPolyPts, ptdPolyPts, Math.Min(ptdPolyPts.Length + 1, oldPtdPolyPts.Length));
-//            ptdPolyPts[ptdPolyPts.Length - 1] = ptdPolyPts[0];
-//        }
-
-//        for (int intIdx = 1; intIdx <= ptdPolyPts.Length - 1; intIdx++)
-//        {
-//            // Angel P1<->P2 and P2<->P1
-//            double v1 = mDL2DLib.GetAngleDegrees2D(ptdPolyPts[intIdx - 1], ptdPolyPts[intIdx]);
-//            double v2 = mDL2DLib.GetAngleDegrees2D(ptdPolyPts[intIdx], ptdPolyPts[intIdx - 1]);
-
-//            // Calculate Outside/inside
-//            Distance2D CheckD1 = mDL2DLib.NewPosByDistanceAndAngle2D(dblRange >= 0 ? Degrees0_360(v1 + 270) : Degrees0_360(v1 + 90), ptdPolyPts[intIdx - 1], Math.Abs(dblRange));
-//            Distance2D CheckD2 = mDL2DLib.NewPosByDistanceAndAngle2D(dblRange >= 0 ? Degrees0_360(v2 - 270) : Degrees0_360(v2 - 90), ptdPolyPts[intIdx], Math.Abs(dblRange));
-//            if (dblRange >= 0)
-//            {
-//                if (mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD1) == true | mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD2) == true)
-//                {
-//                    tmpVadd1 = v1 + 90;
-//                    tmpVadd2 = v2 - 90;
-//                }
-//                else
-//                {
-//                    tmpVadd1 = v1 + 270;
-//                    tmpVadd2 = v2 - 270;
-//                }
-//            }
-//            else if (dblRange < 0)
-//            {
-//                if (mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD1) == false | mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD2) == false)
-//                {
-//                    tmpVadd1 = v1 + 270;
-//                    tmpVadd2 = v2 - 270;
-//                }
-//                else
-//                {
-//                    tmpVadd1 = v1 + 90;
-//                    tmpVadd2 = v2 - 90;
-//                }
-//            }
-
-//            // Calculate Angle
-//            v1 = Degrees0_360(tmpVadd1);    // v1 = IIf(dblRange >= 0, m2DLib.DegreeCorrection(v1 + 270), m2DLib.DegreeCorrection(v1 + 90))
-//            v2 = Degrees0_360(tmpVadd2);    // v2 = IIf(dblRange >= 0, m2DLib.DegreeCorrection(v2 - 270), m2DLib.DegreeCorrection(v2 - 90))
-
-
-//            // Calculate New Position
-//            Distance2D d1 = mDL2DLib.NewPosByDistanceAndAngle2D(v1, ptdPolyPts[intIdx - 1], Math.Abs(dblRange));
-//            Distance2D d2 = mDL2DLib.NewPosByDistanceAndAngle2D(v2, ptdPolyPts[intIdx], Math.Abs(dblRange));
-
-//            // Add New Position to 2d Array
-//            if (ptd == null)
-//            {
-//                ptd = new Distance2D[1];
-//                ptd[0] = d1;
-//            }
-//            else if (intIdx != ptdPolyPts.Length - 1)
-//            {
-//                if (mDL2DLib.LinesIntersects2D(d1, d2, tmpP1, tmpP2) == true)
-//                {
-//                    var oldPtd = ptd;
-//                    ptd = new Distance2D[ptd.Length + 1];
-//                    if (oldPtd != null)
-//                        Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
-//                    ptd[ptd.Length - 1] = mDL2DLib.LinesIntersectsAt2D(d1, d2, tmpP1, tmpP2);
-//                }
-//                else
-//                {
-//                    var oldPtd = ptd;
-//                    ptd = new Distance2D[ptd.Length + 1];
-//                    if (oldPtd != null)
-//                        Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
-//                    ptd[ptd.Length - 1] = tmpP2;
-//                    var oldPtd = ptd;
-//                    ptd = new Distance2D[ptd.Length + 1];
-//                    if (oldPtd != null)
-//                        Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
-//                    ptd[ptd.Length - 1] = d1;
-//                }
-//            }
-//            else if (intIdx == ptdPolyPts.Length - 1)
-//            {
-//                if (ptd.Length >= 2)
-//                {
-//                    if (mDL2DLib.LinesIntersects2D(d1, d2, ptd[0], ptd[1]))
-//                    {
-//                        var oldPtd = ptd;
-//                        ptd = new Distance2D[ptd.Length + 1];
-//                        if (oldPtd != null)
-//                            Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
-//                        ptd[ptd.Length - 1] = ptd[0];
-//                    }
-//                }
-//            }
-//            tmpP1 = d1;
-//            tmpP2 = d2;
-//            tmpV1 = v1;
-//            tmpV2 = v2;
-//        }
-
-//        return ptd;
-//    }
-
-//    public static int AnglePerpendicularZone(double intAngleDegree)
-//    {
-//        // Zones: 1:0-90,2:91-180,3:181-270,4:271-359
-//        if (intAngleDegree >= 0 && intAngleDegree <= 90)
-//            return 1;
-//        if (intAngleDegree > 90 && intAngleDegree <= 180)
-//            return 2;
-//        if (intAngleDegree > 180 && intAngleDegree <= 270)
-//            return 3;
-//        if (intAngleDegree > 270 && intAngleDegree < 360)
-//            return 4;
-
-//        return 0;
-//    }
-
-//    public static Distance2D[] MeargePolygons2D(System.Drawing.Graphics gfx, Distance2D[] ptdPolyPts1, Distance2D[] ptdPolyPts2) // Created By Kimpa 070221
-//    {
-//        if (ptdPolyPts1 == null)
-//            return null;
-//        if (ptdPolyPts2 == null)
-//            return null;
-
-//        Distance2D p1, p2, p3, p4, pMid;
-//        double xR, xL, yU, yD, dblLength, dblStep;
-//        double dblR = 0;
-//        xR = 0; xL = 0; yU = 0; yD = 0;
-
-//        // Close the Polypts1 and PolyPts2
-//        if (ptdPolyPts1[0].X != ptdPolyPts1[ptdPolyPts1.Length - 1].X | ptdPolyPts1[0].Y == ptdPolyPts1[ptdPolyPts1.Length - 1].Y)
-//        {
-//            var oldPtdPolyPts1 = ptdPolyPts1;
-//            ptdPolyPts1 = new Distance2D[ptdPolyPts1.Length + 1];
-//            if (oldPtdPolyPts1 != null)
-//                Array.Copy(oldPtdPolyPts1, ptdPolyPts1, Math.Min(ptdPolyPts1.Length + 1, oldPtdPolyPts1.Length));
-//            ptdPolyPts1[ptdPolyPts1.Length - 1] = ptdPolyPts1[0];
-//        }
-//        if (ptdPolyPts2[0].X != ptdPolyPts2[ptdPolyPts2.Length - 1].X | ptdPolyPts2[0].Y == ptdPolyPts2[ptdPolyPts2.Length - 1].Y)
-//        {
-//            var oldPtdPolyPts2 = ptdPolyPts2;
-//            ptdPolyPts2 = new Distance2D[ptdPolyPts2.Length + 1];
-//            if (oldPtdPolyPts2 != null)
-//                Array.Copy(oldPtdPolyPts2, ptdPolyPts2, Math.Min(ptdPolyPts2.Length + 1, oldPtdPolyPts2.Length));
-//            ptdPolyPts2[ptdPolyPts2.Length - 1] = ptdPolyPts2[0];
-//        }
-
-//        // Calculate a big Rectangle around p1,p2
-//        for (int intIdx = 0; intIdx <= ptdPolyPts1.Length - 1; intIdx++)
-//        {
-//            if (intIdx == 0)
-//            {
-//                xR = ptdPolyPts1[intIdx].X;
-//                xL = ptdPolyPts1[intIdx].X;
-//                yU = ptdPolyPts1[intIdx].Y;
-//                yD = ptdPolyPts1[intIdx].Y;
-//            }
-
-//            if (ptdPolyPts1[intIdx].X > xR)
-//                xR = ptdPolyPts1[intIdx].X;
-//            if (ptdPolyPts1[intIdx].X < xL)
-//                xL = ptdPolyPts1[intIdx].X;
-//            if (ptdPolyPts1[intIdx].Y > yD)
-//                yD = ptdPolyPts1[intIdx].Y;
-//            if (ptdPolyPts1[intIdx].Y < yU)
-//                yU = ptdPolyPts1[intIdx].Y;
-//        }
-//        for (int intIdx = 0; intIdx <= ptdPolyPts2.Length - 1; intIdx++)
-//        {
-//            if (ptdPolyPts2[intIdx].X > xR)
-//                xR = ptdPolyPts2[intIdx].X;
-//            if (ptdPolyPts2[intIdx].X < xL)
-//                xL = ptdPolyPts2[intIdx].X;
-//            if (ptdPolyPts2[intIdx].Y > yD)
-//                yD = ptdPolyPts2[intIdx].Y;
-//            if (ptdPolyPts2[intIdx].Y < yU)
-//                yU = ptdPolyPts2[intIdx].Y;
-//        }
-
-//        p1.X = xL; p1.Y = yU;
-//        p2.X = xR; p2.Y = yU;
-//        p3.X = xR; p3.Y = yD;
-//        p4.X = xL; p4.Y = yD;
-
-//        // Diameter
-//        if ((Math.Abs(xL - xR) / 2) >= (Math.Abs(yU - yD) / 2))
-//            dblR = (Math.Abs(xL - xR) / 2) * 2;
-//        if ((Math.Abs(xL - xR) / 2) < (Math.Abs(yU - yD) / 2))
-//            dblR = (Math.Abs(yU - yD) / 2) * 2;
-
-//        // Holds the Rectangles
-//        Distance2D[] ptdRec1 = new Distance2D[4];
-//        Distance2D[] ptdRec2 = new Distance2D[4];
-
-//        // Calculate Rectangle Around ptdPolypts1
-//        for (int intIdx = 0; intIdx <= ptdPolyPts1.Length - 1; intIdx++)
-//        {
-//            if (intIdx == 0)
-//            {
-//                xR = ptdPolyPts1[intIdx].X;
-//                xL = ptdPolyPts1[intIdx].X;
-//                yU = ptdPolyPts1[intIdx].Y;
-//                yD = ptdPolyPts1[intIdx].Y;
-//            }
-
-//            if (ptdPolyPts1[intIdx].X > xR)
-//                xR = ptdPolyPts1[intIdx].X;
-//            if (ptdPolyPts1[intIdx].X < xL)
-//                xL = ptdPolyPts1[intIdx].X;
-//            if (ptdPolyPts1[intIdx].Y > yD)
-//                yD = ptdPolyPts1[intIdx].Y;
-//            if (ptdPolyPts1[intIdx].Y < yU)
-//                yU = ptdPolyPts1[intIdx].Y;
-//        }
-
-//        ptdRec1[0] = new Distance2D(xL, yU); ptdRec1[1] = new Distance2D(xR, yU);
-//        ptdRec1[2] = new Distance2D(xR, yD); ptdRec1[3] = new Distance2D(xL, yD);
-
-//        // Calculate Rectangle around ptdPolypts2
-//        for (int intIdx = 0; intIdx <= ptdPolyPts2.Length - 1; intIdx++)
-//        {
-//            if (intIdx == 0)
-//            {
-//                xR = ptdPolyPts2[intIdx].X;
-//                xL = ptdPolyPts2[intIdx].X;
-//                yU = ptdPolyPts2[intIdx].Y;
-//                yD = ptdPolyPts2[intIdx].Y;
-//            }
-
-//            if (ptdPolyPts2[intIdx].X > xR)
-//                xR = ptdPolyPts2[intIdx].X;
-//            if (ptdPolyPts2[intIdx].X < xL)
-//                xL = ptdPolyPts2[intIdx].X;
-//            if (ptdPolyPts2[intIdx].Y > yD)
-//                yD = ptdPolyPts2[intIdx].Y;
-//            if (ptdPolyPts2[intIdx].Y < yU)
-//                yU = ptdPolyPts2[intIdx].Y;
-//        }
-
-//        ptdRec2[0] = new Distance2D(xL, yU); ptdRec2[1] = new Distance2D(xR, yU);
-//        ptdRec2[2] = new Distance2D(xR, yD); ptdRec2[3] = new Distance2D(xL, yD);
-//        Distance2D ptdCross1 = new Distance2D(0, 0);
-//        Distance2D ptdCross2 = new Distance2D(0, 0);
-
-//        double tmpD = 0;
-//        for (int intIdx = 1; intIdx <= ptdPolyPts1.Length - 1; intIdx++)
-//        {
-//            if (mDL2DLib.LinesIntersects2D(new Distance2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Distance2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts1[intIdx - 1], ptdPolyPts1[intIdx]))
-//                ptdCross1 = mDL2DLib.LinesIntersectsAt2D(new Distance2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Distance2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts1[intIdx - 1], ptdPolyPts1[intIdx]);
-//        }
-//        tmpD = 0;
-//        for (int intIdx = 1; intIdx <= ptdPolyPts2.Length - 1; intIdx++)
-//        {
-//            if (mDL2DLib.LinesIntersects2D(new Distance2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Distance2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts2[intIdx - 1], ptdPolyPts2[intIdx]))
-//                ptdCross2 = mDL2DLib.LinesIntersectsAt2D(new Distance2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Distance2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts2[intIdx - 1], ptdPolyPts2[intIdx]);
-//        }
-
-//        if (ptdCross1.X == 0 & ptdCross1.Y == 0)
-//            ptdCross1 = new Distance2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y);
-//        if (ptdCross2.X == 0 & ptdCross2.Y == 0)
-//            ptdCross2 = new Distance2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y);
-
-
-//        // Midpoint in Rectangle
-//        pMid.X = Math.Abs(ptdCross1.X - ptdCross2.X) / 2 + ptdCross1.X > ptdCross2.X ? ptdCross2.X : ptdCross1.X; // ((Math.Abs(xL - xR)) / 2) + xL 
-//        pMid.Y = Math.Abs(ptdCross1.Y - ptdCross2.Y) / 2 + ptdCross1.Y > ptdCross2.Y ? ptdCross2.Y : ptdCross1.Y; // ((Math.Abs(yU - yD)) / 2) + yU
-
-//        gfx.DrawEllipse(Pens.Blue, System.Convert.ToSingle(ptdCross1.X) - 2, System.Convert.ToSingle(ptdCross1.Y) - 2, 4, 4);
-//        gfx.DrawEllipse(Pens.Red, System.Convert.ToSingle(ptdCross2.X) - 2, System.Convert.ToSingle(ptdCross2.Y) - 2, 4, 4);
-//        gfx.DrawEllipse(Pens.Black, System.Convert.ToSingle(pMid.X) - 2, System.Convert.ToSingle(pMid.Y) - 2, 4, 4);
-//        dblLength = (ptdPolyPts1.Length + ptdPolyPts2.Length);
-//        dblStep = 1; // 360 / dblLength
-
-//        // Calculate Merge Points
-//        double tmpDistance = 0;
-//        Distance2D[] ptdMerge2d = null;
-//        int intCount = 0;
-//        double Angle = 0;
-//        Distance2D tmpP2;
-
-//        while (!Angle > 360)
-//        {
-//            Angle = Angle + dblStep;
-//            tmpP2 = new Distance2D(0, 0);
-
-//            // Backup Code with New lineIntersect..
-//            // For i As Integer = 1 To ptdPolyPts1.Length - 1
-//            // If m2DLib.LinesIntersects2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i)) Then
-//            // If m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i))) > tmpDistance Then
-//            // tmpDistance = m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i)))
-//            // tmpP2 = m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i))
-//            // End If
-//            // End If
-//            // Next
-//            // For j As Integer = 1 To ptdPolyPts2.Length - 1
-//            // If m2DLib.LinesIntersects2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)) Then
-//            // If m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j))) > tmpDistance Then
-//            // tmpDistance = m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)))
-//            // tmpP2 = m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)) 
-//            // End If
-//            // End If
-//            // Next
-
-//            // Caculate New Points
-//            for (int i = 1; i <= ptdPolyPts1.Length - 1; i++)
-//            {
-//                if (mDL2DLib.IS_OldLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]))
-//                {
-//                    if (mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i])) > tmpDistance)
-//                    {
-//                        tmpDistance = mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]));
-//                        tmpP2 = mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]);
-//                    }
-//                }
-//            }
-
-//            // Caculate New Points
-//            for (int j = 1; j <= ptdPolyPts2.Length - 1; j++)
-//            {
-//                if (mDL2DLib.IS_OldLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]) == true)
-//                {
-//                    if (mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j])) > tmpDistance)
-//                    {
-//                        tmpDistance = mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]));
-//                        tmpP2 = mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]);
-//                    }
-//                }
-//            }
-
-//            tmpDistance = 0;
-//            if (tmpP2.X > 0 | tmpP2.X < 0 | tmpP2.Y > 0 | tmpP2.Y < 0)
-//            {
-//                if (ptdMerge2d == null)
-//                {
-//                    ptdMerge2d = new Distance2D[intCount + 1];
-//                    ptdMerge2d[intCount] = tmpP2;
-//                    intCount = intCount + 1;
-//                }
-//                else
-//                {
-//                    var oldPtdMerge2d = ptdMerge2d;
-//                    ptdMerge2d = new Distance2D[intCount + 1];
-//                    if (oldPtdMerge2d != null)
-//                        Array.Copy(oldPtdMerge2d, ptdMerge2d, Math.Min(intCount + 1, oldPtdMerge2d.Length));
-//                    ptdMerge2d[intCount] = tmpP2;
-//                    intCount = intCount + 1;
-//                }
-//            }
-//        }
-
-//        return ptdMerge2d;
-//    }
-
-//    // Wraps at 360 degrees, so result is in [0..360).
-//    // TBD: Same as Wrap360.
-//    public static double Degrees0_360(double dblDeg) // Created By Kimpa 070221
-//    {
-//        if (dblDeg > 360)
-//            return dblDeg % 360;
-
-//        if (dblDeg < 0)
-//            // "360 +" moves from negative to positive, because Mod of negative returns a negative.
-//            return 360 + (dblDeg % 360);
-
-//        return dblDeg;
-//    }
-//    public static double OppsiteDegree(double dblDeg)  // Created By Kimpa 070221
-//    {
-//        return dblDeg >= 180 ? dblDeg - 180 : dblDeg + 180;
-//    }
-//    public static Distance2D NewPosByDistanceAndAngle2D(double dblDeg, Distance2D ptdPointOrigo2d, double Distance) // Created By Kimpa 070221
-//    {
-//        return new Distance2D(ptdPointOrigo2d.X + (Math.Cos((Math.PI / 180) * dblDeg) * Distance), ptdPointOrigo2d.Y + (Math.Sin((Math.PI / 180) * dblDeg) * Distance));
-//    }
-//    private static double[] bubble_sort(double[] dblIndex) // Created By Kimpa 070221
-//    {
-//        if (dblIndex == null)
-//            return null;
-
-//        for (int i = 0; i <= dblIndex.Length - 1; i++)
-//        {
-//            for (int j = 0; j <= dblIndex.Length - 2; j++)
-//            {
-//                if (dblIndex[j] > dblIndex[j + 1])
-//                    Swap(dblIndex[j], dblIndex[j + 1]);
-//            }
-//        }
-
-//        return dblIndex;
-//    }
-
-//    public static Distance2D OLDLineIntersect2D(Distance2D p1n, Distance2D p2n, Distance2D p1m, Distance2D p2m) // Created By Kim
-//    {
-//        return mDL2DLib.OLDLineIntersect2D(p1n.X, p1n.Y, p2n.X, p2n.Y, p1m.X, p1m.Y, p2m.X, p2m.Y);
-//    }
-//    public static bool IS_OldLineIntersect2D(Distance2D p1n, Distance2D p2n, Distance2D p1m, Distance2D p2m) // Created By Kim
-//    {
-//        return mDL2DLib.IS_OldLineIntersect2D(p1n.X, p1n.Y, p2n.X, p2n.Y, p1m.X, p1m.Y, p2m.X, p2m.Y);
-//    }
-
-//    public static Distance2D OLDLineIntersect2D(double dblStartFirstPointX, double dblStartFirstPointY, double dblEndFirstPointX, double dblEndFirstPointY, double dblStartSecondPointX, double dblStartSecondPointY, double dblEndSecondPointX, double dblEndSecondPointY, ref double dblx = 0, ref double dbly = 0) // Created By Kim
-//    {
-//        // Can handle better LineIntersect
-//        double b1, b2, a1, a2, xi, yi, x1hi, x1lo, y1hi, y1lo, ax, bx, ay, by, cx, cy, d, f, e;
-
-//        ax = dblEndFirstPointX - dblStartFirstPointX;
-//        bx = dblStartSecondPointX - dblEndSecondPointX;
-
-//        if (ax < 0)
-//        {
-//            x1lo = dblEndFirstPointX; x1hi = dblStartFirstPointX;
-//        }
-//        else
-//        {
-//            x1hi = dblEndFirstPointX; x1lo = dblStartFirstPointX;
-//        }
-//        if (bx > 0)
-//        {
-//            if (x1hi < dblEndSecondPointX | dblStartSecondPointX == x1lo)
-//                return default(Distance2D);
-//        }
-//        else if (x1hi < dblStartSecondPointX | dblEndSecondPointX < x1lo)
-//            return default(Distance2D);
-
-//        ay = dblEndFirstPointY - dblStartFirstPointY;
-//        by = dblStartSecondPointY - dblEndSecondPointY;
-//        if (ay < 0)
-//        {
-//            y1lo = dblEndFirstPointY; y1hi = dblStartFirstPointY;
-//        }
-//        else
-//        {
-//            y1hi = dblEndFirstPointY; y1lo = dblStartFirstPointY;
-//        }
-
-//        if (by > 0)
-//        {
-//            if (y1hi < dblEndSecondPointY | dblStartSecondPointY < y1lo)
-//                return default(Distance2D);
-//        }
-//        else if (y1hi < dblStartSecondPointY | dblEndSecondPointY < y1lo)
-//            return default(Distance2D);
-
-//        cx = dblStartFirstPointX - dblStartSecondPointX;
-//        cy = dblStartFirstPointY - dblStartSecondPointY;
-
-//        d = by * cx - bx * cy;
-//        f = ay * bx - ax * by;
-
-//        if (f > 0)
-//        {
-//            if ((d < 0 | d > f))
-//                return default(Distance2D);
-//        }
-//        else if ((d > 0 | d < f))
-//            return default(Distance2D);
-
-//        e = ax * cy - ay * cx;
-//        if (f > 0)
-//        {
-//            if ((e < 0 | e > f))
-//                return default(Distance2D);
-//        }
-//        else if ((e > 0 | e < f))
-//            return default(Distance2D);
-//        if (f == 0)
-//            return default(Distance2D);
-
-//        // Calculate Where it intersect
-//        if (!(dblStartFirstPointX - dblEndFirstPointX) == 0)
-//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - dblEndFirstPointX);
-//        else
-//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - (dblEndFirstPointX + 0.000001));
-//        if (!(dblStartSecondPointX - dblEndSecondPointX) == 0)
-//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - dblEndSecondPointX);
-//        else
-//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - (dblEndSecondPointX + 0.000001));
-
-//        a1 = dblStartFirstPointY - (b1 * dblStartFirstPointX);
-//        a2 = dblStartSecondPointY - (b2 * dblStartSecondPointX);
-//        xi = (-(a1 - a2)) / (b1 - b2);
-//        yi = a1 + b1 * xi;
-
-//        double q1, q2, q3, q4;
-
-//        q1 = (dblStartFirstPointX - xi) * (xi - dblEndFirstPointX);
-//        q2 = (dblStartSecondPointX - xi) * (xi - dblEndSecondPointX);
-//        q3 = (dblStartFirstPointY - yi) * (yi - dblEndFirstPointY);
-//        q4 = (dblStartSecondPointY - yi) * (yi - dblEndSecondPointY);
-
-//        q1 = Math.Round(q1, 3);
-//        q2 = Math.Round(q2, 3);
-//        q3 = Math.Round(q3, 3);
-//        q4 = Math.Round(q4, 3);
-
-//        if (q1 >= 0 & q2 >= 0 & q3 >= 0 & q4 >= 0)
-//        {
-//            dblx = xi;
-//            dbly = yi;
-//            return new Distance2D(dblx, dbly);
-//        }
-//        else
-//            return default(Distance2D);
-
-//        return default(Distance2D);
-//    }
-
-//    public static bool IS_OldLineIntersect2D(double dblStartFirstPointX, double dblStartFirstPointY, double dblEndFirstPointX, double dblEndFirstPointY, double dblStartSecondPointX, double dblStartSecondPointY, double dblEndSecondPointX, double dblEndSecondPointY, ref double dblx = 0, ref double dbly = 0) // Created By Kim
-//    {
-//        // Can handle better LineIntersect
-//        double b1, b2, a1, a2, xi, yi, x1hi, x1lo, y1hi, y1lo, ax, bx, ay, by, cx, cy, d, f, e;
-
-//        ax = dblEndFirstPointX - dblStartFirstPointX;
-//        bx = dblStartSecondPointX - dblEndSecondPointX;
-
-//        if (ax < 0)
-//        {
-//            x1lo = dblEndFirstPointX; x1hi = dblStartFirstPointX;
-//        }
-//        else
-//        {
-//            x1hi = dblEndFirstPointX; x1lo = dblStartFirstPointX;
-//        }
-//        if (bx > 0)
-//        {
-//            if (x1hi < dblEndSecondPointX | dblStartSecondPointX == x1lo)
-//                return false;
-//        }
-//        else if (x1hi < dblStartSecondPointX | dblEndSecondPointX < x1lo)
-//            return false;
-
-//        ay = dblEndFirstPointY - dblStartFirstPointY;
-//        by = dblStartSecondPointY - dblEndSecondPointY;
-//        if (ay < 0)
-//        {
-//            y1lo = dblEndFirstPointY; y1hi = dblStartFirstPointY;
-//        }
-//        else
-//        {
-//            y1hi = dblEndFirstPointY; y1lo = dblStartFirstPointY;
-//        }
-
-//        if (by > 0)
-//        {
-//            if (y1hi < dblEndSecondPointY | dblStartSecondPointY < y1lo)
-//                return false;
-//        }
-//        else if (y1hi < dblStartSecondPointY | dblEndSecondPointY < y1lo)
-//            return false;
-
-//        cx = dblStartFirstPointX - dblStartSecondPointX;
-//        cy = dblStartFirstPointY - dblStartSecondPointY;
-
-//        d = by * cx - bx * cy;
-//        f = ay * bx - ax * by;
-
-//        if (f > 0)
-//        {
-//            if ((d < 0 | d > f))
-//                return false;
-//        }
-//        else if ((d > 0 | d < f))
-//            return false;
-
-//        e = ax * cy - ay * cx;
-//        if (f > 0)
-//        {
-//            if ((e < 0 | e > f))
-//                return false;
-//        }
-//        else if ((e > 0 | e < f))
-//            return false;
-//        if (f == 0)
-//            return false;
-
-//        // Calculate Where it intersect
-//        if (!(dblStartFirstPointX - dblEndFirstPointX) == 0)
-//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - dblEndFirstPointX);
-//        else
-//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - (dblEndFirstPointX + 0.000001));
-//        if (!(dblStartSecondPointX - dblEndSecondPointX) == 0)
-//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - dblEndSecondPointX);
-//        else
-//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - (dblEndSecondPointX + 0.000001));
-
-//        a1 = dblStartFirstPointY - (b1 * dblStartFirstPointX);
-//        a2 = dblStartSecondPointY - (b2 * dblStartSecondPointX);
-//        xi = (-(a1 - a2)) / (b1 - b2);
-//        yi = a1 + b1 * xi;
-
-//        double q1, q2, q3, q4;
-
-//        q1 = (dblStartFirstPointX - xi) * (xi - dblEndFirstPointX);
-//        q2 = (dblStartSecondPointX - xi) * (xi - dblEndSecondPointX);
-//        q3 = (dblStartFirstPointY - yi) * (yi - dblEndFirstPointY);
-//        q4 = (dblStartSecondPointY - yi) * (yi - dblEndSecondPointY);
-
-//        q1 = Math.Round(q1, 3);
-//        q2 = Math.Round(q2, 3);
-//        q3 = Math.Round(q3, 3);
-//        q4 = Math.Round(q4, 3);
-
-//        if (q1 >= 0 & q2 >= 0 & q3 >= 0 & q4 >= 0)
-//        {
-//            dblx = xi;
-//            dbly = yi;
-//            return true;
-//        }
-//        else
-//            return false;
-//        // --------End Slow but very very good
-
-//        return false;
-//    }
-
-
-//    // Use this when need to know if point is near boundary versus being a specified distance inside.
-//    public enum InOut
-//    {
-//        Inside = 0,
-//        Outside = 1,
-//        Border = 2
-//    }
-
-//    // Span has A and B sides, which may differ in whether they are Inside or Outside the other polygon.
-//    // MUST match InOutContinue values, for In/Out/BorderSame/BorderOpposite.
-//    public enum InOutPair
-//    {
-//        Inside = 0,
-//        Outside = 1,
-//        BorderSameSide = 2  // Interiors of both shapes are on same side of span.
-//,
-//        BorderOpposite = 3  // Interiors of shapes are on opposite sides of span.
-//,
-//        AInBOut = 4    // A Inside, B Outside
-//,
-//        AOutBIn = 5    // A Outside, B Inside
-//,
-//        Border_TooClose = 6     // Border; Can't resolve interiors. TBD whether finer tolerance would fix, or cause other problems.
-//    }
-
-//    // Can pass in either InOutPair or InOutContinue.
-//    public static bool SpanTypeIsBorder(InOutPair eInOutPair)
-//    {
-//        return (eInOutPair == InOutPair.BorderSameSide) || (eInOutPair == InOutPair.BorderOpposite) || (eInOutPair == InOutPair.Border_TooClose);
-//    }
-
-//    // Like InOutPair, but add possibility of "Continue"
-//    // MUST match InOutPair values, for In/Out/BorderSame/BorderOpposite.
-//    public enum InOutContinue
-//    {
-//        Inside = 0,
-//        Outside = 1,
-//        BorderSameSide = 2  // Interiors of both shapes are on same side of span.
-//,
-//        BorderOpposite = 3  // Interiors of shapes are on opposite sides of span.
-//,
-//        AInBOut = 4    // A Inside, B Outside
-//,
-//        AOutBIn = 5    // A Outside, B Inside
-//,
-//        Border_TooClose = 6     // Border; Can't resolve interiors. TBD whether finer tolerance would fix, or cause other problems.
-//,
-//        Continue,
-//        Conflict
-//    }
-
-//    public static string Nick(object ob, int nChars)
-//    {
-//        string str = ob.ToString();
-//        if (str.Length <= nChars)
-//            return str;
-//        return str.Remove(nChars);
-//    }
-
-//    // 6-letter Nickname (aka abbreviation).
-//    public static string Nick(InOut eInOut)
-//    {
-//        return Nick(eInOut, 6);
-//    }
-
-//    // 1-letter Nickname.
-//    public static char Nick1(InOut eInOut)
-//    {
-//        return eInOut.ToString()[0];
-//    }
-
-//    // 4-letter Nickname (aka abbreviation).
-//    public static string Nick(InOutPair eInOut)
-//    {
-//        switch (eInOut)
-//        {
-//            case InOutPair.AInBOut:
-//                {
-//                    return "AiBo";
-//                }
-
-//            case InOutPair.AOutBIn:
-//                {
-//                    return "AoBi";
-//                }
-
-//            default:
-//                {
-//                    return mDL2DLib.Nick(eInOut, 4);
-//                }
-//        }
-//    }
-
-
-
-//    public class EdgeSegmentIndexs
-//    {
-//        // Indexs into containing polygon's point list.
-//        public readonly int Index1, Index2;
-//        public EdgeSegmentIndexs(int index1, int index2)
-//        {
-//            this.Index1 = index1;
-//            this.Index2 = index2;
-//        }
-
-
-//        public override string ToString()
-//        {
-//            return string.Format("EdgeSegment({0}, {1})", Index1, Index2);
-//        }
-
-
-//        public override bool Equals(object obj)
-//        {
-//            EdgeSegmentIndexs b = obj as EdgeSegmentIndexs;
-//            if (b == null)
-//                return false;
-
-//            return ((Index1 == b.Index1) && (Index2 == b.Index2)) || ((Index1 == b.Index2) && (Index2 == b.Index1));
-//        }
-
-//        public override int GetHashCode()
-//        {
-//            // Use consistent ordering, because Equals is true if same, but in different order!
-//            if (Index1 <= Index2)
-//                return MakeHash(Index1, Index2);
-//            else
-//                return MakeHash(Index2, Index1);
-//        }
-//    }
-
-
-//    public class EdgeSegmentPoints
-//    {
-//        // CAUTION: For scan-crossing, P2.Y is excluded from segment (does not quite reach P2.Y).
-//        public readonly Distance2D P1, P2;
-//        public EdgeSegmentPoints(Distance2D p1, Distance2D p2)
-//        {
-//            this.P1 = p1;
-//            this.P2 = p2;
-//        }
-
-
-//        public override string ToString()
-//        {
-//            return string.Format("{0} {1} {2}", this.GetType().Name, this.P1, this.P2);
-//        }
-
-
-//        // CAUTION: For scan-crossing, P2.Y is excluded from segment (does not quite reach P2.Y). That is not accounted for here.
-//        public double MinY()
-//        {
-//            return Math.Min(this.P1.Y, this.P2.Y);
-//        }
-
-//        // CAUTION: For scan-crossing, P2.Y is excluded from segment (does not quite reach P2.Y). That is not accounted for here.
-//        public double MaxY()
-//        {
-//            return Math.Max(this.P1.Y, this.P2.Y);
-//        }
-
-
-//        // NaN if does not intersect.
-//        public double XAtY(double y)
-//        {
-//            double ix = P1.X;
-//            double jx = P2.X;
-//            double iy = P1.Y;
-//            double jy = P2.Y;
-//            // NOTE: Excludes P2.Y (jy).
-//            if ((iy <= y && y < jy) || (jy < y && y <= iy))
-//            {
-//                // This segment spans the target y.
-
-//                // x on segment, at this y.
-//                double totalDy = jy - iy;
-//                double dy = y - iy;
-//                double totalDx = jx - ix;
-//                double calcDx = dy * (totalDx / totalDy);
-//                double calcX = ix + calcDx;
-//                return calcX;
-//            }
-
-//            return double.NaN;
-//        }
-//    }
-
-
-//    public class IntersectsAtY
-//    {
-//        public readonly double Y;
-//        public readonly List<double> Xs = new List<double>();
-//        public IntersectsAtY(double y)
-//        {
-//            this.Y = y;
-//        }
-
-
-//        public override string ToString()
-//        {
-//            string xsStr = string.Join(", ", (from x in this.Xs
-//                                              select (Round4or6(x).ToString())).ToArray());
-//            return string.Format("{0} @Y={1} Xs=({2})", this.GetType().Name, this.Y, xsStr);
-//        }
-
-
-//        // REQUIRE Xs.Count > 0.
-//        public double FirstX()
-//        {
-//            return Xs[0];
-//        }
-
-//        // REQUIRE Xs.Count > 0.
-//        public double LastX()
-//        {
-//            return LastElement(Xs);
-//        }
-
-
-//        public void AddX(double x)
-//        {
-//            Xs.Add(x);
-//        }
-
-//        public void SortXs()
-//        {
-//            this.Xs.Sort();
-//        }
-//    }
-
-//    // A scan area bounded by left/right line segments.
-//    public class ScanQuadrilateral
-//    {
-//        public readonly double MinY, MaxY;
-//        public readonly double X1AtMinY, X2AtMinY, X1AtMaxY, X2AtMaxY;
-
-//        public ScanQuadrilateral(double x1AtMinY, double x2AtMinY, double minY, double x1AtMaxY, double x2AtMaxY, double maxY)
-//        {
-//            this.X1AtMinY = x1AtMinY;
-//            this.X2AtMinY = x2AtMinY;
-//            this.MinY = minY;
-//            this.X1AtMaxY = x1AtMaxY;
-//            this.X2AtMaxY = x2AtMaxY;
-//            this.MaxY = maxY;
-//        }
-
-
-//        public override string ToString()
-//        {
-//            return string.Format("{0} {7}x{8}={9}  ({1}..{2}@Y={3}) .. ({4}..{5}@Y={6})", this.GetType().Name, Round2(X1AtMinY), Round2(X2AtMinY), Round2(MinY), Round2(X1AtMaxY), Round2(X2AtMaxY), Round2(MaxY), Round2(AverageDx()), Round2(Dy()), Round2(Area()));
-//        }
-
-
-//        public double Area()
-//        {
-//            return AverageDx() * Dy();
-//        }
-
-//        public double AverageDx()
-//        {
-//            double dxAtMinY = X2AtMinY - X1AtMinY;
-//            double dxAtMaxY = X2AtMaxY - X1AtMaxY;
-//            return Average(dxAtMinY, dxAtMaxY);
-//        }
-
-//        public double Dy()
-//        {
-//            return MaxY - MinY;
-//        }
-
-//        public Distance2D RandomLocation(Random rand = null)
-//        {
-//            if (rand == null)
-//                rand = Random1;
-//            double xWgt = rand.NextDouble();
-//            double yWgt = rand.NextDouble();
-//            double xAtY0 = Lerp(X1AtMinY, X2AtMinY, xWgt);
-//            double xAtY1 = Lerp(X1AtMaxY, X2AtMaxY, xWgt);
-//            Distance2D pt = new Distance2D(Lerp(xAtY0, xAtY1, yWgt), Lerp(MinY, MaxY, yWgt));
-//            return pt;
-//        }
-//    }
-
-
-//    public class ScanBin
-//    {
-//        // Return created bins; Out binStepY (y-extent of bin, or y-distance between bins).
-//        public static ScanBin[] CreateBins(Distance2D minV, Distance2D maxV, int count, out double binStepY)
-//        {
-//            double deltaY = maxV.Y - minV.Y;
-//            binStepY = deltaY / count;
-
-//            ScanBin[] bins = new ScanBin[count - 1 + 1];
-//            for (int i = 0; i <= count - 1; i++)
-//                bins[i] = new ScanBin();
-
-//            return bins;
-//        }
-
-//        public static ScanBin PickBin(ScanBin[] bins, double y, double minBinY, double binStepY)
-//        {
-//            if (double.IsNaN(y) || double.IsInfinity(y) || y == double.MaxValue)
-//                return null; // No valid answer.
-
-//            int count = bins.Length;
-//            int iBin = RawBinIndex(y, minBinY, binStepY);
-//            if ((iBin < 0) || (iBin >= count))
-//                return null; // Outside of range of bins.
-
-//            return bins[iBin];
-//        }
-
-//        // Return highBinIndex; set lowBinIndex. If highBinIndex < 0, there are no bins within range.
-//        public static int BinIndexRange(ScanBin[] bins, double y1, double y2, double minBinY, double stepY, out int lowBinIndex)
-//        {
-//            int maxIndex = bins.Length - 1;
-//            int iBinLow = RawBinIndex(y1, minBinY, stepY);
-//            int iBinHigh = RawBinIndex(y2, minBinY, stepY);
-//            if (iBinHigh < iBinLow)
-//                Swap(iBinLow, iBinHigh);
-
-//            if (iBinLow < 0)
-//                iBinLow = 0;
-//            if (iBinHigh > maxIndex)
-//                iBinHigh = maxIndex;
-
-//            if (iBinHigh < iBinLow)
-//            {
-//                lowBinIndex = -1;
-//                return -1;
-//            }
-
-//            lowBinIndex = iBinLow;
-//            return iBinHigh;
-//        }
-
-//        // May return value that is not a valid index.
-//        public static int RawBinIndex(double y, double minBinY, double binStepY)
-//        {
-//            return FloorInt((y - minBinY) / binStepY);
-//        }
-
-//        public List<EdgeSegmentIndexs> Segments;
-
-//        public ScanBin()
-//        {
-//            Segments = new List<EdgeSegmentIndexs>();
-//        }
-
-//        public void Dispose()
-//        {
-//            Segments.Clear();
-//            Segments = null;
-//        }
-
-//        public void Add(EdgeSegmentIndexs seg)
-//        {
-//            Segments.Add(seg);
-//        }
-//    }
-
-
-//    private const int Max1NScanBins = 64;
-//    private const int Max2NScanBins = 512;
-//    private const double MaxSmallTolerance = OneThousandth;
-
-
-//    // Private ReadOnly t_history As New List(Of String)
-
-//    // For efficient Point_InOut, when processing many points versus one polygon.
-//    // Divides EdgeSegments of polygon into bins, by y.
-//    // For each point check, only need to examine the segments in the bin containing point.y.
-//    public class ScanBinnedPolygon
-//    {
-//        public readonly Distance2D minV_tol, maxV_tol;   // Min/Max (including tolerance) in x & y.
-//        public readonly double Tolerance;
-//        // binStepY is y-distance between bins (or y-extent of a bin).
-//        private readonly double toleranceSquared, binStepY;
-//        // Sometimes we use a large tolerance, for detecting points w/i "tolerance" of poly edge.
-//        // "border" means "within tolerance" of border, so when tolerance is large,
-//        // this includes points outside of actual border (but within that tolerance),
-//        // and also points INSIDE actual border (but within that tolerance of border).
-//        // There are places where we should NOT use that tolerance, when large.
-//        private readonly double smallToleranceSquared;
-//        public double test_minDanger = double.MaxValue;
-//        private readonly int ID;
-
-//        public readonly int TrueLength;  // If duplicate point at end, exclude it.
-//        // Don't rely on vertices.Count/LastIndex/LastElement (may be excluding final point).
-//        // Don't assume this is a single sequence of points - when AddHole, those vertices are added at end.
-//        // TBD: Would be easier to add hole if this were a List.
-//        public IList<Distance2D> Vertices;
-//        // TBD: Can we rely on this being closed?
-//        public IList<Distance2D> OriginalVertices;
-
-//        // Optional: Caller can set this, so can retrieve later.
-//        // (Type is "Object", because here we don't have access to "cTGFWorldPolygon".)
-//        public object OriginalPolygon;
-
-//        public ScanBin[] scanBins;
-
-//        public ScanBinnedPolygon(IList<Distance2D> vertices, double tolerance, int id = 0)
-//        {
-//            this.OriginalVertices = vertices;
-//            this.Vertices = new List<Distance2D>(vertices);
-//            bool didCopy = true;
-
-//            this.Tolerance = tolerance;
-//            this.toleranceSquared = tolerance * tolerance;
-//            double smallTolerance = ClampMax(tolerance, MaxSmallTolerance);
-//            this.smallToleranceSquared = smallTolerance * smallTolerance;
-//            this.ID = id;
-//            // t_history.Add(String.Format("ID={0} ({1})", Me.ID, Me.vertices.Count))
-//            // If (t_history.Count Mod 5000) = 0 Then
-//            // t_history.Sort()
-//            // End If
-
-//            // If duplicate point at end, exclude it.
-//            // "While" in case there are multiple near-identical points.
-//            int nRemoved = 0;
-//            while (this.Vertices.Count > 1 && FirstElement(this.Vertices).X.NearlyEquals_ScaledTolerance(LastElement(this.Vertices).X, ScaledToleranceDouble) && FirstElement(this.Vertices).Y.NearlyEquals_ScaledTolerance(LastElement(this.Vertices).Y, ScaledToleranceDouble))
-//            {
-//                // Remove the last element (which is near-duplicate of first element).
-//                if (nRemoved == 0)
-//                {
-//                    // First removal.
-//                    if (!didCopy)
-//                        this.Vertices = new List<Distance2D>(vertices);
-//                }
-//                this.Vertices.RemoveAt(LastIndex(this.Vertices));
-//                nRemoved += 1;
-//            }
-//            TrueLength = this.Vertices.Count;
-//            if (nRemoved > 1)
-//                Test();
-
-//            minV_tol = Distance2D.MaxValue;
-//            maxV_tol = Distance2D.MinValue;
-//            for (int i = 0; i <= TrueLength - 1; i++)
-//                AccumMinMax(vertices[i], ref minV_tol, ref maxV_tol);
-//            // Include tolerance in x & y.
-//            minV_tol.X -= tolerance; minV_tol.Y -= tolerance;
-//            maxV_tol.X += tolerance; maxV_tol.Y += tolerance;
-
-//            int nBins1 = Math.Min(System.Convert.ToInt32(Math.Ceiling(maxV_tol.Y - MinBinY)), Max1NScanBins);
-//            int nBins2 = Math.Min(System.Convert.ToInt32(Math.Ceiling(2 * Math.Sqrt(vertices.Count))), Max2NScanBins);
-//            int nScanBins = Math.Max(nBins1, nBins2);
-//            if (nScanBins < 4)
-//                nScanBins = 4;
-//            scanBins = ScanBin.CreateBins(minV_tol, maxV_tol, nScanBins, out binStepY);
-
-//            // Place each edgeSegment in all bins that it overlaps (or is within tolerance of).
-//            for (int i = 0; i <= TrueLength - 1; i++)
-//            {
-//                // Segment starting at last point wraps back to [0].
-//                int j = (i + 1) % TrueLength;
-//                CreateEdgeSegmentAndAddToBins(i, j);
-//            }
-//        }
-
-//        private void CreateEdgeSegmentAndAddToBins(int i, int j)
-//        {
-//            Distance2D pointI = Vertices[i];
-//            Distance2D pointJ = Vertices[j];
-//            // 
-//            if (pointJ.Y < pointI.Y)
-//                // Swap, so pointI has lower y.
-//                Swap(pointI, pointJ);
-
-//            double safeMinY = pointI.Y - Tolerance;
-//            double safeMaxY = pointJ.Y + Tolerance;
-
-//            int lowBinIndex;
-//            int highBinIndex = ScanBin.BinIndexRange(scanBins, safeMinY, safeMaxY, MinBinY, binStepY, out lowBinIndex);
-//            if (highBinIndex < 0)
-//                return;
-
-//            EdgeSegmentIndexs seg = new EdgeSegmentIndexs(i, j);
-//            for (int iBin = lowBinIndex; iBin <= highBinIndex; iBin++)
-//                scanBins[iBin].Add(seg);
-//        }
-
-//        // ASSUME hole is closed, and does not extend outside the originally provided vertices.
-//        public void AddHole(Distance2D[] holeVertices)
-//        {
-//            // If duplicate point at end, exclude it.
-//            int holeVertTrueLen;
-//            if (holeVertices[0].X == LastElement(holeVertices).X & holeVertices[0].Y == LastElement(holeVertices).Y)
-//                holeVertTrueLen = holeVertices.Length - 1;
-//            else
-//                holeVertTrueLen = holeVertices.Length;
-
-//            List<Distance2D> allVerts = new List<Distance2D>(this.Vertices);
-//            int oldLen = this.Vertices.Count;
-//            int newLen = oldLen + holeVertTrueLen;
-//            allVerts.AddRange(holeVertices);
-//            if (allVerts.Count > newLen)
-//                allVerts.RemoveAt(LastIndex(allVerts));
-//            // BEFORE "CreateEdgeSegmentAndAddToBins".
-//            this.Vertices = allVerts.ToArray();
-
-//            // Place each edgeSegment in all bins that it overlaps (or is within tolerance of).
-//            for (int ri = 0; ri <= holeVertTrueLen - 1; ri++)
-//            {
-//                int rj = (ri + 1) % holeVertTrueLen;
-//                // "oldLen + ": hole verts were appended after poly verts.
-//                int i = oldLen + ri;
-//                int j = oldLen + rj;
-//                CreateEdgeSegmentAndAddToBins(i, j);
-//            }
-//            // Edge segment that closes the hole.
-//            // "oldLen + ": hole verts were appended after poly verts.
-//            CreateEdgeSegmentAndAddToBins(oldLen + holeVertTrueLen - 1, oldLen + 0);
-//        }
-
-//        public void Dispose()
-//        {
-//            for (int i = 0; i <= LastIndex(scanBins); i++)
-//            {
-//                scanBins[i].Dispose();
-//                scanBins[i] = null;
-//            }
-//            scanBins = null;
-//        }
-
-
-//        public override string ToString()
-//        {
-//            return string.Format("ScanBinnedPolygon ID={0}, {1} points", this.ID, this.Vertices.Count);
-//        }
-
-
-//        // lower bound
-//        public Distance2D MinV2IncludingTolerance
-//        {
-//            get
-//            {
-//                return minV_tol;
-//            }
-//        }
-//        // upper bound
-//        public Distance2D MaxV2IncludingTolerance
-//        {
-//            get
-//            {
-//                return maxV_tol;
-//            }
-//        }
-
-//        public Rectangle2D MinMaxIncludingTolerance
-//        {
-//            get
-//            {
-//                return Rectangle2D.FromMinMax(minV_tol, maxV_tol);
-//            }
-//        }
-
-
-//        private double MinBinY
-//        {
-//            get
-//            {
-//                return this.minV_tol.Y;
-//            }
-//        }
-//        private int MaxValidBinIndex
-//        {
-//            get
-//            {
-//                return LastIndex(scanBins);
-//            }
-//        }
-
-//        public bool Point_SafelyInside(Distance2D point)
-//        {
-//            // Dim oInOut As InOut = Point_InOut(point)
-//            // If oInOut = InOut.Border Then
-//            // If (t_polId <> t_prev_polId) OrElse (t_polId2 <> t_prev_polId2) Then
-//            // Dim dubious = 0
-//            // t_prev_polId = t_polId : t_prev_polId2 = t_polId2
-//            // End If
-//            // End If
-//            return (Point_InOut(point) == InOut.Inside);
-//        }
-
-//        // Use this when need to know if point is near boundary of polygon
-//        // (segments between vertices) versus being a specified distance inside.
-//        public InOut Point_InOut(Distance2D point)
-//        {
-//            float segIndexAndFrac;
-//            double minGap, minDistanceSq, proposeX;
-//            return Point_InOut_Work(point, false, false, out segIndexAndFrac, out minDistanceSq, out minGap, out proposeX);
-//        }
-
-//        // tmstest
-//        public InOut Point_InOut_Fake(Distance2D point)
-//        {
-//            double x = point.X;
-//            double y = point.Y;
-
-//            if ((x < minV_tol.X) || (x > maxV_tol.X) || (y < MinBinY) || (y > maxV_tol.Y))
-//                // test_nQuick += 1
-//                return InOut.Outside;
-
-//            if (Random1.NextDouble() < 0.1)
-//                return InOut.Inside;
-//            else
-//                return InOut.Outside;
-//        }
-
-//        // ' NO - segIndexAndFrac only valid when InOut.Border.
-//        // Public Function Point_InOut(point As Distance2D, <Out()> ByRef closestPt As Distance2D) As InOut
-//        // Dim minGap, proposeX As Double, segIndexAndFrac As Single
-//        // Dim result As InOut = Point_InOut(point, False, segIndexAndFrac, minGap, proposeX)
-
-//        // closestPt = Me.SegIFAsPoint(segIndexAndFrac)
-//        // Return result
-//        // End Function
-
-//        public InOut Point_InOut(Distance2D point, out float segIndexAndFrac)
-//        {
-//            // NOTE: accurateNearBorder=True. Slower, but more accurate "nearest" point.
-//            double minGap, minDistanceSq, proposeX;
-//            return Point_InOut_Work(point, false, true, out segIndexAndFrac, out minDistanceSq, out minGap, out proposeX);
-//        }
-
-//        public InOut Point_InOut(Distance2D point, bool extraCheck, out double minGap, out double proposeX)
-//        {
-//            float segIndexAndFrac;
-//            double minDistanceSq;
-//            return Point_InOut_Work(point, extraCheck, false, out segIndexAndFrac, out minDistanceSq, out minGap, out proposeX);
-//        }
-
-//        public List<EdgeSegmentIndexs> AllEdgeSegments()
-//        {
-//            return EdgeSegmentsInBinRange(0, LastIndex(scanBins));
-//        }
-
-//        public List<EdgeSegmentIndexs> EdgeSegmentsInRange(Distance2D p1, Distance2D p2)
-//        {
-//            double minX = Math.Min(p1.X, p2.X);
-//            double minY = Math.Min(p1.Y, p2.Y);
-//            double maxX = Math.Max(p1.X, p2.X);
-//            double maxY = Math.Max(p1.Y, p2.Y);
-
-//            if ((maxX < minV_tol.X) || (minX > maxV_tol.X) || (maxY < MinBinY) || (minY > maxV_tol.Y))
-//                return new List<EdgeSegmentIndexs>(); // out of bounds => None.
-
-//            if (minY < MinBinY)
-//                minY = MinBinY;
-//            int minBinI = ScanBin.RawBinIndex(minY, MinBinY, binStepY);
-
-//            if (maxY > maxV_tol.Y)
-//                maxY = maxV_tol.Y;
-//            int maxBinI = ScanBin.RawBinIndex(maxY, MinBinY, binStepY);
-//            if (maxBinI > LastIndex(scanBins))
-//                maxBinI = LastIndex(scanBins);
-
-//            return EdgeSegmentsInBinRange(minBinI, maxBinI);
-//        }
-
-//        private List<EdgeSegmentIndexs> EdgeSegmentsInBinRange(int minBinI, int maxBinI)
-//        {
-//            // HashSet: Segment may be in multiple bins; only want once.
-//            HashSet<EdgeSegmentIndexs> segments = new HashSet<EdgeSegmentIndexs>();
-
-//            for (int binIndex = minBinI; binIndex <= maxBinI; binIndex++)
-//            {
-//                ScanBin bin = scanBins[binIndex];
-//                foreach (EdgeSegmentIndexs segment in bin.Segments)
-//                    segments.Add(segment);
-//            }
-
-//            return segments.ToList();
-//        }
-
-
-//        public bool SegmentIntersects(Distance2D p1, Distance2D p2)
-//        {
-//            return SegmentIntersection(p1, p2).HasValue;
-//        }
-
-//        public Distance2D? SegmentIntersection(Distance2D p1, Distance2D p2)
-//        {
-//            Distance2D minP = p1.Min(p2);
-//            Distance2D maxP = p1.Max(p2);
-
-//            List<EdgeSegmentIndexs> segs = EdgeSegmentsInRange(p1, p2);
-//            foreach (EdgeSegmentIndexs seg in segs)
-//            {
-//                Distance2D ps1 = this.Vertices[seg.Index1];
-//                Distance2D ps2 = this.Vertices[seg.Index2];
-//                if (mDL2DLib.MinMaxIntersect(minP, maxP, ps1.Min(ps2), ps1.Max(ps2)))
-//                {
-//                    Distance2D? isectPt = LinesIntersection2D(p1, p2, ps1, ps2);
-//                    if (isectPt.HasValue)
-//                        return isectPt;
-//                }
-//            }
-
-//            return default(Distance2D?);
-//        }
-
-//        public EdgeSegmentPoints AsPoints(EdgeSegmentIndexs segment)
-//        {
-//            return new EdgeSegmentPoints(Vertices[segment.Index1], Vertices[segment.Index2]);
-//        }
-
-//        public List<ScanQuadrilateral> AsQuads(out double minY, out double maxY, out double areaSum)
-//        {
-//            minY = double.MaxValue;
-//            maxY = double.MinValue;
-
-//            List<EdgeSegmentPoints> segmentPs = (from segment in AllEdgeSegments()
-//                                                 select AsPoints(segment)).ToList();
-//            // Sort by MinY.
-//            segmentPs.Sort((a, b) =>
-//            {
-//                return a.MinY().CompareTo(b.MinY());
-//            });
-
-//            // TBD: Since we have sorted segmentPs, we could get minY from first segmentP.
-//            foreach (EdgeSegmentPoints segment in segmentPs)
-//            {
-//                AccumMinMax(segment.P1.Y, ref minY, ref maxY);
-//                AccumMinMax(segment.P2.Y, ref minY, ref maxY);
-//            }
-
-//            List<IntersectsAtY> isectss = new List<IntersectsAtY>();
-//            double minY1 = minY;
-//            List<EdgeSegmentPoints> activeSegments = new List<EdgeSegmentPoints>();
-//            foreach (EdgeSegmentPoints segment in segmentPs)
-//            {
-//                double newMinY = segment.MinY();
-//                if (newMinY > minY1)
-//                {
-//                    if (activeSegments.Count == 0)
-//                        Dubious();
-//                    minY1 = ProcessSegments(activeSegments, isectss, minY1, newMinY);
-//                }
-//                else
-//                {
-//                }
-//                activeSegments.Add(segment);
-//            }
-
-//            // Build quads from intersections on scans.
-//            List<ScanQuadrilateral> quads = new List<ScanQuadrilateral>();
-//            areaSum = 0;
-//            IntersectsAtY atY1 = null;
-//            foreach (IntersectsAtY atY2 in isectss)
-//            {
-//                if (Exists(atY1))
-//                {
-//                    // ASSUME already sorted xs.
-//                    // NOTE: LastX may equal FirstX. Result is a triangle.
-//                    int ixLim = Math.Min(atY1.Xs.Count, atY2.Xs.Count);
-//                    // TODO: If odd number, haven't kept info to know which goes with which.
-//                    // Therefore, correct solution is to build a list of edges.
-//                    // Alternatively, find intersections a hair away from the key ys,
-//                    // so know where they were going/coming from.
-//                    for (int ix = 0; ix <= ixLim - 1; ix += 2)
-//                    {
-//                        // "If..": if both ends have same X, skip the quad.
-//                        if ((ix < LastIndex(atY1.Xs)) || (ix < LastIndex(atY2.Xs)))
-//                        {
-//                            double x1AtY1 = atY1.Xs[ix];
-//                            double x2AtY1 = atY1.Xs[ClampMax(ix + 1, LastIndex(atY1.Xs))];
-//                            double x1AtY2 = atY2.Xs[ix];
-//                            double x2AtY2 = atY2.Xs[ClampMax(ix + 1, LastIndex(atY2.Xs))];
-//                            ScanQuadrilateral quad = new ScanQuadrilateral(x1AtY1, x2AtY1, atY1.Y, x1AtY2, x2AtY2, atY2.Y);
-//                            quads.Add(quad);
-//                            areaSum += quad.Area();   // tmstest
-//                        }
-//                        else
-//                            Test();
-//                    }
-//                }
-//                // Prep Next
-//                atY1 = atY2;
-//            }
-
-//            return quads;
-//        }
-
-//        // We've moved past minY, so see if any quads can be output.
-//        // SIDE-EFFECT: Adds elements to "quads"
-//        private double ProcessSegments(IList<EdgeSegmentPoints> activeSegments, List<IntersectsAtY> isectss, double minY, double newMinY)
-//        {
-//            List<EdgeSegmentPoints> toRemove = new List<EdgeSegmentPoints>();
-//            while (minY < newMinY)
-//            {
-//                toRemove.Clear();
-//                // Find segments that intersect minY; x per segment.
-//                IntersectsAtY atY = new IntersectsAtY(minY);
-//                double nextY = double.MaxValue;
-//                foreach (EdgeSegmentPoints segment in activeSegments)
-//                {
-//                    // Find intersection at minY.
-//                    double x = segment.XAtY(minY);
-//                    if (!double.IsNaN(x))
-//                        atY.AddX(x);
-//                    else
-//                        // Does not overlap. Ready to remove?
-//                        if (segment.MaxY() < minY)
-//                        toRemove.Add(segment);
-//                    else
-//                        // Happens if P2.Y = minY.  Maybe also happens if P1.Y = minY.
-//                        // To be safe, leave segment active, until we are definitely past.
-//                        Test();
-//                    // Look for next smallest y.
-//                    double minY0 = segment.MinY();
-//                    if (minY0 > minY)
-//                        AccumMin(minY0, ref nextY);
-//                    double maxY0 = segment.MaxY();
-//                    if (maxY0 > minY)
-//                        AccumMin(maxY0, ref nextY);
-//                }
-//                // Found intersections?
-//                if (atY.Xs.Count > 0)
-//                {
-//                    atY.SortXs();
-//                    isectss.Add(atY);
-//                }
-//                else
-//                    Dubious();
-//                // Next minY.
-//                minY = nextY;
-//                // Remove any that no longer overlap.
-//                if (toRemove.Count > 0)
-//                {
-//                    foreach (EdgeSegmentPoints segment in toRemove)
-//                        activeSegments.Remove(segment);
-//                }
-//                if (minY < newMinY)
-//                    // Does this ever happen?  Or is newMinY always the next y?
-//                    Test();
-//            }
-
-//            return newMinY;
-//        }
-
-//        // Use this when need to know if point is near boundary of polygon
-//        // (segments between vertices) versus being a specified distance inside.
-//        // segIndexAndFrac only valid when InOut.Border.
-//        // minGap and proposeX only valid when extraCheck=True.
-//        private InOut Point_InOut_Work(Distance2D point, bool extraCheck, bool accurateNearBorder, out float segIndexAndFrac, out double minDistanceSq, out double minGap, out double proposeX)
-//        {
-//            double x = point.X;
-//            double y = point.Y;
-//            segIndexAndFrac = -1;    // Undefined
-//            minDistanceSq = double.MaxValue;
-//            minGap = double.MaxValue; proposeX = double.NaN;   // Undefined
-
-//            if ((x < minV_tol.X) || (x > maxV_tol.X) || (y < MinBinY) || (y > maxV_tol.Y))
-//                // test_nQuick += 1
-//                return InOut.Outside;
-
-//            double borderToleranceSquared = accurateNearBorder ? smallToleranceSquared : toleranceSquared;
-//            bool foundNearBorder = false;
-//            // Only valid near border.
-//            float closestSegIF = -1;
-//            Distance2D closestPt = Distance2D.NaN();
-
-//            // test_nSlow += 1
-//            // The only relevant edges are in bin.
-//            ScanBin bin = ScanBin.PickBin(scanBins, y, MinBinY, binStepY);
-//            if (bin == null)
-//                return InOut.Outside; // Should not happen, since we did bounds check above.
-
-//            bool odd = false;
-//            List<double> crossingXs = null;
-//            if (extraCheck)
-//                crossingXs = new List<double>();
-//            foreach (EdgeSegmentIndexs seg in bin.Segments)
-//            {
-//                // test_nEdgeChecks += 1
-//                Distance2D p1 = this.Vertices[seg.Index1];
-//                Distance2D p2 = this.Vertices[seg.Index2];
-
-//                // NearBoundary check.
-//                double ix = p1.X;
-//                double jx = p2.X;
-
-//                // point may be near this span.
-//                double safeMinX;
-//                double safeMaxX;
-//                if (ix <= jx)
-//                {
-//                    safeMinX = ix - Tolerance;
-//                    safeMaxX = jx + Tolerance;
-//                }
-//                else
-//                {
-//                    safeMinX = jx - Tolerance;
-//                    safeMaxX = ix + Tolerance;
-//                }
-//                if ((safeMinX <= x) && (x <= safeMaxX))
-//                {
-//                    // point may be near this span.
-//                    double t;
-//                    double distanceSq = PointDistanceSquaredToLine2D(point, p1, p2, ref t);
-//                    if (distanceSq <= toleranceSquared)
-//                    {
-//                        // --- is "InOut.Border" ---
-//                        // We could "Return" here, if we know caller doesn't care about segIndexAndFrac.
-
-//                        // TBD: Is this still needed by any caller?
-//                        // If within small-tolerance of an endpoint, return THAT. Sometimes avoids returning value slightly into next segment.
-//                        // TBD: Now that "toleranceSquared <> smallToleranceSquared",
-//                        // Should we instead test whether t Is near Then 0 Or 1?
-//                        if (DistanceSquared2D(point, p1) < smallToleranceSquared)
-//                            t = 0;
-//                        else if (DistanceSquared2D(point, p2) < smallToleranceSquared)
-//                            t = 1;
-
-//                        // NOTE: This might not be the CLOSEST point - it is any point within tolerance.
-//                        float segIndexAndFrac1;
-//                        if (seg.Index2 == 0 || seg.Index2 == seg.Index1 + 1)
-//                            segIndexAndFrac1 = System.Convert.ToSingle(seg.Index1 + t);
-//                        else
-//                            segIndexAndFrac1 = System.Convert.ToSingle(Lerp(seg.Index1, seg.Index2, t));
-
-//                        if (!accurateNearBorder)
-//                        {
-//                            // We can return any "close enough" point.
-//                            segIndexAndFrac = segIndexAndFrac1;
-//                            return InOut.Border;
-//                        }
-//                        else
-//                        {
-//                            foundNearBorder = true;
-//                            if (distanceSq < minDistanceSq)
-//                            {
-//                                // This is closest so far.
-//                                minDistanceSq = distanceSq;
-//                                segIndexAndFrac = segIndexAndFrac1;
-//                            }
-//                            // Continue to test remaining segments.
-//                            continue;
-//                        }
-//                    }
-//                    if (distanceSq < test_minDanger)
-//                        test_minDanger = distanceSq;
-//                }
-
-
-//                // --- Current segment not near border ---
-
-//                if (foundNearBorder)
-//                    // Current segment is away from border, so we can ignore it (because we already have a better candidate).
-//                    continue;
-
-
-//                // odd/even counting to determine whether inside.
-//                double iy = p1.Y;
-//                double jy = p2.Y;
-//                // TBD: Shouldn't this be consistent w.r.t. jy?  Always exclude "=" with jy, to exclude P2.Y?
-//                if ((iy < y & jy >= y) | (jy < y & iy >= y))
-//                {
-//                    // This segment spans the target y.
-
-//                    if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                        odd = !odd;
-
-//                    if (extraCheck)
-//                    {
-//                        // x on segment, at this y.
-//                        double totalDy = jy - iy;
-//                        double dy = y - iy;
-//                        double totalDx = jx - ix;
-//                        double calcDx = dy * (totalDx / totalDy);
-//                        double calcX = ix + calcDx;
-//                        crossingXs.Add(calcX);
-//                    }
-//                }
-//            }
-
-//            if (extraCheck)
-//            {
-//                crossingXs.Sort();
-//                // Find smallest gap.
-//                // TODO: Is there ever zero gap, due to endpoint appearing twice? (Shouldn't be, if segment test done correctly)
-//                minGap = double.MaxValue;
-//                double priorX = double.MinValue;
-//                proposeX = double.MinValue;
-//                foreach (double crossingX in crossingXs)
-//                {
-//                    double gap = crossingX - priorX;
-//                    if (gap < minGap)
-//                    {
-//                        minGap = gap;
-//                        proposeX = Average(priorX, crossingX);
-//                    }
-//                    // Next
-//                    priorX = crossingX;
-//                }
-//            }
-
-//            if (foundNearBorder)
-//                return InOut.Border;
-//            else
-//                return odd ? InOut.Inside : InOut.Outside;
-//        }
-
-//        public Distance2D SegIFAsPoint(float segIndexAndFrac)
-//        {
-//            float segFrac;
-//            int segIndex = SplitIntegerAndFraction(segIndexAndFrac, ref segFrac);
-
-//            Distance2D pt0 = this.Vertices[IndexWrap(segIndex)];
-//            Distance2D pt1 = this.Vertices[NextIndexWrap(segIndex)];
-//            return Lerp(pt0, pt1, segFrac);
-//        }
-
-//        // REQUIRE: index >= 0.
-//        public int IndexWrap(int index)
-//        {
-//            return (index % this.TrueLength);
-//        }
-//        public int NextIndexWrap(int index)
-//        {
-//            return ((index + 1) % this.TrueLength);
-//        }
-//        public int PriorIndexWrap(int index)
-//        {
-//            // "+ length" to avoid negative value.
-//            return ((index - 1 + TrueLength) % this.TrueLength);
-//        }
-
-//        // Find closest other stuff to given pt on polygon (described as segIndexAndFrac).
-//        // That is, exclude the segments(s) involved in this pt.
-//        public double MinDistanceToSelf(float givenSegIndexAndFrac, ref float closestSegIndexAndFrac)
-//        {
-//            float givenSegFrac;
-//            int givenSegIndex = SplitIntegerAndFraction(givenSegIndexAndFrac, ref givenSegFrac);
-//            int skipIndexA = givenSegIndex;
-//            int skipIndexB = NextIndexWrap(givenSegIndex);
-//            int skipIndexZ;
-//            skipIndexZ = PriorIndexWrap(skipIndexA); // Skip prior segment also
-
-//            // If givenSegFrac <= 0.1 Then
-//            // skipIndexZ = PriorIndexWrap(skipIndexA) ' Skip prior segment also
-//            // ElseIf givenSegFrac >= 0.9 Then
-//            // skipIndexZ = NextIndexWrap(skipIndexB)  ' Skip next segment also
-//            // Else
-//            // skipIndexZ = -1 ' (Will never match.)
-//            // End If
-
-//            Distance2D givenPt = SegIFAsPoint(givenSegIndexAndFrac);
-
-//            // Pick bin containing y, and the bins immediately above and below.
-//            // NOTE: In rare circumstances, this may omit the closest segment -- but only when closest distance > MinBinY.
-//            // Even if y is out of range, force at least one bin to be selected.
-//            int iBin = ScanBin.RawBinIndex(givenPt.Y, MinBinY, binStepY);
-//            int minBinI = Clamp(iBin - 1, 0, MaxValidBinIndex);
-//            int maxBinI = Clamp(iBin + 1, 0, MaxValidBinIndex);
-//            List<EdgeSegmentIndexs> segments = EdgeSegmentsInBinRange(minBinI, maxBinI);
-
-//            // Find closest segment.
-//            double minDistanceSq = double.MaxValue;
-//            EdgeSegmentIndexs segmentAtMin = null;
-//            double tAtMin;
-//            foreach (EdgeSegmentIndexs segment in segments)
-//            {
-//                int segIndex = segment.Index1;
-//                var doSkip = (segIndex == skipIndexA) || (segIndex == skipIndexB) || (segIndex == skipIndexZ);
-//                if (!doSkip)
-//                {
-//                    double t;
-//                    double distSq = PointDistanceSquaredToLine2D(givenPt, Vertices[segIndex], Vertices[segment.Index2], ref t);
-//                    if (distSq < minDistanceSq)
-//                    {
-//                        minDistanceSq = distSq;
-//                        segmentAtMin = segment;
-//                        tAtMin = t;
-//                    }
-//                }
-//            }
-
-//            closestSegIndexAndFrac = System.Convert.ToSingle(segmentAtMin.Index1 + tAtMin);
-//            return Math.Sqrt(minDistanceSq);
-//        }
-
-//        // Slow.
-//        public double DistanceToBorder(Distance2D pt, out InOut eInOut, out Distance2D closestPt)
-//        {
-//            // Slow.
-//            float segIndexAndFrac;
-//            double minDistance = DistanceToBorder(pt, ref eInOut, ref segIndexAndFrac);
-
-//            if (segIndexAndFrac < 0)
-//                closestPt = new Distance2D(0, 0);
-//            else
-//                closestPt = this.SegIFAsPoint(segIndexAndFrac);
-//            // 
-//            return minDistance;
-//        }
-
-//        // Slow (could speed up by checking only segments w/i 1 bin of pt). (When above/below all bins, would need to find closest non-empty bin.)
-//        public double DistanceToBorder(Distance2D pt, out InOut eInOut, out float segIndexAndFrac)
-//        {
-//            eInOut = Point_InOut(pt);
-
-//            // Find shortest distance to a polygon segment.
-//            // ASSUME polygon's last point = first point.
-//            double minDistSq = double.MaxValue;
-//            int iAtMinDist;
-//            float tAtMinDist;
-//            Distance2D prevSegPt;
-//            for (int i = 0; i <= LastIndex(Vertices); i++)
-//            {
-//                Distance2D segPt = Vertices[i];
-//                if (i > 0)
-//                {
-//                    // If i = 329 Then
-//                    // Test()
-//                    // End If
-//                    double t;
-//                    double distSq = PointDistanceSquaredToLine2D(pt, prevSegPt, segPt, ref t);
-//                    if (distSq < minDistSq)
-//                    {
-//                        minDistSq = distSq;
-//                        iAtMinDist = i;
-//                        tAtMinDist = System.Convert.ToSingle(t);
-//                    }
-//                }
-
-//                prevSegPt = segPt;
-//            }
-
-//            segIndexAndFrac = (iAtMinDist - 1) + tAtMinDist;
-
-//            return Math.Sqrt(minDistSq);
-//        }
-//    }
-
-
-//    // REQUIRE: Start point NOT duplicated at end of sequence.
-//    public static Distance2D IFAsPoint(float indexAndFrac, IList<Distance2D> sequence)
-//    {
-//        float seqFrac;
-//        int seqI = SplitIntegerAndFraction(indexAndFrac, ref seqFrac);
-
-//        int nWrap = sequence.Count;
-//        Distance2D pt0 = sequence[WrappedIndex(seqI, nWrap)];
-//        Distance2D pt1 = sequence[WrappedIndex(seqI + 1, nWrap)];
-//        return Lerp(pt0, pt1, seqFrac);
-//    }
-
-
-//    // Return Integer portion; Out resultFraction.
-//    public static int SplitIntegerAndFraction(float integerAndFraction, out float resultFraction)
-//    {
-//        int resultInteger = FloorInt(integerAndFraction);
-
-//        resultFraction = integerAndFraction - resultInteger;
-//        return resultInteger;
-//    }
-//    // Return Integer portion; Out resultFraction.
-//    public static int SplitIntegerAndFraction(double integerAndFraction, out double resultFraction)
-//    {
-//        int resultInteger = FloorInt(integerAndFraction);
-
-//        resultFraction = integerAndFraction - resultInteger;
-//        return resultInteger;
-//    }
-
-//    // Public t_polId, t_polId2 As Integer
-//    // Private t_prev_polId, t_prev_polId2 As Integer
-
-//    public static PointF PointF_Zero()
-//    {
-//        return new PointF(0, 0);
-//    }
-
-//    public static PointF PointF_MinValue()
-//    {
-//        return new PointF(float.MinValue, float.MinValue);
-//    }
-
-//    public static PointF PointF_MaxValue()
-//    {
-//        return new PointF(float.MaxValue, float.MaxValue);
-//    }
-
-//    // Before first call, caller must initialize minV to Integer.MaxValue, and maxV to Integer.MinValue.
-//    public static void AccumMinMax(int v, ref int minV, ref int maxV)
-//    {
-//        if (v < minV)
-//            minV = v;
-//        if (v > maxV)
-//            maxV = v;
-//    }
-//    // Before first call, caller must initialize minV to Single.MaxValue, and maxV to Single.MinValue.
-//    public static void AccumMinMax(float v, ref float minV, ref float maxV)
-//    {
-//        if (v < minV)
-//            minV = v;
-//        if (v > maxV)
-//            maxV = v;
-//    }
-//    // Before first call, caller must initialize minV to Double.MaxValue, and maxV to Double.MinValue.
-//    public static void AccumMinMax(double v, ref double minV, ref double maxV)
-//    {
-//        if (v < minV)
-//            minV = v;
-//        if (v > maxV)
-//            maxV = v;
-//    }
-//    // Before first call, caller must initialize minV to Double.MaxValue, and maxV to Double.MinValue.
-//    public static void AccumMinMax(double v, int index, ref double minV, ref double maxV, ref int minI, ref int maxI)
-//    {
-//        if (v < minV)
-//        {
-//            minV = v; minI = index;
-//        }
-//        if (v > maxV)
-//        {
-//            maxV = v; maxI = index;
-//        }
-//    }
-
-
-
-//    // Before first call, caller must initialize:
-//    // sum to zero, count to zero.
-//    // minV to Double.MaxValue, and maxV to Double.MinValue.
-//    public static void AccumSumMinMax(double v, ref double sum, ref double count, ref double minV, ref double maxV)
-//    {
-//        sum += v;
-//        count += 1;
-//        if (v < minV)
-//            minV = v;
-//        if (v > maxV)
-//            maxV = v;
-//    }
-
-
-//    // Private test_nQuick, test_nSlow, test_nEdgeChecks As Integer
-
-//    // Use this when need to know if point is near boundary versus being a specified distance inside.
-//    // Slow - use only if don't know polygon bounding rectangle.
-//    public static InOut Point_InOut_Polygon2D(Distance2D[] polygon, Distance2D point, double tolerance)
-//    {
-//        // NOTE: "Min/MaxValue / 2" in case it is unsafe to do tolerance math near to Min/MaxValues.
-//        return Point_InOut_Polygon2D(polygon, point, tolerance, new Distance2D(double.MinValue / 2, double.MinValue / 2), new Distance2D(double.MaxValue / 2, double.MaxValue / 2));
-//    }
-
-//    // Use this when need to know if point is near boundary versus being a specified distance inside.
-//    // See Class ScanBinnedPolygon for faster approach if testing many points against a polygon.
-//    public static InOut Point_InOut_Polygon2D(Distance2D[] polygon, Distance2D point, double tolerance, Distance2D minV, Distance2D maxV)
-//    {
-//        if (polygon == null)
-//            return InOut.Outside;
-
-//        double x = point.X;
-//        double y = point.Y;
-//        if ((x < minV.X - tolerance) || (x > maxV.X + tolerance) || (y < minV.Y - tolerance) || (y > maxV.Y + tolerance))
-//            // test_nQuick += 1
-//            return InOut.Outside;
-
-//        // test_nSlow += 1
-//        double toleranceSquared = tolerance * tolerance;
-
-//        int length;
-//        if (polygon[0].X == LastElement(polygon).X & polygon[0].Y == LastElement(polygon).Y)
-//            length = polygon.Length - 1;
-//        else
-//            length = polygon.Length;
-
-//        bool odd = false;
-//        for (int i = 0; i <= length - 1; i++)
-//        {
-//            int j = (i + 1) % length;
-//            Distance2D pointI = polygon[i];
-//            Distance2D pointJ = polygon[j];
-//            double iy = pointI.Y;
-//            double jy = pointJ.Y;
-
-//            double safeMinY;
-//            double safeMaxY;
-//            if (iy <= jy)
-//            {
-//                safeMinY = iy - tolerance;
-//                safeMaxY = jy + tolerance;
-//            }
-//            else
-//            {
-//                safeMinY = jy - tolerance;
-//                safeMaxY = iy + tolerance;
-//            }
-
-//            if ((safeMinY <= y) && (y <= safeMaxY))
-//            {
-//                double ix = pointI.X;
-//                double jx = pointJ.X;
-
-//                // point may be near this span.
-//                double safeMinX;
-//                double safeMaxX;
-//                if (ix <= jx)
-//                {
-//                    safeMinX = ix - tolerance;
-//                    safeMaxX = jx + tolerance;
-//                }
-//                else
-//                {
-//                    safeMinX = jx - tolerance;
-//                    safeMaxX = ix + tolerance;
-//                }
-//                if ((safeMinX <= x) && (x <= safeMaxX))
-//                {
-//                    // point may be near this span.
-//                    if (PointDistanceSquaredToLine2D(point, pointI, pointJ) <= toleranceSquared)
-//                        return InOut.Border;
-//                }
-
-//                // odd/even counting to determine whether inside.
-//                if ((iy < y & jy >= y) | (jy < y & iy >= y))
-//                {
-//                    if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                        odd = !odd;
-//                }
-//            }
-//        }
-
-//        return odd ? InOut.Inside : InOut.Outside;
-//    }
-
-
-//    // p versus line (a, b).
-//    // Returns -1, 0, or 1.
-//    // "0" if on line, or if line has length zero.
-//    // Formula is Z-component of cross-product.
-//    // http://stackoverflow.com/questions/1560492/how-to-tell-whether-a-point-is-to-the-right-or-left-of-a-line/1560510#1560510
-//    public static int PointWhichSideOfLine_A(Distance2D p, Distance2D a, Distance2D b)
-//    {
-//        Distance2D rb = b - a;
-//        Distance2D rp = p - a;
-//        return Math.Sign((rb.X * rp.Y) - (rb.Y * rp.X));
-//    }
-
-//    // Returns -2, -1, 0, or 1. "0" if falls on line, "-1" if point's Y is less than line's Y for that X.
-//    // "-2" if line has length zero, so cannot define the result.
-//    // If line is near vertical, roles of X and Y are reversed.
-//    public static int PointWhichSideOfLine(Distance2D point, Distance2D lineP1, Distance2D lineP2)
-//    {
-//        Distance2D deltaP2 = lineP2 - lineP1;
-//        Distance2D deltaP = point - lineP1;
-//        if (Math.Abs(deltaP2.Y) > Math.Abs(deltaP2.X))
-//        {
-//            // Near vertical; swap roles of X and Y.
-//            deltaP2 = new Distance2D(deltaP2.Y, deltaP2.X);
-//            deltaP = new Distance2D(deltaP.Y, deltaP.X);
-//        }
-
-//        if (deltaP2.X == 0)
-//            return -2; // Undefined
-
-//        double lineDeltaYAtX = deltaP.X * (deltaP2.Y / deltaP2.X);
-//        if (deltaP.Y > lineDeltaYAtX)
-//            return 1;
-//        if (deltaP.Y == lineDeltaYAtX)
-//            return 0;
-//        // <
-//        return -1;
-//    }
-
-//    public static void Prep_WhichSideOfLine(Distance2D lineP1, Distance2D lineP2, out bool swapXY, out double slope)
-//    {
-//        Distance2D deltaP2 = lineP2 - lineP1;
-
-//        swapXY = Math.Abs(deltaP2.Y) > Math.Abs(deltaP2.X);
-//        if (swapXY)
-//            // Near vertical; swap roles of X and Y.
-//            deltaP2 = new Distance2D(deltaP2.Y, deltaP2.X);
-
-//        if (deltaP2.X == 0)
-//            slope = double.NaN;  // Undefined
-//        else
-//            slope = deltaP2.Y / deltaP2.X;
-//    }
-
-//    // The line is described by "lineP1, swapXY, slope".
-//    public static int PointWhichSideOfLine_UsePrep(Distance2D point, Distance2D lineP1, bool swapXY, double slope)
-//    {
-//        if (slope == double.NaN)
-//            return -2; // Undefined
-
-//        Distance2D deltaP = point - lineP1;
-//        if (swapXY)
-//            // Near vertical; swap roles of X and Y.
-//            deltaP = new Distance2D(deltaP.Y, deltaP.X);
-
-//        double lineDeltaYAtX = deltaP.X * slope;
-//        if (deltaP.Y > lineDeltaYAtX)
-//            return 1;
-//        if (deltaP.Y == lineDeltaYAtX)
-//            return 0;
-//        // <
-//        return -1;
-//    }
-
-//    public static double XAtY(double goalY, Distance2D lineP1, Distance2D lineP2, bool allowExtend)
-//    {
-//        // Swap roles of X and Y.
-//        return YAtX(goalY, lineP1.SwapXY(), lineP2.SwapXY(), allowExtend);
-//    }
-
-//    // Find y at goalX on line (lineP1, lineP2).
-//    // "allowExtend": If allowed to go beyond ends of line.
-//    // If no solution, returns Double.NaN.
-//    public static double YAtX(double goalX, Distance2D lineP1, Distance2D lineP2, bool allowExtend)
-//    {
-//        double x1 = lineP1.X;
-//        double x2 = lineP2.X;
-//        double y1 = lineP1.Y;
-//        double y2 = lineP2.Y;
-
-//        double lineDx = x2 - x1;
-//        double lineDy = y2 - y1;
-//        bool xWithinLine = BetweenInclusive_WithTolerance(goalX, x1, x2, Math.Abs(lineDx * VerySmall));
-//        if (!xWithinLine)
-//        {
-//            // If near an endpoint, return endpoint.
-//            // When line is very short, return closest endpoint.
-//            double error1 = Math.Abs(x1 - goalX);
-//            double error2 = Math.Abs(x2 - goalX);
-//            if (error1 <= error2)
-//            {
-//                // p1 is closer.
-//                if (error1.NearlyEquals(0))
-//                    return y1;
-//            }
-//            else
-//                // p2 is closer.
-//                if (error2.NearlyEquals(0))
-//                return y2;
-//            if (!allowExtend)
-//                return double.NaN;
-//            // Check for vertical line, which would make it impossible.
-//            // TBD: If working with tiny numbers, need tolerance "lineDx * VerySmall".
-//            // BUT if do that, may need additional logic to ensure don't get numeric overflow trying to reach the goal.
-//            if (lineDx.NearlyEquals(0))
-//                return double.NaN;
-//        }
-
-//        double goalDx = goalX - x1;
-
-//        // Traditional formula based on slope (dy/dx).
-//        return y1 + (lineDy / lineDx) * goalDx;
-//    }
-
-
-//    // True if ANY of "pts" is inside "polygon".
-//    // PERFORMANCE: Recommend caller first check points against polygon's bounding rectangle.
-//    public static bool PointsInPolygon2D(Distance2D[] polygon, Distance2D[] pts)
-//    {
-//        foreach (Distance2D ptdPt in pts)
-//        {
-//            if (PointInPolygon2D(polygon, ptdPt))
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    // True if ANY of "pts" is inside "polygon".
-//    // PERFORMANCE: Recommend caller first check against polygon's bounding rectangle.
-//    public static bool PointsInPolygon2D(PointF[] polygon, PointF[] pts)
-//    {
-//        foreach (PointF ptfPt in pts)
-//        {
-//            if (PointInPolygon2D(polygon, ptfPt))
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-
-//    // PERFORMANCE: Recommend caller first check against polygon's bounding rectangle.
-//    // CAUTION: IF pass in "polygon as points", the 4 corners must be CLOCKWISE not ZIGZAG order.
-//    public static bool PointInPolygon2D(Distance2D[] polygon, Distance2D point)
-//    {
-//        if (polygon == null)
-//            return false;
-
-//        bool odd = false;
-//        int length;
-//        int i, j;
-//        double ix, iy, jx, jy, x, y;
-
-
-//        if (polygon[0].X == polygon[polygon.Length - 1].X & polygon[0].Y == polygon[polygon.Length - 1].Y)
-//            length = polygon.Length - 1;
-//        else
-//            length = polygon.Length;
-
-//        x = point.X;
-//        y = point.Y;
-//        for (i = 0; i <= length - 1; i++)
-//        {
-//            j = (i + 1) % length;
-//            ix = polygon[i].X;
-//            iy = polygon[i].Y;
-//            jx = polygon[j].X;
-//            jy = polygon[j].Y;
-//            // if y-within-span
-//            if ((iy < y && jy >= y) || (jy < y && iy >= y))
-//            {
-//                // if x-past-segment's-x-at-y
-//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                    // point is past segment.
-//                    odd = !odd;
-//            }
-//        }
-
-//        return odd;
-//    }
-
-//    // PERFORMANCE: Recommend caller first check against polygon's bounding rectangle.
-//    public static bool PointInPolygon2D(PointF[] polygon, PointF point)
-//    {
-//        if (polygon == null)
-//            return false;
-
-//        bool odd = false;
-//        int length;
-//        int i, j;
-//        double ix, iy, jx, jy, x, y;
-
-//        if (polygon[0].X == polygon[polygon.Length - 1].X & polygon[0].Y == polygon[polygon.Length - 1].Y)
-//            length = polygon.Length - 1;
-//        else
-//            length = polygon.Length;
-
-//        x = point.X;
-//        y = point.Y;
-
-//        for (i = 0; i <= length - 1; i++)
-//        {
-//            j = (i + 1) % length;
-//            ix = polygon[i].X;
-//            iy = polygon[i].Y;
-//            jx = polygon[j].X;
-//            jy = polygon[j].Y;
-//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
-//            {
-//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
-//                    odd = !odd;
-//            }
-//        }
-//        return odd;
-//    }
-
-//    public static bool CirclesIntersects2D(Distance2D ptdP1, Distance2D ptdP2, double dblR1, double dblR2)
-//    {
-//        double dblDI = CalcDistance2D(ptdP1, ptdP2);
-
-//        if (dblDI > dblR1 + dblR2)
-//            return false;
-
-//        return true;
-//    }
-
-//    public static Distance2D[] CirclesIntersectsAt2D(Distance2D ptdP1, Distance2D ptdP2, double dblR1, double dblR2)
-//    {
-//        double dblDI = CalcDistance2D(ptdP1, ptdP2);
-
-//        if (dblDI > dblR1 + dblR2)
-//            return null;
-//        if (dblDI < Math.Abs(dblR1 - dblR2))
-//            return null;
-
-//        Distance2D ptdDelta = new Distance2D(ptdP2.X - ptdP1.X, ptdP2.Y - ptdP1.Y);
-//        // dblDI = Math.Sqrt((ptdDelta.Y * ptdDelta.Y) + (ptdDelta.X * ptdDelta.X))
-//        double a = ((dblR1 * dblR1) - (dblR2 * dblR2) + (dblDI * dblDI)) / (2 * dblDI);
-//        Distance2D ptdP3 = new Distance2D(ptdP1.X + (ptdDelta.X * a / dblDI), ptdP1.Y + (ptdDelta.Y * a / dblDI));
-//        double h = Math.Sqrt((dblR1 * dblR1) - (a * a));
-//        Distance2D ptdR = new Distance2D(-ptdDelta.Y * (h / dblDI), ptdDelta.X * (h / dblDI));
-//        Distance2D[] ptdRet = new Distance2D[2];
-
-//        ptdRet[0].X = ptdP3.X + ptdR.X;
-//        ptdRet[0].Y = ptdP3.Y + ptdR.Y;
-//        ptdRet[1].X = ptdP3.X - ptdR.X;
-//        ptdRet[1].Y = ptdP3.Y - ptdR.Y;
-
-//        return ptdRet;
-//    }
-
-//    public static Distance2D[] Merge_Linear_Shapes(Distance2D[] ptdShape1, Distance2D[] ptdShape2)
-//    {
-//        // Assumes shaper are 3rd degree beziers
-//        Distance2D[] ptdRet = null;
-
-//        Distance2D[] ptdNewShape1 = null;
-//        int intIdxNewS1 = 0;
-//        Distance2D[] ptdNewShape2 = null;
-
-//        for (int intIdxS1 = 0; intIdxS1 <= ptdShape1.Length - 1; intIdxS1++)
-//        {
-//            Distance2D ptdS1P1;
-//            Distance2D ptdS1P2 = ptdShape1[intIdxS1];
-//            Distance2D[] ptdCrossPoints = null;
-
-//            if (intIdxS1 == 0)
-//                ptdS1P1 = ptdShape1[ptdShape1.Length - 1];
-//            else
-//                ptdS1P1 = ptdShape1[intIdxS1 - 1];
-
-//            for (int intIdxS2 = 0; intIdxS2 <= ptdShape2.Length - 1; intIdxS2++)
-//            {
-//                Distance2D ptdS2P1;
-//                Distance2D ptdS2P2 = ptdShape2[intIdxS2];
-
-//                if (intIdxS2 == 0)
-//                    ptdS2P1 = ptdShape1[ptdShape2.Length - 1];
-
-//                if (LinesIntersects2D(ptdS1P1, ptdS1P2, ptdS2P1, ptdS2P2))
-//                {
-//                    // Korsar
-//                    if (ptdCrossPoints == null)
-//                        ptdCrossPoints = new Distance2D[1];
-//                    else
-//                    {
-//                        var oldPtdCrossPoints = ptdCrossPoints;
-//                        ptdCrossPoints = new Distance2D[ptdCrossPoints.Length + 1];
-//                        if (oldPtdCrossPoints != null)
-//                            Array.Copy(oldPtdCrossPoints, ptdCrossPoints, Math.Min(ptdCrossPoints.Length + 1, oldPtdCrossPoints.Length));
-//                    }
-
-//                    ptdCrossPoints[ptdCrossPoints.Length - 1] = LinesIntersectsAt2D(ptdS1P1, ptdS1P2, ptdS2P1, ptdS2P2);
-//                }
-//            }
-
-//            int intBound = 0;
-
-//            if (ptdNewShape1 == null)
-//                intBound = 1;
-//            else
-//                intBound = ptdNewShape1.Length + 1;
-
-//            if (!ptdCrossPoints == null)
-//                intBound += ptdCrossPoints.Length;
-//            var oldPtdNewShape1 = ptdNewShape1;
-//            ptdNewShape1 = new Distance2D[intBound + 1];
-//            if (oldPtdNewShape1 != null)
-//                Array.Copy(oldPtdNewShape1, ptdNewShape1, Math.Min(intBound + 1, oldPtdNewShape1.Length));
-
-//            ptdNewShape1[intIdxNewS1] = ptdS1P1; intIdxNewS1 += 1;
-
-//            if (!ptdCrossPoints == null)
-//            {
-//                for (int intIdx = 0; intIdx <= ptdCrossPoints.Length - 1; intIdx++)
-//                {
-//                }
-//            }
-//        }
-
-//        return ptdRet;
-//    }
-
-
-
-//    public static Distance3D[] Calculate_Convex_Hull(ref Distance3D[] ptdVertices)
-//    {
-//        // The Convex Hull will be the current points (unless there are three co-linear points and OnBorder = False... we will ignore this case) 
-//        if (ptdVertices.Length <= 3)
-//            return (Distance3D[])ptdVertices.Clone();
-
-//        Distance3D[] ptdRet = null;
-//        int intIXNAStart = 0;
-//        bool bolOnBorder = false;
-//        // Find the starting index of the hull by finding the leftmost point in the polygon 
-
-//        for (int intIXNA = 1; intIXNA <= ptdVertices.Length - 1; intIXNA++)
-//        {
-//            if (ptdVertices[intIXNA].X < ptdVertices[intIXNAStart].X)
-//                // Point is Left Most 
-//                intIXNAStart = intIXNA;
-//            else if (ptdVertices[intIXNA].X == ptdVertices[intIXNAStart].X)
-//            {
-//                // Point is tied for left most, see if it's higher 
-//                if (ptdVertices[intIXNA].Y < ptdVertices[intIXNAStart].Y)
-//                    intIXNAStart = intIXNA;
-//            }
-//        }
-
-//        bool[] bolInHull = new bool[ptdVertices.Length - 1 + 1];
-
-//        // Sort until we get back to StartIndex 
-//        int intIXNALast = intIXNAStart;
-
-//        do
-//        {
-//            int intSelected = -1;
-//            for (int intIXNA = 0; intIXNA <= ptdVertices.Length - 1; intIXNA++)
-//            {
-//                if (!bolInHull[intIXNA] & intIXNA != intIXNALast)
-//                {
-//                    if (intSelected == -1)
-//                        // No point has been selected yet, select this one 
-//                        intSelected = intIXNA;
-//                    else
-//                    {
-//                        double dblCross = CrossProduct2D(ptdVertices[intIXNA], ptdVertices[intIXNALast], ptdVertices[intSelected]);
-//                        if (dblCross == 0.0)
-//                        {
-//                            // On the line 
-//                            if (bolOnBorder)
-//                            {
-//                                // Since we want the points on the border, take the one closer to LastIndex 
-//                                if (DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intIXNA], ptdVertices[intIXNA]) < DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intSelected], ptdVertices[intSelected]))
-//                                    intSelected = intIXNA;
-//                            }
-//                            else if (DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intIXNA], ptdVertices[intIXNA]) > DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intSelected], ptdVertices[intSelected]))
-//                                intSelected = intIXNA;
-//                        }
-//                        else if (dblCross < 0.0)
-//                            // ptdVertices(intIXNA) is more counter-clockwise 
-//                            intSelected = intIXNA;
-//                    }
-//                }
-//            }
-//            // Set LastIndex to the final Selected point 
-//            intIXNALast = intSelected;
-
-//            // Update the InHull array to know this point has been added to the hull 
-//            bolInHull[intIXNALast] = true;
-
-//            // Add the point 
-//            if (ptdRet == null)
-//                ptdRet = new Distance3D[1];
-//            else
-//            {
-//                var oldPtdRet = ptdRet;
-//                ptdRet = new Distance3D[ptdRet.Length + 1];
-//                if (oldPtdRet != null)
-//                    Array.Copy(oldPtdRet, ptdRet, Math.Min(ptdRet.Length + 1, oldPtdRet.Length));
-//            }
-
-//            ptdRet[ptdRet.Length - 1] = ptdVertices[intIXNALast];
-//        }
-//        while (intIXNALast != intIXNAStart); // Check if we're back to the starting point 
-
-//        return ptdRet;
-//    }
-
-//    public static double CrossProduct2D(Distance2D Origin, Distance2D A, Distance2D B)
-//    {
-//        return (A.X - Origin.X) * (B.Y - Origin.Y) - (B.X - Origin.X) * (A.Y - Origin.Y);
-//    }
-
-//    // NOTE: See mDL3DLib for "CrossProduct3D".
-//    public static double CrossProduct2D(Distance3D Origin, Distance3D A, Distance3D B)
-//    {
-//        return (A.X - Origin.X) * (B.Y - Origin.Y) - (B.X - Origin.X) * (A.Y - Origin.Y);
-//    }
-
-//    public static double DotProduct2D(Distance3D Origin, Distance3D A, Distance3D B)
-//    {
-//        return (A.X - Origin.X) * (B.X - Origin.X) + (A.Y - Origin.Y) * (B.Y - Origin.Y);
-//    }
-
-
-
-//    public static bool Is_Vertex_Inside_Triangle2D(Distance3D ptdPt, Distance3D ptdA, Distance3D ptdB, Distance3D ptdC)
-//    {
-//        Distance3D e0, e1, e2;
-//        double a1, a2, a3, b1, b2;
-//        double det;
-//        double c1, c2;
-
-//        e0.X = ptdPt.X - ptdA.X;
-//        e0.Y = ptdPt.Y - ptdA.Y;
-
-//        e1.X = ptdB.X - ptdA.X;
-//        e1.Y = ptdB.Y - ptdA.Y;
-
-//        e2.X = ptdC.X - ptdA.X;
-//        e2.Y = ptdC.Y - ptdA.Y;
-
-//        a1 = e1.X * e1.X + e1.Y * e1.Y;
-//        a2 = e1.X * e2.X + e1.Y * e2.Y;
-//        a3 = e2.X * e2.X + e2.Y * e2.Y;
-
-//        b1 = e0.X * e1.X + e0.Y * e1.Y;
-//        b2 = e0.X * e2.X + e0.Y * e2.Y;
-
-//        det = a1 * a3 - a2 * a2;
-
-//        c1 = (b1 * a3 - b2 * a2) / det;
-//        c2 = (b2 * a1 - b1 * a2) / det;
-
-//        return (c1 >= 0.0) && (c1 <= 1.0) && (c2 >= 0) && (c2 <= 1);
-//    }
-
-//    public static double Calculate_ZValue_Inside_Triangle(Distance3D ptdPt, Distance3D ptdA, Distance3D ptdB, Distance3D ptdC)
-//    {
-//        Distance3D v1, v2, n;
-//        double d, e;
-
-//        v1 = new Distance3D(ptdB.X - ptdA.X, ptdB.Y - ptdA.Y, ptdB.Z - ptdA.Z); // v1 = ptdB - ptdA
-//        v2 = new Distance3D(ptdC.X - ptdA.X, ptdC.Y - ptdA.Y, ptdC.Z - ptdA.Z); // v2 = ptdC - ptdA
-
-//        n.X = v1.Y * v2.Z - v1.Z * v2.Y;
-//        n.Y = v1.Z * v2.X - v1.X * v2.Z;
-//        n.Z = v1.X * v2.Y - v1.Y * v2.X;
-
-//        d = n.X * ptdA.X + n.Y * ptdA.Y + n.Z * ptdA.Z;
-
-//        ptdPt.Z = 0.0;
-//        e = n.X * ptdPt.X + n.Y * ptdPt.Y + n.Z * 0;
-
-//        ptdPt.Z = (d - e) / n.Z;
-
-//        return ptdPt.Z;
-//    }
-
-//    public static bool PointInsideTriangle2D(double dblPTX, double dblPTY, double dblPTZ, double dblAX, double dblAY, double dblAZ, double dblBX, double dblBY, double dblBZ, double dblCX, double dblCY, double dblCZ)
-//    {
-//        double dble0X, dble0Y, dble0Z;
-//        double dble1X, dble1Y, dble1Z;
-//        double dble2X, dble2Y, dble2Z;
-//        double a1, a2, a3, b1, b2;
-//        double det;
-//        double c1, c2;
-
-//        dble0X = dblPTX - dblAX;
-//        dble0Y = dblPTY - dblAY;
-//        dble0Z = dblPTZ - dblAZ;
-
-//        dble1X = dblBX - dblAX;
-//        dble1Y = dblBY - dblAY;
-//        dble1Z = dblBZ - dblAZ;
-
-//        dble2X = dblCX - dblAX;
-//        dble2Y = dblCY - dblAY;
-//        dble2Z = dblCZ - dblAZ;
-
-//        a1 = dble1X * dble1X + dble1Y * dble1Y + dble1Z * dble1Z;
-//        a2 = dble1X * dble2X + dble1Y * dble2Y + dble1Z * dble2Z;
-//        a3 = dble2X * dble2X + dble2Y * dble2Y + dble2Z * dble2Z;
-
-//        b1 = dble0X * dble1X + dble0Y * dble1Y + dble0Z * dble1Z;
-//        b2 = dble0X * dble2X + dble0Y * dble2Y + dble0Z * dble2Z;
-
-//        det = a1 * a3 - a2 * a2;
-
-//        c1 = (b1 * a3 - b2 * a2) / det;
-//        c2 = (b2 * a1 - b1 * a2) / det;
-
-//        return (c1 >= 0.0) && (c1 <= 1.0) && (c2 >= 0) && (c2 <= 1);
-//    }
-
-
-//    public static bool NewRectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Distance3D ptdOrigoVector)
-//    {
-//        Distance2D[] ptdRect1 = new Distance2D[4];
-//        Distance2D[] ptdRect2 = new Distance2D[4];
-
-//        // If ptdOrigoVector.X < 0 Then
-//        // rcdRect1.X -= rcdRect1.Width
-//        // rcdRect2.X -= rcdRect2.Width
-//        // Else
-
-//        // End If
-
-//        if (ptdOrigoVector.Y < 0)
-//        {
-//        }
-//        else
-//        {
-//            rcdRect1.Y -= rcdRect1.Height;
-//            rcdRect2.Y -= rcdRect2.Height;
-//        }
-
-//        // Debug.WriteLine("Rectangle X0 Y0 W" & rcdRect1.Width & " H" & rcdRect1.Height)
-//        // Debug.WriteLine("Point     X" & rcdRect2.X - rcdRect1.X & " Y" & rcdRect2.Y - rcdRect1.Y)
-
-//        // Only Works if rcdRect1 all positiv numbers
-//        ptdRect1[0].X = rcdRect1.X; ptdRect1[0].Y = rcdRect1.Y;
-//        ptdRect1[1].X = rcdRect1.X + rcdRect1.Width; ptdRect1[1].Y = rcdRect1.Y;
-//        ptdRect1[2].X = rcdRect1.X; ptdRect1[2].Y = rcdRect1.Y + rcdRect1.Height;
-//        ptdRect1[3].X = rcdRect1.X + rcdRect1.Width; ptdRect1[3].Y = rcdRect1.Y + rcdRect1.Height;
-
-//        ptdRect2[0].X = rcdRect2.X; ptdRect2[0].Y = rcdRect2.Y;
-//        ptdRect2[1].X = rcdRect2.X + rcdRect2.Width; ptdRect2[1].Y = rcdRect2.Y;
-//        ptdRect2[2].X = rcdRect2.X; ptdRect2[2].Y = rcdRect2.Y + rcdRect2.Height;
-//        ptdRect2[3].X = rcdRect2.X + rcdRect2.Width; ptdRect2[3].Y = rcdRect2.Y + rcdRect2.Height;
-
-//        for (int intIdx = 0; intIdx <= 3; intIdx++)
-//        {
-//            if (PointInsideRectangle2D_Strict(ptdRect1[intIdx], rcdRect2) || PointInsideRectangle2D_Strict(ptdRect2[intIdx], rcdRect1))
-//                return true;
-//        }
-
-//        return false;
-//    }
-
-//    public static Rectangle2D Calculate_Rectangle(Distance2D[] polygonAsPoints)
-//    {
-//        if (polygonAsPoints == null)
-//            return default(Rectangle2D);
-
-//        Distance2D maxPt;
-//        Distance2D minPt = Calculate_MinMax(polygonAsPoints, ref maxPt);
-
-//        return Rectangle2D.FromMinMax(minPt, maxPt);
-//    }
-
-//    public static Distance2D Calculate_CenterOfRotatableRectangle(Distance2D[] ptdPolygon)
-//    {
-//        Distance2D pointSum = new Distance2D(0, 0);
-//        int pointCount = 0;
-//        foreach (Distance2D point in ptdPolygon)
-//        {
-//            pointSum += point;
-//            pointCount += 1;
-//        }
-//        return (pointSum / (double)pointCount);
-//    }
-
-
-//    public static Distance2D[] Calculate_MinMax(Distance2D[] points)
-//    {
-//        Distance2D maxPt;
-//        Distance2D minPt = Calculate_MinMax(points, ref maxPt);
-
-//        if (maxPt.X < minPt.X)
-//            return null;
-
-//        Distance2D[] retPoints = new Distance2D[2];
-//        retPoints[0] = minPt;
-//        retPoints[1] = maxPt;
-//        return retPoints;
-//    }
-
-//    public static MinMaxSingle Calculate_MinMax(IList<Vector3> vecs)
-//    {
-//    }
-
-//    // Return minPt; (out) maxPt.
-//    // If zero points are input, then outgoing max's are less then min's.
-//    public static Distance2D Calculate_MinMax(Distance2D pt1, Distance2D pt2, out Distance2D maxPt)
-//    {
-//        Distance2D minPt = pt1;
-//        maxPt = pt1;
-
-//        if (pt2.X < minPt.X)
-//            minPt.X = pt2.X;
-//        if (pt2.Y < minPt.Y)
-//            minPt.Y = pt2.Y;
-
-//        if (pt2.X > maxPt.X)
-//            maxPt.X = pt2.X;
-//        if (pt2.Y > maxPt.Y)
-//            maxPt.Y = pt2.Y;
-
-//        return minPt;
-//    }
-
-//    // Return minPt; (out) maxPt.
-//    // If zero points are input, then outgoing max's are less then min's.
-//    public static Distance2D Calculate_MinMax(Distance2D[] points, out Distance2D maxPt)
-//    {
-//        Distance2D minPt = Distance2D.MaxValue;
-//        maxPt = Distance2D.MinValue;
-
-//        // "no data" indicated by (minPt > maxPt).
-//        if ((points == null) || (points.Length == 0))
-//            return minPt;
-
-//        for (int i = 0; i <= LastIndex(points); i++)
-//            mDL2DLib.AccumMinMax(points[i], ref minPt, ref maxPt);
-
-//        return minPt;
-//    }
-
-
-//    // Because WGS-84 unit is tiny, multiply tolerance by this.
-//    private static double Unit_Scaled(Distance2D[] pts)
-//    {
-//        Distance2D minPt = Distance2D.MaxValue;
-//        Distance2D maxPt = Distance2D.MinValue;
-//        for (int i = 0; i <= LastIndex(pts); i++)
-//            mDL2DLib.AccumMinMax(pts[i], ref minPt, ref maxPt);
-
-//        double shapeSize = CalcDistance2D(minPt, maxPt);
-//        // Don't have scale above 1 - only affect tolerance when coordinates are tiny.
-//        double unitScale = Math.Min(1.0, shapeSize);
-
-//        return unitScale;
-//    }
-
-//    // If fineDetail=True, then long sections retain more points.
-//    public static Distance2D[] Simplify_Polygon(Distance2D[] pts, bool fineDetail)
-//    {
-//        return Simplify_Polygon2(pts, fineDetail ? 2.0 : 5.0, fineDetail ? 0.015 : 0.02);
-//    }
-
-//    // "EPS" is a measure of angle (change in direction).
-//    // When "doSmooth", looks ahead for any future point within distance tolerance and EPS.
-//    // (To be precise, find smallest EPS within distance.)
-//    // That is, allowed to remove "bumps".
-//    public static Distance2D[] Simplify_Polygon2(Distance2D[] pts, double tolerance, double EPS = 0.02, bool doSmooth = false)
-//    {
-//        string strReport = "";
-
-//        List<int> outIs = new List<int>();
-
-//        double unitScale = Unit_Scaled(pts);
-
-//        // Dim threshold As Double = DegreesToRadians(0.05)
-//        double distSqThreshold = Math.Pow((unitScale * tolerance), 2);
-//        // This limits how large a bump we can eliminate.  Too small, and might miss a continuation, too large and performance suffers.
-//        double bumpSizeTolerance = 4 * tolerance;
-//        double bumpSizeSqThreshold = Math.Pow((unitScale * bumpSizeTolerance), 2);
-//        // TODO: Variable formula combining distance and EPS, such that larger distances would have smaller angle threshold (instead of abruptly deciding to keep the point at a given distance).
-
-
-//        // Method 3 Cross product
-//        // Dim minDiff As Double = Double.MaxValue, maxDiff As Double = Double.MinValue
-//        // Dim test_history As New List(Of Single)
-//        // Dim t_nChecks As Integer = 0, t_nBetterFar As Integer = 0
-
-//        // Always keep first two points, which establish initial angle.
-//        outIs.Add(0);
-//        outIs.Add(1);
-//        int iSkipUntil = 0;
-//        // Almost always will be stopped first by distance.
-//        int nLookAhead = LastIndex(pts) / 2;
-//        // 
-//        for (int inI = 2; inI <= LastIndex(pts); inI++)
-//        {
-//            if (inI < iSkipUntil)
-//                continue;
-//            // Dim crossProduct As Double = pts(inI-1).Cross(pts(inI), pts(inI + 1))
-//            int lastOutII = LastIndex(outIs);
-//            Distance2D p0 = pts[outIs[lastOutII - 1]];
-//            // aka previous outI
-//            int lastOutI = outIs[lastOutII];
-//            Distance2D p1 = pts[lastOutI];
-//            Distance2D p2 = pts[inI];
-//            double distSq = DistanceSquared2D(p1, p2);
-
-//            double dist01Sq = DistanceSquared2D(p0, p1);
-//            double absCross = CalcAbsCross(p0, p1, p2, dist01Sq);
-//            // If (absCross < minDiff) AndAlso (absCross > 0) Then _
-//            // minDiff = absCross
-//            // AccumMax(absCross, maxDiff)
-//            // test_history.Add(absCross)
-
-//            int prevInI = inI - 1;
-
-
-//            if (doSmooth)
-//            {
-//                // (absCross >= EPS) OrElse
-//                if (((distSq >= distSqThreshold)))
-//                {
-//                    // Exceeded thresholds (since last kept point).
-//                    // Find best point to keep before the threshold is exceeded. (Though sometimes have no choice but to take inI.)
-//                    // Take into account the angle AFTER each point, by finding the best NEXT point to go with each possible choice.
-//                    int bestInJ = CalcBestInJ(pts, lastOutI, inI, p0, p1, dist01Sq, absCross, nLookAhead, distSqThreshold, bumpSizeSqThreshold);
-//                    outIs.Add(bestInJ);
-//                }
-//            }
-//            else
-//                // ' --- TODO: Better (needs testing) ---
-//                // If (absCross >= EPS) OrElse (distSq >= distSqThreshold) Then
-//                // If lastOutI < prevInI Then
-//                // ' Keep PREVIOUS point (so within spec).
-//                // outIs.Add(prevInI)
-//                // Else
-//                // ' Previous is already kept; keep CURRENT point (best we can do).
-//                // outIs.Add(inI)
-//                // End If
-//                // Else
-//                // ' Don't need current point (unless next point is beyond spec; at that time will be "previous")
-//                // Test()
-//                // End If
-
-//                if ((absCross >= EPS))
-//            {
-//                // After a bend.
-//                // ALSO keep the point IN THE CORNER OF the bend (if not already kept).
-//                if ((lastOutI < prevInI) && (!doSmooth))
-//                    outIs.Add(prevInI);
-//                // After bend - keep inI
-//                // NOTE: If kept prevInI, Only need if "DistanceSquared2D(pts(prevInI), p2) >= distSqThreshold",
-//                // but not worth further testing to optimize that case.
-//                outIs.Add(inI);
-//            }
-//            else if (distSq >= distSqThreshold)
-//                // Exceeded distance.
-//                // TBD: Keep the BEST point up to inI.
-//                // TBD: Do we ever get here, given the logic above?
-//                outIs.Add(inI);
-//            else
-//                // Near last out point, and almost a straight line - discard inI.
-//                Test();
-//        }
-
-//        // Always keep final point.
-//        if (LastElement(outIs) != LastIndex(pts))
-//            outIs.Add(LastIndex(pts));
-
-//        // strReport &= "Min diff: " & minDiff.ToString(ValStr(minDiff)) & vbCrLf
-//        // Debug.WriteLine(strReport)
-
-
-
-//        strReport = "";
-
-//        List<Distance2D> outPts = new List<Distance2D>(outIs.Count);
-//        foreach (int outI in outIs)
-//            outPts.Add(pts[outI]);
-
-//        if (doSmooth)
-//        {
-//            // Spread bends into straight sections.
-//            // (Without this, when form Bezier's, there are "kinks" where angles are zero.)
-
-//            int nWrap = GetNWrap(outPts);
-//            // Angle per point, via wrapping. If DoesWrap, no angle for last point, as that is identical to first point.
-//            List<float> outAngles = new List<float>(nWrap);
-//            float sumAngleDegrees = 0;
-//            for (int iPt = 0; iPt <= nWrap - 1; iPt++)
-//            {
-//                Distance2D p0 = outPts[WrappedIndex(iPt - 1, nWrap)];
-//                Distance2D p1 = outPts[iPt];
-//                Distance2D p2 = outPts[WrappedIndex(iPt + 1, nWrap)];
-//                float angle = System.Convert.ToSingle(CalcBendDegrees(p0, p1, p2));
-//                outAngles.Add(angle);
-//                sumAngleDegrees += angle;
-//            }
-
-//            // "-1": Each distance uses two points.
-//            // outDistances(i) corresponds to outPts(i) and (i+1).
-//            List<float> outDistances = new List<float>(nWrap - 1);
-//            // "1": Each distance uses point before.
-//            for (int iPt = 1; iPt <= LastIndex(outPts); iPt++)
-//            {
-//                Distance2D pt0 = outPts[iPt - 1];
-//                Distance2D pt1 = outPts[iPt];
-//                outDistances.Add(System.Convert.ToSingle(CalcDistance2D(pt0, pt1)));
-//            }
-
-//            for (int iAngle = 0; iAngle <= nWrap - 1; iAngle++)
-//            {
-//                int iPt = iAngle;
-//                float a0 = outAngles[WrappedIndex(iAngle - 1, nWrap)];
-//                float a1 = outAngles[iAngle];
-//                float a2 = outAngles[WrappedIndex(iAngle + 1, nWrap)];
-//                float absA0 = Math.Abs(a0);
-
-//                float dist01 = outDistances[WrappedIndex(iAngle - 1, nWrap)];
-//                float dist12 = outDistances[iAngle];
-
-//                // Delta is positive when a1 is smaller.
-//                float da01 = Math.Abs(a0) - Math.Abs(a1);
-//                float da21 = Math.Abs(a2) - Math.Abs(a1);
-//                if (iAngle >= 112)
-//                    Test();
-//                if (da01 >= 1)
-//                    // a0 is significantly greater than a1.
-//                    // Spread bend from a0 to a1.
-//                    // But "limited" by bend at a2?
-//                    Test();
-//            }
-//        }
-
-//        strReport += "START Vertice count: " + pts.Length + Constants.vbCrLf;
-//        strReport += "END Vertice count: " + outPts.Count + Constants.vbCrLf;
-//        // Debug.WriteLine(strReport)
-
-//        return outPts.ToArray();
-//    }
-
-//    private static int CalcBestInJ(Distance2D[] pts, int lastOutI, int inI, Distance2D p0, Distance2D p1, double dist01Sq, double absCross, int nLookAhead, double distSqThreshold, double bumpSizeSqThreshold)
-//    {
-//        // NOTE: This "absCross" is from inI, which might exceed distance.
-//        // HOWEVER, if there is no better one, should we keep it?
-//        // NO, we haven't tested what far point would go with this, so may not be valid (even ignoring distance threshold).
-//        double minAbsCross = double.MaxValue;   // absCross
-//        int bestInJ = inI;
-
-//        // TBD: Wrap around?
-//        // inI + 1 To Math.Min(inI + nLookAhead, LastIndex(pts))
-//        // There might not be ANY points in this range. In which case, use inI (from above).
-//        for (int inJ = lastOutI + 1; inJ <= inI - 1; inJ++)
-//        {
-//            Distance2D p2b = pts[inJ];
-//            double distBSq = DistanceSquared2D(p1, p2b);
-//            // TBD: I don't think either of these conditions ever happen, because inI is the first point out-of-range.
-//            if (distBSq >= bumpSizeSqThreshold)
-//                // Exceeded look-ahead.
-//                // NOTE: If bump is taller than this check, will stop here - even if a later point might be within threshold.
-//                break;
-//            else if (distBSq >= distSqThreshold)
-//                // Not an acceptable continuation point.
-//                continue;
-
-//            double absCrossB = CalcAbsCross(p0, p1, p2b, dist01Sq);
-//            if (absCrossB < minAbsCross)
-//            {
-//                // Check whether OTHER end's cross is also better.
-//                double absCrossBEnd = CalcAbsCrossBEnd(pts, inJ, p1, p2b, absCrossB, nLookAhead, distBSq, distSqThreshold, bumpSizeSqThreshold);
-//                // The WORSE of the two ends is what we minimize.
-//                absCrossB = Math.Max(absCrossB, absCrossBEnd);
-//                if (absCrossB < minAbsCross)
-//                {
-//                    minAbsCross = absCrossB;
-//                    bestInJ = inJ;
-//                }
-//            }
-//        }
-
-//        return bestInJ;
-//    }
-
-//    // NOTE: "Angle p1-p0-p2". Would it make more sense to work with "180 degrees minus Angle p0-p1-p2"?
-//    private static double CalcAbsCross(Distance2D p0, Distance2D p1, Distance2D p2, double dist01Sq)
-//    {
-//        double crossProduct = p0.Cross(p1, p2);
-//        double magnitudeProduct = Math.Sqrt(dist01Sq * DistanceSquared2D(p0, p2));
-
-//        double sinA = crossProduct / magnitudeProduct;
-//        return Math.Abs(sinA);
-//    }
-
-//    private static double CalcAbsCrossBEnd(Distance2D[] pts, int inJ, Distance2D p1, Distance2D p2b, double absCrossB, int nLookAhead, double distBSq, double distSqThreshold, double bumpSizeSqThreshold)
-//    {
-//        double absCrossBEnd = double.MaxValue;
-
-//        int nWrap = GetNWrap(pts);
-
-//        // Find best angle near far end.
-//        // CAUTION: inK allowed to exceed last index; it wraps.
-//        for (int inK = inJ + 1; inK <= inJ + nLookAhead; inK++)
-//        {
-//            Distance2D p3 = pts[inK % nWrap];
-//            // "If": Always calculate the first inK, even if it is too far. (Far if points are separated by excessive distance.)
-//            if (absCrossBEnd < double.MaxValue)
-//            {
-//                double distBEndSq = DistanceSquared2D(p2b, p3);
-//                if (distBEndSq >= bumpSizeSqThreshold)
-//                    // Exceeded look-ahead.
-//                    // NOTE: If bump is taller than this check, will stop here - even if a later point might be within threshold.
-//                    break;
-//                else if (distBEndSq >= distSqThreshold)
-//                    continue;
-//            }
-//            AccumMin(CalcAbsCross(p1, p2b, p3, distBSq), ref absCrossBEnd);
-//            if (absCrossBEnd <= absCrossB)
-//                // Quality limited by BStart.
-//                break;
-//        }
-
-//        return absCrossBEnd;
-//    }
-
-
-
-//    // Pair of values representing a range.
-//    public abstract class MinMax<T>
-//    {
-//        protected T _min, _max;
-//        // Number of values accumulated.
-//        protected int _count;
-
-//        public MinMax(T min, T max)
-//        {
-//            this._min = min;
-//            this._max = max;
-//        }
-
-//        public override string ToString()
-//        {
-//            return $"{ToStringPrefix()} (min={_min}, max={_max})";
-//        }
-
-
-
-//        public T Min
-//        {
-//            get
-//            {
-//                return _min;
-//            }
-//        }
-//        public T Max
-//        {
-//            get
-//            {
-//                return _max;
-//            }
-//        }
-
-//        public int Count
-//        {
-//            get
-//            {
-//                return _count;
-//            }
-//        }
-
-
-//        // ALL subclasses must override to accumulate,
-//        // then do "_count += 1".
-//        public abstract void Accumulate(T value);
-
-
-//        protected string ToStringPrefix()
-//        {
-//            return $"{this.GetType().Name} N={_count}";
-//        }
-//    }
-
-
-//    public class MinMaxInteger : MinMax<int>
-//    {
-
-//        // Start an empty accumulation.
-//        public static MinMaxInteger CreateForAccumulate()
-//        {
-//            // Start with reversed values, which indicates empty accumulation.
-//            return new MinMaxInteger(int.MaxValue, int.MinValue);
-//        }
-
-
-
-//        public MinMaxInteger(int min, int max) : base(min, max)
-//        {
-//        }
-
-//        public override string ToString()
-//        {
-//            return $"{MinMax(Of System.Int32).ToStringPrefix()} (min={MinMax(Of System.Int32)._min}, max={MinMax(Of System.Int32)._max})";
-//        }
-
-
-
-//        public override void Accumulate(int value)
-//        {
-//            mDL2DLib.AccumMinMax(value, ref MinMax(Of System.Int32)._min, ref MinMax(Of System.Int32)._max);
-//            MinMax(OfSystem.Int32)._count += 1;
-//        }
-
-
-//        public int Delta
-//        {
-//            get
-//            {
-//                return MinMax(OfSystem.Int32)._max - MinMax(Of System.Int32)._min;
-//            }
-//        }
-//    }
-
-
-//    public class MinMaxSingle : MinMax<float>
-//    {
-//        public MinMaxSingle(float min, float max) : base(min, max)
-//        {
-//        }
-
-//        public override string ToString()
-//        {
-//            return $"{MinMax(Of System.Single).ToStringPrefix()} (min={MinMax(Of System.Single)._min}, max={MinMax(Of System.Single)._max})";
-//        }
-
-
-
-//        public override void Accumulate(float value)
-//        {
-//            mDL2DLib.AccumMinMax(value, ref MinMax(Of System.Single)._min, ref MinMax(Of System.Single)._max);
-//            MinMax(OfSystem.Single)._count += 1;
-//        }
-
-
-//        public float Delta
-//        {
-//            get
-//            {
-//                return MinMax(OfSystem.Single)._max - MinMax(Of System.Single)._min;
-//            }
-//        }
-//    }
-
-
-//    public class MinMaxDouble : MinMax<double>
-//    {
-
-//        // Incoming values may be in either order.
-//        public static MinMaxDouble FromPair(double a, double b)
-//        {
-//            if (b < a)
-//                return new MinMaxDouble(b, a);
-//            else
-//                return new MinMaxDouble(a, b);
-//        }
-
-//        // Start an empty accumulation.
-//        public static MinMaxDouble CreateForAccumulate()
-//        {
-//            // Start with reversed values, which indicates empty accumulation.
-//            return new MinMaxDouble(double.MaxValue, double.MinValue);
-//        }
-
-
-
-//        public MinMaxDouble(double min, double max) : base(min, max)
-//        {
-//        }
-
-
-//        public override string ToString()
-//        {
-//            return $"{MinMax(Of System.Double).ToStringPrefix()} (min={MinMax(Of System.Double)._min}, max={MinMax(Of System.Double)._max})";
-//        }
-
-
-//        public override void Accumulate(double value)
-//        {
-//            mDL2DLib.AccumMinMax(value, ref MinMax(Of System.Double)._min, ref MinMax(Of System.Double)._max);
-//            MinMax(OfSystem.Double)._count += 1;
-//        }
-
-
-
-//        // CAUTION: Overflow if call before any elements have been Accumulated.
-//        // CAUTION: May be negative for an empty accumulation.
-//        // To be safe, call HasExtent first, only call Delta if that is True.
-//        // TBD: Perhaps this should incorporate HasExtent logic,
-//        // convert uninitialized value (no Accumulate calls) to "-1".
-//        public double Delta
-//        {
-//            get
-//            {
-//                return MinMax(OfSystem.Double)._max - MinMax(Of System.Double)._min;
-//            }
-//        }
-
-//        public bool HasExtent(bool inclusive)
-//        {
-//            if (MinMax(OfSystem.Double)._max < MinMax(OfSystem.Double)._min )
-//                return false;
-//            else if (MinMax(OfSystem.Double)._max == MinMax(OfSystem.Double)._min )
-//                return inclusive;
-//            else
-//                return true;
-//        }
-
-//        public bool Intersects(MinMaxDouble other)
-//        {
-//            double minY = Math.Max(this.Min, other.Min);
-//            double maxY = Math.Min(this.Max, other.Max);
-//            return (minY <= maxY);
-//        }
-
-//        // "tracking": Tell caller whether this is new minimum or maximum.
-//        public void AccumulateWithTracking(double v, out bool isNewMin, out bool isNewMax)
-//        {
-//            if (v < MinMax(OfSystem.Double)._min )
-//            {
-//                MinMax(OfSystem.Double)._min = v;
-//                isNewMin = true;
-//            }
-//            else
-//                isNewMin = false;
-
-//            if (v > MinMax(OfSystem.Double)._max )
-//            {
-//                MinMax(OfSystem.Double)._max = v;
-//                isNewMax = true;
-//            }
-//            else
-//                isNewMax = false;
-//        }
-//    }
-
-
-//    public class MinMaxPoint : MinMax<Point>
-//    {
-
-//        // Standard instance that has IsValid=False.
-//        public static MinMaxPoint NotValidOne = new MinMaxPoint(0, 0, -1, -1);
-
-//        public MinMaxPoint(Point min, Point max) : base(min, max)
-//        {
-//        }
-
-//        public MinMaxPoint(int minX, int minY, int maxX, int maxY) : this(new Point(minX, minY), new Point(maxX, maxY))
-//        {
-//        }
-
-
-
-//        public override void Accumulate(Point value)
-//        {
-//            if (value.X < MinMax(Of Point)._min.X)
-//                MinMax(Of Point)._min.X = value.X;
-//            if (value.Y < MinMax(Of Point)._min.Y)
-//                MinMax(Of Point)._min.Y = value.Y;
-
-//            if (value.X > MinMax(Of Point)._max.X)
-//                MinMax(Of Point)._max.X = value.X;
-//            if (value.Y > MinMax(Of Point)._max.Y)
-//                MinMax(Of Point)._max.Y = value.Y;
-
-//            MinMax(OfPoint)._count += 1;
-//        }
-
-
-//        // Public ReadOnly Property Delta() As Point
-//        // Get
-//        // Return m_Max - m_Min
-//        // End Get
-//        // End Property
-
-//        /// <summary>
-//        ///         ''' aka "Is Not Empty".
-//        ///         ''' </summary>
-//        ///         ''' <returns></returns>
-//        public bool IsValid
-//        {
-//            get
-//            {
-//                return ((this.Max.X >= this.Min.X) && (this.Max.Y >= this.Min.Y));
-//            }
-//        }
-
-//        public int MinX
-//        {
-//            get
-//            {
-//                return MinMax(Of Point)._min.X;
-//            }
-//        }
-//        public int MaxX
-//        {
-//            get
-//            {
-//                return MinMax(Of Point)._max.X;
-//            }
-//        }
-//        public int MinY
-//        {
-//            get
-//            {
-//                return MinMax(Of Point)._min.Y;
-//            }
-//        }
-//        public int MaxY
-//        {
-//            get
-//            {
-//                return MinMax(Of Point)._max.Y;
-//            }
-//        }
-//    }
-
-
-//    public class MinMaxPoint2D : MinMax<Distance2D>
-//    {
-
-//        // Start an empty accumulation.
-//        public static MinMaxPoint2D CreateForAccumulate()
-//        {
-//            // Start with reversed values, which indicates empty accumulation.
-//            return new MinMaxPoint2D(Distance2D.MaxValue, Distance2D.MinValue);
-//        }
-
-//        // Used when corners might not be in min/max order. E.g. due to flip of x or y.
-//        public static MinMaxPoint2D CreateFromCorners(Distance2D corner1, Distance2D corner2)
-//        {
-//            Distance2D minPt = corner1;
-//            Distance2D maxPt = corner1;
-//            mDL2DLib.AccumMinMax(corner2, ref minPt, ref maxPt);
-
-//            return new MinMaxPoint2D(minPt, maxPt);
-//        }
-
-//        // "corners" might be two UL/BR or might be four (possibly rotated rectangle).
-//        public static MinMaxPoint2D CreateFromCorners(Distance2D[] corners)
-//        {
-//            MinMaxPoint2D mm = MinMaxPoint2D.CreateForAccumulate();
-
-//            foreach (Distance2D corner in corners)
-//                mm.Accumulate(corner);
-
-//            return mm;
-//        }
-
-//        public static bool Valid(Distance2D min, Distance2D max)
-//        {
-//            return (min.IsValid && max.IsValid && (min.X <= max.X) && (min.Y <= max.Y));
-//        }
-
-
-
-//        public MinMaxPoint2D(Distance2D min, Distance2D max) : base(min, max)
-//        {
-//        }
-
-//        public MinMaxPoint2D(RectangleF rect) : this(new Distance2D(rect.X, rect.Y), new Distance2D(rect.Right, rect.Bottom))
-//        {
-//        }
-
-
-//        public override string ToString()
-//        {
-//            return string.Format("{0}(min={1}, max={2})", this.GetType().Name, MinMax(Of TestProject.mDL2DLib.Distance2D)._min, MinMax(Of TestProject.mDL2DLib.Distance2D)._max);
-//        }
-
-//        public string ShortString()
-//        {
-//            return string.Format("(min={0}, max={1})", MinMax(Of TestProject.mDL2DLib.Distance2D)._min, MinMax(Of TestProject.mDL2DLib.Distance2D)._max);
-//        }
-
-
-
-//        public override void Accumulate(Distance2D pt)
-//        {
-//            mDL2DLib.AccumMinMax(pt, ref MinMax(Of TestProject.mDL2DLib.Distance2D)._min, ref MinMax(Of TestProject.mDL2DLib.Distance2D)._max);
-//            MinMax(OfTestProject.mDL2DLib.Distance2D)._count += 1;
-//        }
-
-//        public void AccumulateRect(Rectangle2D rect)
-//        {
-//            Accumulate(rect.TopLeft);
-//            Accumulate(rect.BottomRight);
-//        }
-
-//        /// <summary>
-//        ///         ''' Positive values enlarge rectangle.
-//        ///         ''' </summary>
-//        ///         ''' <param name="lowX"></param>
-//        ///         ''' <param name="lowY"></param>
-//        ///         ''' <param name="highX"></param>
-//        ///         ''' <param name="highY"></param>
-//        public void ExpandBy(double lowX, double lowY, double highX, double highY)
-//        {
-//            if (IsValid())
-//            {
-//                // Positive lowX means make rectangle larger, by lowering minX.
-//                MinMax(Of TestProject.mDL2DLib.Distance2D)._min.X -= lowX;
-//                MinMax(Of TestProject.mDL2DLib.Distance2D)._min.Y -= lowY;
-//                MinMax(Of TestProject.mDL2DLib.Distance2D)._max.X += highX;
-//                MinMax(Of TestProject.mDL2DLib.Distance2D)._max.Y += highY;
-//            }
-//        }
-
-
-//        // NOTE: If created by "CreateForAccumulate", before any calls made to Accumulate, this will return False.
-//        public bool IsValid
-//        {
-//            get
-//            {
-//                return Valid(this.Min, this.Max);
-//            }
-//        }
-
-//        public Distance2D Center
-//        {
-//            get
-//            {
-//                return Average(MinMax(Of TestProject.mDL2DLib.Distance2D)._max, MinMax(Of TestProject.mDL2DLib.Distance2D)._min);
-//            }
-//        }
-
-//        public Distance2D Delta
-//        {
-//            get
-//            {
-//                return MinMax(OfTestProject.mDL2DLib.Distance2D)._max - MinMax(Of TestProject.mDL2DLib.Distance2D)._min;
-//            }
-//        }
-
-//        public Rectangle2D AsRect
-//        {
-//            get
-//            {
-//                return Rectangle2D.FromMinMax(MinMax(Of TestProject.mDL2DLib.Distance2D)._min, MinMax(Of TestProject.mDL2DLib.Distance2D)._max);
-//            }
-//        }
-
-
-//        public bool Contains(Distance2D pt)
-//        {
-//            return BetweenInclusive(pt.X, MinMax(Of TestProject.mDL2DLib.Distance2D).Min.X, MinMax(Of TestProject.mDL2DLib.Distance2D).Max.X) && BetweenInclusive(pt.Y, MinMax(Of TestProject.mDL2DLib.Distance2D).Min.Y, MinMax(Of TestProject.mDL2DLib.Distance2D).Max.Y);
-//        }
-//    }
-
-
-
-
-//    public static Distance2D[] ConvertArrayPointFtoPoint2D(System.Drawing.PointF[] ptfPoint)
-//    {
-//        if (ptfPoint == null)
-//            return null;
-//        Distance2D[] ptdPoint = new Distance2D[ptfPoint.Length - 1 + 1];
-//        for (int intIdx = 0; intIdx <= ptfPoint.Length - 1; intIdx++)
-//            ptdPoint[intIdx] = new Distance2D((ptfPoint[intIdx]));
-//        return ptdPoint;
-//    }
-
-//    public static System.Drawing.PointF[] ConvertArrayPoint2DToPointF(Distance2D[] ptdPoint)
-//    {
-//        if (ptdPoint == null)
-//            return null;
-//        System.Drawing.PointF[] ptfPoint = new System.Drawing.PointF[ptdPoint.Length - 1 + 1];
-//        for (int intIdx = 0; intIdx <= ptdPoint.Length - 1; intIdx++)
-//            ptfPoint[intIdx] = ptdPoint[intIdx].ToPointF();
-//        return ptfPoint;
-//    }
-//    public static PointF ConvertPoint2DToPointF(Distance2D ptdPoint)
-//    {
-//        return new System.Drawing.PointF(System.Convert.ToSingle(ptdPoint.X), System.Convert.ToSingle(ptdPoint.Y));
-//    }
-//    public static Distance2D ConvertPointFToPoint2d(System.Drawing.PointF ptfPoint)
-//    {
-//        return new Distance2D(ptfPoint);
-//    }
-
-//    public static Distance2D[] ConvertRectangleToPoint2D(System.Drawing.RectangleF rcfRect)
-//    {
-//        Distance2D[] ptdpoint = new Distance2D[4];
-//        ptdpoint[0] = new Distance2D(rcfRect.X, rcfRect.Y);
-//        ptdpoint[1] = new Distance2D(System.Convert.ToDouble(rcfRect.X + rcfRect.Width), System.Convert.ToDouble(rcfRect.Y));
-//        ptdpoint[2] = new Distance2D(System.Convert.ToDouble(rcfRect.X + rcfRect.Width), System.Convert.ToDouble(rcfRect.Y + rcfRect.Height));
-//        ptdpoint[3] = new Distance2D(System.Convert.ToDouble(rcfRect.X), System.Convert.ToDouble(rcfRect.Y + rcfRect.Height));
-//        return ptdpoint;
-//    }
-//}
+// Angle change or "bend" at the middle point of a sequence of three points p0-p1-p2 (forming two line segments).
+// Zero when the points are all on a straight line. +-90 when they form a right angle.
+// This is "180 - central-angle". (The central angle p0-p1-p2 is 180 degrees when points are on a straight line.)
+public static double CalcBendDegrees(Dist2D p0, Dist2D p1, Dist2D p2)
+{
+	double heading01 = GetAngleDegrees2D(p0, p1);
+	double heading12 = GetAngleDegrees2D(p1, p2);
+	// From -180 to +180.
+	return AngleDegreesAsShorterDirection(heading12 - heading01);
+}
+
+		//    // This calculation works if angle change <= 90 degrees. Beyond that, is +-"180 - correct_answer".
+		//    // Due to ambiguity in arc-sine?
+		//    // Private Function CalcBendDegrees(p0 As Dist2D, p1 As Dist2D, p2 As Dist2D) As Double
+		//    // Dim crossProduct As Double = p1.Cross(p0, p2)
+		//    // Dim magnitudeProduct As Double = Math.Sqrt(DistanceSquared2D(p0, p1) * DistanceSquared2D(p1, p2))
+
+		//    // Dim sinA As Double = crossProduct / magnitudeProduct
+		//    // Return RadiansToDegrees(Math.Asin(sinA))
+		//    // End Function
+
+		public static double GetAngleDegrees2D(Dist3D ptdOrigo, Dist3D ptdHeading)
+		{
+			return GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdHeading.X, ptdHeading.Y);
+		}
+
+		public static double GetAngleDegrees2D(Dist2D ptdOrigo, Dist2D ptdHeading)
+		{
+			return GetAngleDegrees2D(ptdOrigo.X, ptdOrigo.Y, ptdHeading.X, ptdHeading.Y);
+		}
+
+		public static double GetAngleDegrees2D(PointF ptfOrigo, PointF ptfHeading)
+		{
+			return GetAngleDegrees2D(ptfOrigo.X, ptfOrigo.Y, ptfHeading.X, ptfHeading.Y);
+		}
+
+		// A better name might be "vector direction": it is based on a single vector (it is not an angle between two vectors).
+		// Calculate Rotation given AimPoint and Origin By Simple ArcTangent^2 . Right Mid Square Zero Deg
+		// I believe this is rotation relative to X-axis.
+		public static double GetAngleDegrees2D(double originX, double originY, double aimPointX, double aimPointY)
+		{
+			if ((originX == m_cacheOrigoX) && (originY == m_cacheOrigoY) && (aimPointX == m_cachePointX) && (aimPointY == m_cachePointY)) {
+				t_nAngleFast += 1;
+				return m_cacheAngle;
+			}
+
+			double angle = Math.Atan2(aimPointY - originY, aimPointX - originX) * (180 / Math.PI);
+			if (angle < 0)
+				angle += 360;
+
+			m_cacheAngle = angle;
+			m_cacheOrigoX = originX; m_cacheOrigoY = originY; m_cachePointX = aimPointX; m_cachePointY = aimPointY;
+
+			t_nAngleSlow += 1;
+			return angle;
+		}
+
+		private static double m_cacheOrigoX, m_cacheOrigoY, m_cachePointX, m_cachePointY, m_cacheAngle;
+		private static int t_nAngleFast, t_nAngleSlow;
+
+		// E.g. returns "45" If the angles differ by 45 degrees, regardless of which is greater,
+		// and taking into account wrapping at +-180 or +-360.
+		// Always takes SHORTER direction around the circle, so answer is in range 0..180.
+		public static double AbsDifferenceTwoAngleDegrees2D(double angleDegrees1, double angleDegrees2)
+		{
+			// This takes any possible angle values, and yields a (wrapped) delta of 0..360.
+			double absDeltaAngleDegrees = Math.Abs(angleDegrees2 - angleDegrees1) % 360;
+			if (absDeltaAngleDegrees > 180)
+				// Take the shorter direction. 0..180.
+				absDeltaAngleDegrees = 360 - absDeltaAngleDegrees;
+			return absDeltaAngleDegrees;
+		}
+
+		// Input might be from -360 to +360.
+		// Return angle, from -180 to +180 degrees.
+		// For Sweep angle, assuming sweep is less than 180 degrees,
+		// but might be in either direction.
+		public static double AngleDegreesAsShorterDirection(double deltaAngleDegrees)
+		{
+			return DeltaArcAsShorterDirection(deltaAngleDegrees, 360);
+		}
+
+		// "Arc" generalized to any wrapping coordinate.
+		public static double DeltaArcAsShorterDirection(double deltaArc, double wrapAt)
+		{
+			// Just in case, reduce large range.
+			deltaArc = deltaArc % wrapAt;
+			double halfWrapAt = wrapAt / 2.0;
+
+			if (deltaArc > halfWrapAt)
+				deltaArc -= wrapAt;
+			else if (deltaArc <= -halfWrapAt)
+				deltaArc += wrapAt;
+			else {
+			}
+
+			// Verify
+			if ((deltaArc < -halfWrapAt) || (deltaArc > halfWrapAt))
+				U.Trouble();
+
+			return deltaArc;
+		}
+
+		// Convert any angle (in degrees) to value in 0..360.
+		// Negative values become positive values.
+		public static double Wrap360(double angleDegrees)
+		{
+			// Reduce large range.
+			angleDegrees = angleDegrees % 360;
+			if (angleDegrees < 0)
+				angleDegrees += 360;
+
+			return angleDegrees;
+		}
+
+		public static void Test_AngleDegreesAsShorterDirection()
+		{
+			if (!AngleDegreesAsShorterDirection(360).NearlyEquals(0) || !AngleDegreesAsShorterDirection(359).NearlyEquals(-1) || !AngleDegreesAsShorterDirection(200).NearlyEquals(-160) || !AngleDegreesAsShorterDirection(560).NearlyEquals(-160) || !AngleDegreesAsShorterDirection(180.01).NearlyEquals(-179.99) || !AngleDegreesAsShorterDirection(180).NearlyEquals(180) || !AngleDegreesAsShorterDirection(179.99).NearlyEquals(179.99) || !AngleDegreesAsShorterDirection(179).NearlyEquals(179) || !AngleDegreesAsShorterDirection(1).NearlyEquals(1) || !AngleDegreesAsShorterDirection(0.01).NearlyEquals(0.01) || !AngleDegreesAsShorterDirection(0).NearlyEquals(0) || !AngleDegreesAsShorterDirection(-360).NearlyEquals(0) || !AngleDegreesAsShorterDirection(-359).NearlyEquals(1) || !AngleDegreesAsShorterDirection(-200).NearlyEquals(160) || !AngleDegreesAsShorterDirection(-560).NearlyEquals(160) || !AngleDegreesAsShorterDirection(-180.01).NearlyEquals(179.99) || !(AngleDegreesAsShorterDirection(-180).NearlyEquals(180) || AngleDegreesAsShorterDirection(-180).NearlyEquals(-180)) || !AngleDegreesAsShorterDirection(-179.99).NearlyEquals(-179.99) || !AngleDegreesAsShorterDirection(-179).NearlyEquals(-179) || !AngleDegreesAsShorterDirection(-1).NearlyEquals(-1) || !AngleDegreesAsShorterDirection(-0.01).NearlyEquals(-0.01))
+				U.Trouble();
+		}
+
+		// By "sorted", we mean ordered such that the angle from #1 to #2 is <= 180 degrees --
+		// the shorter distance around the circle.
+		public static void SortTwoAnglesSoShorterDistance(ref double angleDegrees1, ref double angleDegrees2)
+		{
+			double deltaAngleDegrees = (angleDegrees2 - angleDegrees1);
+			if (deltaAngleDegrees < -180)
+				// E.g. (350, 10) -- keep same order.
+				return;
+			else if (deltaAngleDegrees < 0) {
+			} else if (deltaAngleDegrees <= 180)
+				// E.g. (170, 190) -- keep same order.
+				return;
+			else {
+			}
+
+			// Swap them.
+			U.Swap(ref angleDegrees1, ref angleDegrees2);
+		}
+
+		// Given Two angles (in degrees), are they pointing "more away from each other" than "towards each other"?
+		public static bool AngleDegrees_Are_Opposite(double angleDegrees1, double angleDegrees2)
+		{
+			// AbsDifferenceTwoAngleDegrees2D is in range 0..180.
+			// Half that is "90".
+			return (AbsDifferenceTwoAngleDegrees2D(angleDegrees1, angleDegrees2) > 90);
+		}
+
+
+		public static double GetAngleRadians2D(Dist2D ptdOrigo, Dist2D ptdHeading)
+		{
+			return GetAngleRadians2D(ptdOrigo.X, ptdOrigo.Y, ptdHeading.X, ptdHeading.Y);
+		}
+
+		public static double GetAngleRadians2D(PointF ptfOrigo, PointF ptfHeading)
+		{
+			return GetAngleRadians2D(ptfOrigo.X, ptfOrigo.Y, ptfHeading.X, ptfHeading.Y);
+		}
+
+		// Calculate Rotation given Point and Origo By Simple ArcTangent^2 . Right Mid Square Zero Deg
+		public static double GetAngleRadians2D(double originX, double originY, double pointX, double pointY)
+		{
+			double angleRadians = Math.Atan2(pointY - originY, pointX - originX);
+			return angleRadians;
+		}
+
+		// "deltaPt" should be a difference between two points; e.g. "ptB - ptA".
+		// aka "DirectionVector To AngleRadians".
+		public static double GetAngleRadians2D(Dist2D deltaPt)
+		{
+			return GetAngleRadians2D(deltaPt.X, deltaPt.Y);
+		}
+		public static double GetAngleRadians2D(Size2D twist)
+		{
+			return GetAngleRadians2D(twist.Width, twist.Height);
+		}
+		public static double GetAngleRadians2D(double dx, double dy)
+		{
+			double angleRadians = Math.Atan2(dy, dx);
+			return angleRadians;
+		}
+
+
+
+		//    // From origin, move in direction of secondPoint, by specified distance.
+		//    // The result may be either nearer or farther from origin than secondPoint is.
+		//    // secondPoint is merely used to give a direction.
+		//    public static Dist2D MoveOnHeading(Dist2D origin, Dist2D secondPoint, double distance)
+		//    {
+		//        Dist2D delta = secondPoint - origin;
+		//        return MoveOnHeading_GivenDelta(origin, delta, distance);
+		//    }
+
+		//    // Move away from origin, starting at currentPt, by specified distance.
+		//    // The result is on the line from origin through currentPt, but farther away by "distance".
+		//    // NOTE: Negative distance => move towards "origin".
+		//    public static Dist2D MoveFartherOnHeading(Dist2D origin, Dist2D currentPt, double distance)
+		//    {
+		//        // NOTE: Alternative implementation would be similar to code in "Dist3D" version.
+
+		//        Dist2D delta = currentPt - origin;
+		//        return MoveOnHeading_GivenDelta(currentPt, delta, distance);
+		//    }
+
+		//    // Move away from origin, starting at currentPt, by specified distance.
+		//    // The result is on the line from origin through currentPt, but farther away by "distance".
+		//    // NOTE: Negative distance => move towards "origin".
+		//    public static Dist3D MoveFartherOnHeading(Dist3D origin, Dist3D currentPt, double distance)
+		//    {
+		//        double totalDistance = Dist3D(origin, currentPt) + distance;
+		//        return MoveOnHeading(origin, currentPt, totalDistance);
+		//    }
+
+		//    // Move from startPoint, by specified distance, at RIGHT ANGLE TO line towards origin.
+		//    public static Dist2D MoveRightAngleToHeading(Dist2D startPoint, double distance, Dist2D origin)
+		//    {
+		//        Dist2D delta = startPoint - origin;
+		//        return MoveRightAngleToHeading_GivenDelta(startPoint, delta, distance);
+		//    }
+
+		//    // Use this if you already have the delta between two points.
+		//    // Moves in direction of delta, by specified distance.
+		//    public static Dist2D MoveOnHeading_GivenDelta(Dist2D startPoint, Dist2D delta, double distance)
+		//    {
+		//        double deltaLength = delta.Length;
+		//        if (deltaLength == 0)
+		//            return startPoint; // Cannot determine direction to move, so don't.
+
+		//        Dist2D result = startPoint + (distance / deltaLength) * delta;
+		//        // ' test - verify
+		//        // Dim verifyDistanceSq As Double = DistanceSquared2D(startPoint, result)
+		//        // If Not verifyDistanceSq.NearlyEquals(distance * distance) Then
+		//        // Test()
+		//        // End If
+
+		//        return result;
+		//    }
+
+		//    // Use this if you already have the delta between two points.
+		//    // Moves at RIGHT ANGLE TO delta, by specified distance.
+		//    public static Dist2D MoveRightAngleToHeading_GivenDelta(Dist2D startPoint, Dist2D delta, double distance)
+		//    {
+		//        double deltaLength = delta.Length;
+		//        if (deltaLength == 0)
+		//            return startPoint; // Cannot determine direction to move, so don't.
+
+		//        Dist2D result = startPoint + (distance / deltaLength) * RightAngleToDelta(delta);
+		//        return result;
+		//    }
+
+		//    // ARBITRARILY pick one of the right angles.
+		//    public static Dist2D RightAngleToDelta(Dist2D delta)
+		//    {
+		//        return (new Dist2D(-delta.Y, delta.X));
+		//    }
+
+
+		//    public static Dist2D MoveOnHeadingDegrees(Dist2D origin, double angleDegrees, double distance)
+		//    {
+		//        return MoveOnHeadingRadians(origin, DegreesToRadians(angleDegrees), distance);
+		//    }
+
+		//    public static Dist2D MoveOnHeadingRadians(Dist2D origin, double angleRadians, double distance)
+		//    {
+		//        Dist2D directionVector = AngleRadians_To_DirectionVector(angleRadians);
+		//        Dist2D result = origin + distance * directionVector;
+		//        return result;
+		//    }
+
+		//    // Move in direction of secondPoint, specified distance from origin.
+		//    // (Put in 2D lib, next to 2D version, so callers don't have to specify which module to reference.)
+		//    public static Dist3D MoveOnHeading(Dist3D origin, Dist3D secondPoint, double distance)
+		//    {
+		//        Dist3D delta = secondPoint - origin;
+		//        double deltaLength = delta.Length;
+		//        if (deltaLength == 0)
+		//            return origin; // Cannot determine direction to move, so don't.
+
+		//        Dist3D result = origin + delta * (distance / deltaLength);
+		//        // ' test - verify
+		//        // Dim verify As Double = DistanceSquared2D(result, origin)
+		//        // If Not verify.NearlyEquals(distance * distance) Then
+		//        // Test()
+		//        // End If
+		//        return result;
+		//    }
+
+
+		//    public static double LinearInterpolationX2D(double dblY, PointF ptfP1, PointF ptfP2)
+		//    {
+		//        return LinearInterpolationX2D(dblY, ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
+		//    }
+
+		//    public static double LinearInterpolationX2D(double dblY, Dist2D ptdP1, Dist2D ptdP2)
+		//    {
+		//        return LinearInterpolationX2D(dblY, ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
+		//    }
+
+		//    public static double LinearInterpolationX2D(double dblY, double dblP1X, double dblP1Y, double dblP2X, double dblP2Y)
+		//    {
+		//        return ((dblP1X - dblP2X) * dblY - (dblP1X * dblP2Y) + (dblP2X * dblP1Y)) / (dblP1Y - dblP2Y);
+		//    }
+
+		//    public static double LinearInterpolationY2D(double dblX, PointF ptfP1, PointF ptfP2)
+		//    {
+		//        return LinearInterpolationY2D(dblX, ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
+		//    }
+
+		//    public static double LinearInterpolationY2D(double dblX, Dist2D ptdP1, Dist2D ptdP2)
+		//    {
+		//        return LinearInterpolationY2D(dblX, ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
+		//    }
+
+		//    public static double LinearInterpolationY2D(double dblX, double dblP1X, double dblP1Y, double dblP2X, double dblP2Y)
+		//    {
+		//        return dblP1Y + (((dblX - dblP1X) * (dblP2Y - dblP1Y)) / (dblP2X - dblP1X));
+		//    }
+
+		//    public static double PointFurthestDistanceToRectangle2D(PointF ptfPoint, PointF[] ptfRec)
+		//    {
+		//        if (ptfRec == null)
+		//            return -1;
+
+		//        double dblFurthestDI = -1;
+
+		//        for (int intIdx = 0; intIdx <= 3; intIdx++)
+		//        {
+		//            double dblDI = CalcDistance2D(ptfPoint, ptfRec[intIdx]);
+
+		//            if (dblDI > dblFurthestDI)
+		//                dblFurthestDI = dblDI;
+		//        }
+
+		//        return dblFurthestDI;
+		//    }
+
+		//    public static double PointFurthestDistanceToRectangle2D(Dist2D ptdPoint, Dist2D[] ptdRec)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+
+		//        double dblFurthestDI = -1;
+
+		//        for (int intIdx = 0; intIdx <= 3; intIdx++)
+		//        {
+		//            double dblDI = CalcDistance2D(ptdPoint, ptdRec[intIdx]);
+
+		//            if (dblDI > dblFurthestDI)
+		//                dblFurthestDI = dblDI;
+		//        }
+
+		//        return dblFurthestDI;
+		//    }
+
+		//    public static double PointFurthestDistanceToRectangle2D(Dist3D ptdPoint, Dist3D[] ptdRec)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+
+		//        double dblFurthestDI = -1;
+
+		//        for (int intIdx = 0; intIdx <= 3; intIdx++)
+		//        {
+		//            double dblDI = CalcDistance2D(ptdPoint, ptdRec[intIdx]);
+
+		//            if (dblDI > dblFurthestDI)
+		//                dblFurthestDI = dblDI;
+		//        }
+
+		//        return dblFurthestDI;
+		//    }
+
+		//    public static void PointFurthestAndClosestToShape(PointF point, PointF[] shape, bool closed, out PointF closestPt, out double closestDI, out PointF furthestPt, out double furthestDI)
+		//    {
+		//        if (shape == null)
+		//            return;
+
+		//        closestDI = -1;
+		//        furthestDI = -1;
+
+		//        int length = shape.Length - 1;
+
+		//        if (!closed || (shape.Length > 1 && shape[0] == shape[shape.Length - 1]))
+		//            length = shape.Length - 2;
+
+		//        for (int i = 0; i <= length; i++)
+		//        {
+		//            int j = (i + 1) % length;
+
+		//            double dic = PointDistanceToLine2D(point, shape[i], shape[j]);
+		//            PointF ptc = LinePointClosestToPoint2D(point, shape[i], shape[j]);
+
+		//            double dif;
+		//            PointF ptf = PointFurthestToLine(point, shape[i], shape[j], out dif);
+
+		//            if (furthestDI == -1 || dif > furthestDI)
+		//            {
+		//                furthestDI = dif;
+		//                furthestPt = ptf;
+		//            }
+
+		//            if (closestDI == -1 || dic < closestDI)
+		//            {
+		//                closestDI = dic;
+		//                closestPt = ptc;
+		//            }
+		//        }
+		//    }
+
+		//    public static PointF PointFurthestToLine(PointF point, PointF p1, PointF p2, out double di)
+		//    {
+		//        double di1 = CalcDistance2D(point, p1);
+		//        double di2 = CalcDistance2D(point, p2);
+
+		//        if (di1 > di2)
+		//        {
+		//            di = di1;
+		//            return p1;
+		//        }
+		//        else
+		//        {
+		//            di = di2;
+		//            return p2;
+		//        }
+		//    }
+
+		//    public static double PointDistanceToRectangle2D(PointF ptfPoint, PointF[] ptfRec)
+		//    {
+		//        if (ptfRec == null)
+		//            return -1;
+
+		//        double dblClosestDI = -1;
+
+		//        for (int intIdx = 0; intIdx <= 3; intIdx++)
+		//        {
+		//            PointF ptfP1;
+		//            PointF ptfP2 = ptfRec[intIdx];
+
+		//            if (intIdx == 0)
+		//                ptfP1 = ptfRec[3];
+		//            else
+		//                ptfP1 = ptfRec[intIdx - 1];
+
+		//            double dblDI = PointDistanceToLine2D(ptfPoint, ptfP1, ptfP2);
+
+		//            if (dblClosestDI < 0)
+		//                dblClosestDI = dblDI;
+		//            else if (dblDI < dblClosestDI)
+		//                dblClosestDI = dblDI;
+		//        }
+
+		//        return dblClosestDI;
+		//    }
+
+		//    public static double PointDistanceToRectangle2D(Dist2D ptdPoint, Dist2D[] ptdRec)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+
+		//        double dblClosestDI = -1;
+
+		//        for (int intIdx = 0; intIdx <= 3; intIdx++)
+		//        {
+		//            Dist2D ptdP1;
+		//            Dist2D ptdP2 = ptdRec[intIdx];
+
+		//            if (intIdx == 0)
+		//                ptdP1 = ptdRec[3];
+		//            else
+		//                ptdP1 = ptdRec[intIdx - 1];
+
+		//            double dblDI = PointDistanceToLine2D(ptdPoint, ptdP1, ptdP2);
+
+		//            if (dblClosestDI < 0)
+		//                dblClosestDI = dblDI;
+		//            else if (dblDI < dblClosestDI)
+		//                dblClosestDI = dblDI;
+		//        }
+
+		//        return dblClosestDI;
+		//    }
+
+		//    public static double PointDistanceToRectangle2D(Dist3D ptdPoint, Dist3D[] ptdRec)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+
+		//        double dblClosestDI = -1;
+
+		//        for (int intIdx = 0; intIdx <= 3; intIdx++)
+		//        {
+		//            Dist3D ptdP1;
+		//            Dist3D ptdP2 = ptdRec[intIdx];
+
+		//            if (intIdx == 0)
+		//                ptdP1 = ptdRec[3];
+		//            else
+		//                ptdP1 = ptdRec[intIdx - 1];
+
+		//            double dblDI = PointDistanceToLine2D(ptdPoint, ptdP1, ptdP2);
+
+		//            if (dblClosestDI < 0)
+		//                dblClosestDI = dblDI;
+		//            else if (dblDI < dblClosestDI)
+		//                dblClosestDI = dblDI;
+		//        }
+
+		//        return dblClosestDI;
+		//    }
+
+		//    public static double PointDistanceToLine2D(PointF ptfPoint, PointF ptfP1, PointF ptfP2)
+		//    {
+		//        PointF ptfDelta;
+		//        PointF ptfClosest;
+		//        float t;
+
+		//        ptfDelta = Delta2D(ptfP1, ptfP2);
+
+		//        if (ptfDelta.X == 0 & ptfDelta.Y == 0)
+		//            return mDL2DLib.CalcDistance2D(ptfPoint, ptfP1);
+
+		//        // Calculate the t that minimizes the Distance.
+		//        t = ((ptfPoint.X - ptfP1.X) * ptfDelta.X + (ptfPoint.Y - ptfP1.Y) * ptfDelta.Y) / (double)(ptfDelta.X * ptfDelta.X + ptfDelta.Y * ptfDelta.Y);
+
+		//        // See if this represents one of the segment's
+		//        // end points or a point in the middle.
+		//        if (t < 0)
+		//        {
+		//            ptfDelta.X = ptfPoint.X - ptfP1.X;
+		//            ptfDelta.Y = ptfPoint.Y - ptfP1.Y;
+		//            ptfClosest.X = ptfP1.X;
+		//            ptfClosest.Y = ptfP1.Y;
+		//        }
+		//        else if (t > 1)
+		//        {
+		//            ptfDelta.X = ptfPoint.X - ptfP2.X;
+		//            ptfDelta.Y = ptfPoint.Y - ptfP2.Y;
+		//            ptfClosest.X = ptfP2.X;
+		//            ptfClosest.Y = ptfP2.Y;
+		//        }
+		//        else
+		//        {
+		//            ptfClosest.X = ptfP1.X + t * ptfDelta.X;
+		//            ptfClosest.Y = ptfP1.Y + t * ptfDelta.Y;
+		//            ptfDelta.X = ptfPoint.X - ptfClosest.X;
+		//            ptfDelta.Y = ptfPoint.Y - ptfClosest.Y;
+		//        }
+
+		//        return mDL2DLib.CalcDistance2D(ptfPoint, ptfClosest);
+		//    }
+		//    // Performance: Avoids Sqrt.
+		//    public static double PointDistanceSquaredToLine2D(PointF point, PointF p1, PointF p2)
+		//    {
+		//        PointF delta = Delta2D(p1, p2);
+		//        if (delta.X == 0 & delta.Y == 0)
+		//            return mDL2DLib.DistanceSquared2D(point, p1);
+
+		//        // Calculate the t that minimizes the Distance.
+		//        float t = ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (double)(delta.X * delta.X + delta.Y * delta.Y);
+
+		//        // See if this represents one of the segment's
+		//        // end points or a point inbetween.
+		//        PointF closest;
+		//        if (t <= 0)
+		//        {
+		//            closest.X = p1.X;
+		//            closest.Y = p1.Y;
+		//        }
+		//        else if (t >= 1)
+		//        {
+		//            closest.X = p2.X;
+		//            closest.Y = p2.Y;
+		//        }
+		//        else
+		//        {
+		//            closest.X = p1.X + t * delta.X;
+		//            closest.Y = p1.Y + t * delta.Y;
+		//        }
+
+		//        return mDL2DLib.DistanceSquared2D(point, closest);
+		//    }
+
+		//    // p1 & p2 define the line. Allow the line to extend beyond the two points; find shortest delta from a point on that extended line.
+		//    // If p1 = p2, the result is undefined; represent as (Double.NaN, Double.NaN).
+		//    public static Dist2D PointDeltaToLineExtended2D(Dist2D point, Dist2D p1, Dist2D p2)
+		//    {
+		//        // Because we are allowing the line to extend, we don't clamp "closest" to be between p1 and p2.
+		//        // (Contrast with PointDistanceToLine2D.)
+		//        Dist2D closest = ClosestPointOnLineExtended2D(point, p1, p2);
+		//        if (double.IsNaN(closest.X))
+		//            return new Dist2D(double.NaN, double.NaN); // Undefined.
+
+		//        double deltaX = point.X - closest.X;
+		//        double deltaY = point.Y - closest.Y;
+		//        return new Dist2D(deltaX, deltaY);
+		//    }
+
+		//    // p1 & p2 define the line. Allow the line to extend beyond the two points; find closest point on that extended line.
+		//    // If p1 = p2, the result is undefined; represent as (Double.NaN, Double.NaN).
+		//    public static Dist2D ClosestPointOnLineExtended2D(Dist2D point, Dist2D p1, Dist2D p2)
+		//    {
+		//        Dist2D delta = Delta2D(p1, p2);
+
+		//        if (delta.X == 0 && delta.Y == 0)
+		//            return new Dist2D(double.NaN, double.NaN); // Undefined.
+
+		//        // Calculate the t that minimizes the Distance.
+		//        double t = CalcTOfClosestPoint(point, p1, delta);
+
+		//        // Because we are allowing the line to extend, we don't clamp "closest" to be between p1 and p2.
+		//        // That is, we don't clip t to be between 0 and 1.
+		//        return TToPoint(t, p1, delta);
+		//    }
+
+		//    // Allows extension beyond original endpoints;
+		//    // I.E. may return value outside of 0..1.
+		//    // CAUTION: The last parameter is "delta"; it is NOT p2!
+		//    public static double CalcTOfClosestPoint(Dist2D point, Dist2D p1, Dist2D delta)
+		//    {
+		//        return ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (delta.X * delta.X + delta.Y * delta.Y);
+		//    }
+
+		//    // Allows extension beyond original endpoints;
+		//    // I.E. may return value outside of 0..1.
+		//    public static float CalcTOfClosestPoint(PointF point, PointF p1, PointF delta)
+		//    {
+		//        double dx = System.Convert.ToDouble(delta.X);
+		//        // For accuracy, intermediate values are Double.
+		//        double dy = System.Convert.ToDouble(delta.Y);
+		//        return System.Convert.ToSingle(((System.Convert.ToDouble(point.X) - p1.X) * dx + (System.Convert.ToDouble(point.Y) - p1.Y) * dy) / (dx * dx + dy * dy));
+		//    }
+
+		//    // t=0 => p1, t=1 => p1+delta.
+		//    public static Dist2D TToPoint(double t, Dist2D p1, Dist2D delta)
+		//    {
+		//        double px = p1.X + t * delta.X;
+		//        double py = p1.Y + t * delta.Y;
+		//        return new Dist2D(px, py);
+		//    }
+
+
+		//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
+		//    public static double PointDistanceToLine2D(Dist2D point, Dist2D p1, Dist2D p2)
+		//    {
+		//        double t;
+		//        return PointDistanceToLine2D_AndT(point, p1, p2, out t);
+		//    }
+
+		//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
+		//    // PERFORMANCE: Avoids Sqrt, by returning distance-squared rather than distance.
+		//    public static double PointDistanceSqToLine2D(Dist2D point, Dist2D p1, Dist2D p2)
+		//    {
+		//        double t;
+		//        return PointDistanceSqToLine2D_AndT(point, p1, p2, out t);
+		//    }
+
+		//    public static double PointDistanceSqToLine2D_AndClosestPoint(Dist2D point, Dist2D p1, Dist2D p2, out Dist2D closest)
+		//    {
+		//        double t;
+		//        closest = ClosestPointOnLine2D_AndT(point, p1, p2, ref t);
+		//        return mDL2DLib.DistanceSquared2D(point, closest);
+		//    }
+
+		//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
+		//    // "t" is "weight" of point on line that is closest to "point";
+		//    // it is 0 at p1, 1 at p2.
+		//    public static double PointDistanceToLine2D_AndT(Dist2D point, Dist2D p1, Dist2D p2, out double t)
+		//    {
+		//        Dist2D closest = ClosestPointOnLine2D_AndT(point, p1, p2, ref t);
+		//        return mDL2DLib.CalcDistance2D(point, closest);
+		//    }
+
+		//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
+		//    // "t" is "weight" of point on line that is closest to "point";
+		//    // it is 0 at p1, 1 at p2.
+		//    // PERFORMANCE: Avoids Sqrt, by returning distance-squared rather than distance.
+		//    public static double PointDistanceSqToLine2D_AndT(Dist2D point, Dist2D p1, Dist2D p2, out double t)
+		//    {
+		//        Dist2D closest = ClosestPointOnLine2D_AndT(point, p1, p2, ref t);
+		//        return mDL2DLib.DistanceSquared2D(point, closest);
+		//    }
+
+		//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
+		//    // "t" is "weight" of point on line that is closest to "point";
+		//    // it is 0 at p1, 1 at p2.
+		//    public static Dist2D ClosestPointOnLine2D_AndT(Dist2D point, Dist2D p1, Dist2D p2, out double t)
+		//    {
+		//        Dist2D delta = Delta2D(p1, p2);
+
+		//        if (delta.X == 0 & delta.Y == 0)
+		//        {
+		//            // Line is a single point; take distance from "point" to that point.
+		//            // All "t"s would yield same answer. (Or maybe there would be divide-by-zero.) Treat it as "half-way".
+		//            t = 0.5;
+		//            // p1 and p2 are the same; there is only one possible answer to "closest point".
+		//            return p1;
+		//        }
+
+		//        // ----> Main Work <----
+		//        // Out "t".
+		//        // Calculate the t that minimizes the Distance.
+		//        t = CalcTOfClosestPoint(point, p1, delta);
+
+
+		//        // See if "t" represents one of the segment's end points, or a point in-between.
+		//        // NOTE: Alternative implementation would be t = Clamp(t, 0, 1), then always use t * delta.
+		//        // However, that would have a (small) numerical error at t=1.
+		//        Dist2D closest;
+		//        if (t <= 0)
+		//        {
+		//            t = 0;
+		//            closest = p1;
+		//        }
+		//        else if (t >= 1)
+		//        {
+		//            t = 1;
+		//            closest = p2;
+		//        }
+		//        else
+		//        {
+		//            closest.X = p1.X + t * delta.X;
+		//            closest.Y = p1.Y + t * delta.Y;
+		//        }
+
+		//        return closest;
+		//    }
+
+		//    // "2D" because "point" has no Z; calculating in XY plane.
+		//    // Return value then interpolates Z based on p1 and p2.
+		//    // Line (p1, p2) is a segment: does not extend beyond its endpoints.
+		//    // "t" is "weight" of point on line that is closest to "point";
+		//    // it is 0 at p1, 1 at p2.
+		//    public static Dist3D ClosestPointOnLine2D_AndT(Dist2D point, Dist3D p1, Dist3D p2, out double t)
+		//    {
+		//        Dist2D p1Flat = p1.ToPoint2D();
+		//        Dist2D p2Flat = p2.ToPoint2D();
+		//        Dist2D delta = Delta2D(p1Flat, p2Flat);
+
+		//        if (delta.X == 0 & delta.Y == 0)
+		//        {
+		//            // Line is a single point; take distance from "point" to that point.
+		//            // All "t"s would yield same answer. (Or maybe there would be divide-by-zero.) Treat it as "half-way".
+		//            t = 0.5;
+		//            // p1 and p2 are the same; there is only one possible answer to "closest point".
+		//            return p1;
+		//        }
+
+		//        // ----> Main Work <----
+		//        // Out "t".
+		//        // Calculate the t that minimizes the Distance.
+		//        t = CalcTOfClosestPoint(point, p1Flat, delta);
+
+
+		//        // See if "t" represents one of the segment's end points, or a point in-between.
+		//        // NOTE: Alternative implementation would be t = Clamp(t, 0, 1), then always use t * delta.
+		//        // However, that would have a (small) numerical error at t=1.
+		//        Dist3D closest;
+		//        if (t <= 0)
+		//        {
+		//            t = 0;
+		//            closest = p1;
+		//        }
+		//        else if (t >= 1)
+		//        {
+		//            t = 1;
+		//            closest = p2;
+		//        }
+		//        else
+		//        {
+		//            closest.X = p1.X + t * delta.X;
+		//            closest.Y = p1.Y + t * delta.Y;
+		//            double deltaZ = p2.Z - p1.Z;
+		//            closest.Z = p1.Z + t * deltaZ;
+		//            Test();
+		//        }
+
+		//        return closest;
+		//    }
+
+
+
+		//    // Finds closest points on the two segments; able to interpolate along either segment (but not both simultaneously).
+		//    // TODO: Currently can't simultaneously interpolate both segments; if segments intersect, should find that intersection point.
+		//    // PERFORMANCE: Interpolates all 4 pairs of "one end and the other full segment"; a lot of that work is redundant.
+		//    // "p1a..p1b" and "p2a..p2b" are the two segments. Do not extend beyond ends of segments.
+		//    public static double ClosestPointsOnSegments_Distance(Dist2D p1a, Dist2D p1b, Dist2D p2a, Dist2D p2b, out Dist2D closestP1, out Dist2D closestP2)
+		//    {
+		//        double minDistanceSq = double.MaxValue;
+
+		//        // Check all 4 segment ends for distance; closest end will be closest overall.
+		//        AccumClosestPointPairAndDistanceSq(p1a, p2a, p2b, ref minDistanceSq, ref closestP1, ref closestP2);
+		//        AccumClosestPointPairAndDistanceSq(p1b, p2a, p2b, ref minDistanceSq, ref closestP1, ref closestP2);
+		//        // CAUTION: "closestP1" corresponds to "p1a", so caller must change parameter order when testing a point from segment 2.
+		//        AccumClosestPointPairAndDistanceSq(p2a, p1a, p1b, ref minDistanceSq, ref closestP2, ref closestP1);
+		//        AccumClosestPointPairAndDistanceSq(p2b, p1a, p1b, ref minDistanceSq, ref closestP2, ref closestP1);
+
+		//        return Math.Sqrt(minDistanceSq);
+		//    }
+
+		//    // CAUTION: "closestP1" corresponds to "p1a", so caller must change parameter order when testing a point from segment 2.
+		//    private static void AccumClosestPointPairAndDistanceSq(Dist2D p1a, Dist2D p2a, Dist2D p2b, ref double minDistanceSq, ref Dist2D closestP1, ref Dist2D closestP2)
+		//    {
+		//        Dist2D partnerPt;
+		//        double distanceSq = PointDistanceSqToLine2D_AndClosestPoint(p1a, p2a, p2b, out partnerPt);
+
+		//        if (distanceSq < minDistanceSq)
+		//        {
+		//            minDistanceSq = distanceSq;
+		//            closestP1 = p1a;
+		//            closestP2 = partnerPt;
+		//        }
+		//    }
+
+
+		//    // Don't wrap. If want closest polygon, and poly is not already closed, caller must append first point at end of array.
+		//    public static double PointDistanceToPolyline(Dist2D point, Dist2D[] poly)
+		//    {
+		//        Dist2D closestPt = default(Dist2D);
+		//        return PointDistanceToPolyline_AndClosestPoint(point, poly, out closestPt);
+		//    }
+
+		//    // Don't wrap. If want closest polygon, and poly is not already closed, caller must append first point at end of array.
+		//    public static double PointDistanceToPolyline_AndClosestPoint(Dist2D point, Dist2D[] poly, out Dist2D closestPt)
+		//    {
+		//        double minDistanceSq = double.MaxValue;
+		//        // OUT: closestPt
+		//        closestPt = default(Dist2D);
+
+
+		//        int lastIndex = poly.Length - 1;
+		//        // Don't wrap. If want closest polygon, and poly is not already closed, caller must append first point at end of array.
+		//        for (int i = 0; i <= lastIndex - 1; i++)
+		//        {
+		//            int j = i + 1;
+		//            // If j >= lastIndex Then j = 0
+
+		//            Dist2D closest1 = default(Dist2D);
+		//            double distanceSq = PointDistanceSqToLine2D_AndClosestPoint(point, poly[i], poly[j], out closest1);
+
+		//            if (distanceSq < minDistanceSq)
+		//            {
+		//                minDistanceSq = distanceSq;
+		//                // OUT: closestPt
+		//                closestPt = closest1;
+		//            }
+		//        }
+
+
+		//        double minDistance = double.MaxValue;
+		//        if (Exists(closestPt))
+		//            minDistance = Math.Sqrt(minDistanceSq);
+		//        return minDistance;
+		//    }
+
+		//    // Performance: Avoids Sqrt.
+		//    public static double PointDistanceSquaredToLine2D(Dist2D point, Dist2D p1, Dist2D p2)
+		//    {
+		//        Dist2D closest = LinePointClosestToPoint2D(point, p1, p2);
+		//        return DistanceSquared2D(point, closest);
+		//    }
+		//    // Performance: Avoids Sqrt.
+		//    public static double PointDistanceSquaredToLine2D(Dist2D point, Dist2D p1, Dist2D p2, out Dist2D closest)
+		//    {
+		//        closest = LinePointClosestToPoint2D(point, p1, p2);
+		//        return DistanceSquared2D(point, closest);
+		//    }
+		//    // Performance: Avoids Sqrt.
+		//    public static double PointDistanceSquaredToLine2D(Dist2D point, Dist2D p1, Dist2D p2, out double t)
+		//    {
+		//        Dist2D closest = LinePointClosestToPoint2D(point, p1, p2, ref t);
+		//        return DistanceSquared2D(point, closest);
+		//    }
+
+		//    public static Dist2D LinePointClosestToPoint2D(Dist2D point, Dist2D p1, Dist2D p2)
+		//    {
+		//        double t;
+		//        return LinePointClosestToPoint2D(point, p1, p2, ref t);
+		//    }
+
+		//    // Set t to 0 if p1 is closest, 1 if p2 is closest, value between 0..1 to represent closest point in middle.
+		//    public static Dist2D LinePointClosestToPoint2D(Dist2D point, Dist2D p1, Dist2D p2, out double t)
+		//    {
+		//        Dist2D delta = Delta2D(p1, p2);
+
+		//        // Test for zero-length line segment. If so, return that segment's only point.
+		//        if (delta.X == 0 & delta.Y == 0)
+		//            return p1;
+
+		//        // Calculate the t that minimizes the Distance.
+		//        t = ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (delta.X * delta.X + delta.Y * delta.Y);
+
+		//        // See if this represents one of the segment's
+		//        // end points or a point in the middle.
+		//        Dist2D closest;
+		//        if (t < 0)
+		//        {
+		//            t = 0;
+		//            closest = p1;
+		//        }
+		//        else if (t > 1)
+		//        {
+		//            t = 1;
+		//            closest = p2;
+		//        }
+		//        else
+		//        {
+		//            closest.X = p1.X + t * delta.X;
+		//            closest.Y = p1.Y + t * delta.Y;
+		//        }
+
+		//        // ' Verify
+		//        // Dim deltaPt As Dist2D = Delta2D(point, closest)
+		//        // Dim dist As Single = deltaPt.Length
+		//        // Dim verify As Dist2D = Lerp(p1, p2, t)
+
+		//        return closest;
+		//    }
+
+
+		//    public static PointF LinePointClosestToPoint2D(PointF point, PointF p1, PointF p2)
+		//    {
+		//        float t;
+		//        return LinePointClosestToPoint2D(point, p1, p2, t);
+		//    }
+		//    // Set t to 0 if p1 is closest, 1 if p2 is closest, value between 0..1 to represent closest point in middle.
+		//    public static PointF LinePointClosestToPoint2D(PointF point, PointF p1, PointF p2, out float t)
+		//    {
+		//        PointF delta = Delta2D(p1, p2);
+
+		//        // Test for zero-length line segment. If so, return that segment's only point.
+		//        if (delta.X == 0 & delta.Y == 0)
+		//            return p1;
+
+		//        // Calculate the t that minimizes the Distance.
+		//        t = ((point.X - p1.X) * delta.X + (point.Y - p1.Y) * delta.Y) / (double)(delta.X * delta.X + delta.Y * delta.Y);
+
+		//        // See if this represents one of the segment's
+		//        // end points or a point in the middle.
+		//        PointF closest;
+		//        if (t < 0)
+		//        {
+		//            t = 0;
+		//            closest = p1;
+		//        }
+		//        else if (t > 1)
+		//        {
+		//            t = 1;
+		//            closest = p2;
+		//        }
+		//        else
+		//        {
+		//            closest.X = p1.X + t * delta.X;
+		//            closest.Y = p1.Y + t * delta.Y;
+		//        }
+
+		//        // ' Verify
+		//        // Dim deltaPt As Dist2D = Delta2D(point, closest)
+		//        // Dim dist As Single = deltaPt.Length
+		//        // Dim verify As Dist2D = Lerp(p1, p2, t)
+
+		//        return closest;
+		//    }
+
+		//    // Public Function PointDistanceToLine2D(ByVal ptdPoint As Dist2D, ByVal ptdP1 As Dist2D, ByVal ptdP2 As Dist2D) As Double
+		//    // Dim ptdDelta As Dist2D
+		//    // Dim ptdClosest As Dist2D
+		//    // Dim t As Double
+
+		//    // ptdDelta = Delta2D(ptdP1, ptdP2)
+
+		//    // If ptdDelta.X = 0 And ptdDelta.Y = 0 Then _
+		//    // Return m2DLib.CalcDistance2D(ptdPoint, ptdP1)
+
+		//    // ' Calculate the t that minimizes the Distance.
+		//    // t = ((ptdPoint.X - ptdP1.X) * ptdDelta.X + (ptdPoint.Y - ptdP1.Y) * ptdDelta.Y) / (ptdDelta.X * ptdDelta.X + ptdDelta.Y * _
+		//    // ptdDelta.Y)
+
+		//    // ' See if this represents one of the segment's
+		//    // ' end points or a point in the middle.
+		//    // If t < 0 Then
+		//    // ptdDelta.X = ptdPoint.X - ptdP1.X
+		//    // ptdDelta.Y = ptdPoint.Y - ptdP1.Y
+		//    // ptdClosest.X = ptdP1.X
+		//    // ptdClosest.Y = ptdP1.Y
+		//    // ElseIf t > 1 Then
+		//    // ptdDelta.X = ptdPoint.X - ptdP2.X
+		//    // ptdDelta.Y = ptdPoint.Y - ptdP2.Y
+		//    // ptdClosest.X = ptdP2.X
+		//    // ptdClosest.Y = ptdP2.Y
+		//    // Else
+		//    // ptdClosest.X = ptdP1.X + t * ptdDelta.X
+		//    // ptdClosest.Y = ptdP1.Y + t * ptdDelta.Y
+		//    // ptdDelta.X = ptdPoint.X - ptdClosest.X
+		//    // ptdDelta.Y = ptdPoint.Y - ptdClosest.Y
+		//    // End If
+
+		//    // Return m2DLib.CalcDistance2D(ptdPoint, ptdClosest)
+		//    // End Function
+
+		//    public static double PointDistanceToLine2D(double dblPointX, double dblPointY, double dblP1X, double dblP1Y, double dblP2X, double dblP2Y)
+		//    {
+		//        Dist2D ptdDelta;
+		//        Dist2D ptdClosest;
+		//        double t;
+
+		//        ptdDelta = Delta2D(dblP1X, dblP1Y, dblP2X, dblP2Y);
+
+		//        if (ptdDelta.X == 0 & ptdDelta.Y == 0)
+		//            return mDL2DLib.CalcDistance2D(dblPointX, dblPointY, dblP1X, dblP1Y);
+
+		//        // Calculate the t that minimizes the Distance.
+		//        t = ((dblPointX - dblP1X) * ptdDelta.X + (dblPointY - dblP1Y) * ptdDelta.Y) / (ptdDelta.X * ptdDelta.X + ptdDelta.Y * ptdDelta.Y);
+
+		//        // See if this represents one of the segment's
+		//        // end points or a point in the middle.
+		//        if (t < 0)
+		//        {
+		//            ptdClosest.X = dblP1X;
+		//            ptdClosest.Y = dblP1Y;
+		//        }
+		//        else if (t > 1)
+		//        {
+		//            ptdClosest.X = dblP2X;
+		//            ptdClosest.Y = dblP2Y;
+		//        }
+		//        else
+		//        {
+		//            ptdClosest.X = dblP1X + t * ptdDelta.X;
+		//            ptdClosest.Y = dblP1Y + t * ptdDelta.Y;
+		//        }
+
+		//        return mDL2DLib.CalcDistance2D(dblPointX, dblPointY, ptdClosest.X, ptdClosest.Y);
+		//    }
+
+		//    public static double PointDistanceToLine2D(Dist3D ptdPoint, Dist3D ptdP1, Dist3D ptdP2)
+		//    {
+		//        Dist3D ptdDelta;
+		//        Dist3D ptdClosest;
+		//        double t;
+
+		//        ptdDelta = Delta2D(ptdP1, ptdP2);
+
+		//        if (ptdDelta.X == 0 & ptdDelta.Y == 0)
+		//            return mDL2DLib.CalcDistance2D(ptdPoint, ptdP1);
+
+		//        // Calculate the t that minimizes the Distance.
+		//        t = ((ptdPoint.X - ptdP1.X) * ptdDelta.X + (ptdPoint.Y - ptdP1.Y) * ptdDelta.Y) / (double)(ptdDelta.X * ptdDelta.X + ptdDelta.Y * ptdDelta.Y);
+
+		//        // See if this represents one of the segment's
+		//        // end points or a point in the middle.
+		//        if (t < 0)
+		//        {
+		//            ptdDelta.X = ptdPoint.X - ptdP1.X;
+		//            ptdDelta.Y = ptdPoint.Y - ptdP1.Y;
+		//            ptdClosest.X = ptdP1.X;
+		//            ptdClosest.Y = ptdP1.Y;
+		//        }
+		//        else if (t > 1)
+		//        {
+		//            ptdDelta.X = ptdPoint.X - ptdP2.X;
+		//            ptdDelta.Y = ptdPoint.Y - ptdP2.Y;
+		//            ptdClosest.X = ptdP2.X;
+		//            ptdClosest.Y = ptdP2.Y;
+		//        }
+		//        else
+		//        {
+		//            ptdClosest.X = ptdP1.X + t * ptdDelta.X;
+		//            ptdClosest.Y = ptdP1.Y + t * ptdDelta.Y;
+		//            ptdDelta.X = ptdPoint.X - ptdClosest.X;
+		//            ptdDelta.Y = ptdPoint.Y - ptdClosest.Y;
+		//        }
+
+		//        return mDL2DLib.CalcDistance2D(ptdPoint, ptdClosest);
+		//    }
+
+
+		//    public static double ClosestIndexFracAlongPoints(Dist2D goalLocation, IList<Dist2D> pts)
+		//    {
+		//        Dist2D closestPt;
+		//        return ClosestIndexFracAlongPoints(goalLocation, pts, ref closestPt);
+		//    }
+
+		//    /// <summary> aka Closest IndexAndFraction AlongPoints.
+		//    ///     ''' Integer part of result is index of point at start of a segment,
+		//    ///     ''' Fraction part of result is (0..1) along segment which ends at pts(index+1).
+		//    ///     ''' </summary>
+		//    ///     ''' <param name="goalLocation">Goal to get near to.</param>
+		//    ///     ''' <param name="pts">Boundary of a closed shape. NO duplicate at end of first point.</param>
+		//    ///     ''' <param name="closestPt">corresponds to indexFrac; point along segment closest to "goalLocation".</param>
+		//    ///     ''' <returns></returns>
+		//    public static double ClosestIndexFracAlongPoints(Dist2D goalLocation, IList<Dist2D> pts, out Dist2D closestPt)
+		//    {
+		//        int closestILeg;
+		//        double closestT;
+		//        closestPt = ClosestPointOnPointSequence(goalLocation, pts, out closestILeg, out closestT);
+
+		//        double closestIndexFrac = closestILeg + closestT;
+		//        return closestIndexFrac;
+		//    }
+
+		//    // Return "index", set "frac".
+		//    public static int SeparateIndexFrac(double indexFrac, int wrapAt, out double frac)
+		//    {
+		//        int index = System.Convert.ToInt32(Math.Floor(indexFrac));
+		//        frac = indexFrac - index;
+
+		//        // Simplify when round off error moves away from an index.
+		//        if (frac.NearlyEquals(1, VerySmall))
+		//        {
+		//            index += 1;
+		//            frac = 0;
+		//        }
+
+		//        if (wrapAt == int.MaxValue)
+		//            return index;
+		//        else
+		//            return (index % wrapAt);
+		//    }
+
+		//    // Returns a point along line segments between sequence of points (not just one of the pts; may be anywhere between two adjacent ones).
+		//    // E.g. "pts" might be line-of-play points from tee(s) to (start/center) green.
+		//    // closestILeg is 0, for the leg from pts(0) to pts(1). Etc.
+		//    // closestT (aka "closestFrac") is fraction (lerp weight) along the leg: it is 0 at the start of the leg; 1 at the end of the leg.
+		//    // The returned value "closestPt" can be calculated from closestILeg and closestT:
+		//    // = pts(closestILeg) + lerp(pts(closestILeg), pts(closestILeg+1), closestT)
+		//    // Special case when "closestILeg = LastIndex(pts)", because there is no "pts(closestILeg+1)":
+		//    // = pts(closestILeg)
+		//    // = LastElement(pts)
+		//    public static Dist2D ClosestPointOnPointSequence(Dist2D location, IList<Dist2D> pts, out int closestILeg, out double closestT)
+		//    {
+		//        Dist2D closestPt = pts[0];
+		//        closestILeg = 0;
+		//        closestT = 0;
+		//        double minDistanceSq = double.MaxValue;
+
+		//        // "- 1": Uses next point.
+		//        for (int iLeg = 0; iLeg <= LastIndex(pts) - 1; iLeg++)
+		//        {
+		//            Dist2D p1 = pts[iLeg];
+		//            Dist2D p2 = pts[iLeg + 1];
+		//            double t;
+		//            Dist2D closestPt1 = ClosestPointOnLine2D_AndT(location, p1, p2, ref t);
+		//            double distanceSq1 = DistanceSquared2D(location, closestPt1);
+		//            if (distanceSq1 < minDistanceSq)
+		//            {
+		//                minDistanceSq = distanceSq1;
+		//                closestPt = closestPt1;
+		//                closestILeg = iLeg;
+		//                closestT = t;
+		//            }
+		//        }
+
+		//        return closestPt;
+		//    }
+
+		//    // Given an initial position along one leg of a sequence of points,
+		//    // "startILeg" and "startT" (e.g. ClosestPointOnPointSequence > closestILeg & closestT),
+		//    // and a distance to move, calculates where to move to.
+		//    // Won't go beyond end of sequence.
+		//    // "endILeg" is the START of the final leg that is used. (But if reach very end, it will be the final point.)
+		//    public static Dist2D MoveAlongPointSequence(int startILeg, double startT, double moveDistance, Dist2D[] pts, out int endILeg, out double endT)
+		//    {
+		//        // At start; these will be moved along below.
+		//        // "endILeg" is the START of the final leg that is used.
+		//        endILeg = startILeg;
+		//        endT = startT;
+		//        Dist2D endPt = pts[startILeg];
+		//        // additional distance we need to move, from current endPt.
+		//        double remainingMoveDistance = moveDistance;
+
+		//        // Special case if we are already at end.
+		//        if (startILeg == LastIndex(pts))
+		//            return endPt;
+
+
+		//        // "<" rather than "<=", because to move, there must be another pt after this.
+		//        while (endILeg < LastIndex(pts))
+		//        {
+		//            // Move along the segment.
+		//            double legDistance = CalcDistance2D(pts[endILeg], pts[endILeg + 1]);
+		//            // The current point is this distance along the start leg.
+		//            // ("endT" will be 0, except on start leg.)
+		//            double tDistance = endT * legDistance;
+		//            double remainingDistanceOnLeg = legDistance - tDistance;
+
+		//            if (remainingDistanceOnLeg > remainingMoveDistance)
+		//            {
+		//                // The move can be completed on the current leg.
+		//                double deltaT = remainingMoveDistance / legDistance;
+		//                endT += deltaT;
+		//                endPt = Lerp(endPt, pts[endILeg + 1], endT);
+		//                return endPt;
+		//            }
+		//            else
+		//            {
+		//                // Move to end of leg; which is beginning of next leg.
+		//                remainingMoveDistance -= remainingDistanceOnLeg;
+		//                // At beginning of next leg.
+		//                endILeg += 1;
+		//                endPt = pts[endILeg];
+		//                endT = 0;
+		//            }
+		//        }
+
+
+		//        // We reached the end of sequence; even if remainingMoveDistance > 0,
+		//        // we cannot move any farther.
+		//        return endPt;
+		//    }
+
+		//    // From "startLocation", moves to closest point along sequence of "pts", then moves along that sequence by "moveDistance".
+		//    public static Dist2D PointAheadOnPointSequence(Dist2D startLocation, Dist2D[] pts, double moveDistance)
+		//    {
+		//        int startILeg = 0;
+		//        // Sets startILeg and startT. startPtOnSequence can be calculated from these (= pts(startILeg) + lerp(pts(startILeg), pts(startILeg+1), startT)).
+		//        double startT = 0.0;
+		//        Dist2D startPtOnSequence = ClosestPointOnPointSequence(startLocation, pts, out startILeg, out startT);
+		//        int endILeg = 0;
+
+		//        // If will need to move again from endPt, then endILeg and endT would be the input to another call to MoveAlongPointSequence.
+		//        // Or can simply call PointAheadOnPointSequence again, with endPt as startLocation.
+		//        // If endILeg = LastIndex(pts) Then
+		//        // endPt = LastElement(pts)
+		//        // Else endPt = pts(endILeg) + lerp(pts(endILeg), pts(endILeg+1), endT)
+		//        double endT = 0.0;
+		//        Dist2D endPt = MoveAlongPointSequence(startILeg, startT, moveDistance, pts, out endILeg, out endT);
+		//        return endPt;
+		//    }
+
+		//    // Used to calculate landing point along a line-of-play (LOP).
+		//    // Player is standing at "startLocation".
+		//    // From "startLocation", moves to closest point along sequence of "lopPts",
+		//    // then moves along that sequence until we are "landingDistance" from startLocation.
+		//    // (The final point of lopPts is CG.)
+		//    // This is different than "PointAheadOnPointSequence", in that the distance is calculated from startLocation, rather than measuring along LOP.
+		//    public static Dist2D HitLineOfPlayAtDistance(Dist2D startLocation, Dist2D[] lopPts, double landingDistance)
+		//    {
+		//        int startILeg;
+		//        double startT;
+		//        Dist2D closestPtOnSequence = ClosestPointOnPointSequence(startLocation, lopPts, out startILeg, out startT);
+
+		//        Dist2D guessPt = closestPtOnSequence;
+		//        double guessDistance = CalcDistance2D(startLocation, guessPt);
+
+		//        // If we are > landingDistance from LOP, then the best answer is to hit straight towards LOP.
+		//        // NOTE: This won't happen in golf, because we would be way out of bounds,
+		//        // but included for completeness, in case a small landingDistance is passed in.
+		//        if (guessDistance >= landingDistance)
+		//            return guessPt;
+
+		//        // Examine each point on LOP, until find one that is farther than landingDistance.
+		//        // The answer will be on the leg leading to that point.
+		//        // TBD: Is there ever a situation where there is A SECOND solution?
+		//        Dist2D longPt = guessPt;
+		//        double longDistance = guessDistance;
+		//        int endILeg = startILeg + 1;
+		//        while (endILeg <= LastIndex(lopPts))
+		//        {
+		//            longPt = lopPts[endILeg];
+		//            longDistance = CalcDistance2D(startLocation, longPt);
+		//            // This leg has a point at desired distance.
+		//            if (longDistance >= landingDistance)
+		//                break;
+		//            // Prep Next
+		//            endILeg += 1;
+		//        }
+
+		//        if (longDistance < landingDistance)
+		//            // We reached end of LOP, without reaching landingDistance.
+		//            // Return end of LOP.
+		//            return LastElement(lopPts);
+
+		//        // There is some point along this leg that is at landingDistance.
+		//        Dist2D shortPt = lopPts[endILeg - 1];
+		//        double shortDistance = CalcDistance2D(startLocation, shortPt);
+
+		//        double t;
+		//        Dist2D closestPtOnLeg = ClosestPointOnLine2D_AndT(startLocation, shortPt, longPt, ref t);
+		//        double closestPtOnLegDistance = CalcDistance2D(startLocation, closestPtOnLeg);
+		//        if (closestPtOnLegDistance < landingDistance)
+		//        {
+		//            // The usual case: closest point on leg falls short.
+		//            shortPt = closestPtOnLeg;
+		//            shortDistance = closestPtOnLegDistance;
+		//        }
+		//        else
+		//        {
+		//            // Don't think this can happen, but just in case:
+		//            // closest point on leg is long.
+		//            longPt = closestPtOnLeg;
+		//            longDistance = closestPtOnLegDistance;
+		//        }
+
+		//        // Theoretically possible, though unlikely to ever happen in practice.
+		//        // Avoids divide by zero in WgtFromResult.
+		//        if (shortDistance == longDistance)
+		//            return longPt;
+
+		//        double wgt = WgtFromResult(shortDistance, longDistance, landingDistance);
+		//        // Point along the leg.
+		//        // CAUTION: Not exact, because distance calculation from startPoint isn't a linear function along the segment.
+		//        guessPt = Lerp(shortPt, longPt, wgt);
+		//        guessDistance = CalcDistance2D(startLocation, guessPt);
+
+		//        // Iterate to get more accurate answer.
+		//        int nMore = 5;
+		//        while ((nMore > 0))
+		//        {
+		//            if (guessDistance > landingDistance + 0.5)
+		//            {
+		//                // overshot
+		//                longPt = guessPt;
+		//                longDistance = guessDistance;
+		//            }
+		//            else if (guessDistance < landingDistance - 0.5)
+		//            {
+		//                // undershot
+		//                shortPt = guessPt;
+		//                shortDistance = guessDistance;
+		//            }
+		//            else
+		//                // Close enough.
+		//                break;
+
+		//            // Prep Next
+		//            nMore -= 1;
+		//            wgt = WgtFromResult(shortDistance, longDistance, landingDistance);
+		//            guessPt = Lerp(shortPt, longPt, wgt);
+		//            guessDistance = CalcDistance2D(startLocation, guessPt);
+		//        }
+
+		//        return guessPt;
+		//    }
+
+
+		//    public static bool IsPointCloseToLine2D(PointF ptfPt, PointF[] ptfPoints, float dblErr)
+		//    {
+		//        if (ptfPoints == null)
+		//            return false;
+
+		//        double errDbl = System.Convert.ToDouble(dblErr);
+		//        double errSquared = errDbl * errDbl;
+
+		//        for (int intIdx = 1; intIdx <= ptfPoints.Length - 1; intIdx++)
+		//        {
+		//            // Performance: Avoids Sqrt.
+		//            if (PointDistanceSquaredToLine2D(ptfPt, ptfPoints[intIdx - 1], ptfPoints[intIdx]) < errSquared)
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    public static bool IsPointCloseToLine2D(Dist2D ptdPt, Dist2D[] ptdPoints, double dblErr)
+		//    {
+		//        if (ptdPoints == null)
+		//            return false;
+
+		//        for (int intIdx = 1; intIdx <= ptdPoints.Length - 1; intIdx++)
+		//        {
+		//            if (PointDistanceToLine2D(ptdPt, ptdPoints[intIdx - 1], ptdPoints[intIdx]) < dblErr)
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    public static bool IsPointCloseToLine2D(Dist3D ptdPt, Dist3D[] ptdPoints, double dblErr)
+		//    {
+		//        if (ptdPoints == null)
+		//            return false;
+
+		//        for (int intIdx = 1; intIdx <= ptdPoints.Length - 1; intIdx++)
+		//        {
+		//            if (PointDistanceToLine2D(ptdPt, ptdPoints[intIdx - 1], ptdPoints[intIdx]) < dblErr)
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    // http://alienryderflex.com/polygon/
+		//    public static bool IsPointWithinPolygon2D(PointF[] polygon, PointF point)
+		//    {
+		//        if (polygon == null)
+		//            return false;
+
+		//        int length = GetLength_ExcludingDuplicateEndpoint(polygon);
+
+		//        // Process points
+		//        bool odd = false;
+		//        double x = point.X;
+		//        double y = point.Y;
+		//        for (int i = 0; i <= length - 1; i++)
+		//        {
+		//            int j = (i + 1) % length;
+		//            double iy = polygon[i].Y;
+		//            double jy = polygon[j].Y;
+		//            if ((iy < y && jy >= y) || (jy < y && iy >= y))
+		//            {
+		//                double ix = polygon[i].X;
+		//                double jx = polygon[j].X;
+		//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                    odd = !odd;
+		//            }
+		//        }
+
+		//        return odd;
+		//    }
+
+		//    // For performance, the tolerance calculation is approximate. Allows somewhat longer diagonal distance.
+		//    public static bool IsPointWithinToleranceOfPolygon(PointF[] polygon, PointF point, float tolerance)
+		//    {
+		//        if (polygon == null)
+		//            return false;
+
+		//        int length = GetLength_ExcludingDuplicateEndpoint(polygon);
+
+		//        // Process points
+		//        bool odd = false;
+		//        double x = point.X;
+		//        double y = point.Y;
+		//        for (int i = 0; i <= length - 1; i++)
+		//        {
+		//            int j = (i + 1) % length;
+
+		//            PointF pi = polygon[i];
+		//            PointF pj = polygon[j];
+
+		//            double iy = pi.Y;
+		//            double jy = pj.Y;
+
+		//            double minY, maxY;
+		//            if (jy < iy)
+		//            {
+		//                minY = jy; maxY = iy;
+		//            }
+		//            else
+		//            {
+		//                minY = iy; maxY = jy;
+		//            }
+
+		//            if ((y < minY - tolerance) || (y > maxY + tolerance))
+		//                continue;
+
+		//            double ix = pi.X;
+		//            double jx = pj.X;
+
+		//            // point may be near this span.
+		//            double minX, maxX;
+		//            if (ix <= jx)
+		//            {
+		//                minX = ix; maxX = jx;
+		//            }
+		//            else
+		//            {
+		//                minX = jx; maxX = ix;
+		//            }
+
+		//            if (x < minX - tolerance)
+		//                // Point is safe distance to left. Not within tolerance of this segment.
+		//                // Not counted as crossing.
+		//                var toleft = 0;
+		//            else if (x > maxX + tolerance)
+		//            {
+		//                // Point is safe distance to right. Not within tolerance of this segment.
+		//                // Counts as crossing, if within y-span (not merely within tolerance).
+		//                // CAUTION: To avoid double-counting at endpoint, one test is "<", other test is "<=".
+		//                if ((minY < y) && (y <= maxY))
+		//                    odd = !odd;
+		//            }
+		//            else
+		//            {
+		//                // This is only time we need thorough check for "within tolerance" of segment.
+		//                // CAUTION: To avoid double-counting at endpoint, one test is "<", other test is "<=".
+		//                // (Also avoids divide-by-zero.)
+
+		//                PointF delta = Delta2D(pi, pj);
+
+		//                // If we get here, we are within tolerance of bounding box surrounding segment.
+		//                // Avoid Divide By Zero.
+		//                if (delta.Y == 0)
+		//                    // SPECIAL CASE: Segment is a point, or a horizontal line.
+		//                    // We are within tolerance. Approximately; might be slightly longer diagonal distance.
+		//                    return true;
+
+		//                Dist2D closest = LinePointClosestToPoint2D(new Dist2D(point), new Dist2D(pi), new Dist2D(pj));
+		//                // We only need approximate distance to compare to tolerance. The longer edge is an approximation to distance.
+		//                float approxDistance = System.Convert.ToSingle(Math.Max(Math.Abs(closest.X - x), Math.Abs(closest.Y - y)));
+		//                if (approxDistance < tolerance)
+		//                    return true;
+
+		//                if ((minY < y) && (y <= maxY))
+		//                {
+		//                    if ((ix + ((y - iy) / (jy - iy)) * (jx - ix)) < x)
+		//                        // Counts as crossing.
+		//                        odd = !odd;
+		//                }
+		//            }
+		//        }
+
+		//        return odd;
+		//    }
+
+		//    // Check if the first point and the last point are equal
+		//    private static int GetLength_ExcludingDuplicateEndpoint(PointF[] polygon)
+		//    {
+		//        int length;
+
+		//        int lastIndex1 = LastIndex(polygon);
+		//        if (polygon[0].X == polygon[lastIndex1].X & polygon[0].Y == polygon[lastIndex1].Y)
+		//            length = polygon.Length - 1;
+		//        else
+		//            length = polygon.Length;
+
+		//        return length;
+		//    }
+
+		//    public static bool IsPointWithinPolygon2D(Dist2D[] ptdPolygon, Dist2D point)
+		//    {
+		//        // http://alienryderflex.com/ptdPolygon/
+
+		//        if (ptdPolygon == null)
+		//            return false;
+
+		//        bool odd = false;
+		//        int length;
+		//        int i, j;
+		//        double ix, iy, jx, jy, x, y;
+
+		//        // Check if the first point and the last point are equal
+		//        if (ptdPolygon[0].X == ptdPolygon[ptdPolygon.Length - 1].X & ptdPolygon[0].Y == ptdPolygon[ptdPolygon.Length - 1].Y)
+		//            length = ptdPolygon.Length - 1;
+		//        else
+		//            length = ptdPolygon.Length;
+
+		//        // Process points
+		//        for (i = 0; i <= length - 1; i++)
+		//        {
+		//            j = (i + 1) % length;
+		//            ix = ptdPolygon[i].X;
+		//            iy = ptdPolygon[i].Y;
+		//            jx = ptdPolygon[j].X;
+		//            jy = ptdPolygon[j].Y;
+		//            x = point.X;
+		//            y = point.Y;
+		//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
+		//            {
+		//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                    odd = !odd;
+		//            }
+		//        }
+
+		//        return odd;
+		//    }
+
+		//    public static bool IsPointWithinPolygon2D(Dist3D[] ptdPolygon, Dist3D point)
+		//    {
+		//        // http://alienryderflex.com/ptdPolygon/
+
+		//        if (ptdPolygon == null)
+		//            return false;
+
+		//        bool odd = false;
+		//        int length;
+		//        int i, j;
+		//        double ix, iy, jx, jy, x, y;
+
+		//        // Check if the first point and the last point are equal
+		//        if (ptdPolygon[0].X == ptdPolygon[ptdPolygon.Length - 1].X & ptdPolygon[0].Y == ptdPolygon[ptdPolygon.Length - 1].Y)
+		//            length = ptdPolygon.Length - 1;
+		//        else
+		//            length = ptdPolygon.Length;
+
+		//        // Process points
+		//        for (i = 0; i <= length - 1; i++)
+		//        {
+		//            j = (i + 1) % length;
+		//            ix = ptdPolygon[i].X;
+		//            iy = ptdPolygon[i].Y;
+		//            jx = ptdPolygon[j].X;
+		//            jy = ptdPolygon[j].Y;
+		//            x = point.X;
+		//            y = point.Y;
+		//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
+		//            {
+		//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                    odd = !odd;
+		//            }
+		//        }
+
+		//        return odd;
+		//    }
+
+		//    public static bool IsPointWithinPolygon2D_Test_If_Faster(ref Dist3D[] ptdPolygon, Dist3D point, int intStartIdx, int intEndIdx)
+		//    {
+		//        // http://alienryderflex.com/ptdPolygon/
+
+		//        if (ptdPolygon == null)
+		//            return false;
+
+		//        bool odd = false;
+		//        int length;
+		//        int i, j;
+		//        double ix, iy, jx, jy, x, y;
+
+		//        // Check if the first point and the last point are equal
+		//        if (ptdPolygon[0].X == ptdPolygon[ptdPolygon.Length - 1].X & ptdPolygon[0].Y == ptdPolygon[ptdPolygon.Length - 1].Y)
+		//            // length = ptdPolygon.Length - 1
+		//            length = intEndIdx - intStartIdx;
+		//        else
+		//            // length = ptdPolygon.Length
+		//            length = intEndIdx - intStartIdx + 1;
+
+		//        // Process points
+		//        for (i = intStartIdx; i <= intEndIdx; i++)
+		//        {
+		//            j = (i + 1) % length;
+		//            ix = ptdPolygon[i].X;
+		//            iy = ptdPolygon[i].Y;
+		//            jx = ptdPolygon[j].X;
+		//            jy = ptdPolygon[j].Y;
+		//            x = point.X;
+		//            y = point.Y;
+		//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
+		//            {
+		//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                    odd = !odd;
+		//            }
+		//        }
+
+		//        return odd;
+		//    }
+
+		//    public static bool IsPointsWithinRectangle2D(PointF[] ptfRec, PointF[] ptfPts)
+		//    {
+		//        if (ptfRec == null)
+		//            return false;
+
+		//        for (int intIdx = 0; intIdx <= ptfPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptfPts[intIdx], ptfRec))
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    public static bool IsPointsWithinRectangle2D(Dist2D[] ptdRec, Dist2D[] ptdPts)
+		//    {
+		//        if (ptdRec == null)
+		//            return false;
+
+		//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    public static bool IsPointsWithinRectangle2D(Dist3D[] ptdRec, Dist3D[] ptdPts)
+		//    {
+		//        if (ptdRec == null)
+		//            return false;
+
+		//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    // PERFORMANCE: Caller should do polygon (rectangular) bounds check before calling this, to quickly handle case where ptfRec is entirely outside that bounds.
+		//    public static bool DoesRectangleIntersectPolygon2DInterior(PointF[] ptfPolygon, PointF[] ptfRec)
+		//    {
+		//        // Cheap check: center and 4 corners.
+		//        foreach (PointF p in ptfRec)
+		//        {
+		//            if (IsPointWithinPolygon2D(ptfPolygon, p))
+		//                return true;
+		//        }
+
+		//        if (IsPointWithinPolygon2D(ptfPolygon, PointFRect_Center(ptfRec)))
+		//            return true;
+
+		//        // TODO: Check intersection of any of 4 lines with polygon interior. How?
+		//        // NOTE: Only matters if line passes ACROSS the polygon (with none of the rect corners inside the polygon -- those were tested above).
+		//        // HACK: Check 4 middles of lines. If those all miss, consider that "good enough" test.
+		//        if (IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[0], ptfRec[1])) || IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[1], ptfRec[2])) || IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[2], ptfRec[3])) || IsPointWithinPolygon2D(ptfPolygon, Average(ptfRec[3], ptfRec[0])))
+		//            return true;
+
+		//        return false;
+		//    }
+
+		//    // VERY SLOW.
+		//    // CAUTION: Won't detect case where one polygon completely encloses the other one.
+		//    public static bool PolygonsIntersects2D(PointF[] ptfPoly1, PointF[] ptfPoly2)
+		//    {
+		//        if (ptfPoly1 == null | ptfPoly2 == null)
+		//            return false;
+
+		//        for (int intIdx = 1; intIdx <= ptfPoly1.Length - 1; intIdx++)
+		//        {
+		//            for (int intIdx2 = 1; intIdx2 <= ptfPoly2.Length - 1; intIdx2++)
+		//            {
+		//                if (LinesIntersects2D(ptfPoly1[intIdx - 1], ptfPoly1[intIdx], ptfPoly2[intIdx2 - 1], ptfPoly2[intIdx2]))
+		//                    return true;
+		//            }
+		//        }
+
+		//        return false;
+		//    }
+
+		//    // VERY SLOW.
+		//    // Closed = include a segment between last point and first point.
+		//    public static bool PolygonClosedIntersects2D(PointF[] poly1, PointF[] poly2)
+		//    {
+		//        if ((poly1 == null) || (poly2 == null))
+		//            return false;
+
+		//        for (int index1 = 1; index1 <= poly1.Length; index1++)
+		//        {
+		//            for (int index2 = 1; index2 <= poly2.Length; index2++)
+		//            {
+		//                int index1wrap = !index1 == poly1.Length ? index1 : 0;
+		//                int index2wrap = !index2 == poly2.Length ? index2 : 0;
+		//                if (LinesIntersects2D(poly1[index1 - 1], poly1[index1wrap], poly2[index2 - 1], poly2[index2wrap]))
+		//                    return true;
+		//            }
+		//        }
+
+		//        return false;
+		//    }
+
+		//    // VERY SLOW.
+		//    // CAUTION: Won't detect case where one polygon completely encloses the other one.
+		//    public static bool PolygonsIntersects2D(Dist2D[] ptdPoly1, Dist2D[] ptdPoly2)
+		//    {
+		//        if (ptdPoly1 == null | ptdPoly2 == null)
+		//            return false;
+
+		//        for (int intIdx = 1; intIdx <= ptdPoly1.Length - 1; intIdx++)
+		//        {
+		//            for (int intIdx2 = 1; intIdx2 <= ptdPoly2.Length - 1; intIdx2++)
+		//            {
+		//                if (LinesIntersects2D(ptdPoly1[intIdx - 1], ptdPoly1[intIdx], ptdPoly2[intIdx2 - 1], ptdPoly2[intIdx2]))
+		//                    return true;
+		//            }
+		//        }
+
+		//        return false;
+		//    }
+
+		//    // VERY SLOW.
+		//    // CAUTION: Won't detect case where one polygon completely encloses the other one.
+		//    public static bool PolygonsIntersects2D(Dist3D[] ptdPoly1, Dist3D[] ptdPoly2)
+		//    {
+		//        if (ptdPoly1 == null | ptdPoly2 == null)
+		//            return false;
+
+		//        for (int intIdx = 1; intIdx <= ptdPoly1.Length - 1; intIdx++)
+		//        {
+		//            for (int intIdx2 = 1; intIdx2 <= ptdPoly2.Length - 1; intIdx2++)
+		//            {
+		//                if (LinesIntersects2D(ptdPoly1[intIdx - 1], ptdPoly1[intIdx], ptdPoly2[intIdx2 - 1], ptdPoly2[intIdx2]))
+		//                    return true;
+		//            }
+		//        }
+
+		//        return false;
+		//    }
+
+		//    // True if line segment (p1, p2) intersects any edge segment of polygon represented by polyPts.
+		//    public static bool SegmentIntersectsPolygon2D(Dist2D p1, Dist2D p2, IList<Dist2D> polyPts)
+		//    {
+		//        Dist2D minP = p1.Min(p2);
+		//        Dist2D maxP = p1.Max(p2);
+
+		//        Dist2D priorPt = polyPts[0];
+		//        for (int i = 1; i <= LastIndex(polyPts); i++)
+		//        {
+		//            Dist2D pt = polyPts[i];
+		//            if (mDL2DLib.MinMaxIntersect(minP, maxP, pt.Min(priorPt), pt.Max(priorPt)))
+		//            {
+		//                if (LinesIntersects2D(p1, p2, priorPt, pt))
+		//                    return true;
+		//            }
+		//            // Prep Next
+		//            priorPt = pt;
+		//        }
+
+		//        return false;
+		//    }
+
+
+		//    public static Dist2D ExtendLine2D(Dist2D ptdP1, Dist2D ptdP2, double dblDistance)
+		//    {
+		//        double dblTotalDistance = mDL2DLib.CalcDistance2D(ptdP1, ptdP2) + dblDistance;
+		//        double dblDAngle = GetAngleDegrees2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
+
+		//        return new Dist2D(ptdP1.X + dblTotalDistance * Math.Cos((dblDAngle / 180) * Math.PI), ptdP1.Y + dblTotalDistance * Math.Sin((dblDAngle / 180) * Math.PI));
+		//    }
+
+		//    public static PointF ExtendLine2D(PointF ptfP1, PointF ptfP2, float sngDistance)
+		//    {
+		//        double dblTotalDistance = mDL2DLib.CalcDistance2D(ptfP1, ptfP2) + sngDistance;
+		//        double dblDAngle = GetAngleDegrees2D(ptfP1.X, ptfP1.Y, ptfP2.X, ptfP2.Y);
+
+		//        return new PointF(System.Convert.ToSingle(ptfP1.X + dblTotalDistance * Math.Cos((dblDAngle / 180) * Math.PI)), System.Convert.ToSingle(ptfP1.Y + dblTotalDistance * Math.Sin((dblDAngle / 180) * Math.PI)));
+		//    }
+
+		//    public static double ReverseAngle(double dblAngle)
+		//    {
+		//        return 360 - dblAngle;
+		//    }
+
+		//    public static float ReverseAngle(float sngAngle)
+		//    {
+		//        return 360 - sngAngle;
+		//    }
+
+		//    public static int ReverseAngle(int intAngle)
+		//    {
+		//        return 360 - intAngle;
+		//    }
+
+		//    // Given an arbitrary angle in degrees, move it into range (-180, +180].
+		//    public static double Degrees_Signed180(double degrees)
+		//    {
+		//        degrees = degrees % 360;
+
+		//        if (degrees <= -180)
+		//            degrees += 360;
+		//        else if (degrees > 180)
+		//            degrees -= 360;
+
+		//        return degrees;
+		//    }
+
+		//    // Convert radians to degrees; return within range (-180, +180].
+		//    public static double RadiansToDegrees_Signed180(double radians)
+		//    {
+		//        return Degrees_Signed180(RadiansToDegrees(radians));
+		//    }
+
+		//    public static double RadiansToDegrees(double dblRadians)
+		//    {
+		//        return dblRadians * 180 / Math.PI;
+		//    }
+
+		//    public static double DegreesToRadians(double dblDegrees)
+		//    {
+		//        return dblDegrees * Math.PI / 180;
+		//    }
+
+		//    public const double TwoPI = 2 * Math.PI;
+
+		//    public const double Degrees90AsRadians = Math.PI / 2.0;
+		//    public const double Degrees89_9AsRadians = Degrees90AsRadians * 89.9 / 90;
+		//    public const double Degrees180AsRadians = Math.PI;
+		//    public const double Degrees270AsRadians = 3 * Math.PI / 2.0;
+		//    public const double Degrees360AsRadians = TwoPI;
+
+
+
+		//    // Returnerar antalet punkter ur ptdPts som ligger inom ptfRec
+		//    public static int PointsCountInRectangle2D(PointF[] ptfRec, PointF[] ptfPts)
+		//    {
+		//        if (ptfRec == null)
+		//            return -1;
+		//        if (ptfPts == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        for (int intIdx = 0; intIdx <= ptfPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptfPts[intIdx], ptfRec))
+		//                intPtsCtr += 1;
+		//        }
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(Dist2D[] ptdRec, Dist2D[] ptdPts)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+		//        if (ptdPts == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
+		//                intPtsCtr += 1;
+		//        }
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(Dist3D[] ptdRec, Dist3D[] ptdPts)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+		//        if (ptdPts == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptdPts[intIdx], ptdRec))
+		//                intPtsCtr += 1;
+		//        }
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(RectangleF rcfRec, PointF[] ptfPts)
+		//    {
+		//        if (ptfPts == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        for (int intIdx = 0; intIdx <= ptfPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptfPts[intIdx], rcfRec))
+		//                intPtsCtr += 1;
+		//        }
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(RectangleF rcfRec, Dist2D[] ptdPts)
+		//    {
+		//        if (ptdPts == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptdPts[intIdx], rcfRec))
+		//                intPtsCtr += 1;
+		//        }
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(RectangleF rcfRec, Dist3D[] ptdPts)
+		//    {
+		//        if (ptdPts == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        for (int intIdx = 0; intIdx <= ptdPts.Length - 1; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D(ptdPts[intIdx], rcfRec))
+		//                intPtsCtr += 1;
+		//        }
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(RectangleF rcfRec, RectangleF rcfPts)
+		//    {
+		//        int intPtsCtr = 0;
+
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y), rcfRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y), rcfRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), rcfRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y + rcfPts.Height), rcfRec))
+		//            intPtsCtr += 1;
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(PointF[] ptfRec, RectangleF rcfPts)
+		//    {
+		//        if (ptfRec == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y), ptfRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y), ptfRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptfRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new PointF(rcfPts.X, rcfPts.Y + rcfPts.Height), ptfRec))
+		//            intPtsCtr += 1;
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(Dist2D[] ptdRec, RectangleF rcfPts)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        if (PointInsideRectangle2D(new Dist2D(rcfPts.X, rcfPts.Y), ptdRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new Dist2D(rcfPts.X + rcfPts.Width, rcfPts.Y), ptdRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new Dist2D(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptdRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new Dist2D(rcfPts.X, rcfPts.Y + rcfPts.Height), ptdRec))
+		//            intPtsCtr += 1;
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static int PointsCountInRectangle2D(Dist3D[] ptdRec, RectangleF rcfPts)
+		//    {
+		//        if (ptdRec == null)
+		//            return -1;
+
+		//        int intPtsCtr = 0;
+
+		//        if (PointInsideRectangle2D(new Dist3D(rcfPts.X, rcfPts.Y), ptdRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new Dist3D(rcfPts.X + rcfPts.Width, rcfPts.Y), ptdRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new Dist3D(rcfPts.X + rcfPts.Width, rcfPts.Y + rcfPts.Height), ptdRec))
+		//            intPtsCtr += 1;
+		//        if (PointInsideRectangle2D(new Dist3D(rcfPts.X, rcfPts.Y + rcfPts.Height), ptdRec))
+		//            intPtsCtr += 1;
+
+		//        return intPtsCtr;
+		//    }
+
+		//    public static Dist2D PolygonCentroid2D(Dist2D[] ptdPolygon, double dblDivider)
+		//    {
+		//        if (ptdPolygon == null || ptdPolygon.Length < 1)
+		//            return new Dist2D(double.NegativeInfinity, double.NegativeInfinity);
+		//        if (ptdPolygon.Length == 1)
+		//            return ptdPolygon[0];
+		//        if (ptdPolygon.Length == 2)
+		//            return Average(ptdPolygon[0], ptdPolygon[1]);
+		//        try
+		//        {
+		//            double dblA = 0;
+		//            double dblXC = 0;
+		//            double dblYC = 0;
+		//            var dblMinX = ptdPolygon[0].X;
+		//            double dblMinY = ptdPolygon[0].Y;
+
+		//            for (int intIdx = 1; intIdx <= ptdPolygon.Length - 1; intIdx++)
+		//            {
+		//                double dblX = ptdPolygon[intIdx].X;
+		//                double dblY = ptdPolygon[intIdx].Y;
+
+		//                if (dblX < dblMinX)
+		//                    dblMinX = dblX;
+		//                if (dblY < dblMinY)
+		//                    dblMinY = dblY;
+		//            }
+
+		//            Dist2D ptdMin = new Dist2D(dblMinX / dblDivider, dblMinY / dblDivider);
+
+		//            for (int intIdx = 0; intIdx <= ptdPolygon.Length - 1; intIdx++)
+		//            {
+		//                Dist2D ptdP1 = ptdPolygon[intIdx];
+		//                Dist2D ptdP2 = ptdPolygon[(intIdx + 1) % ptdPolygon.Length];
+		//                if (ptdP2 == ptdP1)
+		//                    continue; // E.g. if final point is same as first point.
+
+		//                ptdP1.X /= dblDivider; ptdP1.Y /= dblDivider;
+		//                ptdP2.X /= dblDivider; ptdP2.Y /= dblDivider;
+
+		//                ptdP1 -= ptdMin;
+		//                ptdP2 -= ptdMin;
+
+		//                double dblP = ptdP1.X * ptdP2.Y - ptdP2.X * ptdP1.Y;
+
+		//                dblA += dblP;
+		//                dblXC += (ptdP1.X + ptdP2.X) * dblP;
+		//                dblYC += (ptdP1.Y + ptdP2.Y) * dblP;
+		//            }
+
+		//            Dist2D ptdRet;
+		//            if (dblA == 0.0)
+		//            {
+		//                // Failed - simply average the points. (Happens if only two points.)
+		//                Dist2D pSum = new Dist2D(0, 0);
+		//                int len = ptdPolygon.Length;
+		//                if (LastElement(ptdPolygon) == ptdPolygon[0])
+		//                    len -= 1;
+		//                for (int i = 0; i <= len - 1; i++)
+		//                    pSum += ptdPolygon[i];
+		//                ptdRet = pSum / (double)len;
+		//            }
+		//            else
+		//            {
+		//                dblA /= 2;
+		//                ptdRet = new Dist2D(dblXC / (6 * dblA), dblYC / (6 * dblA)) + ptdMin;
+		//                ptdRet.X *= dblDivider; ptdRet.Y *= dblDivider;
+		//            }
+
+		//            return ptdRet;
+		//        }
+		//        catch (Exception ex)
+		//        {
+		//            return new Dist2D(double.NegativeInfinity, double.NegativeInfinity);
+		//        }
+		//    }
+
+		//    public static Dist2D PolygonFindBestCentroidOnObject(Dist2D[] ptdPolygon, Dist2D ptdOrigo)
+		//    {
+		//        if (ptdPolygon == null)
+		//            return Dist2D.Zero();
+		//        var dblMinX = ptdPolygon[0].X;
+		//        double dblMinY = ptdPolygon[0].Y;
+		//        var dblMaxX = ptdPolygon[0].X;
+		//        double dblMaxY = ptdPolygon[0].Y;
+		//        double dblFurthest;
+
+		//        for (int intIdx = 0; intIdx <= ptdPolygon.Length - 1; intIdx++)
+		//        {
+		//            if (ptdPolygon[intIdx].X < dblMinX)
+		//                dblMinX = ptdPolygon[intIdx].X;
+		//            if (ptdPolygon[intIdx].Y < dblMinY)
+		//                dblMinY = ptdPolygon[intIdx].Y;
+
+		//            if (ptdPolygon[intIdx].X < dblMaxX)
+		//                dblMaxX = ptdPolygon[intIdx].X;
+		//            if (ptdPolygon[intIdx].Y < dblMaxY)
+		//                dblMaxY = ptdPolygon[intIdx].Y;
+
+		//            double dblDistance = CalcDistance2D(ptdOrigo, ptdPolygon[intIdx]);
+
+		//            if (dblDistance > dblFurthest)
+		//                dblFurthest = dblDistance;
+		//        }
+
+		//        dblFurthest *= 2;
+
+		//        Dist2D ptdMin = new Dist2D(dblMinX - 1, dblMinY - 1);
+		//        Dist2D ptdMax = new Dist2D(dblMaxX - 1, dblMaxY - 1);
+		//        Dist2D ptdOrigoD = ptdOrigo - ptdMin;
+		//        Dist2D[] ptdHits = null;
+		//        int intAcc = 8;
+
+		//        for (int intIdxAngle = 1; intIdxAngle <= intAcc; intIdxAngle++)
+		//        {
+		//            Dist2D ptdRay;
+
+		//            ptdRay = RotateAtByDegrees2D(ptdOrigo, ptdOrigo + dblFurthest, 360 / (double)intAcc * intIdxAngle);
+
+		//            for (int intIdx = 0; intIdx <= ptdPolygon.Length - 1; intIdx++)
+		//            {
+		//                Dist2D ptdP1 = ptdPolygon[intIdx] - ptdMin;
+		//                Dist2D ptdP2 = ptdPolygon[(intIdx + 1) % ptdPolygon.Length] - ptdMin;
+
+		//                if (LinesIntersects2D(ptdP1, ptdP2, ptdOrigoD, ptdRay - ptdMin))
+		//                {
+		//                    Dist2D ptdIsect = LinesIntersectsAt2D(ptdP1, ptdP2, ptdOrigoD, ptdRay - ptdMin);
+
+		//                    if (!(ptdIsect.X == 0 && ptdIsect.Y == 0))
+		//                    {
+		//                        if (ptdHits == null)
+		//                            ptdHits = new Dist2D[1];
+		//                        else
+		//                        {
+		//                            var oldPtdHits = ptdHits;
+		//                            ptdHits = new Dist2D[ptdHits.Length + 1];
+		//                            if (oldPtdHits != null)
+		//                                Array.Copy(oldPtdHits, ptdHits, Math.Min(ptdHits.Length + 1, oldPtdHits.Length));
+		//                        }
+
+		//                        ptdHits[ptdHits.Length - 1] = ptdIsect + ptdMin;
+		//                    }
+		//                }
+		//            }
+		//        }
+
+		//        if (!ptdHits == null)
+		//        {
+		//            double dblClosestDI = double.NegativeInfinity;
+		//            int intClosestIdx = -1;
+
+		//            for (int intIdx = 0; intIdx <= ptdHits.Length - 1; intIdx++)
+		//            {
+		//                double dblDistance = CalcDistance2D(ptdOrigo, ptdHits[intIdx]);
+
+		//                if (double.IsInfinity(dblClosestDI) || dblDistance < dblClosestDI)
+		//                {
+		//                    dblClosestDI = dblDistance;
+		//                    intClosestIdx = intIdx;
+		//                }
+		//            }
+
+		//            if (intClosestIdx >= 0)
+		//                return ptdHits[intClosestIdx];
+		//        }
+
+		//        return Dist2D.Zero();
+		//    }
+
+		//    // Public Function DistanceBetweenRectangles2D(ByVal ptfRec1() As PointF, ByVal ptfRec2() As PointF) As Double
+		//    // If ptfRec1 Is Nothing Then Return -1
+		//    // If ptfRec2 Is Nothing Then Return -1
+
+		//    // Dim dblDi As Double = -1
+
+		//    // ' Returns 0 if the both rectangles intersects
+
+		//    // If RectanglesIntersects2D(ptfRec1, ptfRec2) Then Return 0
+
+		//    // For intIdx As Integer = 0 To 3
+		//    // For intIdx2 As Integer = 0 To 3
+		//    // Dim dblDI1 As Double = PointDistanceToLine2D(ptfRec1(intIdx2), ptfRec2(IIf(intIdx = 0, 3, intIdx - 1)), ptfRec2(intIdx))
+		//    // Dim dblDI2 As Double = PointDistanceToLine2D(ptfRec2(intIdx2), ptfRec1(IIf(intIdx = 0, 3, intIdx - 1)), ptfRec1(intIdx))
+
+		//    // If dblDi = -1 Or dblDI1 < dblDi Then dblDi = dblDI1
+		//    // If dblDi = -1 Or dblDI2 < dblDi Then dblDi = dblDI2
+		//    // Next
+		//    // Next
+
+		//    // Return dblDi
+		//    // End Function
+
+		//    // Public Function DistanceBetweenRectangles2D(ByVal ptdRec1() As Dist2D, ByVal ptdRec2() As Dist2D) As Double
+		//    // If ptdRec1 Is Nothing Then Return -1
+		//    // If ptdRec2 Is Nothing Then Return -1
+
+		//    // Dim dblDi As Double = -1
+
+		//    // ' Returns 0 if the both rectangles intersects
+
+		//    // If RectanglesIntersects2D(ptdRec1, ptdRec2) Then Return 0
+
+		//    // For intIdx As Integer = 0 To 3
+		//    // For intIdx2 As Integer = 0 To 3
+		//    // Dim dblDI1 As Double = PointDistanceToLine2D(ptdRec1(intIdx2), ptdRec2(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec2(intIdx))
+		//    // Dim dblDI2 As Double = PointDistanceToLine2D(ptdRec2(intIdx2), ptdRec1(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec1(intIdx))
+
+		//    // If dblDi = -1 Or dblDI1 < dblDi Then dblDi = dblDI1
+		//    // If dblDi = -1 Or dblDI2 < dblDi Then dblDi = dblDI2
+		//    // Next
+		//    // Next
+
+		//    // Return dblDi
+		//    // End Function
+
+		//    // Public Function DistanceBetweenRectangles2D(ByVal ptdRec1() As Dist3D, ByVal ptdRec2() As Dist3D) As Double
+		//    // If ptdRec1 Is Nothing Then Return -1
+		//    // If ptdRec2 Is Nothing Then Return -1
+
+		//    // Dim dblDi As Double = -1
+
+		//    // ' Returns 0 if the both rectangles intersects
+
+		//    // 'HACK FIXA DENNA ASAP
+		//    // 'If RectanglesIntersects2D(ptdRec1, ptdRec2) Then Return 0
+
+		//    // For intIdx As Integer = 0 To 3
+		//    // For intIdx2 As Integer = 0 To 3
+		//    // Dim dblDI1 As Double = PointDistanceToLine2D(ptdRec1(intIdx2), ptdRec2(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec2(intIdx))
+		//    // Dim dblDI2 As Double = PointDistanceToLine2D(ptdRec2(intIdx2), ptdRec1(IIf(intIdx = 0, 3, intIdx - 1)), ptdRec1(intIdx))
+
+		//    // If dblDi = -1 Or dblDI1 < dblDi Then dblDi = dblDI1
+		//    // If dblDi = -1 Or dblDI2 < dblDi Then dblDi = dblDI2
+		//    // Next
+		//    // Next
+
+		//    // Return dblDi
+		//    // End Function
+
+		//    public static Dist2D[] Create_LinesByControlPoints(Dist2D[] ptdPoints)
+		//    {
+		//        if (ptdPoints == null)
+		//            return null;
+		//        // ptdPoints = ptdPoints.Clone
+
+		//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
+		//        PointF[] ptfPoints = new PointF[ptdPoints.Length - 1 + 1];
+
+		//        Dist2D ptdRP = ptdPoints[0];
+
+		//        for (int intIdx = 0; intIdx <= ptdPoints.GetUpperBound(0); intIdx++)
+		//            ptfPoints[intIdx] = new PointF(System.Convert.ToSingle((ptdPoints[intIdx].X - ptdRP.X) * 10), System.Convert.ToSingle((ptdPoints[intIdx].Y - ptdRP.Y) * 10));
+
+		//        gfpSplines.AddLines(ptfPoints);
+
+		//        Dist2D[] ptdRetPoints = new Dist2D[gfpSplines.PathPoints.GetUpperBound(0) + 1];
+		//        PointF[] ptfPathPoints = gfpSplines.PathPoints;
+		//        for (int intIdx = 0; intIdx <= ptdRetPoints.GetUpperBound(0); intIdx++)
+		//            ptdRetPoints[intIdx] = new Dist2D((ptfPathPoints[intIdx].X / (double)10) + ptdRP.X, (ptfPathPoints[intIdx].Y / (double)10) + ptdRP.Y);
+
+		//        return ptdRetPoints;
+		//    }
+
+		//    public static PointF[] Create_LinesByControlPoints(PointF[] ptfPoints)
+		//    {
+		//        if (ptfPoints == null)
+		//            return null;
+
+		//        return (PointF[])ptfPoints.Clone();
+		//    }
+
+		//    public static Dist2D[] Create_PolygonByControlPoints(Dist2D[] ptdPoints)
+		//    {
+		//        if (ptdPoints == null)
+		//            return null;
+		//        // ptdPoints = ptdPoints.Clone
+
+		//        // Dim gfpSplines As New Drawing2D.GraphicsPath
+		//        // Dim ptfPoints(ptdPoints.Length - 1) As PointF
+
+		//        // Dim ptdRP As Dist2D = ptdPoints(0)
+
+		//        // For intIdx As Integer = 0 To ptdPoints.GetUpperBound(0)
+		//        // ptdPoints(intIdx).X -= ptdRP.X ' This is a fix for when the Dist2D are to big numbers
+		//        // ptdPoints(intIdx).Y -= ptdRP.Y
+		//        // ptfPoints(intIdx) = ptdPoints(intIdx).ToPointF
+		//        // ptfPoints(intIdx).X *= 10
+		//        // ptfPoints(intIdx).Y *= 10
+		//        // Next
+
+		//        // gfpSplines.AddPolygon(ptfPoints)
+
+		//        // Dim ptdRetPoints(gfpSplines.PathPoints.GetUpperBound(0)) As Dist2D
+
+		//        // For intIdx As Integer = 0 To ptdRetPoints.GetUpperBound(0)
+		//        // ptdRetPoints(intIdx) = New Dist2D(gfpSplines.PathPoints(intIdx).X, gfpSplines.PathPoints(intIdx).Y)
+		//        // ptdRetPoints(intIdx).X /= 10
+		//        // ptdRetPoints(intIdx).Y /= 10
+		//        // ptdRetPoints(intIdx).X += ptdRP.X
+		//        // ptdRetPoints(intIdx).Y += ptdRP.Y
+		//        // Next
+
+		//        if (!ptdPoints[0].X == ptdPoints[ptdPoints.GetUpperBound(0)].X | !ptdPoints[0].Y == ptdPoints[ptdPoints.GetUpperBound(0)].Y)
+		//        {
+		//            var oldPtdPoints = ptdPoints;
+		//            ptdPoints = new Dist2D[ptdPoints.GetUpperBound(0) + 1 + 1];
+		//            if (oldPtdPoints != null)
+		//                Array.Copy(oldPtdPoints, ptdPoints, Math.Min(ptdPoints.GetUpperBound(0) + 1 + 1, oldPtdPoints.Length));
+		//            ptdPoints[ptdPoints.GetUpperBound(0)] = ptdPoints[0];
+		//        }
+
+		//        return ptdPoints;
+		//    }
+
+		//    public static PointF[] Create_PolygonByControlPoints(PointF[] ptfPoints)
+		//    {
+		//        if (ptfPoints == null)
+		//            return null;
+
+		//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
+
+		//        gfpSplines.AddPolygon(ptfPoints);
+
+		//        return gfpSplines.PathPoints;
+		//    }
+
+		//    private static int intSmoothness = 80;
+		//    private static int intPrecision = 1;
+
+		//    public static Dist2D[] Create_ClosedSimplyfiedCardinalByControlPoints(Dist2D[] ptdPoints)
+		//    {
+		//        if (ptdPoints == null)
+		//            return null;
+		//        // ptdPoints = ptdPoints.Clone
+
+		//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
+		//        PointF[] ptfPoints = new PointF[ptdPoints.Length - 1 + 1];
+
+		//        Dist2D ptdRP = ptdPoints[0];
+
+		//        for (int intIdx = 0; intIdx <= ptdPoints.GetUpperBound(0); intIdx++)
+		//        {
+		//            // ptdPoints(intIdx).X -= ptdRP.X ' This is a fix for when the Dist2D are to big numbers
+		//            // ptdPoints(intIdx).Y -= ptdRP.Y
+		//            // ptfPoints(intIdx) = ptdPoints(intIdx).ToPointF
+		//            ptfPoints[intIdx].X = System.Convert.ToSingle(ptdPoints[intIdx].X - ptdRP.X);
+		//            ptfPoints[intIdx].Y = System.Convert.ToSingle(ptdPoints[intIdx].Y - ptdRP.Y);
+		//        }
+
+		//        gfpSplines.AddClosedCurve(ptfPoints);
+		//        gfpSplines.Flatten();
+
+		//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
+		//        Dist2D[] ptdRetPoints;
+
+		//        ptdRetPoints = new Dist2D[ptfRetPoints.GetUpperBound(0) + 1];
+
+		//        for (int intIdx = 0; intIdx <= ptfRetPoints.GetUpperBound(0); intIdx++)
+		//        {
+		//            ptdRetPoints[intIdx] = new Dist2D(ptfRetPoints[intIdx].X, ptfRetPoints[intIdx].Y);
+		//            ptdRetPoints[intIdx].X += ptdRP.X;
+		//            ptdRetPoints[intIdx].Y += ptdRP.Y;
+		//        }
+
+		//        return ptdRetPoints;
+		//    }
+
+		//    public static PointF[] Create_ClosedSimplyfiedCardinalByControlPoints(PointF[] ptfPoints)
+		//    {
+		//        if (ptfPoints == null)
+		//            return null;
+
+		//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
+
+		//        gfpSplines.AddClosedCurve(ptfPoints);
+		//        gfpSplines.Flatten();
+
+		//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
+
+		//        return ptfRetPoints;
+		//    }
+
+		//    public static Dist2D[] Create_SimplyfiedCardinalByControlPoints(Dist2D[] ptdPoints)
+		//    {
+		//        if (ptdPoints == null)
+		//            return null;
+		//        // ptdPoints = ptdPoints.Clone
+
+		//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
+		//        PointF[] ptfPoints = new PointF[ptdPoints.Length - 1 + 1];
+
+		//        Dist2D ptdRP = ptdPoints[0];
+
+		//        for (int intIdx = 0; intIdx <= ptdPoints.GetUpperBound(0); intIdx++)
+		//            ptfPoints[intIdx] = new PointF(System.Convert.ToSingle(ptdPoints[intIdx].X - ptdRP.X), System.Convert.ToSingle(ptdPoints[intIdx].Y - ptdRP.Y));
+
+		//        gfpSplines.AddCurve(ptfPoints);
+		//        gfpSplines.Flatten();
+
+		//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
+		//        Dist2D[] ptdRetPoints = new Dist2D[ptfRetPoints.GetUpperBound(0) + 1];
+
+		//        for (int intIdx = 0; intIdx <= ptfRetPoints.GetUpperBound(0); intIdx++)
+		//            ptdRetPoints[intIdx] = new Dist2D(ptfRetPoints[intIdx].X + ptdRP.X, ptfRetPoints[intIdx].Y + ptdRP.Y);
+
+		//        return ptdRetPoints;
+		//    }
+
+		//    public static PointF[] Create_SimplyfiedCardinalByControlPoints(PointF[] ptfPoints)
+		//    {
+		//        if (ptfPoints == null)
+		//            return null;
+
+		//        Drawing2D.GraphicsPath gfpSplines = new Drawing2D.GraphicsPath();
+
+		//        gfpSplines.AddCurve(ptfPoints);
+		//        gfpSplines.Flatten();
+
+		//        PointF[] ptfRetPoints = BezierApproximationToPointF(gfpSplines.PathPoints, intSmoothness, intPrecision, false);
+
+		//        return ptfRetPoints;
+		//    }
+
+		//    public static Dist2D[] Create_ClosedCardinalByControlPoints(Dist2D[] ptdPts)
+		//    {
+		//        if (ptdPts == null)
+		//            return null;
+		//        Dist2D[] ptdRet;
+		//        int intRetCtr = 0;
+
+		//        if (ptdPts.Length < 2)
+		//            return null;
+		//        else if (ptdPts.Length == 2)
+		//        {
+		//            ptdRet = new Dist2D[4];
+
+		//            ptdRet[0] = ptdPts[0];
+		//            ptdRet[1] = ptdPts[0];
+		//            ptdRet[2] = ptdPts[1];
+		//            ptdRet[3] = ptdPts[1];
+
+		//            return ptdRet;
+		//        }
+
+		//        float tension = 0.5;
+		//        float control_scale;
+		//        Dist2D pt;
+		//        Dist2D pt_before;
+		//        Dist2D pt_after;
+		//        Dist2D pt_after2;
+		//        Dist2D Di;
+		//        Dist2D DiPlus1;
+		//        Dist2D p1, p2, p3, p4;
+		//        int intPts = ptdPts.Length;
+
+		//        control_scale = System.Convert.ToSingle(tension / 0.5 * 0.175);
+
+		//        ptdRet = new Dist2D[(intPts - 1) * 3 + 3 + 1];
+
+		//        ptdRet[0] = ptdPts[0];
+
+		//        for (int intIdx = 0; intIdx <= Information.UBound(ptdPts); intIdx++)
+		//        {
+		//            pt_before = ptdPts[(intIdx - 1 + intPts) % intPts];
+		//            pt = ptdPts[intIdx];
+		//            pt_after = ptdPts[(intIdx + 1) % intPts];
+		//            pt_after2 = ptdPts[(intIdx + 2) % intPts];
+
+		//            p1 = pt;
+		//            p4 = pt_after;
+
+		//            Di.X = pt_after.X - pt_before.X;
+		//            Di.Y = pt_after.Y - pt_before.Y;
+		//            p2.X = pt.X + control_scale * Di.X;
+		//            p2.Y = pt.Y + control_scale * Di.Y;
+
+		//            DiPlus1.X = pt_after2.X - ptdPts[intIdx].X;
+		//            DiPlus1.Y = pt_after2.Y - ptdPts[intIdx].Y;
+		//            p3.X = pt_after.X - control_scale * DiPlus1.X;
+		//            p3.Y = pt_after.Y - control_scale * DiPlus1.Y;
+
+		//            // ptdRet(intRetCtr) = p1
+		//            ptdRet[intRetCtr + 1] = p2;
+		//            ptdRet[intRetCtr + 2] = p3;
+		//            ptdRet[intRetCtr + 3] = p4;
+
+		//            intRetCtr += 3;
+		//        }
+
+		//        return ptdRet;
+		//    }
+
+		//    public static Dist2D[] Create_CardinalByControlPoints(Dist2D[] ptdPts)
+		//    {
+		//        if (ptdPts == null)
+		//            return null;
+		//        Dist2D[] ptdRet;
+		//        int intRetCtr = 0;
+
+		//        if (ptdPts.Length < 2)
+		//            return null;
+		//        else if (ptdPts.Length == 2)
+		//        {
+		//            ptdRet = new Dist2D[4];
+
+		//            ptdRet[0] = ptdPts[0];
+		//            ptdRet[1] = ptdPts[0];
+		//            ptdRet[2] = ptdPts[1];
+		//            ptdRet[3] = ptdPts[1];
+
+		//            return ptdRet;
+		//        }
+
+		//        float tension = 0.5;
+		//        float control_scale;
+		//        Dist2D pt;
+		//        Dist2D pt_before;
+		//        Dist2D pt_after;
+		//        Dist2D pt_after2;
+		//        Dist2D Di;
+		//        Dist2D DiPlus1;
+		//        Dist2D p1, p2, p3, p4;
+		//        int intPts = ptdPts.Length;
+
+		//        control_scale = System.Convert.ToSingle(tension / 0.5 * 0.175);
+
+		//        ptdRet = new Dist2D[(intPts - 1) * 3 + 1];
+
+		//        ptdRet[0] = ptdPts[0];
+
+		//        for (int intIdx = 0; intIdx <= intPts - 2; intIdx++)
+		//        {
+		//            pt_before = ptdPts[Math.Max(intIdx - 1, 0)];
+		//            pt = ptdPts[intIdx];
+		//            pt_after = ptdPts[intIdx + 1];
+		//            pt_after2 = ptdPts[Math.Min(intIdx + 2, Information.UBound(ptdPts))];
+
+		//            p1 = ptdPts[intIdx];
+		//            p4 = ptdPts[intIdx + 1];
+
+		//            Di.X = pt_after.X - pt_before.X;
+		//            Di.Y = pt_after.Y - pt_before.Y;
+		//            p2.X = pt.X + control_scale * Di.X;
+		//            p2.Y = pt.Y + control_scale * Di.Y;
+
+		//            DiPlus1.X = pt_after2.X - ptdPts[intIdx].X;
+		//            DiPlus1.Y = pt_after2.Y - ptdPts[intIdx].Y;
+		//            p3.X = pt_after.X - control_scale * DiPlus1.X;
+		//            p3.Y = pt_after.Y - control_scale * DiPlus1.Y;
+
+		//            ptdRet[intRetCtr + 1] = p2;
+		//            ptdRet[intRetCtr + 2] = p3;
+		//            ptdRet[intRetCtr + 3] = p4;
+
+		//            intRetCtr += 3;
+		//        }
+
+		//        return ptdRet;
+		//    }
+
+		//    // Returns 2 Dist2D
+		//    public static Dist2D[] Get_CrossingLine2D(Dist2D ptdP1, Dist2D ptdP2, double dblRadius)
+		//    {
+		//        Dist2D[] ptdCross = new Dist2D[2]; // (0) = "Left" side     (1) = "Right" side
+		//        double dblAngle = mDL2DLib.GetAngleDegrees2D(ptdP1.X, ptdP1.Y, ptdP2.X, ptdP2.Y);
+
+		//        ptdCross[0].X = dblRadius;
+		//        ptdCross[1].X = dblRadius;
+
+		//        RotateByDegrees2D(ref ptdCross[0], dblAngle + 90);
+		//        RotateByDegrees2D(ref ptdCross[1], dblAngle - 90);
+		//        ptdCross[0].X += ptdP2.X;
+		//        ptdCross[0].Y += ptdP2.Y;
+		//        ptdCross[1].X += ptdP2.X;
+		//        ptdCross[1].Y += ptdP2.Y;
+
+		//        return ptdCross;
+		//    }
+
+		//    public static double CalculatePolygonArea2D(PointF[] ptfPts)
+		//    {
+		//        if (ptfPts == null)
+		//            return -1;
+		//        double dblArea = 0;
+
+		//        for (int intIdx = 1; intIdx <= ptfPts.Length - 1; intIdx++)
+		//        {
+		//            if (intIdx == 0)
+		//                dblArea += (ptfPts[intIdx].X - ptfPts[ptfPts.Length - 1].X) * (ptfPts[intIdx].Y + ptfPts[ptfPts.Length - 1].Y) / (double)2;
+		//            else
+		//                dblArea += (ptfPts[intIdx].X - ptfPts[intIdx - 1].X) * (ptfPts[intIdx].Y + ptfPts[intIdx - 1].Y) / (double)2;
+		//        }
+
+		//        return Math.Abs(dblArea);
+		//    }
+
+		//    // E.g. http://www.mathopenref.com/coordpolygonarea2.html
+		//    // Take area from line segment to X-axis, as traverse the polygon.
+		//    // On side where X's are increasing, is adding the area.
+		//    // On side where X's are decreasing, is subtracting the area.
+		//    // The area between polygon and axis is adding and subtracted, so cancels out,
+		//    // leaving the area of the polygon as the result.
+		//    // Abs is needed because order of points might yield negative of area.
+		//    public static double CalculatePolygonArea2D(IList<Dist2D> pts)
+		//    {
+		//        if (pts == null)
+		//            return 0;
+
+		//        double area = 0;
+		//        Dist2D prevPt = LastElement(pts);
+
+		//        foreach (Dist2D pt in pts)
+		//        {
+		//            area += (pt.X - prevPt.X) * (pt.Y + prevPt.Y) / 2;
+		//            // Prep Next
+		//            prevPt = pt;
+		//        }
+
+		//        return Math.Abs(area);
+		//    }
+
+		//    public static double CalculatePolygonArea2D(Dist3D[] ptdPts)
+		//    {
+		//        if (ptdPts == null)
+		//            return -1;
+		//        double dblArea = 0;
+
+		//        for (int intIdx = 1; intIdx <= ptdPts.Length - 1; intIdx++)
+		//        {
+		//            if (intIdx == 0)
+		//                dblArea += (ptdPts[intIdx].X - ptdPts[ptdPts.Length - 1].X) * (ptdPts[intIdx].Y + ptdPts[ptdPts.Length - 1].Y) / (double)2;
+		//            else
+		//                dblArea += (ptdPts[intIdx].X - ptdPts[intIdx - 1].X) * (ptdPts[intIdx].Y + ptdPts[intIdx - 1].Y) / (double)2;
+		//        }
+
+		//        return Math.Abs(dblArea);
+		//    }
+
+		//    // When "autoClose", adds distance between last and first point.
+		//    // (For our polygons, those are usually the same location, so autoClose is not needed.)
+		//    public static double Perimeter(IList<Dist2D> pts, bool autoClose = false)
+		//    {
+		//        double result = 0;
+		//        // "- 2" (rather than "- 1") because calculation uses "i + 1".
+		//        for (int i = 0; i <= pts.Count - 2; i++)
+		//        {
+		//            Dist2D p1 = pts[i];
+		//            Dist2D p2 = pts[i + 1];
+		//            double segmentLength = CalcDistance2D(p1, p2);
+		//            result += segmentLength;
+		//        }
+
+		//        if (autoClose)
+		//        {
+		//            double segmentLength = CalcDistance2D(LastElement(pts), FirstElement(pts));
+		//            result += segmentLength;
+		//        }
+
+		//        return result;
+		//    }
+
+
+		//    public static Dist2D[] ExtendPolygon2D(Dist2D[] ptdPolyPts, double dblRange) // Created By Kimpa 070227
+		//    {
+		//        if (ptdPolyPts == null)
+		//            return null;
+		//        if (ptdPolyPts.Length < 2)
+		//            return null;
+
+		//        double tmpV1, tmpV2;
+		//        Dist2D tmpP1, tmpP2;
+		//        Dist2D[] ptd = null;
+		//        double tmpVadd1, tmpVadd2;
+
+		//        tmpVadd1 = 0; tmpVadd2 = 0;
+
+		//        if (!ptdPolyPts[0].X == ptdPolyPts[ptdPolyPts.Length - 1].X | !ptdPolyPts[0].Y == ptdPolyPts[ptdPolyPts.Length - 1].Y)
+		//        {
+		//            var oldPtdPolyPts = ptdPolyPts;
+		//            ptdPolyPts = new Dist2D[ptdPolyPts.Length + 1];
+		//            if (oldPtdPolyPts != null)
+		//                Array.Copy(oldPtdPolyPts, ptdPolyPts, Math.Min(ptdPolyPts.Length + 1, oldPtdPolyPts.Length));
+		//            ptdPolyPts[ptdPolyPts.Length - 1] = ptdPolyPts[0];
+		//        }
+
+		//        for (int intIdx = 1; intIdx <= ptdPolyPts.Length - 1; intIdx++)
+		//        {
+		//            // Angel P1<->P2 and P2<->P1
+		//            double v1 = mDL2DLib.GetAngleDegrees2D(ptdPolyPts[intIdx - 1], ptdPolyPts[intIdx]);
+		//            double v2 = mDL2DLib.GetAngleDegrees2D(ptdPolyPts[intIdx], ptdPolyPts[intIdx - 1]);
+
+		//            // Calculate Outside/inside
+		//            Dist2D CheckD1 = mDL2DLib.NewPosByDistanceAndAngle2D(dblRange >= 0 ? Degrees0_360(v1 + 270) : Degrees0_360(v1 + 90), ptdPolyPts[intIdx - 1], Math.Abs(dblRange));
+		//            Dist2D CheckD2 = mDL2DLib.NewPosByDistanceAndAngle2D(dblRange >= 0 ? Degrees0_360(v2 - 270) : Degrees0_360(v2 - 90), ptdPolyPts[intIdx], Math.Abs(dblRange));
+		//            if (dblRange >= 0)
+		//            {
+		//                if (mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD1) == true | mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD2) == true)
+		//                {
+		//                    tmpVadd1 = v1 + 90;
+		//                    tmpVadd2 = v2 - 90;
+		//                }
+		//                else
+		//                {
+		//                    tmpVadd1 = v1 + 270;
+		//                    tmpVadd2 = v2 - 270;
+		//                }
+		//            }
+		//            else if (dblRange < 0)
+		//            {
+		//                if (mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD1) == false | mDL2DLib.PointInPolygon2D(ptdPolyPts, CheckD2) == false)
+		//                {
+		//                    tmpVadd1 = v1 + 270;
+		//                    tmpVadd2 = v2 - 270;
+		//                }
+		//                else
+		//                {
+		//                    tmpVadd1 = v1 + 90;
+		//                    tmpVadd2 = v2 - 90;
+		//                }
+		//            }
+
+		//            // Calculate Angle
+		//            v1 = Degrees0_360(tmpVadd1);    // v1 = IIf(dblRange >= 0, m2DLib.DegreeCorrection(v1 + 270), m2DLib.DegreeCorrection(v1 + 90))
+		//            v2 = Degrees0_360(tmpVadd2);    // v2 = IIf(dblRange >= 0, m2DLib.DegreeCorrection(v2 - 270), m2DLib.DegreeCorrection(v2 - 90))
+
+
+		//            // Calculate New Position
+		//            Dist2D d1 = mDL2DLib.NewPosByDistanceAndAngle2D(v1, ptdPolyPts[intIdx - 1], Math.Abs(dblRange));
+		//            Dist2D d2 = mDL2DLib.NewPosByDistanceAndAngle2D(v2, ptdPolyPts[intIdx], Math.Abs(dblRange));
+
+		//            // Add New Position to 2d Array
+		//            if (ptd == null)
+		//            {
+		//                ptd = new Dist2D[1];
+		//                ptd[0] = d1;
+		//            }
+		//            else if (intIdx != ptdPolyPts.Length - 1)
+		//            {
+		//                if (mDL2DLib.LinesIntersects2D(d1, d2, tmpP1, tmpP2) == true)
+		//                {
+		//                    var oldPtd = ptd;
+		//                    ptd = new Dist2D[ptd.Length + 1];
+		//                    if (oldPtd != null)
+		//                        Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
+		//                    ptd[ptd.Length - 1] = mDL2DLib.LinesIntersectsAt2D(d1, d2, tmpP1, tmpP2);
+		//                }
+		//                else
+		//                {
+		//                    var oldPtd = ptd;
+		//                    ptd = new Dist2D[ptd.Length + 1];
+		//                    if (oldPtd != null)
+		//                        Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
+		//                    ptd[ptd.Length - 1] = tmpP2;
+		//                    var oldPtd = ptd;
+		//                    ptd = new Dist2D[ptd.Length + 1];
+		//                    if (oldPtd != null)
+		//                        Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
+		//                    ptd[ptd.Length - 1] = d1;
+		//                }
+		//            }
+		//            else if (intIdx == ptdPolyPts.Length - 1)
+		//            {
+		//                if (ptd.Length >= 2)
+		//                {
+		//                    if (mDL2DLib.LinesIntersects2D(d1, d2, ptd[0], ptd[1]))
+		//                    {
+		//                        var oldPtd = ptd;
+		//                        ptd = new Dist2D[ptd.Length + 1];
+		//                        if (oldPtd != null)
+		//                            Array.Copy(oldPtd, ptd, Math.Min(ptd.Length + 1, oldPtd.Length));
+		//                        ptd[ptd.Length - 1] = ptd[0];
+		//                    }
+		//                }
+		//            }
+		//            tmpP1 = d1;
+		//            tmpP2 = d2;
+		//            tmpV1 = v1;
+		//            tmpV2 = v2;
+		//        }
+
+		//        return ptd;
+		//    }
+
+		//    public static int AnglePerpendicularZone(double intAngleDegree)
+		//    {
+		//        // Zones: 1:0-90,2:91-180,3:181-270,4:271-359
+		//        if (intAngleDegree >= 0 && intAngleDegree <= 90)
+		//            return 1;
+		//        if (intAngleDegree > 90 && intAngleDegree <= 180)
+		//            return 2;
+		//        if (intAngleDegree > 180 && intAngleDegree <= 270)
+		//            return 3;
+		//        if (intAngleDegree > 270 && intAngleDegree < 360)
+		//            return 4;
+
+		//        return 0;
+		//    }
+
+		//    public static Dist2D[] MeargePolygons2D(System.Drawing.Graphics gfx, Dist2D[] ptdPolyPts1, Dist2D[] ptdPolyPts2) // Created By Kimpa 070221
+		//    {
+		//        if (ptdPolyPts1 == null)
+		//            return null;
+		//        if (ptdPolyPts2 == null)
+		//            return null;
+
+		//        Dist2D p1, p2, p3, p4, pMid;
+		//        double xR, xL, yU, yD, dblLength, dblStep;
+		//        double dblR = 0;
+		//        xR = 0; xL = 0; yU = 0; yD = 0;
+
+		//        // Close the Polypts1 and PolyPts2
+		//        if (ptdPolyPts1[0].X != ptdPolyPts1[ptdPolyPts1.Length - 1].X | ptdPolyPts1[0].Y == ptdPolyPts1[ptdPolyPts1.Length - 1].Y)
+		//        {
+		//            var oldPtdPolyPts1 = ptdPolyPts1;
+		//            ptdPolyPts1 = new Dist2D[ptdPolyPts1.Length + 1];
+		//            if (oldPtdPolyPts1 != null)
+		//                Array.Copy(oldPtdPolyPts1, ptdPolyPts1, Math.Min(ptdPolyPts1.Length + 1, oldPtdPolyPts1.Length));
+		//            ptdPolyPts1[ptdPolyPts1.Length - 1] = ptdPolyPts1[0];
+		//        }
+		//        if (ptdPolyPts2[0].X != ptdPolyPts2[ptdPolyPts2.Length - 1].X | ptdPolyPts2[0].Y == ptdPolyPts2[ptdPolyPts2.Length - 1].Y)
+		//        {
+		//            var oldPtdPolyPts2 = ptdPolyPts2;
+		//            ptdPolyPts2 = new Dist2D[ptdPolyPts2.Length + 1];
+		//            if (oldPtdPolyPts2 != null)
+		//                Array.Copy(oldPtdPolyPts2, ptdPolyPts2, Math.Min(ptdPolyPts2.Length + 1, oldPtdPolyPts2.Length));
+		//            ptdPolyPts2[ptdPolyPts2.Length - 1] = ptdPolyPts2[0];
+		//        }
+
+		//        // Calculate a big Rectangle around p1,p2
+		//        for (int intIdx = 0; intIdx <= ptdPolyPts1.Length - 1; intIdx++)
+		//        {
+		//            if (intIdx == 0)
+		//            {
+		//                xR = ptdPolyPts1[intIdx].X;
+		//                xL = ptdPolyPts1[intIdx].X;
+		//                yU = ptdPolyPts1[intIdx].Y;
+		//                yD = ptdPolyPts1[intIdx].Y;
+		//            }
+
+		//            if (ptdPolyPts1[intIdx].X > xR)
+		//                xR = ptdPolyPts1[intIdx].X;
+		//            if (ptdPolyPts1[intIdx].X < xL)
+		//                xL = ptdPolyPts1[intIdx].X;
+		//            if (ptdPolyPts1[intIdx].Y > yD)
+		//                yD = ptdPolyPts1[intIdx].Y;
+		//            if (ptdPolyPts1[intIdx].Y < yU)
+		//                yU = ptdPolyPts1[intIdx].Y;
+		//        }
+		//        for (int intIdx = 0; intIdx <= ptdPolyPts2.Length - 1; intIdx++)
+		//        {
+		//            if (ptdPolyPts2[intIdx].X > xR)
+		//                xR = ptdPolyPts2[intIdx].X;
+		//            if (ptdPolyPts2[intIdx].X < xL)
+		//                xL = ptdPolyPts2[intIdx].X;
+		//            if (ptdPolyPts2[intIdx].Y > yD)
+		//                yD = ptdPolyPts2[intIdx].Y;
+		//            if (ptdPolyPts2[intIdx].Y < yU)
+		//                yU = ptdPolyPts2[intIdx].Y;
+		//        }
+
+		//        p1.X = xL; p1.Y = yU;
+		//        p2.X = xR; p2.Y = yU;
+		//        p3.X = xR; p3.Y = yD;
+		//        p4.X = xL; p4.Y = yD;
+
+		//        // Diameter
+		//        if ((Math.Abs(xL - xR) / 2) >= (Math.Abs(yU - yD) / 2))
+		//            dblR = (Math.Abs(xL - xR) / 2) * 2;
+		//        if ((Math.Abs(xL - xR) / 2) < (Math.Abs(yU - yD) / 2))
+		//            dblR = (Math.Abs(yU - yD) / 2) * 2;
+
+		//        // Holds the Rectangles
+		//        Dist2D[] ptdRec1 = new Dist2D[4];
+		//        Dist2D[] ptdRec2 = new Dist2D[4];
+
+		//        // Calculate Rectangle Around ptdPolypts1
+		//        for (int intIdx = 0; intIdx <= ptdPolyPts1.Length - 1; intIdx++)
+		//        {
+		//            if (intIdx == 0)
+		//            {
+		//                xR = ptdPolyPts1[intIdx].X;
+		//                xL = ptdPolyPts1[intIdx].X;
+		//                yU = ptdPolyPts1[intIdx].Y;
+		//                yD = ptdPolyPts1[intIdx].Y;
+		//            }
+
+		//            if (ptdPolyPts1[intIdx].X > xR)
+		//                xR = ptdPolyPts1[intIdx].X;
+		//            if (ptdPolyPts1[intIdx].X < xL)
+		//                xL = ptdPolyPts1[intIdx].X;
+		//            if (ptdPolyPts1[intIdx].Y > yD)
+		//                yD = ptdPolyPts1[intIdx].Y;
+		//            if (ptdPolyPts1[intIdx].Y < yU)
+		//                yU = ptdPolyPts1[intIdx].Y;
+		//        }
+
+		//        ptdRec1[0] = new Dist2D(xL, yU); ptdRec1[1] = new Dist2D(xR, yU);
+		//        ptdRec1[2] = new Dist2D(xR, yD); ptdRec1[3] = new Dist2D(xL, yD);
+
+		//        // Calculate Rectangle around ptdPolypts2
+		//        for (int intIdx = 0; intIdx <= ptdPolyPts2.Length - 1; intIdx++)
+		//        {
+		//            if (intIdx == 0)
+		//            {
+		//                xR = ptdPolyPts2[intIdx].X;
+		//                xL = ptdPolyPts2[intIdx].X;
+		//                yU = ptdPolyPts2[intIdx].Y;
+		//                yD = ptdPolyPts2[intIdx].Y;
+		//            }
+
+		//            if (ptdPolyPts2[intIdx].X > xR)
+		//                xR = ptdPolyPts2[intIdx].X;
+		//            if (ptdPolyPts2[intIdx].X < xL)
+		//                xL = ptdPolyPts2[intIdx].X;
+		//            if (ptdPolyPts2[intIdx].Y > yD)
+		//                yD = ptdPolyPts2[intIdx].Y;
+		//            if (ptdPolyPts2[intIdx].Y < yU)
+		//                yU = ptdPolyPts2[intIdx].Y;
+		//        }
+
+		//        ptdRec2[0] = new Dist2D(xL, yU); ptdRec2[1] = new Dist2D(xR, yU);
+		//        ptdRec2[2] = new Dist2D(xR, yD); ptdRec2[3] = new Dist2D(xL, yD);
+		//        Dist2D ptdCross1 = new Dist2D(0, 0);
+		//        Dist2D ptdCross2 = new Dist2D(0, 0);
+
+		//        double tmpD = 0;
+		//        for (int intIdx = 1; intIdx <= ptdPolyPts1.Length - 1; intIdx++)
+		//        {
+		//            if (mDL2DLib.LinesIntersects2D(new Dist2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Dist2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts1[intIdx - 1], ptdPolyPts1[intIdx]))
+		//                ptdCross1 = mDL2DLib.LinesIntersectsAt2D(new Dist2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Dist2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts1[intIdx - 1], ptdPolyPts1[intIdx]);
+		//        }
+		//        tmpD = 0;
+		//        for (int intIdx = 1; intIdx <= ptdPolyPts2.Length - 1; intIdx++)
+		//        {
+		//            if (mDL2DLib.LinesIntersects2D(new Dist2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Dist2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts2[intIdx - 1], ptdPolyPts2[intIdx]))
+		//                ptdCross2 = mDL2DLib.LinesIntersectsAt2D(new Dist2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y), new Dist2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y), ptdPolyPts2[intIdx - 1], ptdPolyPts2[intIdx]);
+		//        }
+
+		//        if (ptdCross1.X == 0 & ptdCross1.Y == 0)
+		//            ptdCross1 = new Dist2D(Math.Abs(ptdRec1[1].X - ptdRec1[0].X) / 2 + ptdRec1[0].X, Math.Abs(ptdRec1[3].Y - ptdRec1[0].Y) / 2 + ptdRec1[0].Y);
+		//        if (ptdCross2.X == 0 & ptdCross2.Y == 0)
+		//            ptdCross2 = new Dist2D(Math.Abs(ptdRec2[1].X - ptdRec2[0].X) / 2 + ptdRec2[0].X, Math.Abs(ptdRec2[3].Y - ptdRec2[0].Y) / 2 + ptdRec2[0].Y);
+
+
+		//        // Midpoint in Rectangle
+		//        pMid.X = Math.Abs(ptdCross1.X - ptdCross2.X) / 2 + ptdCross1.X > ptdCross2.X ? ptdCross2.X : ptdCross1.X; // ((Math.Abs(xL - xR)) / 2) + xL 
+		//        pMid.Y = Math.Abs(ptdCross1.Y - ptdCross2.Y) / 2 + ptdCross1.Y > ptdCross2.Y ? ptdCross2.Y : ptdCross1.Y; // ((Math.Abs(yU - yD)) / 2) + yU
+
+		//        gfx.DrawEllipse(Pens.Blue, System.Convert.ToSingle(ptdCross1.X) - 2, System.Convert.ToSingle(ptdCross1.Y) - 2, 4, 4);
+		//        gfx.DrawEllipse(Pens.Red, System.Convert.ToSingle(ptdCross2.X) - 2, System.Convert.ToSingle(ptdCross2.Y) - 2, 4, 4);
+		//        gfx.DrawEllipse(Pens.Black, System.Convert.ToSingle(pMid.X) - 2, System.Convert.ToSingle(pMid.Y) - 2, 4, 4);
+		//        dblLength = (ptdPolyPts1.Length + ptdPolyPts2.Length);
+		//        dblStep = 1; // 360 / dblLength
+
+		//        // Calculate Merge Points
+		//        double tmpDistance = 0;
+		//        Dist2D[] ptdMerge2d = null;
+		//        int intCount = 0;
+		//        double Angle = 0;
+		//        Dist2D tmpP2;
+
+		//        while (!Angle > 360)
+		//        {
+		//            Angle = Angle + dblStep;
+		//            tmpP2 = new Dist2D(0, 0);
+
+		//            // Backup Code with New lineIntersect..
+		//            // For i As Integer = 1 To ptdPolyPts1.Length - 1
+		//            // If m2DLib.LinesIntersects2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i)) Then
+		//            // If m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i))) > tmpDistance Then
+		//            // tmpDistance = m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i)))
+		//            // tmpP2 = m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1(i - 1), ptdPolyPts1(i))
+		//            // End If
+		//            // End If
+		//            // Next
+		//            // For j As Integer = 1 To ptdPolyPts2.Length - 1
+		//            // If m2DLib.LinesIntersects2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)) Then
+		//            // If m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j))) > tmpDistance Then
+		//            // tmpDistance = m2DLib.CalcDistance2D(pMid, m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)))
+		//            // tmpP2 = m2DLib.LinesIntersectsAt2D(pMid, m2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2(j - 1), ptdPolyPts2(j)) 
+		//            // End If
+		//            // End If
+		//            // Next
+
+		//            // Caculate New Points
+		//            for (int i = 1; i <= ptdPolyPts1.Length - 1; i++)
+		//            {
+		//                if (mDL2DLib.IS_OldLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]))
+		//                {
+		//                    if (mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i])) > tmpDistance)
+		//                    {
+		//                        tmpDistance = mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]));
+		//                        tmpP2 = mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts1[i - 1], ptdPolyPts1[i]);
+		//                    }
+		//                }
+		//            }
+
+		//            // Caculate New Points
+		//            for (int j = 1; j <= ptdPolyPts2.Length - 1; j++)
+		//            {
+		//                if (mDL2DLib.IS_OldLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]) == true)
+		//                {
+		//                    if (mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j])) > tmpDistance)
+		//                    {
+		//                        tmpDistance = mDL2DLib.CalcDistance2D(pMid, mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]));
+		//                        tmpP2 = mDL2DLib.OLDLineIntersect2D(pMid, mDL2DLib.NewPosByDistanceAndAngle2D(Angle, pMid, dblR), ptdPolyPts2[j - 1], ptdPolyPts2[j]);
+		//                    }
+		//                }
+		//            }
+
+		//            tmpDistance = 0;
+		//            if (tmpP2.X > 0 | tmpP2.X < 0 | tmpP2.Y > 0 | tmpP2.Y < 0)
+		//            {
+		//                if (ptdMerge2d == null)
+		//                {
+		//                    ptdMerge2d = new Dist2D[intCount + 1];
+		//                    ptdMerge2d[intCount] = tmpP2;
+		//                    intCount = intCount + 1;
+		//                }
+		//                else
+		//                {
+		//                    var oldPtdMerge2d = ptdMerge2d;
+		//                    ptdMerge2d = new Dist2D[intCount + 1];
+		//                    if (oldPtdMerge2d != null)
+		//                        Array.Copy(oldPtdMerge2d, ptdMerge2d, Math.Min(intCount + 1, oldPtdMerge2d.Length));
+		//                    ptdMerge2d[intCount] = tmpP2;
+		//                    intCount = intCount + 1;
+		//                }
+		//            }
+		//        }
+
+		//        return ptdMerge2d;
+		//    }
+
+		//    // Wraps at 360 degrees, so result is in [0..360).
+		//    // TBD: Same as Wrap360.
+		//    public static double Degrees0_360(double dblDeg) // Created By Kimpa 070221
+		//    {
+		//        if (dblDeg > 360)
+		//            return dblDeg % 360;
+
+		//        if (dblDeg < 0)
+		//            // "360 +" moves from negative to positive, because Mod of negative returns a negative.
+		//            return 360 + (dblDeg % 360);
+
+		//        return dblDeg;
+		//    }
+		//    public static double OppsiteDegree(double dblDeg)  // Created By Kimpa 070221
+		//    {
+		//        return dblDeg >= 180 ? dblDeg - 180 : dblDeg + 180;
+		//    }
+		//    public static Dist2D NewPosByDistanceAndAngle2D(double dblDeg, Dist2D ptdPointOrigo2d, double Distance) // Created By Kimpa 070221
+		//    {
+		//        return new Dist2D(ptdPointOrigo2d.X + (Math.Cos((Math.PI / 180) * dblDeg) * Distance), ptdPointOrigo2d.Y + (Math.Sin((Math.PI / 180) * dblDeg) * Distance));
+		//    }
+		//    private static double[] bubble_sort(double[] dblIndex) // Created By Kimpa 070221
+		//    {
+		//        if (dblIndex == null)
+		//            return null;
+
+		//        for (int i = 0; i <= dblIndex.Length - 1; i++)
+		//        {
+		//            for (int j = 0; j <= dblIndex.Length - 2; j++)
+		//            {
+		//                if (dblIndex[j] > dblIndex[j + 1])
+		//                    Swap(dblIndex[j], dblIndex[j + 1]);
+		//            }
+		//        }
+
+		//        return dblIndex;
+		//    }
+
+		//    public static Dist2D OLDLineIntersect2D(Dist2D p1n, Dist2D p2n, Dist2D p1m, Dist2D p2m) // Created By Kim
+		//    {
+		//        return mDL2DLib.OLDLineIntersect2D(p1n.X, p1n.Y, p2n.X, p2n.Y, p1m.X, p1m.Y, p2m.X, p2m.Y);
+		//    }
+		//    public static bool IS_OldLineIntersect2D(Dist2D p1n, Dist2D p2n, Dist2D p1m, Dist2D p2m) // Created By Kim
+		//    {
+		//        return mDL2DLib.IS_OldLineIntersect2D(p1n.X, p1n.Y, p2n.X, p2n.Y, p1m.X, p1m.Y, p2m.X, p2m.Y);
+		//    }
+
+		//    public static Dist2D OLDLineIntersect2D(double dblStartFirstPointX, double dblStartFirstPointY, double dblEndFirstPointX, double dblEndFirstPointY, double dblStartSecondPointX, double dblStartSecondPointY, double dblEndSecondPointX, double dblEndSecondPointY, ref double dblx = 0, ref double dbly = 0) // Created By Kim
+		//    {
+		//        // Can handle better LineIntersect
+		//        double b1, b2, a1, a2, xi, yi, x1hi, x1lo, y1hi, y1lo, ax, bx, ay, by, cx, cy, d, f, e;
+
+		//        ax = dblEndFirstPointX - dblStartFirstPointX;
+		//        bx = dblStartSecondPointX - dblEndSecondPointX;
+
+		//        if (ax < 0)
+		//        {
+		//            x1lo = dblEndFirstPointX; x1hi = dblStartFirstPointX;
+		//        }
+		//        else
+		//        {
+		//            x1hi = dblEndFirstPointX; x1lo = dblStartFirstPointX;
+		//        }
+		//        if (bx > 0)
+		//        {
+		//            if (x1hi < dblEndSecondPointX | dblStartSecondPointX == x1lo)
+		//                return default(Dist2D);
+		//        }
+		//        else if (x1hi < dblStartSecondPointX | dblEndSecondPointX < x1lo)
+		//            return default(Dist2D);
+
+		//        ay = dblEndFirstPointY - dblStartFirstPointY;
+		//        by = dblStartSecondPointY - dblEndSecondPointY;
+		//        if (ay < 0)
+		//        {
+		//            y1lo = dblEndFirstPointY; y1hi = dblStartFirstPointY;
+		//        }
+		//        else
+		//        {
+		//            y1hi = dblEndFirstPointY; y1lo = dblStartFirstPointY;
+		//        }
+
+		//        if (by > 0)
+		//        {
+		//            if (y1hi < dblEndSecondPointY | dblStartSecondPointY < y1lo)
+		//                return default(Dist2D);
+		//        }
+		//        else if (y1hi < dblStartSecondPointY | dblEndSecondPointY < y1lo)
+		//            return default(Dist2D);
+
+		//        cx = dblStartFirstPointX - dblStartSecondPointX;
+		//        cy = dblStartFirstPointY - dblStartSecondPointY;
+
+		//        d = by * cx - bx * cy;
+		//        f = ay * bx - ax * by;
+
+		//        if (f > 0)
+		//        {
+		//            if ((d < 0 | d > f))
+		//                return default(Dist2D);
+		//        }
+		//        else if ((d > 0 | d < f))
+		//            return default(Dist2D);
+
+		//        e = ax * cy - ay * cx;
+		//        if (f > 0)
+		//        {
+		//            if ((e < 0 | e > f))
+		//                return default(Dist2D);
+		//        }
+		//        else if ((e > 0 | e < f))
+		//            return default(Dist2D);
+		//        if (f == 0)
+		//            return default(Dist2D);
+
+		//        // Calculate Where it intersect
+		//        if (!(dblStartFirstPointX - dblEndFirstPointX) == 0)
+		//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - dblEndFirstPointX);
+		//        else
+		//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - (dblEndFirstPointX + 0.000001));
+		//        if (!(dblStartSecondPointX - dblEndSecondPointX) == 0)
+		//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - dblEndSecondPointX);
+		//        else
+		//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - (dblEndSecondPointX + 0.000001));
+
+		//        a1 = dblStartFirstPointY - (b1 * dblStartFirstPointX);
+		//        a2 = dblStartSecondPointY - (b2 * dblStartSecondPointX);
+		//        xi = (-(a1 - a2)) / (b1 - b2);
+		//        yi = a1 + b1 * xi;
+
+		//        double q1, q2, q3, q4;
+
+		//        q1 = (dblStartFirstPointX - xi) * (xi - dblEndFirstPointX);
+		//        q2 = (dblStartSecondPointX - xi) * (xi - dblEndSecondPointX);
+		//        q3 = (dblStartFirstPointY - yi) * (yi - dblEndFirstPointY);
+		//        q4 = (dblStartSecondPointY - yi) * (yi - dblEndSecondPointY);
+
+		//        q1 = Math.Round(q1, 3);
+		//        q2 = Math.Round(q2, 3);
+		//        q3 = Math.Round(q3, 3);
+		//        q4 = Math.Round(q4, 3);
+
+		//        if (q1 >= 0 & q2 >= 0 & q3 >= 0 & q4 >= 0)
+		//        {
+		//            dblx = xi;
+		//            dbly = yi;
+		//            return new Dist2D(dblx, dbly);
+		//        }
+		//        else
+		//            return default(Dist2D);
+
+		//        return default(Dist2D);
+		//    }
+
+		//    public static bool IS_OldLineIntersect2D(double dblStartFirstPointX, double dblStartFirstPointY, double dblEndFirstPointX, double dblEndFirstPointY, double dblStartSecondPointX, double dblStartSecondPointY, double dblEndSecondPointX, double dblEndSecondPointY, ref double dblx = 0, ref double dbly = 0) // Created By Kim
+		//    {
+		//        // Can handle better LineIntersect
+		//        double b1, b2, a1, a2, xi, yi, x1hi, x1lo, y1hi, y1lo, ax, bx, ay, by, cx, cy, d, f, e;
+
+		//        ax = dblEndFirstPointX - dblStartFirstPointX;
+		//        bx = dblStartSecondPointX - dblEndSecondPointX;
+
+		//        if (ax < 0)
+		//        {
+		//            x1lo = dblEndFirstPointX; x1hi = dblStartFirstPointX;
+		//        }
+		//        else
+		//        {
+		//            x1hi = dblEndFirstPointX; x1lo = dblStartFirstPointX;
+		//        }
+		//        if (bx > 0)
+		//        {
+		//            if (x1hi < dblEndSecondPointX | dblStartSecondPointX == x1lo)
+		//                return false;
+		//        }
+		//        else if (x1hi < dblStartSecondPointX | dblEndSecondPointX < x1lo)
+		//            return false;
+
+		//        ay = dblEndFirstPointY - dblStartFirstPointY;
+		//        by = dblStartSecondPointY - dblEndSecondPointY;
+		//        if (ay < 0)
+		//        {
+		//            y1lo = dblEndFirstPointY; y1hi = dblStartFirstPointY;
+		//        }
+		//        else
+		//        {
+		//            y1hi = dblEndFirstPointY; y1lo = dblStartFirstPointY;
+		//        }
+
+		//        if (by > 0)
+		//        {
+		//            if (y1hi < dblEndSecondPointY | dblStartSecondPointY < y1lo)
+		//                return false;
+		//        }
+		//        else if (y1hi < dblStartSecondPointY | dblEndSecondPointY < y1lo)
+		//            return false;
+
+		//        cx = dblStartFirstPointX - dblStartSecondPointX;
+		//        cy = dblStartFirstPointY - dblStartSecondPointY;
+
+		//        d = by * cx - bx * cy;
+		//        f = ay * bx - ax * by;
+
+		//        if (f > 0)
+		//        {
+		//            if ((d < 0 | d > f))
+		//                return false;
+		//        }
+		//        else if ((d > 0 | d < f))
+		//            return false;
+
+		//        e = ax * cy - ay * cx;
+		//        if (f > 0)
+		//        {
+		//            if ((e < 0 | e > f))
+		//                return false;
+		//        }
+		//        else if ((e > 0 | e < f))
+		//            return false;
+		//        if (f == 0)
+		//            return false;
+
+		//        // Calculate Where it intersect
+		//        if (!(dblStartFirstPointX - dblEndFirstPointX) == 0)
+		//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - dblEndFirstPointX);
+		//        else
+		//            b1 = (dblStartFirstPointY - dblEndFirstPointY) / (dblStartFirstPointX - (dblEndFirstPointX + 0.000001));
+		//        if (!(dblStartSecondPointX - dblEndSecondPointX) == 0)
+		//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - dblEndSecondPointX);
+		//        else
+		//            b2 = (dblStartSecondPointY - dblEndSecondPointY) / (dblStartSecondPointX - (dblEndSecondPointX + 0.000001));
+
+		//        a1 = dblStartFirstPointY - (b1 * dblStartFirstPointX);
+		//        a2 = dblStartSecondPointY - (b2 * dblStartSecondPointX);
+		//        xi = (-(a1 - a2)) / (b1 - b2);
+		//        yi = a1 + b1 * xi;
+
+		//        double q1, q2, q3, q4;
+
+		//        q1 = (dblStartFirstPointX - xi) * (xi - dblEndFirstPointX);
+		//        q2 = (dblStartSecondPointX - xi) * (xi - dblEndSecondPointX);
+		//        q3 = (dblStartFirstPointY - yi) * (yi - dblEndFirstPointY);
+		//        q4 = (dblStartSecondPointY - yi) * (yi - dblEndSecondPointY);
+
+		//        q1 = Math.Round(q1, 3);
+		//        q2 = Math.Round(q2, 3);
+		//        q3 = Math.Round(q3, 3);
+		//        q4 = Math.Round(q4, 3);
+
+		//        if (q1 >= 0 & q2 >= 0 & q3 >= 0 & q4 >= 0)
+		//        {
+		//            dblx = xi;
+		//            dbly = yi;
+		//            return true;
+		//        }
+		//        else
+		//            return false;
+		//        // --------End Slow but very very good
+
+		//        return false;
+		//    }
+
+
+		//    // Use this when need to know if point is near boundary versus being a specified distance inside.
+		//    public enum InOut
+		//    {
+		//        Inside = 0,
+		//        Outside = 1,
+		//        Border = 2
+		//    }
+
+		//    // Span has A and B sides, which may differ in whether they are Inside or Outside the other polygon.
+		//    // MUST match InOutContinue values, for In/Out/BorderSame/BorderOpposite.
+		//    public enum InOutPair
+		//    {
+		//        Inside = 0,
+		//        Outside = 1,
+		//        BorderSameSide = 2  // Interiors of both shapes are on same side of span.
+		//,
+		//        BorderOpposite = 3  // Interiors of shapes are on opposite sides of span.
+		//,
+		//        AInBOut = 4    // A Inside, B Outside
+		//,
+		//        AOutBIn = 5    // A Outside, B Inside
+		//,
+		//        Border_TooClose = 6     // Border; Can't resolve interiors. TBD whether finer tolerance would fix, or cause other problems.
+		//    }
+
+		//    // Can pass in either InOutPair or InOutContinue.
+		//    public static bool SpanTypeIsBorder(InOutPair eInOutPair)
+		//    {
+		//        return (eInOutPair == InOutPair.BorderSameSide) || (eInOutPair == InOutPair.BorderOpposite) || (eInOutPair == InOutPair.Border_TooClose);
+		//    }
+
+		//    // Like InOutPair, but add possibility of "Continue"
+		//    // MUST match InOutPair values, for In/Out/BorderSame/BorderOpposite.
+		//    public enum InOutContinue
+		//    {
+		//        Inside = 0,
+		//        Outside = 1,
+		//        BorderSameSide = 2  // Interiors of both shapes are on same side of span.
+		//,
+		//        BorderOpposite = 3  // Interiors of shapes are on opposite sides of span.
+		//,
+		//        AInBOut = 4    // A Inside, B Outside
+		//,
+		//        AOutBIn = 5    // A Outside, B Inside
+		//,
+		//        Border_TooClose = 6     // Border; Can't resolve interiors. TBD whether finer tolerance would fix, or cause other problems.
+		//,
+		//        Continue,
+		//        Conflict
+		//    }
+
+		//    public static string Nick(object ob, int nChars)
+		//    {
+		//        string str = ob.ToString();
+		//        if (str.Length <= nChars)
+		//            return str;
+		//        return str.Remove(nChars);
+		//    }
+
+		//    // 6-letter Nickname (aka abbreviation).
+		//    public static string Nick(InOut eInOut)
+		//    {
+		//        return Nick(eInOut, 6);
+		//    }
+
+		//    // 1-letter Nickname.
+		//    public static char Nick1(InOut eInOut)
+		//    {
+		//        return eInOut.ToString()[0];
+		//    }
+
+		//    // 4-letter Nickname (aka abbreviation).
+		//    public static string Nick(InOutPair eInOut)
+		//    {
+		//        switch (eInOut)
+		//        {
+		//            case InOutPair.AInBOut:
+		//                {
+		//                    return "AiBo";
+		//                }
+
+		//            case InOutPair.AOutBIn:
+		//                {
+		//                    return "AoBi";
+		//                }
+
+		//            default:
+		//                {
+		//                    return mDL2DLib.Nick(eInOut, 4);
+		//                }
+		//        }
+		//    }
+
+
+
+		//    public class EdgeSegmentIndexs
+		//    {
+		//        // Indexs into containing polygon's point list.
+		//        public readonly int Index1, Index2;
+		//        public EdgeSegmentIndexs(int index1, int index2)
+		//        {
+		//            this.Index1 = index1;
+		//            this.Index2 = index2;
+		//        }
+
+
+		//        public override string ToString()
+		//        {
+		//            return string.Format("EdgeSegment({0}, {1})", Index1, Index2);
+		//        }
+
+
+		//        public override bool Equals(object obj)
+		//        {
+		//            EdgeSegmentIndexs b = obj as EdgeSegmentIndexs;
+		//            if (b == null)
+		//                return false;
+
+		//            return ((Index1 == b.Index1) && (Index2 == b.Index2)) || ((Index1 == b.Index2) && (Index2 == b.Index1));
+		//        }
+
+		//        public override int GetHashCode()
+		//        {
+		//            // Use consistent ordering, because Equals is true if same, but in different order!
+		//            if (Index1 <= Index2)
+		//                return MakeHash(Index1, Index2);
+		//            else
+		//                return MakeHash(Index2, Index1);
+		//        }
+		//    }
+
+
+		//    public class EdgeSegmentPoints
+		//    {
+		//        // CAUTION: For scan-crossing, P2.Y is excluded from segment (does not quite reach P2.Y).
+		//        public readonly Dist2D P1, P2;
+		//        public EdgeSegmentPoints(Dist2D p1, Dist2D p2)
+		//        {
+		//            this.P1 = p1;
+		//            this.P2 = p2;
+		//        }
+
+
+		//        public override string ToString()
+		//        {
+		//            return string.Format("{0} {1} {2}", this.GetType().Name, this.P1, this.P2);
+		//        }
+
+
+		//        // CAUTION: For scan-crossing, P2.Y is excluded from segment (does not quite reach P2.Y). That is not accounted for here.
+		//        public double MinY()
+		//        {
+		//            return Math.Min(this.P1.Y, this.P2.Y);
+		//        }
+
+		//        // CAUTION: For scan-crossing, P2.Y is excluded from segment (does not quite reach P2.Y). That is not accounted for here.
+		//        public double MaxY()
+		//        {
+		//            return Math.Max(this.P1.Y, this.P2.Y);
+		//        }
+
+
+		//        // NaN if does not intersect.
+		//        public double XAtY(double y)
+		//        {
+		//            double ix = P1.X;
+		//            double jx = P2.X;
+		//            double iy = P1.Y;
+		//            double jy = P2.Y;
+		//            // NOTE: Excludes P2.Y (jy).
+		//            if ((iy <= y && y < jy) || (jy < y && y <= iy))
+		//            {
+		//                // This segment spans the target y.
+
+		//                // x on segment, at this y.
+		//                double totalDy = jy - iy;
+		//                double dy = y - iy;
+		//                double totalDx = jx - ix;
+		//                double calcDx = dy * (totalDx / totalDy);
+		//                double calcX = ix + calcDx;
+		//                return calcX;
+		//            }
+
+		//            return double.NaN;
+		//        }
+		//    }
+
+
+		//    public class IntersectsAtY
+		//    {
+		//        public readonly double Y;
+		//        public readonly List<double> Xs = new List<double>();
+		//        public IntersectsAtY(double y)
+		//        {
+		//            this.Y = y;
+		//        }
+
+
+		//        public override string ToString()
+		//        {
+		//            string xsStr = string.Join(", ", (from x in this.Xs
+		//                                              select (Round4or6(x).ToString())).ToArray());
+		//            return string.Format("{0} @Y={1} Xs=({2})", this.GetType().Name, this.Y, xsStr);
+		//        }
+
+
+		//        // REQUIRE Xs.Count > 0.
+		//        public double FirstX()
+		//        {
+		//            return Xs[0];
+		//        }
+
+		//        // REQUIRE Xs.Count > 0.
+		//        public double LastX()
+		//        {
+		//            return LastElement(Xs);
+		//        }
+
+
+		//        public void AddX(double x)
+		//        {
+		//            Xs.Add(x);
+		//        }
+
+		//        public void SortXs()
+		//        {
+		//            this.Xs.Sort();
+		//        }
+		//    }
+
+		//    // A scan area bounded by left/right line segments.
+		//    public class ScanQuadrilateral
+		//    {
+		//        public readonly double MinY, MaxY;
+		//        public readonly double X1AtMinY, X2AtMinY, X1AtMaxY, X2AtMaxY;
+
+		//        public ScanQuadrilateral(double x1AtMinY, double x2AtMinY, double minY, double x1AtMaxY, double x2AtMaxY, double maxY)
+		//        {
+		//            this.X1AtMinY = x1AtMinY;
+		//            this.X2AtMinY = x2AtMinY;
+		//            this.MinY = minY;
+		//            this.X1AtMaxY = x1AtMaxY;
+		//            this.X2AtMaxY = x2AtMaxY;
+		//            this.MaxY = maxY;
+		//        }
+
+
+		//        public override string ToString()
+		//        {
+		//            return string.Format("{0} {7}x{8}={9}  ({1}..{2}@Y={3}) .. ({4}..{5}@Y={6})", this.GetType().Name, Round2(X1AtMinY), Round2(X2AtMinY), Round2(MinY), Round2(X1AtMaxY), Round2(X2AtMaxY), Round2(MaxY), Round2(AverageDx()), Round2(Dy()), Round2(Area()));
+		//        }
+
+
+		//        public double Area()
+		//        {
+		//            return AverageDx() * Dy();
+		//        }
+
+		//        public double AverageDx()
+		//        {
+		//            double dxAtMinY = X2AtMinY - X1AtMinY;
+		//            double dxAtMaxY = X2AtMaxY - X1AtMaxY;
+		//            return Average(dxAtMinY, dxAtMaxY);
+		//        }
+
+		//        public double Dy()
+		//        {
+		//            return MaxY - MinY;
+		//        }
+
+		//        public Dist2D RandomLocation(Random rand = null)
+		//        {
+		//            if (rand == null)
+		//                rand = Random1;
+		//            double xWgt = rand.NextDouble();
+		//            double yWgt = rand.NextDouble();
+		//            double xAtY0 = Lerp(X1AtMinY, X2AtMinY, xWgt);
+		//            double xAtY1 = Lerp(X1AtMaxY, X2AtMaxY, xWgt);
+		//            Dist2D pt = new Dist2D(Lerp(xAtY0, xAtY1, yWgt), Lerp(MinY, MaxY, yWgt));
+		//            return pt;
+		//        }
+		//    }
+
+
+		//    public class ScanBin
+		//    {
+		//        // Return created bins; Out binStepY (y-extent of bin, or y-distance between bins).
+		//        public static ScanBin[] CreateBins(Dist2D minV, Dist2D maxV, int count, out double binStepY)
+		//        {
+		//            double deltaY = maxV.Y - minV.Y;
+		//            binStepY = deltaY / count;
+
+		//            ScanBin[] bins = new ScanBin[count - 1 + 1];
+		//            for (int i = 0; i <= count - 1; i++)
+		//                bins[i] = new ScanBin();
+
+		//            return bins;
+		//        }
+
+		//        public static ScanBin PickBin(ScanBin[] bins, double y, double minBinY, double binStepY)
+		//        {
+		//            if (double.IsNaN(y) || double.IsInfinity(y) || y == double.MaxValue)
+		//                return null; // No valid answer.
+
+		//            int count = bins.Length;
+		//            int iBin = RawBinIndex(y, minBinY, binStepY);
+		//            if ((iBin < 0) || (iBin >= count))
+		//                return null; // Outside of range of bins.
+
+		//            return bins[iBin];
+		//        }
+
+		//        // Return highBinIndex; set lowBinIndex. If highBinIndex < 0, there are no bins within range.
+		//        public static int BinIndexRange(ScanBin[] bins, double y1, double y2, double minBinY, double stepY, out int lowBinIndex)
+		//        {
+		//            int maxIndex = bins.Length - 1;
+		//            int iBinLow = RawBinIndex(y1, minBinY, stepY);
+		//            int iBinHigh = RawBinIndex(y2, minBinY, stepY);
+		//            if (iBinHigh < iBinLow)
+		//                Swap(iBinLow, iBinHigh);
+
+		//            if (iBinLow < 0)
+		//                iBinLow = 0;
+		//            if (iBinHigh > maxIndex)
+		//                iBinHigh = maxIndex;
+
+		//            if (iBinHigh < iBinLow)
+		//            {
+		//                lowBinIndex = -1;
+		//                return -1;
+		//            }
+
+		//            lowBinIndex = iBinLow;
+		//            return iBinHigh;
+		//        }
+
+		//        // May return value that is not a valid index.
+		//        public static int RawBinIndex(double y, double minBinY, double binStepY)
+		//        {
+		//            return FloorInt((y - minBinY) / binStepY);
+		//        }
+
+		//        public List<EdgeSegmentIndexs> Segments;
+
+		//        public ScanBin()
+		//        {
+		//            Segments = new List<EdgeSegmentIndexs>();
+		//        }
+
+		//        public void Dispose()
+		//        {
+		//            Segments.Clear();
+		//            Segments = null;
+		//        }
+
+		//        public void Add(EdgeSegmentIndexs seg)
+		//        {
+		//            Segments.Add(seg);
+		//        }
+		//    }
+
+
+		//    private const int Max1NScanBins = 64;
+		//    private const int Max2NScanBins = 512;
+		//    private const double MaxSmallTolerance = OneThousandth;
+
+
+		//    // Private ReadOnly t_history As New List(Of String)
+
+		//    // For efficient Point_InOut, when processing many points versus one polygon.
+		//    // Divides EdgeSegments of polygon into bins, by y.
+		//    // For each point check, only need to examine the segments in the bin containing point.y.
+		//    public class ScanBinnedPolygon
+		//    {
+		//        public readonly Dist2D minV_tol, maxV_tol;   // Min/Max (including tolerance) in x & y.
+		//        public readonly double Tolerance;
+		//        // binStepY is y-distance between bins (or y-extent of a bin).
+		//        private readonly double toleranceSquared, binStepY;
+		//        // Sometimes we use a large tolerance, for detecting points w/i "tolerance" of poly edge.
+		//        // "border" means "within tolerance" of border, so when tolerance is large,
+		//        // this includes points outside of actual border (but within that tolerance),
+		//        // and also points INSIDE actual border (but within that tolerance of border).
+		//        // There are places where we should NOT use that tolerance, when large.
+		//        private readonly double smallToleranceSquared;
+		//        public double test_minDanger = double.MaxValue;
+		//        private readonly int ID;
+
+		//        public readonly int TrueLength;  // If duplicate point at end, exclude it.
+		//        // Don't rely on vertices.Count/LastIndex/LastElement (may be excluding final point).
+		//        // Don't assume this is a single sequence of points - when AddHole, those vertices are added at end.
+		//        // TBD: Would be easier to add hole if this were a List.
+		//        public IList<Dist2D> Vertices;
+		//        // TBD: Can we rely on this being closed?
+		//        public IList<Dist2D> OriginalVertices;
+
+		//        // Optional: Caller can set this, so can retrieve later.
+		//        // (Type is "Object", because here we don't have access to "cTGFWorldPolygon".)
+		//        public object OriginalPolygon;
+
+		//        public ScanBin[] scanBins;
+
+		//        public ScanBinnedPolygon(IList<Dist2D> vertices, double tolerance, int id = 0)
+		//        {
+		//            this.OriginalVertices = vertices;
+		//            this.Vertices = new List<Dist2D>(vertices);
+		//            bool didCopy = true;
+
+		//            this.Tolerance = tolerance;
+		//            this.toleranceSquared = tolerance * tolerance;
+		//            double smallTolerance = ClampMax(tolerance, MaxSmallTolerance);
+		//            this.smallToleranceSquared = smallTolerance * smallTolerance;
+		//            this.ID = id;
+		//            // t_history.Add(String.Format("ID={0} ({1})", Me.ID, Me.vertices.Count))
+		//            // If (t_history.Count Mod 5000) = 0 Then
+		//            // t_history.Sort()
+		//            // End If
+
+		//            // If duplicate point at end, exclude it.
+		//            // "While" in case there are multiple near-identical points.
+		//            int nRemoved = 0;
+		//            while (this.Vertices.Count > 1 && FirstElement(this.Vertices).X.NearlyEquals_ScaledTolerance(LastElement(this.Vertices).X, ScaledToleranceDouble) && FirstElement(this.Vertices).Y.NearlyEquals_ScaledTolerance(LastElement(this.Vertices).Y, ScaledToleranceDouble))
+		//            {
+		//                // Remove the last element (which is near-duplicate of first element).
+		//                if (nRemoved == 0)
+		//                {
+		//                    // First removal.
+		//                    if (!didCopy)
+		//                        this.Vertices = new List<Dist2D>(vertices);
+		//                }
+		//                this.Vertices.RemoveAt(LastIndex(this.Vertices));
+		//                nRemoved += 1;
+		//            }
+		//            TrueLength = this.Vertices.Count;
+		//            if (nRemoved > 1)
+		//                Test();
+
+		//            minV_tol = Dist2D.MaxValue;
+		//            maxV_tol = Dist2D.MinValue;
+		//            for (int i = 0; i <= TrueLength - 1; i++)
+		//                AccumMinMax(vertices[i], ref minV_tol, ref maxV_tol);
+		//            // Include tolerance in x & y.
+		//            minV_tol.X -= tolerance; minV_tol.Y -= tolerance;
+		//            maxV_tol.X += tolerance; maxV_tol.Y += tolerance;
+
+		//            int nBins1 = Math.Min(System.Convert.ToInt32(Math.Ceiling(maxV_tol.Y - MinBinY)), Max1NScanBins);
+		//            int nBins2 = Math.Min(System.Convert.ToInt32(Math.Ceiling(2 * Math.Sqrt(vertices.Count))), Max2NScanBins);
+		//            int nScanBins = Math.Max(nBins1, nBins2);
+		//            if (nScanBins < 4)
+		//                nScanBins = 4;
+		//            scanBins = ScanBin.CreateBins(minV_tol, maxV_tol, nScanBins, out binStepY);
+
+		//            // Place each edgeSegment in all bins that it overlaps (or is within tolerance of).
+		//            for (int i = 0; i <= TrueLength - 1; i++)
+		//            {
+		//                // Segment starting at last point wraps back to [0].
+		//                int j = (i + 1) % TrueLength;
+		//                CreateEdgeSegmentAndAddToBins(i, j);
+		//            }
+		//        }
+
+		//        private void CreateEdgeSegmentAndAddToBins(int i, int j)
+		//        {
+		//            Dist2D pointI = Vertices[i];
+		//            Dist2D pointJ = Vertices[j];
+		//            // 
+		//            if (pointJ.Y < pointI.Y)
+		//                // Swap, so pointI has lower y.
+		//                Swap(pointI, pointJ);
+
+		//            double safeMinY = pointI.Y - Tolerance;
+		//            double safeMaxY = pointJ.Y + Tolerance;
+
+		//            int lowBinIndex;
+		//            int highBinIndex = ScanBin.BinIndexRange(scanBins, safeMinY, safeMaxY, MinBinY, binStepY, out lowBinIndex);
+		//            if (highBinIndex < 0)
+		//                return;
+
+		//            EdgeSegmentIndexs seg = new EdgeSegmentIndexs(i, j);
+		//            for (int iBin = lowBinIndex; iBin <= highBinIndex; iBin++)
+		//                scanBins[iBin].Add(seg);
+		//        }
+
+		//        // ASSUME hole is closed, and does not extend outside the originally provided vertices.
+		//        public void AddHole(Dist2D[] holeVertices)
+		//        {
+		//            // If duplicate point at end, exclude it.
+		//            int holeVertTrueLen;
+		//            if (holeVertices[0].X == LastElement(holeVertices).X & holeVertices[0].Y == LastElement(holeVertices).Y)
+		//                holeVertTrueLen = holeVertices.Length - 1;
+		//            else
+		//                holeVertTrueLen = holeVertices.Length;
+
+		//            List<Dist2D> allVerts = new List<Dist2D>(this.Vertices);
+		//            int oldLen = this.Vertices.Count;
+		//            int newLen = oldLen + holeVertTrueLen;
+		//            allVerts.AddRange(holeVertices);
+		//            if (allVerts.Count > newLen)
+		//                allVerts.RemoveAt(LastIndex(allVerts));
+		//            // BEFORE "CreateEdgeSegmentAndAddToBins".
+		//            this.Vertices = allVerts.ToArray();
+
+		//            // Place each edgeSegment in all bins that it overlaps (or is within tolerance of).
+		//            for (int ri = 0; ri <= holeVertTrueLen - 1; ri++)
+		//            {
+		//                int rj = (ri + 1) % holeVertTrueLen;
+		//                // "oldLen + ": hole verts were appended after poly verts.
+		//                int i = oldLen + ri;
+		//                int j = oldLen + rj;
+		//                CreateEdgeSegmentAndAddToBins(i, j);
+		//            }
+		//            // Edge segment that closes the hole.
+		//            // "oldLen + ": hole verts were appended after poly verts.
+		//            CreateEdgeSegmentAndAddToBins(oldLen + holeVertTrueLen - 1, oldLen + 0);
+		//        }
+
+		//        public void Dispose()
+		//        {
+		//            for (int i = 0; i <= LastIndex(scanBins); i++)
+		//            {
+		//                scanBins[i].Dispose();
+		//                scanBins[i] = null;
+		//            }
+		//            scanBins = null;
+		//        }
+
+
+		//        public override string ToString()
+		//        {
+		//            return string.Format("ScanBinnedPolygon ID={0}, {1} points", this.ID, this.Vertices.Count);
+		//        }
+
+
+		//        // lower bound
+		//        public Dist2D MinV2IncludingTolerance
+		//        {
+		//            get
+		//            {
+		//                return minV_tol;
+		//            }
+		//        }
+		//        // upper bound
+		//        public Dist2D MaxV2IncludingTolerance
+		//        {
+		//            get
+		//            {
+		//                return maxV_tol;
+		//            }
+		//        }
+
+		//        public Rectangle2D MinMaxIncludingTolerance
+		//        {
+		//            get
+		//            {
+		//                return Rectangle2D.FromMinMax(minV_tol, maxV_tol);
+		//            }
+		//        }
+
+
+		//        private double MinBinY
+		//        {
+		//            get
+		//            {
+		//                return this.minV_tol.Y;
+		//            }
+		//        }
+		//        private int MaxValidBinIndex
+		//        {
+		//            get
+		//            {
+		//                return LastIndex(scanBins);
+		//            }
+		//        }
+
+		//        public bool Point_SafelyInside(Dist2D point)
+		//        {
+		//            // Dim oInOut As InOut = Point_InOut(point)
+		//            // If oInOut = InOut.Border Then
+		//            // If (t_polId <> t_prev_polId) OrElse (t_polId2 <> t_prev_polId2) Then
+		//            // Dim dubious = 0
+		//            // t_prev_polId = t_polId : t_prev_polId2 = t_polId2
+		//            // End If
+		//            // End If
+		//            return (Point_InOut(point) == InOut.Inside);
+		//        }
+
+		//        // Use this when need to know if point is near boundary of polygon
+		//        // (segments between vertices) versus being a specified distance inside.
+		//        public InOut Point_InOut(Dist2D point)
+		//        {
+		//            float segIndexAndFrac;
+		//            double minGap, minDistanceSq, proposeX;
+		//            return Point_InOut_Work(point, false, false, out segIndexAndFrac, out minDistanceSq, out minGap, out proposeX);
+		//        }
+
+		//        // tmstest
+		//        public InOut Point_InOut_Fake(Dist2D point)
+		//        {
+		//            double x = point.X;
+		//            double y = point.Y;
+
+		//            if ((x < minV_tol.X) || (x > maxV_tol.X) || (y < MinBinY) || (y > maxV_tol.Y))
+		//                // test_nQuick += 1
+		//                return InOut.Outside;
+
+		//            if (Random1.NextDouble() < 0.1)
+		//                return InOut.Inside;
+		//            else
+		//                return InOut.Outside;
+		//        }
+
+		//        // ' NO - segIndexAndFrac only valid when InOut.Border.
+		//        // Public Function Point_InOut(point As Dist2D, <Out()> ByRef closestPt As Dist2D) As InOut
+		//        // Dim minGap, proposeX As Double, segIndexAndFrac As Single
+		//        // Dim result As InOut = Point_InOut(point, False, segIndexAndFrac, minGap, proposeX)
+
+		//        // closestPt = Me.SegIFAsPoint(segIndexAndFrac)
+		//        // Return result
+		//        // End Function
+
+		//        public InOut Point_InOut(Dist2D point, out float segIndexAndFrac)
+		//        {
+		//            // NOTE: accurateNearBorder=True. Slower, but more accurate "nearest" point.
+		//            double minGap, minDistanceSq, proposeX;
+		//            return Point_InOut_Work(point, false, true, out segIndexAndFrac, out minDistanceSq, out minGap, out proposeX);
+		//        }
+
+		//        public InOut Point_InOut(Dist2D point, bool extraCheck, out double minGap, out double proposeX)
+		//        {
+		//            float segIndexAndFrac;
+		//            double minDistanceSq;
+		//            return Point_InOut_Work(point, extraCheck, false, out segIndexAndFrac, out minDistanceSq, out minGap, out proposeX);
+		//        }
+
+		//        public List<EdgeSegmentIndexs> AllEdgeSegments()
+		//        {
+		//            return EdgeSegmentsInBinRange(0, LastIndex(scanBins));
+		//        }
+
+		//        public List<EdgeSegmentIndexs> EdgeSegmentsInRange(Dist2D p1, Dist2D p2)
+		//        {
+		//            double minX = Math.Min(p1.X, p2.X);
+		//            double minY = Math.Min(p1.Y, p2.Y);
+		//            double maxX = Math.Max(p1.X, p2.X);
+		//            double maxY = Math.Max(p1.Y, p2.Y);
+
+		//            if ((maxX < minV_tol.X) || (minX > maxV_tol.X) || (maxY < MinBinY) || (minY > maxV_tol.Y))
+		//                return new List<EdgeSegmentIndexs>(); // out of bounds => None.
+
+		//            if (minY < MinBinY)
+		//                minY = MinBinY;
+		//            int minBinI = ScanBin.RawBinIndex(minY, MinBinY, binStepY);
+
+		//            if (maxY > maxV_tol.Y)
+		//                maxY = maxV_tol.Y;
+		//            int maxBinI = ScanBin.RawBinIndex(maxY, MinBinY, binStepY);
+		//            if (maxBinI > LastIndex(scanBins))
+		//                maxBinI = LastIndex(scanBins);
+
+		//            return EdgeSegmentsInBinRange(minBinI, maxBinI);
+		//        }
+
+		//        private List<EdgeSegmentIndexs> EdgeSegmentsInBinRange(int minBinI, int maxBinI)
+		//        {
+		//            // HashSet: Segment may be in multiple bins; only want once.
+		//            HashSet<EdgeSegmentIndexs> segments = new HashSet<EdgeSegmentIndexs>();
+
+		//            for (int binIndex = minBinI; binIndex <= maxBinI; binIndex++)
+		//            {
+		//                ScanBin bin = scanBins[binIndex];
+		//                foreach (EdgeSegmentIndexs segment in bin.Segments)
+		//                    segments.Add(segment);
+		//            }
+
+		//            return segments.ToList();
+		//        }
+
+
+		//        public bool SegmentIntersects(Dist2D p1, Dist2D p2)
+		//        {
+		//            return SegmentIntersection(p1, p2).HasValue;
+		//        }
+
+		//        public Dist2D? SegmentIntersection(Dist2D p1, Dist2D p2)
+		//        {
+		//            Dist2D minP = p1.Min(p2);
+		//            Dist2D maxP = p1.Max(p2);
+
+		//            List<EdgeSegmentIndexs> segs = EdgeSegmentsInRange(p1, p2);
+		//            foreach (EdgeSegmentIndexs seg in segs)
+		//            {
+		//                Dist2D ps1 = this.Vertices[seg.Index1];
+		//                Dist2D ps2 = this.Vertices[seg.Index2];
+		//                if (mDL2DLib.MinMaxIntersect(minP, maxP, ps1.Min(ps2), ps1.Max(ps2)))
+		//                {
+		//                    Dist2D? isectPt = LinesIntersection2D(p1, p2, ps1, ps2);
+		//                    if (isectPt.HasValue)
+		//                        return isectPt;
+		//                }
+		//            }
+
+		//            return default(Dist2D?);
+		//        }
+
+		//        public EdgeSegmentPoints AsPoints(EdgeSegmentIndexs segment)
+		//        {
+		//            return new EdgeSegmentPoints(Vertices[segment.Index1], Vertices[segment.Index2]);
+		//        }
+
+		//        public List<ScanQuadrilateral> AsQuads(out double minY, out double maxY, out double areaSum)
+		//        {
+		//            minY = double.MaxValue;
+		//            maxY = double.MinValue;
+
+		//            List<EdgeSegmentPoints> segmentPs = (from segment in AllEdgeSegments()
+		//                                                 select AsPoints(segment)).ToList();
+		//            // Sort by MinY.
+		//            segmentPs.Sort((a, b) =>
+		//            {
+		//                return a.MinY().CompareTo(b.MinY());
+		//            });
+
+		//            // TBD: Since we have sorted segmentPs, we could get minY from first segmentP.
+		//            foreach (EdgeSegmentPoints segment in segmentPs)
+		//            {
+		//                AccumMinMax(segment.P1.Y, ref minY, ref maxY);
+		//                AccumMinMax(segment.P2.Y, ref minY, ref maxY);
+		//            }
+
+		//            List<IntersectsAtY> isectss = new List<IntersectsAtY>();
+		//            double minY1 = minY;
+		//            List<EdgeSegmentPoints> activeSegments = new List<EdgeSegmentPoints>();
+		//            foreach (EdgeSegmentPoints segment in segmentPs)
+		//            {
+		//                double newMinY = segment.MinY();
+		//                if (newMinY > minY1)
+		//                {
+		//                    if (activeSegments.Count == 0)
+		//                        Dubious();
+		//                    minY1 = ProcessSegments(activeSegments, isectss, minY1, newMinY);
+		//                }
+		//                else
+		//                {
+		//                }
+		//                activeSegments.Add(segment);
+		//            }
+
+		//            // Build quads from intersections on scans.
+		//            List<ScanQuadrilateral> quads = new List<ScanQuadrilateral>();
+		//            areaSum = 0;
+		//            IntersectsAtY atY1 = null;
+		//            foreach (IntersectsAtY atY2 in isectss)
+		//            {
+		//                if (Exists(atY1))
+		//                {
+		//                    // ASSUME already sorted xs.
+		//                    // NOTE: LastX may equal FirstX. Result is a triangle.
+		//                    int ixLim = Math.Min(atY1.Xs.Count, atY2.Xs.Count);
+		//                    // TODO: If odd number, haven't kept info to know which goes with which.
+		//                    // Therefore, correct solution is to build a list of edges.
+		//                    // Alternatively, find intersections a hair away from the key ys,
+		//                    // so know where they were going/coming from.
+		//                    for (int ix = 0; ix <= ixLim - 1; ix += 2)
+		//                    {
+		//                        // "If..": if both ends have same X, skip the quad.
+		//                        if ((ix < LastIndex(atY1.Xs)) || (ix < LastIndex(atY2.Xs)))
+		//                        {
+		//                            double x1AtY1 = atY1.Xs[ix];
+		//                            double x2AtY1 = atY1.Xs[ClampMax(ix + 1, LastIndex(atY1.Xs))];
+		//                            double x1AtY2 = atY2.Xs[ix];
+		//                            double x2AtY2 = atY2.Xs[ClampMax(ix + 1, LastIndex(atY2.Xs))];
+		//                            ScanQuadrilateral quad = new ScanQuadrilateral(x1AtY1, x2AtY1, atY1.Y, x1AtY2, x2AtY2, atY2.Y);
+		//                            quads.Add(quad);
+		//                            areaSum += quad.Area();   // tmstest
+		//                        }
+		//                        else
+		//                            Test();
+		//                    }
+		//                }
+		//                // Prep Next
+		//                atY1 = atY2;
+		//            }
+
+		//            return quads;
+		//        }
+
+		//        // We've moved past minY, so see if any quads can be output.
+		//        // SIDE-EFFECT: Adds elements to "quads"
+		//        private double ProcessSegments(IList<EdgeSegmentPoints> activeSegments, List<IntersectsAtY> isectss, double minY, double newMinY)
+		//        {
+		//            List<EdgeSegmentPoints> toRemove = new List<EdgeSegmentPoints>();
+		//            while (minY < newMinY)
+		//            {
+		//                toRemove.Clear();
+		//                // Find segments that intersect minY; x per segment.
+		//                IntersectsAtY atY = new IntersectsAtY(minY);
+		//                double nextY = double.MaxValue;
+		//                foreach (EdgeSegmentPoints segment in activeSegments)
+		//                {
+		//                    // Find intersection at minY.
+		//                    double x = segment.XAtY(minY);
+		//                    if (!double.IsNaN(x))
+		//                        atY.AddX(x);
+		//                    else
+		//                        // Does not overlap. Ready to remove?
+		//                        if (segment.MaxY() < minY)
+		//                        toRemove.Add(segment);
+		//                    else
+		//                        // Happens if P2.Y = minY.  Maybe also happens if P1.Y = minY.
+		//                        // To be safe, leave segment active, until we are definitely past.
+		//                        Test();
+		//                    // Look for next smallest y.
+		//                    double minY0 = segment.MinY();
+		//                    if (minY0 > minY)
+		//                        AccumMin(minY0, ref nextY);
+		//                    double maxY0 = segment.MaxY();
+		//                    if (maxY0 > minY)
+		//                        AccumMin(maxY0, ref nextY);
+		//                }
+		//                // Found intersections?
+		//                if (atY.Xs.Count > 0)
+		//                {
+		//                    atY.SortXs();
+		//                    isectss.Add(atY);
+		//                }
+		//                else
+		//                    Dubious();
+		//                // Next minY.
+		//                minY = nextY;
+		//                // Remove any that no longer overlap.
+		//                if (toRemove.Count > 0)
+		//                {
+		//                    foreach (EdgeSegmentPoints segment in toRemove)
+		//                        activeSegments.Remove(segment);
+		//                }
+		//                if (minY < newMinY)
+		//                    // Does this ever happen?  Or is newMinY always the next y?
+		//                    Test();
+		//            }
+
+		//            return newMinY;
+		//        }
+
+		//        // Use this when need to know if point is near boundary of polygon
+		//        // (segments between vertices) versus being a specified distance inside.
+		//        // segIndexAndFrac only valid when InOut.Border.
+		//        // minGap and proposeX only valid when extraCheck=True.
+		//        private InOut Point_InOut_Work(Dist2D point, bool extraCheck, bool accurateNearBorder, out float segIndexAndFrac, out double minDistanceSq, out double minGap, out double proposeX)
+		//        {
+		//            double x = point.X;
+		//            double y = point.Y;
+		//            segIndexAndFrac = -1;    // Undefined
+		//            minDistanceSq = double.MaxValue;
+		//            minGap = double.MaxValue; proposeX = double.NaN;   // Undefined
+
+		//            if ((x < minV_tol.X) || (x > maxV_tol.X) || (y < MinBinY) || (y > maxV_tol.Y))
+		//                // test_nQuick += 1
+		//                return InOut.Outside;
+
+		//            double borderToleranceSquared = accurateNearBorder ? smallToleranceSquared : toleranceSquared;
+		//            bool foundNearBorder = false;
+		//            // Only valid near border.
+		//            float closestSegIF = -1;
+		//            Dist2D closestPt = Dist2D.NaN();
+
+		//            // test_nSlow += 1
+		//            // The only relevant edges are in bin.
+		//            ScanBin bin = ScanBin.PickBin(scanBins, y, MinBinY, binStepY);
+		//            if (bin == null)
+		//                return InOut.Outside; // Should not happen, since we did bounds check above.
+
+		//            bool odd = false;
+		//            List<double> crossingXs = null;
+		//            if (extraCheck)
+		//                crossingXs = new List<double>();
+		//            foreach (EdgeSegmentIndexs seg in bin.Segments)
+		//            {
+		//                // test_nEdgeChecks += 1
+		//                Dist2D p1 = this.Vertices[seg.Index1];
+		//                Dist2D p2 = this.Vertices[seg.Index2];
+
+		//                // NearBoundary check.
+		//                double ix = p1.X;
+		//                double jx = p2.X;
+
+		//                // point may be near this span.
+		//                double safeMinX;
+		//                double safeMaxX;
+		//                if (ix <= jx)
+		//                {
+		//                    safeMinX = ix - Tolerance;
+		//                    safeMaxX = jx + Tolerance;
+		//                }
+		//                else
+		//                {
+		//                    safeMinX = jx - Tolerance;
+		//                    safeMaxX = ix + Tolerance;
+		//                }
+		//                if ((safeMinX <= x) && (x <= safeMaxX))
+		//                {
+		//                    // point may be near this span.
+		//                    double t;
+		//                    double distanceSq = PointDistanceSquaredToLine2D(point, p1, p2, ref t);
+		//                    if (distanceSq <= toleranceSquared)
+		//                    {
+		//                        // --- is "InOut.Border" ---
+		//                        // We could "Return" here, if we know caller doesn't care about segIndexAndFrac.
+
+		//                        // TBD: Is this still needed by any caller?
+		//                        // If within small-tolerance of an endpoint, return THAT. Sometimes avoids returning value slightly into next segment.
+		//                        // TBD: Now that "toleranceSquared <> smallToleranceSquared",
+		//                        // Should we instead test whether t Is near Then 0 Or 1?
+		//                        if (DistanceSquared2D(point, p1) < smallToleranceSquared)
+		//                            t = 0;
+		//                        else if (DistanceSquared2D(point, p2) < smallToleranceSquared)
+		//                            t = 1;
+
+		//                        // NOTE: This might not be the CLOSEST point - it is any point within tolerance.
+		//                        float segIndexAndFrac1;
+		//                        if (seg.Index2 == 0 || seg.Index2 == seg.Index1 + 1)
+		//                            segIndexAndFrac1 = System.Convert.ToSingle(seg.Index1 + t);
+		//                        else
+		//                            segIndexAndFrac1 = System.Convert.ToSingle(Lerp(seg.Index1, seg.Index2, t));
+
+		//                        if (!accurateNearBorder)
+		//                        {
+		//                            // We can return any "close enough" point.
+		//                            segIndexAndFrac = segIndexAndFrac1;
+		//                            return InOut.Border;
+		//                        }
+		//                        else
+		//                        {
+		//                            foundNearBorder = true;
+		//                            if (distanceSq < minDistanceSq)
+		//                            {
+		//                                // This is closest so far.
+		//                                minDistanceSq = distanceSq;
+		//                                segIndexAndFrac = segIndexAndFrac1;
+		//                            }
+		//                            // Continue to test remaining segments.
+		//                            continue;
+		//                        }
+		//                    }
+		//                    if (distanceSq < test_minDanger)
+		//                        test_minDanger = distanceSq;
+		//                }
+
+
+		//                // --- Current segment not near border ---
+
+		//                if (foundNearBorder)
+		//                    // Current segment is away from border, so we can ignore it (because we already have a better candidate).
+		//                    continue;
+
+
+		//                // odd/even counting to determine whether inside.
+		//                double iy = p1.Y;
+		//                double jy = p2.Y;
+		//                // TBD: Shouldn't this be consistent w.r.t. jy?  Always exclude "=" with jy, to exclude P2.Y?
+		//                if ((iy < y & jy >= y) | (jy < y & iy >= y))
+		//                {
+		//                    // This segment spans the target y.
+
+		//                    if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                        odd = !odd;
+
+		//                    if (extraCheck)
+		//                    {
+		//                        // x on segment, at this y.
+		//                        double totalDy = jy - iy;
+		//                        double dy = y - iy;
+		//                        double totalDx = jx - ix;
+		//                        double calcDx = dy * (totalDx / totalDy);
+		//                        double calcX = ix + calcDx;
+		//                        crossingXs.Add(calcX);
+		//                    }
+		//                }
+		//            }
+
+		//            if (extraCheck)
+		//            {
+		//                crossingXs.Sort();
+		//                // Find smallest gap.
+		//                // TODO: Is there ever zero gap, due to endpoint appearing twice? (Shouldn't be, if segment test done correctly)
+		//                minGap = double.MaxValue;
+		//                double priorX = double.MinValue;
+		//                proposeX = double.MinValue;
+		//                foreach (double crossingX in crossingXs)
+		//                {
+		//                    double gap = crossingX - priorX;
+		//                    if (gap < minGap)
+		//                    {
+		//                        minGap = gap;
+		//                        proposeX = Average(priorX, crossingX);
+		//                    }
+		//                    // Next
+		//                    priorX = crossingX;
+		//                }
+		//            }
+
+		//            if (foundNearBorder)
+		//                return InOut.Border;
+		//            else
+		//                return odd ? InOut.Inside : InOut.Outside;
+		//        }
+
+		//        public Dist2D SegIFAsPoint(float segIndexAndFrac)
+		//        {
+		//            float segFrac;
+		//            int segIndex = SplitIntegerAndFraction(segIndexAndFrac, ref segFrac);
+
+		//            Dist2D pt0 = this.Vertices[IndexWrap(segIndex)];
+		//            Dist2D pt1 = this.Vertices[NextIndexWrap(segIndex)];
+		//            return Lerp(pt0, pt1, segFrac);
+		//        }
+
+		//        // REQUIRE: index >= 0.
+		//        public int IndexWrap(int index)
+		//        {
+		//            return (index % this.TrueLength);
+		//        }
+		//        public int NextIndexWrap(int index)
+		//        {
+		//            return ((index + 1) % this.TrueLength);
+		//        }
+		//        public int PriorIndexWrap(int index)
+		//        {
+		//            // "+ length" to avoid negative value.
+		//            return ((index - 1 + TrueLength) % this.TrueLength);
+		//        }
+
+		//        // Find closest other stuff to given pt on polygon (described as segIndexAndFrac).
+		//        // That is, exclude the segments(s) involved in this pt.
+		//        public double MinDistanceToSelf(float givenSegIndexAndFrac, ref float closestSegIndexAndFrac)
+		//        {
+		//            float givenSegFrac;
+		//            int givenSegIndex = SplitIntegerAndFraction(givenSegIndexAndFrac, ref givenSegFrac);
+		//            int skipIndexA = givenSegIndex;
+		//            int skipIndexB = NextIndexWrap(givenSegIndex);
+		//            int skipIndexZ;
+		//            skipIndexZ = PriorIndexWrap(skipIndexA); // Skip prior segment also
+
+		//            // If givenSegFrac <= 0.1 Then
+		//            // skipIndexZ = PriorIndexWrap(skipIndexA) ' Skip prior segment also
+		//            // ElseIf givenSegFrac >= 0.9 Then
+		//            // skipIndexZ = NextIndexWrap(skipIndexB)  ' Skip next segment also
+		//            // Else
+		//            // skipIndexZ = -1 ' (Will never match.)
+		//            // End If
+
+		//            Dist2D givenPt = SegIFAsPoint(givenSegIndexAndFrac);
+
+		//            // Pick bin containing y, and the bins immediately above and below.
+		//            // NOTE: In rare circumstances, this may omit the closest segment -- but only when closest distance > MinBinY.
+		//            // Even if y is out of range, force at least one bin to be selected.
+		//            int iBin = ScanBin.RawBinIndex(givenPt.Y, MinBinY, binStepY);
+		//            int minBinI = Clamp(iBin - 1, 0, MaxValidBinIndex);
+		//            int maxBinI = Clamp(iBin + 1, 0, MaxValidBinIndex);
+		//            List<EdgeSegmentIndexs> segments = EdgeSegmentsInBinRange(minBinI, maxBinI);
+
+		//            // Find closest segment.
+		//            double minDistanceSq = double.MaxValue;
+		//            EdgeSegmentIndexs segmentAtMin = null;
+		//            double tAtMin;
+		//            foreach (EdgeSegmentIndexs segment in segments)
+		//            {
+		//                int segIndex = segment.Index1;
+		//                var doSkip = (segIndex == skipIndexA) || (segIndex == skipIndexB) || (segIndex == skipIndexZ);
+		//                if (!doSkip)
+		//                {
+		//                    double t;
+		//                    double distSq = PointDistanceSquaredToLine2D(givenPt, Vertices[segIndex], Vertices[segment.Index2], ref t);
+		//                    if (distSq < minDistanceSq)
+		//                    {
+		//                        minDistanceSq = distSq;
+		//                        segmentAtMin = segment;
+		//                        tAtMin = t;
+		//                    }
+		//                }
+		//            }
+
+		//            closestSegIndexAndFrac = System.Convert.ToSingle(segmentAtMin.Index1 + tAtMin);
+		//            return Math.Sqrt(minDistanceSq);
+		//        }
+
+		//        // Slow.
+		//        public double DistanceToBorder(Dist2D pt, out InOut eInOut, out Dist2D closestPt)
+		//        {
+		//            // Slow.
+		//            float segIndexAndFrac;
+		//            double minDistance = DistanceToBorder(pt, ref eInOut, ref segIndexAndFrac);
+
+		//            if (segIndexAndFrac < 0)
+		//                closestPt = new Dist2D(0, 0);
+		//            else
+		//                closestPt = this.SegIFAsPoint(segIndexAndFrac);
+		//            // 
+		//            return minDistance;
+		//        }
+
+		//        // Slow (could speed up by checking only segments w/i 1 bin of pt). (When above/below all bins, would need to find closest non-empty bin.)
+		//        public double DistanceToBorder(Dist2D pt, out InOut eInOut, out float segIndexAndFrac)
+		//        {
+		//            eInOut = Point_InOut(pt);
+
+		//            // Find shortest distance to a polygon segment.
+		//            // ASSUME polygon's last point = first point.
+		//            double minDistSq = double.MaxValue;
+		//            int iAtMinDist;
+		//            float tAtMinDist;
+		//            Dist2D prevSegPt;
+		//            for (int i = 0; i <= LastIndex(Vertices); i++)
+		//            {
+		//                Dist2D segPt = Vertices[i];
+		//                if (i > 0)
+		//                {
+		//                    // If i = 329 Then
+		//                    // Test()
+		//                    // End If
+		//                    double t;
+		//                    double distSq = PointDistanceSquaredToLine2D(pt, prevSegPt, segPt, ref t);
+		//                    if (distSq < minDistSq)
+		//                    {
+		//                        minDistSq = distSq;
+		//                        iAtMinDist = i;
+		//                        tAtMinDist = System.Convert.ToSingle(t);
+		//                    }
+		//                }
+
+		//                prevSegPt = segPt;
+		//            }
+
+		//            segIndexAndFrac = (iAtMinDist - 1) + tAtMinDist;
+
+		//            return Math.Sqrt(minDistSq);
+		//        }
+		//    }
+
+
+		//    // REQUIRE: Start point NOT duplicated at end of sequence.
+		//    public static Dist2D IFAsPoint(float indexAndFrac, IList<Dist2D> sequence)
+		//    {
+		//        float seqFrac;
+		//        int seqI = SplitIntegerAndFraction(indexAndFrac, ref seqFrac);
+
+		//        int nWrap = sequence.Count;
+		//        Dist2D pt0 = sequence[WrappedIndex(seqI, nWrap)];
+		//        Dist2D pt1 = sequence[WrappedIndex(seqI + 1, nWrap)];
+		//        return Lerp(pt0, pt1, seqFrac);
+		//    }
+
+
+		//    // Return Integer portion; Out resultFraction.
+		//    public static int SplitIntegerAndFraction(float integerAndFraction, out float resultFraction)
+		//    {
+		//        int resultInteger = FloorInt(integerAndFraction);
+
+		//        resultFraction = integerAndFraction - resultInteger;
+		//        return resultInteger;
+		//    }
+		//    // Return Integer portion; Out resultFraction.
+		//    public static int SplitIntegerAndFraction(double integerAndFraction, out double resultFraction)
+		//    {
+		//        int resultInteger = FloorInt(integerAndFraction);
+
+		//        resultFraction = integerAndFraction - resultInteger;
+		//        return resultInteger;
+		//    }
+
+		//    // Public t_polId, t_polId2 As Integer
+		//    // Private t_prev_polId, t_prev_polId2 As Integer
+
+		//    public static PointF PointF_Zero()
+		//    {
+		//        return new PointF(0, 0);
+		//    }
+
+		//    public static PointF PointF_MinValue()
+		//    {
+		//        return new PointF(float.MinValue, float.MinValue);
+		//    }
+
+		//    public static PointF PointF_MaxValue()
+		//    {
+		//        return new PointF(float.MaxValue, float.MaxValue);
+		//    }
+
+		//    // Before first call, caller must initialize minV to Integer.MaxValue, and maxV to Integer.MinValue.
+		//    public static void AccumMinMax(int v, ref int minV, ref int maxV)
+		//    {
+		//        if (v < minV)
+		//            minV = v;
+		//        if (v > maxV)
+		//            maxV = v;
+		//    }
+		//    // Before first call, caller must initialize minV to Single.MaxValue, and maxV to Single.MinValue.
+		//    public static void AccumMinMax(float v, ref float minV, ref float maxV)
+		//    {
+		//        if (v < minV)
+		//            minV = v;
+		//        if (v > maxV)
+		//            maxV = v;
+		//    }
+		//    // Before first call, caller must initialize minV to Double.MaxValue, and maxV to Double.MinValue.
+		//    public static void AccumMinMax(double v, ref double minV, ref double maxV)
+		//    {
+		//        if (v < minV)
+		//            minV = v;
+		//        if (v > maxV)
+		//            maxV = v;
+		//    }
+		//    // Before first call, caller must initialize minV to Double.MaxValue, and maxV to Double.MinValue.
+		//    public static void AccumMinMax(double v, int index, ref double minV, ref double maxV, ref int minI, ref int maxI)
+		//    {
+		//        if (v < minV)
+		//        {
+		//            minV = v; minI = index;
+		//        }
+		//        if (v > maxV)
+		//        {
+		//            maxV = v; maxI = index;
+		//        }
+		//    }
+
+
+
+		//    // Before first call, caller must initialize:
+		//    // sum to zero, count to zero.
+		//    // minV to Double.MaxValue, and maxV to Double.MinValue.
+		//    public static void AccumSumMinMax(double v, ref double sum, ref double count, ref double minV, ref double maxV)
+		//    {
+		//        sum += v;
+		//        count += 1;
+		//        if (v < minV)
+		//            minV = v;
+		//        if (v > maxV)
+		//            maxV = v;
+		//    }
+
+
+		//    // Private test_nQuick, test_nSlow, test_nEdgeChecks As Integer
+
+		//    // Use this when need to know if point is near boundary versus being a specified distance inside.
+		//    // Slow - use only if don't know polygon bounding rectangle.
+		//    public static InOut Point_InOut_Polygon2D(Dist2D[] polygon, Dist2D point, double tolerance)
+		//    {
+		//        // NOTE: "Min/MaxValue / 2" in case it is unsafe to do tolerance math near to Min/MaxValues.
+		//        return Point_InOut_Polygon2D(polygon, point, tolerance, new Dist2D(double.MinValue / 2, double.MinValue / 2), new Dist2D(double.MaxValue / 2, double.MaxValue / 2));
+		//    }
+
+		//    // Use this when need to know if point is near boundary versus being a specified distance inside.
+		//    // See Class ScanBinnedPolygon for faster approach if testing many points against a polygon.
+		//    public static InOut Point_InOut_Polygon2D(Dist2D[] polygon, Dist2D point, double tolerance, Dist2D minV, Dist2D maxV)
+		//    {
+		//        if (polygon == null)
+		//            return InOut.Outside;
+
+		//        double x = point.X;
+		//        double y = point.Y;
+		//        if ((x < minV.X - tolerance) || (x > maxV.X + tolerance) || (y < minV.Y - tolerance) || (y > maxV.Y + tolerance))
+		//            // test_nQuick += 1
+		//            return InOut.Outside;
+
+		//        // test_nSlow += 1
+		//        double toleranceSquared = tolerance * tolerance;
+
+		//        int length;
+		//        if (polygon[0].X == LastElement(polygon).X & polygon[0].Y == LastElement(polygon).Y)
+		//            length = polygon.Length - 1;
+		//        else
+		//            length = polygon.Length;
+
+		//        bool odd = false;
+		//        for (int i = 0; i <= length - 1; i++)
+		//        {
+		//            int j = (i + 1) % length;
+		//            Dist2D pointI = polygon[i];
+		//            Dist2D pointJ = polygon[j];
+		//            double iy = pointI.Y;
+		//            double jy = pointJ.Y;
+
+		//            double safeMinY;
+		//            double safeMaxY;
+		//            if (iy <= jy)
+		//            {
+		//                safeMinY = iy - tolerance;
+		//                safeMaxY = jy + tolerance;
+		//            }
+		//            else
+		//            {
+		//                safeMinY = jy - tolerance;
+		//                safeMaxY = iy + tolerance;
+		//            }
+
+		//            if ((safeMinY <= y) && (y <= safeMaxY))
+		//            {
+		//                double ix = pointI.X;
+		//                double jx = pointJ.X;
+
+		//                // point may be near this span.
+		//                double safeMinX;
+		//                double safeMaxX;
+		//                if (ix <= jx)
+		//                {
+		//                    safeMinX = ix - tolerance;
+		//                    safeMaxX = jx + tolerance;
+		//                }
+		//                else
+		//                {
+		//                    safeMinX = jx - tolerance;
+		//                    safeMaxX = ix + tolerance;
+		//                }
+		//                if ((safeMinX <= x) && (x <= safeMaxX))
+		//                {
+		//                    // point may be near this span.
+		//                    if (PointDistanceSquaredToLine2D(point, pointI, pointJ) <= toleranceSquared)
+		//                        return InOut.Border;
+		//                }
+
+		//                // odd/even counting to determine whether inside.
+		//                if ((iy < y & jy >= y) | (jy < y & iy >= y))
+		//                {
+		//                    if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                        odd = !odd;
+		//                }
+		//            }
+		//        }
+
+		//        return odd ? InOut.Inside : InOut.Outside;
+		//    }
+
+
+		//    // p versus line (a, b).
+		//    // Returns -1, 0, or 1.
+		//    // "0" if on line, or if line has length zero.
+		//    // Formula is Z-component of cross-product.
+		//    // http://stackoverflow.com/questions/1560492/how-to-tell-whether-a-point-is-to-the-right-or-left-of-a-line/1560510#1560510
+		//    public static int PointWhichSideOfLine_A(Dist2D p, Dist2D a, Dist2D b)
+		//    {
+		//        Dist2D rb = b - a;
+		//        Dist2D rp = p - a;
+		//        return Math.Sign((rb.X * rp.Y) - (rb.Y * rp.X));
+		//    }
+
+		//    // Returns -2, -1, 0, or 1. "0" if falls on line, "-1" if point's Y is less than line's Y for that X.
+		//    // "-2" if line has length zero, so cannot define the result.
+		//    // If line is near vertical, roles of X and Y are reversed.
+		//    public static int PointWhichSideOfLine(Dist2D point, Dist2D lineP1, Dist2D lineP2)
+		//    {
+		//        Dist2D deltaP2 = lineP2 - lineP1;
+		//        Dist2D deltaP = point - lineP1;
+		//        if (Math.Abs(deltaP2.Y) > Math.Abs(deltaP2.X))
+		//        {
+		//            // Near vertical; swap roles of X and Y.
+		//            deltaP2 = new Dist2D(deltaP2.Y, deltaP2.X);
+		//            deltaP = new Dist2D(deltaP.Y, deltaP.X);
+		//        }
+
+		//        if (deltaP2.X == 0)
+		//            return -2; // Undefined
+
+		//        double lineDeltaYAtX = deltaP.X * (deltaP2.Y / deltaP2.X);
+		//        if (deltaP.Y > lineDeltaYAtX)
+		//            return 1;
+		//        if (deltaP.Y == lineDeltaYAtX)
+		//            return 0;
+		//        // <
+		//        return -1;
+		//    }
+
+		//    public static void Prep_WhichSideOfLine(Dist2D lineP1, Dist2D lineP2, out bool swapXY, out double slope)
+		//    {
+		//        Dist2D deltaP2 = lineP2 - lineP1;
+
+		//        swapXY = Math.Abs(deltaP2.Y) > Math.Abs(deltaP2.X);
+		//        if (swapXY)
+		//            // Near vertical; swap roles of X and Y.
+		//            deltaP2 = new Dist2D(deltaP2.Y, deltaP2.X);
+
+		//        if (deltaP2.X == 0)
+		//            slope = double.NaN;  // Undefined
+		//        else
+		//            slope = deltaP2.Y / deltaP2.X;
+		//    }
+
+		//    // The line is described by "lineP1, swapXY, slope".
+		//    public static int PointWhichSideOfLine_UsePrep(Dist2D point, Dist2D lineP1, bool swapXY, double slope)
+		//    {
+		//        if (slope == double.NaN)
+		//            return -2; // Undefined
+
+		//        Dist2D deltaP = point - lineP1;
+		//        if (swapXY)
+		//            // Near vertical; swap roles of X and Y.
+		//            deltaP = new Dist2D(deltaP.Y, deltaP.X);
+
+		//        double lineDeltaYAtX = deltaP.X * slope;
+		//        if (deltaP.Y > lineDeltaYAtX)
+		//            return 1;
+		//        if (deltaP.Y == lineDeltaYAtX)
+		//            return 0;
+		//        // <
+		//        return -1;
+		//    }
+
+		//    public static double XAtY(double goalY, Dist2D lineP1, Dist2D lineP2, bool allowExtend)
+		//    {
+		//        // Swap roles of X and Y.
+		//        return YAtX(goalY, lineP1.SwapXY(), lineP2.SwapXY(), allowExtend);
+		//    }
+
+		//    // Find y at goalX on line (lineP1, lineP2).
+		//    // "allowExtend": If allowed to go beyond ends of line.
+		//    // If no solution, returns Double.NaN.
+		//    public static double YAtX(double goalX, Dist2D lineP1, Dist2D lineP2, bool allowExtend)
+		//    {
+		//        double x1 = lineP1.X;
+		//        double x2 = lineP2.X;
+		//        double y1 = lineP1.Y;
+		//        double y2 = lineP2.Y;
+
+		//        double lineDx = x2 - x1;
+		//        double lineDy = y2 - y1;
+		//        bool xWithinLine = BetweenInclusive_WithTolerance(goalX, x1, x2, Math.Abs(lineDx * VerySmall));
+		//        if (!xWithinLine)
+		//        {
+		//            // If near an endpoint, return endpoint.
+		//            // When line is very short, return closest endpoint.
+		//            double error1 = Math.Abs(x1 - goalX);
+		//            double error2 = Math.Abs(x2 - goalX);
+		//            if (error1 <= error2)
+		//            {
+		//                // p1 is closer.
+		//                if (error1.NearlyEquals(0))
+		//                    return y1;
+		//            }
+		//            else
+		//                // p2 is closer.
+		//                if (error2.NearlyEquals(0))
+		//                return y2;
+		//            if (!allowExtend)
+		//                return double.NaN;
+		//            // Check for vertical line, which would make it impossible.
+		//            // TBD: If working with tiny numbers, need tolerance "lineDx * VerySmall".
+		//            // BUT if do that, may need additional logic to ensure don't get numeric overflow trying to reach the goal.
+		//            if (lineDx.NearlyEquals(0))
+		//                return double.NaN;
+		//        }
+
+		//        double goalDx = goalX - x1;
+
+		//        // Traditional formula based on slope (dy/dx).
+		//        return y1 + (lineDy / lineDx) * goalDx;
+		//    }
+
+
+		//    // True if ANY of "pts" is inside "polygon".
+		//    // PERFORMANCE: Recommend caller first check points against polygon's bounding rectangle.
+		//    public static bool PointsInPolygon2D(Dist2D[] polygon, Dist2D[] pts)
+		//    {
+		//        foreach (Dist2D ptdPt in pts)
+		//        {
+		//            if (PointInPolygon2D(polygon, ptdPt))
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    // True if ANY of "pts" is inside "polygon".
+		//    // PERFORMANCE: Recommend caller first check against polygon's bounding rectangle.
+		//    public static bool PointsInPolygon2D(PointF[] polygon, PointF[] pts)
+		//    {
+		//        foreach (PointF ptfPt in pts)
+		//        {
+		//            if (PointInPolygon2D(polygon, ptfPt))
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+
+		//    // PERFORMANCE: Recommend caller first check against polygon's bounding rectangle.
+		//    // CAUTION: IF pass in "polygon as points", the 4 corners must be CLOCKWISE not ZIGZAG order.
+		//    public static bool PointInPolygon2D(Dist2D[] polygon, Dist2D point)
+		//    {
+		//        if (polygon == null)
+		//            return false;
+
+		//        bool odd = false;
+		//        int length;
+		//        int i, j;
+		//        double ix, iy, jx, jy, x, y;
+
+
+		//        if (polygon[0].X == polygon[polygon.Length - 1].X & polygon[0].Y == polygon[polygon.Length - 1].Y)
+		//            length = polygon.Length - 1;
+		//        else
+		//            length = polygon.Length;
+
+		//        x = point.X;
+		//        y = point.Y;
+		//        for (i = 0; i <= length - 1; i++)
+		//        {
+		//            j = (i + 1) % length;
+		//            ix = polygon[i].X;
+		//            iy = polygon[i].Y;
+		//            jx = polygon[j].X;
+		//            jy = polygon[j].Y;
+		//            // if y-within-span
+		//            if ((iy < y && jy >= y) || (jy < y && iy >= y))
+		//            {
+		//                // if x-past-segment's-x-at-y
+		//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                    // point is past segment.
+		//                    odd = !odd;
+		//            }
+		//        }
+
+		//        return odd;
+		//    }
+
+		//    // PERFORMANCE: Recommend caller first check against polygon's bounding rectangle.
+		//    public static bool PointInPolygon2D(PointF[] polygon, PointF point)
+		//    {
+		//        if (polygon == null)
+		//            return false;
+
+		//        bool odd = false;
+		//        int length;
+		//        int i, j;
+		//        double ix, iy, jx, jy, x, y;
+
+		//        if (polygon[0].X == polygon[polygon.Length - 1].X & polygon[0].Y == polygon[polygon.Length - 1].Y)
+		//            length = polygon.Length - 1;
+		//        else
+		//            length = polygon.Length;
+
+		//        x = point.X;
+		//        y = point.Y;
+
+		//        for (i = 0; i <= length - 1; i++)
+		//        {
+		//            j = (i + 1) % length;
+		//            ix = polygon[i].X;
+		//            iy = polygon[i].Y;
+		//            jx = polygon[j].X;
+		//            jy = polygon[j].Y;
+		//            if ((iy < y & jy >= y) | (jy < y & iy >= y))
+		//            {
+		//                if (ix + (y - iy) / (jy - iy) * (jx - ix) < x)
+		//                    odd = !odd;
+		//            }
+		//        }
+		//        return odd;
+		//    }
+
+		//    public static bool CirclesIntersects2D(Dist2D ptdP1, Dist2D ptdP2, double dblR1, double dblR2)
+		//    {
+		//        double dblDI = CalcDistance2D(ptdP1, ptdP2);
+
+		//        if (dblDI > dblR1 + dblR2)
+		//            return false;
+
+		//        return true;
+		//    }
+
+		//    public static Dist2D[] CirclesIntersectsAt2D(Dist2D ptdP1, Dist2D ptdP2, double dblR1, double dblR2)
+		//    {
+		//        double dblDI = CalcDistance2D(ptdP1, ptdP2);
+
+		//        if (dblDI > dblR1 + dblR2)
+		//            return null;
+		//        if (dblDI < Math.Abs(dblR1 - dblR2))
+		//            return null;
+
+		//        Dist2D ptdDelta = new Dist2D(ptdP2.X - ptdP1.X, ptdP2.Y - ptdP1.Y);
+		//        // dblDI = Math.Sqrt((ptdDelta.Y * ptdDelta.Y) + (ptdDelta.X * ptdDelta.X))
+		//        double a = ((dblR1 * dblR1) - (dblR2 * dblR2) + (dblDI * dblDI)) / (2 * dblDI);
+		//        Dist2D ptdP3 = new Dist2D(ptdP1.X + (ptdDelta.X * a / dblDI), ptdP1.Y + (ptdDelta.Y * a / dblDI));
+		//        double h = Math.Sqrt((dblR1 * dblR1) - (a * a));
+		//        Dist2D ptdR = new Dist2D(-ptdDelta.Y * (h / dblDI), ptdDelta.X * (h / dblDI));
+		//        Dist2D[] ptdRet = new Dist2D[2];
+
+		//        ptdRet[0].X = ptdP3.X + ptdR.X;
+		//        ptdRet[0].Y = ptdP3.Y + ptdR.Y;
+		//        ptdRet[1].X = ptdP3.X - ptdR.X;
+		//        ptdRet[1].Y = ptdP3.Y - ptdR.Y;
+
+		//        return ptdRet;
+		//    }
+
+		//    public static Dist2D[] Merge_Linear_Shapes(Dist2D[] ptdShape1, Dist2D[] ptdShape2)
+		//    {
+		//        // Assumes shaper are 3rd degree beziers
+		//        Dist2D[] ptdRet = null;
+
+		//        Dist2D[] ptdNewShape1 = null;
+		//        int intIdxNewS1 = 0;
+		//        Dist2D[] ptdNewShape2 = null;
+
+		//        for (int intIdxS1 = 0; intIdxS1 <= ptdShape1.Length - 1; intIdxS1++)
+		//        {
+		//            Dist2D ptdS1P1;
+		//            Dist2D ptdS1P2 = ptdShape1[intIdxS1];
+		//            Dist2D[] ptdCrossPoints = null;
+
+		//            if (intIdxS1 == 0)
+		//                ptdS1P1 = ptdShape1[ptdShape1.Length - 1];
+		//            else
+		//                ptdS1P1 = ptdShape1[intIdxS1 - 1];
+
+		//            for (int intIdxS2 = 0; intIdxS2 <= ptdShape2.Length - 1; intIdxS2++)
+		//            {
+		//                Dist2D ptdS2P1;
+		//                Dist2D ptdS2P2 = ptdShape2[intIdxS2];
+
+		//                if (intIdxS2 == 0)
+		//                    ptdS2P1 = ptdShape1[ptdShape2.Length - 1];
+
+		//                if (LinesIntersects2D(ptdS1P1, ptdS1P2, ptdS2P1, ptdS2P2))
+		//                {
+		//                    // Korsar
+		//                    if (ptdCrossPoints == null)
+		//                        ptdCrossPoints = new Dist2D[1];
+		//                    else
+		//                    {
+		//                        var oldPtdCrossPoints = ptdCrossPoints;
+		//                        ptdCrossPoints = new Dist2D[ptdCrossPoints.Length + 1];
+		//                        if (oldPtdCrossPoints != null)
+		//                            Array.Copy(oldPtdCrossPoints, ptdCrossPoints, Math.Min(ptdCrossPoints.Length + 1, oldPtdCrossPoints.Length));
+		//                    }
+
+		//                    ptdCrossPoints[ptdCrossPoints.Length - 1] = LinesIntersectsAt2D(ptdS1P1, ptdS1P2, ptdS2P1, ptdS2P2);
+		//                }
+		//            }
+
+		//            int intBound = 0;
+
+		//            if (ptdNewShape1 == null)
+		//                intBound = 1;
+		//            else
+		//                intBound = ptdNewShape1.Length + 1;
+
+		//            if (!ptdCrossPoints == null)
+		//                intBound += ptdCrossPoints.Length;
+		//            var oldPtdNewShape1 = ptdNewShape1;
+		//            ptdNewShape1 = new Dist2D[intBound + 1];
+		//            if (oldPtdNewShape1 != null)
+		//                Array.Copy(oldPtdNewShape1, ptdNewShape1, Math.Min(intBound + 1, oldPtdNewShape1.Length));
+
+		//            ptdNewShape1[intIdxNewS1] = ptdS1P1; intIdxNewS1 += 1;
+
+		//            if (!ptdCrossPoints == null)
+		//            {
+		//                for (int intIdx = 0; intIdx <= ptdCrossPoints.Length - 1; intIdx++)
+		//                {
+		//                }
+		//            }
+		//        }
+
+		//        return ptdRet;
+		//    }
+
+
+
+		//    public static Dist3D[] Calculate_Convex_Hull(ref Dist3D[] ptdVertices)
+		//    {
+		//        // The Convex Hull will be the current points (unless there are three co-linear points and OnBorder = False... we will ignore this case) 
+		//        if (ptdVertices.Length <= 3)
+		//            return (Dist3D[])ptdVertices.Clone();
+
+		//        Dist3D[] ptdRet = null;
+		//        int intIXNAStart = 0;
+		//        bool bolOnBorder = false;
+		//        // Find the starting index of the hull by finding the leftmost point in the polygon 
+
+		//        for (int intIXNA = 1; intIXNA <= ptdVertices.Length - 1; intIXNA++)
+		//        {
+		//            if (ptdVertices[intIXNA].X < ptdVertices[intIXNAStart].X)
+		//                // Point is Left Most 
+		//                intIXNAStart = intIXNA;
+		//            else if (ptdVertices[intIXNA].X == ptdVertices[intIXNAStart].X)
+		//            {
+		//                // Point is tied for left most, see if it's higher 
+		//                if (ptdVertices[intIXNA].Y < ptdVertices[intIXNAStart].Y)
+		//                    intIXNAStart = intIXNA;
+		//            }
+		//        }
+
+		//        bool[] bolInHull = new bool[ptdVertices.Length - 1 + 1];
+
+		//        // Sort until we get back to StartIndex 
+		//        int intIXNALast = intIXNAStart;
+
+		//        do
+		//        {
+		//            int intSelected = -1;
+		//            for (int intIXNA = 0; intIXNA <= ptdVertices.Length - 1; intIXNA++)
+		//            {
+		//                if (!bolInHull[intIXNA] & intIXNA != intIXNALast)
+		//                {
+		//                    if (intSelected == -1)
+		//                        // No point has been selected yet, select this one 
+		//                        intSelected = intIXNA;
+		//                    else
+		//                    {
+		//                        double dblCross = CrossProduct2D(ptdVertices[intIXNA], ptdVertices[intIXNALast], ptdVertices[intSelected]);
+		//                        if (dblCross == 0.0)
+		//                        {
+		//                            // On the line 
+		//                            if (bolOnBorder)
+		//                            {
+		//                                // Since we want the points on the border, take the one closer to LastIndex 
+		//                                if (DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intIXNA], ptdVertices[intIXNA]) < DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intSelected], ptdVertices[intSelected]))
+		//                                    intSelected = intIXNA;
+		//                            }
+		//                            else if (DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intIXNA], ptdVertices[intIXNA]) > DotProduct2D(ptdVertices[intIXNALast], ptdVertices[intSelected], ptdVertices[intSelected]))
+		//                                intSelected = intIXNA;
+		//                        }
+		//                        else if (dblCross < 0.0)
+		//                            // ptdVertices(intIXNA) is more counter-clockwise 
+		//                            intSelected = intIXNA;
+		//                    }
+		//                }
+		//            }
+		//            // Set LastIndex to the final Selected point 
+		//            intIXNALast = intSelected;
+
+		//            // Update the InHull array to know this point has been added to the hull 
+		//            bolInHull[intIXNALast] = true;
+
+		//            // Add the point 
+		//            if (ptdRet == null)
+		//                ptdRet = new Dist3D[1];
+		//            else
+		//            {
+		//                var oldPtdRet = ptdRet;
+		//                ptdRet = new Dist3D[ptdRet.Length + 1];
+		//                if (oldPtdRet != null)
+		//                    Array.Copy(oldPtdRet, ptdRet, Math.Min(ptdRet.Length + 1, oldPtdRet.Length));
+		//            }
+
+		//            ptdRet[ptdRet.Length - 1] = ptdVertices[intIXNALast];
+		//        }
+		//        while (intIXNALast != intIXNAStart); // Check if we're back to the starting point 
+
+		//        return ptdRet;
+		//    }
+
+		//    public static double CrossProduct2D(Dist2D Origin, Dist2D A, Dist2D B)
+		//    {
+		//        return (A.X - Origin.X) * (B.Y - Origin.Y) - (B.X - Origin.X) * (A.Y - Origin.Y);
+		//    }
+
+		//    // NOTE: See mDL3DLib for "CrossProduct3D".
+		//    public static double CrossProduct2D(Dist3D Origin, Dist3D A, Dist3D B)
+		//    {
+		//        return (A.X - Origin.X) * (B.Y - Origin.Y) - (B.X - Origin.X) * (A.Y - Origin.Y);
+		//    }
+
+		//    public static double DotProduct2D(Dist3D Origin, Dist3D A, Dist3D B)
+		//    {
+		//        return (A.X - Origin.X) * (B.X - Origin.X) + (A.Y - Origin.Y) * (B.Y - Origin.Y);
+		//    }
+
+
+
+		//    public static bool Is_Vertex_Inside_Triangle2D(Dist3D ptdPt, Dist3D ptdA, Dist3D ptdB, Dist3D ptdC)
+		//    {
+		//        Dist3D e0, e1, e2;
+		//        double a1, a2, a3, b1, b2;
+		//        double det;
+		//        double c1, c2;
+
+		//        e0.X = ptdPt.X - ptdA.X;
+		//        e0.Y = ptdPt.Y - ptdA.Y;
+
+		//        e1.X = ptdB.X - ptdA.X;
+		//        e1.Y = ptdB.Y - ptdA.Y;
+
+		//        e2.X = ptdC.X - ptdA.X;
+		//        e2.Y = ptdC.Y - ptdA.Y;
+
+		//        a1 = e1.X * e1.X + e1.Y * e1.Y;
+		//        a2 = e1.X * e2.X + e1.Y * e2.Y;
+		//        a3 = e2.X * e2.X + e2.Y * e2.Y;
+
+		//        b1 = e0.X * e1.X + e0.Y * e1.Y;
+		//        b2 = e0.X * e2.X + e0.Y * e2.Y;
+
+		//        det = a1 * a3 - a2 * a2;
+
+		//        c1 = (b1 * a3 - b2 * a2) / det;
+		//        c2 = (b2 * a1 - b1 * a2) / det;
+
+		//        return (c1 >= 0.0) && (c1 <= 1.0) && (c2 >= 0) && (c2 <= 1);
+		//    }
+
+		//    public static double Calculate_ZValue_Inside_Triangle(Dist3D ptdPt, Dist3D ptdA, Dist3D ptdB, Dist3D ptdC)
+		//    {
+		//        Dist3D v1, v2, n;
+		//        double d, e;
+
+		//        v1 = new Dist3D(ptdB.X - ptdA.X, ptdB.Y - ptdA.Y, ptdB.Z - ptdA.Z); // v1 = ptdB - ptdA
+		//        v2 = new Dist3D(ptdC.X - ptdA.X, ptdC.Y - ptdA.Y, ptdC.Z - ptdA.Z); // v2 = ptdC - ptdA
+
+		//        n.X = v1.Y * v2.Z - v1.Z * v2.Y;
+		//        n.Y = v1.Z * v2.X - v1.X * v2.Z;
+		//        n.Z = v1.X * v2.Y - v1.Y * v2.X;
+
+		//        d = n.X * ptdA.X + n.Y * ptdA.Y + n.Z * ptdA.Z;
+
+		//        ptdPt.Z = 0.0;
+		//        e = n.X * ptdPt.X + n.Y * ptdPt.Y + n.Z * 0;
+
+		//        ptdPt.Z = (d - e) / n.Z;
+
+		//        return ptdPt.Z;
+		//    }
+
+		//    public static bool PointInsideTriangle2D(double dblPTX, double dblPTY, double dblPTZ, double dblAX, double dblAY, double dblAZ, double dblBX, double dblBY, double dblBZ, double dblCX, double dblCY, double dblCZ)
+		//    {
+		//        double dble0X, dble0Y, dble0Z;
+		//        double dble1X, dble1Y, dble1Z;
+		//        double dble2X, dble2Y, dble2Z;
+		//        double a1, a2, a3, b1, b2;
+		//        double det;
+		//        double c1, c2;
+
+		//        dble0X = dblPTX - dblAX;
+		//        dble0Y = dblPTY - dblAY;
+		//        dble0Z = dblPTZ - dblAZ;
+
+		//        dble1X = dblBX - dblAX;
+		//        dble1Y = dblBY - dblAY;
+		//        dble1Z = dblBZ - dblAZ;
+
+		//        dble2X = dblCX - dblAX;
+		//        dble2Y = dblCY - dblAY;
+		//        dble2Z = dblCZ - dblAZ;
+
+		//        a1 = dble1X * dble1X + dble1Y * dble1Y + dble1Z * dble1Z;
+		//        a2 = dble1X * dble2X + dble1Y * dble2Y + dble1Z * dble2Z;
+		//        a3 = dble2X * dble2X + dble2Y * dble2Y + dble2Z * dble2Z;
+
+		//        b1 = dble0X * dble1X + dble0Y * dble1Y + dble0Z * dble1Z;
+		//        b2 = dble0X * dble2X + dble0Y * dble2Y + dble0Z * dble2Z;
+
+		//        det = a1 * a3 - a2 * a2;
+
+		//        c1 = (b1 * a3 - b2 * a2) / det;
+		//        c2 = (b2 * a1 - b1 * a2) / det;
+
+		//        return (c1 >= 0.0) && (c1 <= 1.0) && (c2 >= 0) && (c2 <= 1);
+		//    }
+
+
+		//    public static bool NewRectanglesIntersects2D(Rectangle2D rcdRect1, Rectangle2D rcdRect2, Dist3D ptdOrigoVector)
+		//    {
+		//        Dist2D[] ptdRect1 = new Dist2D[4];
+		//        Dist2D[] ptdRect2 = new Dist2D[4];
+
+		//        // If ptdOrigoVector.X < 0 Then
+		//        // rcdRect1.X -= rcdRect1.Width
+		//        // rcdRect2.X -= rcdRect2.Width
+		//        // Else
+
+		//        // End If
+
+		//        if (ptdOrigoVector.Y < 0)
+		//        {
+		//        }
+		//        else
+		//        {
+		//            rcdRect1.Y -= rcdRect1.Height;
+		//            rcdRect2.Y -= rcdRect2.Height;
+		//        }
+
+		//        // Debug.WriteLine("Rectangle X0 Y0 W" & rcdRect1.Width & " H" & rcdRect1.Height)
+		//        // Debug.WriteLine("Point     X" & rcdRect2.X - rcdRect1.X & " Y" & rcdRect2.Y - rcdRect1.Y)
+
+		//        // Only Works if rcdRect1 all positiv numbers
+		//        ptdRect1[0].X = rcdRect1.X; ptdRect1[0].Y = rcdRect1.Y;
+		//        ptdRect1[1].X = rcdRect1.X + rcdRect1.Width; ptdRect1[1].Y = rcdRect1.Y;
+		//        ptdRect1[2].X = rcdRect1.X; ptdRect1[2].Y = rcdRect1.Y + rcdRect1.Height;
+		//        ptdRect1[3].X = rcdRect1.X + rcdRect1.Width; ptdRect1[3].Y = rcdRect1.Y + rcdRect1.Height;
+
+		//        ptdRect2[0].X = rcdRect2.X; ptdRect2[0].Y = rcdRect2.Y;
+		//        ptdRect2[1].X = rcdRect2.X + rcdRect2.Width; ptdRect2[1].Y = rcdRect2.Y;
+		//        ptdRect2[2].X = rcdRect2.X; ptdRect2[2].Y = rcdRect2.Y + rcdRect2.Height;
+		//        ptdRect2[3].X = rcdRect2.X + rcdRect2.Width; ptdRect2[3].Y = rcdRect2.Y + rcdRect2.Height;
+
+		//        for (int intIdx = 0; intIdx <= 3; intIdx++)
+		//        {
+		//            if (PointInsideRectangle2D_Strict(ptdRect1[intIdx], rcdRect2) || PointInsideRectangle2D_Strict(ptdRect2[intIdx], rcdRect1))
+		//                return true;
+		//        }
+
+		//        return false;
+		//    }
+
+		//    public static Rectangle2D Calculate_Rectangle(Dist2D[] polygonAsPoints)
+		//    {
+		//        if (polygonAsPoints == null)
+		//            return default(Rectangle2D);
+
+		//        Dist2D maxPt;
+		//        Dist2D minPt = Calculate_MinMax(polygonAsPoints, ref maxPt);
+
+		//        return Rectangle2D.FromMinMax(minPt, maxPt);
+		//    }
+
+		//    public static Dist2D Calculate_CenterOfRotatableRectangle(Dist2D[] ptdPolygon)
+		//    {
+		//        Dist2D pointSum = new Dist2D(0, 0);
+		//        int pointCount = 0;
+		//        foreach (Dist2D point in ptdPolygon)
+		//        {
+		//            pointSum += point;
+		//            pointCount += 1;
+		//        }
+		//        return (pointSum / (double)pointCount);
+		//    }
+
+
+		//    public static Dist2D[] Calculate_MinMax(Dist2D[] points)
+		//    {
+		//        Dist2D maxPt;
+		//        Dist2D minPt = Calculate_MinMax(points, ref maxPt);
+
+		//        if (maxPt.X < minPt.X)
+		//            return null;
+
+		//        Dist2D[] retPoints = new Dist2D[2];
+		//        retPoints[0] = minPt;
+		//        retPoints[1] = maxPt;
+		//        return retPoints;
+		//    }
+
+		//    public static MinMaxSingle Calculate_MinMax(IList<Vector3> vecs)
+		//    {
+		//    }
+
+		//    // Return minPt; (out) maxPt.
+		//    // If zero points are input, then outgoing max's are less then min's.
+		//    public static Dist2D Calculate_MinMax(Dist2D pt1, Dist2D pt2, out Dist2D maxPt)
+		//    {
+		//        Dist2D minPt = pt1;
+		//        maxPt = pt1;
+
+		//        if (pt2.X < minPt.X)
+		//            minPt.X = pt2.X;
+		//        if (pt2.Y < minPt.Y)
+		//            minPt.Y = pt2.Y;
+
+		//        if (pt2.X > maxPt.X)
+		//            maxPt.X = pt2.X;
+		//        if (pt2.Y > maxPt.Y)
+		//            maxPt.Y = pt2.Y;
+
+		//        return minPt;
+		//    }
+
+		//    // Return minPt; (out) maxPt.
+		//    // If zero points are input, then outgoing max's are less then min's.
+		//    public static Dist2D Calculate_MinMax(Dist2D[] points, out Dist2D maxPt)
+		//    {
+		//        Dist2D minPt = Dist2D.MaxValue;
+		//        maxPt = Dist2D.MinValue;
+
+		//        // "no data" indicated by (minPt > maxPt).
+		//        if ((points == null) || (points.Length == 0))
+		//            return minPt;
+
+		//        for (int i = 0; i <= LastIndex(points); i++)
+		//            mDL2DLib.AccumMinMax(points[i], ref minPt, ref maxPt);
+
+		//        return minPt;
+		//    }
+
+
+		//    // Because WGS-84 unit is tiny, multiply tolerance by this.
+		//    private static double Unit_Scaled(Dist2D[] pts)
+		//    {
+		//        Dist2D minPt = Dist2D.MaxValue;
+		//        Dist2D maxPt = Dist2D.MinValue;
+		//        for (int i = 0; i <= LastIndex(pts); i++)
+		//            mDL2DLib.AccumMinMax(pts[i], ref minPt, ref maxPt);
+
+		//        double shapeSize = CalcDistance2D(minPt, maxPt);
+		//        // Don't have scale above 1 - only affect tolerance when coordinates are tiny.
+		//        double unitScale = Math.Min(1.0, shapeSize);
+
+		//        return unitScale;
+		//    }
+
+		//    // If fineDetail=True, then long sections retain more points.
+		//    public static Dist2D[] Simplify_Polygon(Dist2D[] pts, bool fineDetail)
+		//    {
+		//        return Simplify_Polygon2(pts, fineDetail ? 2.0 : 5.0, fineDetail ? 0.015 : 0.02);
+		//    }
+
+		//    // "EPS" is a measure of angle (change in direction).
+		//    // When "doSmooth", looks ahead for any future point within distance tolerance and EPS.
+		//    // (To be precise, find smallest EPS within distance.)
+		//    // That is, allowed to remove "bumps".
+		//    public static Dist2D[] Simplify_Polygon2(Dist2D[] pts, double tolerance, double EPS = 0.02, bool doSmooth = false)
+		//    {
+		//        string strReport = "";
+
+		//        List<int> outIs = new List<int>();
+
+		//        double unitScale = Unit_Scaled(pts);
+
+		//        // Dim threshold As Double = DegreesToRadians(0.05)
+		//        double distSqThreshold = Math.Pow((unitScale * tolerance), 2);
+		//        // This limits how large a bump we can eliminate.  Too small, and might miss a continuation, too large and performance suffers.
+		//        double bumpSizeTolerance = 4 * tolerance;
+		//        double bumpSizeSqThreshold = Math.Pow((unitScale * bumpSizeTolerance), 2);
+		//        // TODO: Variable formula combining distance and EPS, such that larger distances would have smaller angle threshold (instead of abruptly deciding to keep the point at a given distance).
+
+
+		//        // Method 3 Cross product
+		//        // Dim minDiff As Double = Double.MaxValue, maxDiff As Double = Double.MinValue
+		//        // Dim test_history As New List(Of Single)
+		//        // Dim t_nChecks As Integer = 0, t_nBetterFar As Integer = 0
+
+		//        // Always keep first two points, which establish initial angle.
+		//        outIs.Add(0);
+		//        outIs.Add(1);
+		//        int iSkipUntil = 0;
+		//        // Almost always will be stopped first by distance.
+		//        int nLookAhead = LastIndex(pts) / 2;
+		//        // 
+		//        for (int inI = 2; inI <= LastIndex(pts); inI++)
+		//        {
+		//            if (inI < iSkipUntil)
+		//                continue;
+		//            // Dim crossProduct As Double = pts(inI-1).Cross(pts(inI), pts(inI + 1))
+		//            int lastOutII = LastIndex(outIs);
+		//            Dist2D p0 = pts[outIs[lastOutII - 1]];
+		//            // aka previous outI
+		//            int lastOutI = outIs[lastOutII];
+		//            Dist2D p1 = pts[lastOutI];
+		//            Dist2D p2 = pts[inI];
+		//            double distSq = DistanceSquared2D(p1, p2);
+
+		//            double dist01Sq = DistanceSquared2D(p0, p1);
+		//            double absCross = CalcAbsCross(p0, p1, p2, dist01Sq);
+		//            // If (absCross < minDiff) AndAlso (absCross > 0) Then _
+		//            // minDiff = absCross
+		//            // AccumMax(absCross, maxDiff)
+		//            // test_history.Add(absCross)
+
+		//            int prevInI = inI - 1;
+
+
+		//            if (doSmooth)
+		//            {
+		//                // (absCross >= EPS) OrElse
+		//                if (((distSq >= distSqThreshold)))
+		//                {
+		//                    // Exceeded thresholds (since last kept point).
+		//                    // Find best point to keep before the threshold is exceeded. (Though sometimes have no choice but to take inI.)
+		//                    // Take into account the angle AFTER each point, by finding the best NEXT point to go with each possible choice.
+		//                    int bestInJ = CalcBestInJ(pts, lastOutI, inI, p0, p1, dist01Sq, absCross, nLookAhead, distSqThreshold, bumpSizeSqThreshold);
+		//                    outIs.Add(bestInJ);
+		//                }
+		//            }
+		//            else
+		//                // ' --- TODO: Better (needs testing) ---
+		//                // If (absCross >= EPS) OrElse (distSq >= distSqThreshold) Then
+		//                // If lastOutI < prevInI Then
+		//                // ' Keep PREVIOUS point (so within spec).
+		//                // outIs.Add(prevInI)
+		//                // Else
+		//                // ' Previous is already kept; keep CURRENT point (best we can do).
+		//                // outIs.Add(inI)
+		//                // End If
+		//                // Else
+		//                // ' Don't need current point (unless next point is beyond spec; at that time will be "previous")
+		//                // Test()
+		//                // End If
+
+		//                if ((absCross >= EPS))
+		//            {
+		//                // After a bend.
+		//                // ALSO keep the point IN THE CORNER OF the bend (if not already kept).
+		//                if ((lastOutI < prevInI) && (!doSmooth))
+		//                    outIs.Add(prevInI);
+		//                // After bend - keep inI
+		//                // NOTE: If kept prevInI, Only need if "DistanceSquared2D(pts(prevInI), p2) >= distSqThreshold",
+		//                // but not worth further testing to optimize that case.
+		//                outIs.Add(inI);
+		//            }
+		//            else if (distSq >= distSqThreshold)
+		//                // Exceeded distance.
+		//                // TBD: Keep the BEST point up to inI.
+		//                // TBD: Do we ever get here, given the logic above?
+		//                outIs.Add(inI);
+		//            else
+		//                // Near last out point, and almost a straight line - discard inI.
+		//                Test();
+		//        }
+
+		//        // Always keep final point.
+		//        if (LastElement(outIs) != LastIndex(pts))
+		//            outIs.Add(LastIndex(pts));
+
+		//        // strReport &= "Min diff: " & minDiff.ToString(ValStr(minDiff)) & vbCrLf
+		//        // Debug.WriteLine(strReport)
+
+
+
+		//        strReport = "";
+
+		//        List<Dist2D> outPts = new List<Dist2D>(outIs.Count);
+		//        foreach (int outI in outIs)
+		//            outPts.Add(pts[outI]);
+
+		//        if (doSmooth)
+		//        {
+		//            // Spread bends into straight sections.
+		//            // (Without this, when form Bezier's, there are "kinks" where angles are zero.)
+
+		//            int nWrap = GetNWrap(outPts);
+		//            // Angle per point, via wrapping. If DoesWrap, no angle for last point, as that is identical to first point.
+		//            List<float> outAngles = new List<float>(nWrap);
+		//            float sumAngleDegrees = 0;
+		//            for (int iPt = 0; iPt <= nWrap - 1; iPt++)
+		//            {
+		//                Dist2D p0 = outPts[WrappedIndex(iPt - 1, nWrap)];
+		//                Dist2D p1 = outPts[iPt];
+		//                Dist2D p2 = outPts[WrappedIndex(iPt + 1, nWrap)];
+		//                float angle = System.Convert.ToSingle(CalcBendDegrees(p0, p1, p2));
+		//                outAngles.Add(angle);
+		//                sumAngleDegrees += angle;
+		//            }
+
+		//            // "-1": Each distance uses two points.
+		//            // outDistances(i) corresponds to outPts(i) and (i+1).
+		//            List<float> outDistances = new List<float>(nWrap - 1);
+		//            // "1": Each distance uses point before.
+		//            for (int iPt = 1; iPt <= LastIndex(outPts); iPt++)
+		//            {
+		//                Dist2D pt0 = outPts[iPt - 1];
+		//                Dist2D pt1 = outPts[iPt];
+		//                outDistances.Add(System.Convert.ToSingle(CalcDistance2D(pt0, pt1)));
+		//            }
+
+		//            for (int iAngle = 0; iAngle <= nWrap - 1; iAngle++)
+		//            {
+		//                int iPt = iAngle;
+		//                float a0 = outAngles[WrappedIndex(iAngle - 1, nWrap)];
+		//                float a1 = outAngles[iAngle];
+		//                float a2 = outAngles[WrappedIndex(iAngle + 1, nWrap)];
+		//                float absA0 = Math.Abs(a0);
+
+		//                float dist01 = outDistances[WrappedIndex(iAngle - 1, nWrap)];
+		//                float dist12 = outDistances[iAngle];
+
+		//                // Delta is positive when a1 is smaller.
+		//                float da01 = Math.Abs(a0) - Math.Abs(a1);
+		//                float da21 = Math.Abs(a2) - Math.Abs(a1);
+		//                if (iAngle >= 112)
+		//                    Test();
+		//                if (da01 >= 1)
+		//                    // a0 is significantly greater than a1.
+		//                    // Spread bend from a0 to a1.
+		//                    // But "limited" by bend at a2?
+		//                    Test();
+		//            }
+		//        }
+
+		//        strReport += "START Vertice count: " + pts.Length + Constants.vbCrLf;
+		//        strReport += "END Vertice count: " + outPts.Count + Constants.vbCrLf;
+		//        // Debug.WriteLine(strReport)
+
+		//        return outPts.ToArray();
+		//    }
+
+		//    private static int CalcBestInJ(Dist2D[] pts, int lastOutI, int inI, Dist2D p0, Dist2D p1, double dist01Sq, double absCross, int nLookAhead, double distSqThreshold, double bumpSizeSqThreshold)
+		//    {
+		//        // NOTE: This "absCross" is from inI, which might exceed distance.
+		//        // HOWEVER, if there is no better one, should we keep it?
+		//        // NO, we haven't tested what far point would go with this, so may not be valid (even ignoring distance threshold).
+		//        double minAbsCross = double.MaxValue;   // absCross
+		//        int bestInJ = inI;
+
+		//        // TBD: Wrap around?
+		//        // inI + 1 To Math.Min(inI + nLookAhead, LastIndex(pts))
+		//        // There might not be ANY points in this range. In which case, use inI (from above).
+		//        for (int inJ = lastOutI + 1; inJ <= inI - 1; inJ++)
+		//        {
+		//            Dist2D p2b = pts[inJ];
+		//            double distBSq = DistanceSquared2D(p1, p2b);
+		//            // TBD: I don't think either of these conditions ever happen, because inI is the first point out-of-range.
+		//            if (distBSq >= bumpSizeSqThreshold)
+		//                // Exceeded look-ahead.
+		//                // NOTE: If bump is taller than this check, will stop here - even if a later point might be within threshold.
+		//                break;
+		//            else if (distBSq >= distSqThreshold)
+		//                // Not an acceptable continuation point.
+		//                continue;
+
+		//            double absCrossB = CalcAbsCross(p0, p1, p2b, dist01Sq);
+		//            if (absCrossB < minAbsCross)
+		//            {
+		//                // Check whether OTHER end's cross is also better.
+		//                double absCrossBEnd = CalcAbsCrossBEnd(pts, inJ, p1, p2b, absCrossB, nLookAhead, distBSq, distSqThreshold, bumpSizeSqThreshold);
+		//                // The WORSE of the two ends is what we minimize.
+		//                absCrossB = Math.Max(absCrossB, absCrossBEnd);
+		//                if (absCrossB < minAbsCross)
+		//                {
+		//                    minAbsCross = absCrossB;
+		//                    bestInJ = inJ;
+		//                }
+		//            }
+		//        }
+
+		//        return bestInJ;
+		//    }
+
+		//    // NOTE: "Angle p1-p0-p2". Would it make more sense to work with "180 degrees minus Angle p0-p1-p2"?
+		//    private static double CalcAbsCross(Dist2D p0, Dist2D p1, Dist2D p2, double dist01Sq)
+		//    {
+		//        double crossProduct = p0.Cross(p1, p2);
+		//        double magnitudeProduct = Math.Sqrt(dist01Sq * DistanceSquared2D(p0, p2));
+
+		//        double sinA = crossProduct / magnitudeProduct;
+		//        return Math.Abs(sinA);
+		//    }
+
+		//    private static double CalcAbsCrossBEnd(Dist2D[] pts, int inJ, Dist2D p1, Dist2D p2b, double absCrossB, int nLookAhead, double distBSq, double distSqThreshold, double bumpSizeSqThreshold)
+		//    {
+		//        double absCrossBEnd = double.MaxValue;
+
+		//        int nWrap = GetNWrap(pts);
+
+		//        // Find best angle near far end.
+		//        // CAUTION: inK allowed to exceed last index; it wraps.
+		//        for (int inK = inJ + 1; inK <= inJ + nLookAhead; inK++)
+		//        {
+		//            Dist2D p3 = pts[inK % nWrap];
+		//            // "If": Always calculate the first inK, even if it is too far. (Far if points are separated by excessive distance.)
+		//            if (absCrossBEnd < double.MaxValue)
+		//            {
+		//                double distBEndSq = DistanceSquared2D(p2b, p3);
+		//                if (distBEndSq >= bumpSizeSqThreshold)
+		//                    // Exceeded look-ahead.
+		//                    // NOTE: If bump is taller than this check, will stop here - even if a later point might be within threshold.
+		//                    break;
+		//                else if (distBEndSq >= distSqThreshold)
+		//                    continue;
+		//            }
+		//            AccumMin(CalcAbsCross(p1, p2b, p3, distBSq), ref absCrossBEnd);
+		//            if (absCrossBEnd <= absCrossB)
+		//                // Quality limited by BStart.
+		//                break;
+		//        }
+
+		//        return absCrossBEnd;
+		//    }
+
+
+
+		//    // Pair of values representing a range.
+		//    public abstract class MinMax<T>
+		//    {
+		//        protected T _min, _max;
+		//        // Number of values accumulated.
+		//        protected int _count;
+
+		//        public MinMax(T min, T max)
+		//        {
+		//            this._min = min;
+		//            this._max = max;
+		//        }
+
+		//        public override string ToString()
+		//        {
+		//            return $"{ToStringPrefix()} (min={_min}, max={_max})";
+		//        }
+
+
+
+		//        public T Min
+		//        {
+		//            get
+		//            {
+		//                return _min;
+		//            }
+		//        }
+		//        public T Max
+		//        {
+		//            get
+		//            {
+		//                return _max;
+		//            }
+		//        }
+
+		//        public int Count
+		//        {
+		//            get
+		//            {
+		//                return _count;
+		//            }
+		//        }
+
+
+		//        // ALL subclasses must override to accumulate,
+		//        // then do "_count += 1".
+		//        public abstract void Accumulate(T value);
+
+
+		//        protected string ToStringPrefix()
+		//        {
+		//            return $"{this.GetType().Name} N={_count}";
+		//        }
+		//    }
+
+
+		//    public class MinMaxInteger : MinMax<int>
+		//    {
+
+		//        // Start an empty accumulation.
+		//        public static MinMaxInteger CreateForAccumulate()
+		//        {
+		//            // Start with reversed values, which indicates empty accumulation.
+		//            return new MinMaxInteger(int.MaxValue, int.MinValue);
+		//        }
+
+
+
+		//        public MinMaxInteger(int min, int max) : base(min, max)
+		//        {
+		//        }
+
+		//        public override string ToString()
+		//        {
+		//            return $"{MinMax(Of System.Int32).ToStringPrefix()} (min={MinMax(Of System.Int32)._min}, max={MinMax(Of System.Int32)._max})";
+		//        }
+
+
+
+		//        public override void Accumulate(int value)
+		//        {
+		//            mDL2DLib.AccumMinMax(value, ref MinMax(Of System.Int32)._min, ref MinMax(Of System.Int32)._max);
+		//            MinMax(OfSystem.Int32)._count += 1;
+		//        }
+
+
+		//        public int Delta
+		//        {
+		//            get
+		//            {
+		//                return MinMax(OfSystem.Int32)._max - MinMax(Of System.Int32)._min;
+		//            }
+		//        }
+		//    }
+
+
+		//    public class MinMaxSingle : MinMax<float>
+		//    {
+		//        public MinMaxSingle(float min, float max) : base(min, max)
+		//        {
+		//        }
+
+		//        public override string ToString()
+		//        {
+		//            return $"{MinMax(Of System.Single).ToStringPrefix()} (min={MinMax(Of System.Single)._min}, max={MinMax(Of System.Single)._max})";
+		//        }
+
+
+
+		//        public override void Accumulate(float value)
+		//        {
+		//            mDL2DLib.AccumMinMax(value, ref MinMax(Of System.Single)._min, ref MinMax(Of System.Single)._max);
+		//            MinMax(OfSystem.Single)._count += 1;
+		//        }
+
+
+		//        public float Delta
+		//        {
+		//            get
+		//            {
+		//                return MinMax(OfSystem.Single)._max - MinMax(Of System.Single)._min;
+		//            }
+		//        }
+		//    }
+
+
+		//    public class MinMaxDouble : MinMax<double>
+		//    {
+
+		//        // Incoming values may be in either order.
+		//        public static MinMaxDouble FromPair(double a, double b)
+		//        {
+		//            if (b < a)
+		//                return new MinMaxDouble(b, a);
+		//            else
+		//                return new MinMaxDouble(a, b);
+		//        }
+
+		//        // Start an empty accumulation.
+		//        public static MinMaxDouble CreateForAccumulate()
+		//        {
+		//            // Start with reversed values, which indicates empty accumulation.
+		//            return new MinMaxDouble(double.MaxValue, double.MinValue);
+		//        }
+
+
+
+		//        public MinMaxDouble(double min, double max) : base(min, max)
+		//        {
+		//        }
+
+
+		//        public override string ToString()
+		//        {
+		//            return $"{MinMax(Of System.Double).ToStringPrefix()} (min={MinMax(Of System.Double)._min}, max={MinMax(Of System.Double)._max})";
+		//        }
+
+
+		//        public override void Accumulate(double value)
+		//        {
+		//            mDL2DLib.AccumMinMax(value, ref MinMax(Of System.Double)._min, ref MinMax(Of System.Double)._max);
+		//            MinMax(OfSystem.Double)._count += 1;
+		//        }
+
+
+
+		//        // CAUTION: Overflow if call before any elements have been Accumulated.
+		//        // CAUTION: May be negative for an empty accumulation.
+		//        // To be safe, call HasExtent first, only call Delta if that is True.
+		//        // TBD: Perhaps this should incorporate HasExtent logic,
+		//        // convert uninitialized value (no Accumulate calls) to "-1".
+		//        public double Delta
+		//        {
+		//            get
+		//            {
+		//                return MinMax(OfSystem.Double)._max - MinMax(Of System.Double)._min;
+		//            }
+		//        }
+
+		//        public bool HasExtent(bool inclusive)
+		//        {
+		//            if (MinMax(OfSystem.Double)._max < MinMax(OfSystem.Double)._min )
+		//                return false;
+		//            else if (MinMax(OfSystem.Double)._max == MinMax(OfSystem.Double)._min )
+		//                return inclusive;
+		//            else
+		//                return true;
+		//        }
+
+		//        public bool Intersects(MinMaxDouble other)
+		//        {
+		//            double minY = Math.Max(this.Min, other.Min);
+		//            double maxY = Math.Min(this.Max, other.Max);
+		//            return (minY <= maxY);
+		//        }
+
+		//        // "tracking": Tell caller whether this is new minimum or maximum.
+		//        public void AccumulateWithTracking(double v, out bool isNewMin, out bool isNewMax)
+		//        {
+		//            if (v < MinMax(OfSystem.Double)._min )
+		//            {
+		//                MinMax(OfSystem.Double)._min = v;
+		//                isNewMin = true;
+		//            }
+		//            else
+		//                isNewMin = false;
+
+		//            if (v > MinMax(OfSystem.Double)._max )
+		//            {
+		//                MinMax(OfSystem.Double)._max = v;
+		//                isNewMax = true;
+		//            }
+		//            else
+		//                isNewMax = false;
+		//        }
+		//    }
+
+
+		//    public class MinMaxPoint : MinMax<Point>
+		//    {
+
+		//        // Standard instance that has IsValid=False.
+		//        public static MinMaxPoint NotValidOne = new MinMaxPoint(0, 0, -1, -1);
+
+		//        public MinMaxPoint(Point min, Point max) : base(min, max)
+		//        {
+		//        }
+
+		//        public MinMaxPoint(int minX, int minY, int maxX, int maxY) : this(new Point(minX, minY), new Point(maxX, maxY))
+		//        {
+		//        }
+
+
+
+		//        public override void Accumulate(Point value)
+		//        {
+		//            if (value.X < MinMax(Of Point)._min.X)
+		//                MinMax(Of Point)._min.X = value.X;
+		//            if (value.Y < MinMax(Of Point)._min.Y)
+		//                MinMax(Of Point)._min.Y = value.Y;
+
+		//            if (value.X > MinMax(Of Point)._max.X)
+		//                MinMax(Of Point)._max.X = value.X;
+		//            if (value.Y > MinMax(Of Point)._max.Y)
+		//                MinMax(Of Point)._max.Y = value.Y;
+
+		//            MinMax(OfPoint)._count += 1;
+		//        }
+
+
+		//        // Public ReadOnly Property Delta() As Point
+		//        // Get
+		//        // Return m_Max - m_Min
+		//        // End Get
+		//        // End Property
+
+		//        /// <summary>
+		//        ///         ''' aka "Is Not Empty".
+		//        ///         ''' </summary>
+		//        ///         ''' <returns></returns>
+		//        public bool IsValid
+		//        {
+		//            get
+		//            {
+		//                return ((this.Max.X >= this.Min.X) && (this.Max.Y >= this.Min.Y));
+		//            }
+		//        }
+
+		//        public int MinX
+		//        {
+		//            get
+		//            {
+		//                return MinMax(Of Point)._min.X;
+		//            }
+		//        }
+		//        public int MaxX
+		//        {
+		//            get
+		//            {
+		//                return MinMax(Of Point)._max.X;
+		//            }
+		//        }
+		//        public int MinY
+		//        {
+		//            get
+		//            {
+		//                return MinMax(Of Point)._min.Y;
+		//            }
+		//        }
+		//        public int MaxY
+		//        {
+		//            get
+		//            {
+		//                return MinMax(Of Point)._max.Y;
+		//            }
+		//        }
+		//    }
+
+
+		//    public class MinMaxPoint2D : MinMax<Dist2D>
+		//    {
+
+		//        // Start an empty accumulation.
+		//        public static MinMaxPoint2D CreateForAccumulate()
+		//        {
+		//            // Start with reversed values, which indicates empty accumulation.
+		//            return new MinMaxPoint2D(Dist2D.MaxValue, Dist2D.MinValue);
+		//        }
+
+		//        // Used when corners might not be in min/max order. E.g. due to flip of x or y.
+		//        public static MinMaxPoint2D CreateFromCorners(Dist2D corner1, Dist2D corner2)
+		//        {
+		//            Dist2D minPt = corner1;
+		//            Dist2D maxPt = corner1;
+		//            mDL2DLib.AccumMinMax(corner2, ref minPt, ref maxPt);
+
+		//            return new MinMaxPoint2D(minPt, maxPt);
+		//        }
+
+		//        // "corners" might be two UL/BR or might be four (possibly rotated rectangle).
+		//        public static MinMaxPoint2D CreateFromCorners(Dist2D[] corners)
+		//        {
+		//            MinMaxPoint2D mm = MinMaxPoint2D.CreateForAccumulate();
+
+		//            foreach (Dist2D corner in corners)
+		//                mm.Accumulate(corner);
+
+		//            return mm;
+		//        }
+
+		//        public static bool Valid(Dist2D min, Dist2D max)
+		//        {
+		//            return (min.IsValid && max.IsValid && (min.X <= max.X) && (min.Y <= max.Y));
+		//        }
+
+
+
+		//        public MinMaxPoint2D(Dist2D min, Dist2D max) : base(min, max)
+		//        {
+		//        }
+
+		//        public MinMaxPoint2D(RectangleF rect) : this(new Dist2D(rect.X, rect.Y), new Dist2D(rect.Right, rect.Bottom))
+		//        {
+		//        }
+
+
+		//        public override string ToString()
+		//        {
+		//            return string.Format("{0}(min={1}, max={2})", this.GetType().Name, MinMax(Of TestProject.mDL2DLib.Dist2D)._min, MinMax(Of TestProject.mDL2DLib.Dist2D)._max);
+		//        }
+
+		//        public string ShortString()
+		//        {
+		//            return string.Format("(min={0}, max={1})", MinMax(Of TestProject.mDL2DLib.Dist2D)._min, MinMax(Of TestProject.mDL2DLib.Dist2D)._max);
+		//        }
+
+
+
+		//        public override void Accumulate(Dist2D pt)
+		//        {
+		//            mDL2DLib.AccumMinMax(pt, ref MinMax(Of TestProject.mDL2DLib.Dist2D)._min, ref MinMax(Of TestProject.mDL2DLib.Dist2D)._max);
+		//            MinMax(OfTestProject.mDL2DLib.Dist2D)._count += 1;
+		//        }
+
+		//        public void AccumulateRect(Rectangle2D rect)
+		//        {
+		//            Accumulate(rect.TopLeft);
+		//            Accumulate(rect.BottomRight);
+		//        }
+
+		//        /// <summary>
+		//        ///         ''' Positive values enlarge rectangle.
+		//        ///         ''' </summary>
+		//        ///         ''' <param name="lowX"></param>
+		//        ///         ''' <param name="lowY"></param>
+		//        ///         ''' <param name="highX"></param>
+		//        ///         ''' <param name="highY"></param>
+		//        public void ExpandBy(double lowX, double lowY, double highX, double highY)
+		//        {
+		//            if (IsValid())
+		//            {
+		//                // Positive lowX means make rectangle larger, by lowering minX.
+		//                MinMax(Of TestProject.mDL2DLib.Dist2D)._min.X -= lowX;
+		//                MinMax(Of TestProject.mDL2DLib.Dist2D)._min.Y -= lowY;
+		//                MinMax(Of TestProject.mDL2DLib.Dist2D)._max.X += highX;
+		//                MinMax(Of TestProject.mDL2DLib.Dist2D)._max.Y += highY;
+		//            }
+		//        }
+
+
+		//        // NOTE: If created by "CreateForAccumulate", before any calls made to Accumulate, this will return False.
+		//        public bool IsValid
+		//        {
+		//            get
+		//            {
+		//                return Valid(this.Min, this.Max);
+		//            }
+		//        }
+
+		//        public Dist2D Center
+		//        {
+		//            get
+		//            {
+		//                return Average(MinMax(Of TestProject.mDL2DLib.Dist2D)._max, MinMax(Of TestProject.mDL2DLib.Dist2D)._min);
+		//            }
+		//        }
+
+		//        public Dist2D Delta
+		//        {
+		//            get
+		//            {
+		//                return MinMax(OfTestProject.mDL2DLib.Dist2D)._max - MinMax(Of TestProject.mDL2DLib.Dist2D)._min;
+		//            }
+		//        }
+
+		//        public Rectangle2D AsRect
+		//        {
+		//            get
+		//            {
+		//                return Rectangle2D.FromMinMax(MinMax(Of TestProject.mDL2DLib.Dist2D)._min, MinMax(Of TestProject.mDL2DLib.Dist2D)._max);
+		//            }
+		//        }
+
+
+		//        public bool Contains(Dist2D pt)
+		//        {
+		//            return BetweenInclusive(pt.X, MinMax(Of TestProject.mDL2DLib.Dist2D).Min.X, MinMax(Of TestProject.mDL2DLib.Dist2D).Max.X) && BetweenInclusive(pt.Y, MinMax(Of TestProject.mDL2DLib.Dist2D).Min.Y, MinMax(Of TestProject.mDL2DLib.Dist2D).Max.Y);
+		//        }
+		//    }
+
+
+
+
+		//    public static Dist2D[] ConvertArrayPointFtoPoint2D(System.Drawing.PointF[] ptfPoint)
+		//    {
+		//        if (ptfPoint == null)
+		//            return null;
+		//        Dist2D[] ptdPoint = new Dist2D[ptfPoint.Length - 1 + 1];
+		//        for (int intIdx = 0; intIdx <= ptfPoint.Length - 1; intIdx++)
+		//            ptdPoint[intIdx] = new Dist2D((ptfPoint[intIdx]));
+		//        return ptdPoint;
+		//    }
+
+		//    public static System.Drawing.PointF[] ConvertArrayPoint2DToPointF(Dist2D[] ptdPoint)
+		//    {
+		//        if (ptdPoint == null)
+		//            return null;
+		//        System.Drawing.PointF[] ptfPoint = new System.Drawing.PointF[ptdPoint.Length - 1 + 1];
+		//        for (int intIdx = 0; intIdx <= ptdPoint.Length - 1; intIdx++)
+		//            ptfPoint[intIdx] = ptdPoint[intIdx].ToPointF();
+		//        return ptfPoint;
+		//    }
+		//    public static PointF ConvertPoint2DToPointF(Dist2D ptdPoint)
+		//    {
+		//        return new System.Drawing.PointF(System.Convert.ToSingle(ptdPoint.X), System.Convert.ToSingle(ptdPoint.Y));
+		//    }
+		//    public static Dist2D ConvertPointFToPoint2d(System.Drawing.PointF ptfPoint)
+		//    {
+		//        return new Dist2D(ptfPoint);
+		//    }
+
+		//    public static Dist2D[] ConvertRectangleToPoint2D(System.Drawing.RectangleF rcfRect)
+		//    {
+		//        Dist2D[] ptdpoint = new Dist2D[4];
+		//        ptdpoint[0] = new Dist2D(rcfRect.X, rcfRect.Y);
+		//        ptdpoint[1] = new Dist2D(System.Convert.ToDouble(rcfRect.X + rcfRect.Width), System.Convert.ToDouble(rcfRect.Y));
+		//        ptdpoint[2] = new Dist2D(System.Convert.ToDouble(rcfRect.X + rcfRect.Width), System.Convert.ToDouble(rcfRect.Y + rcfRect.Height));
+		//        ptdpoint[3] = new Dist2D(System.Convert.ToDouble(rcfRect.X), System.Convert.ToDouble(rcfRect.Y + rcfRect.Height));
+		//        return ptdpoint;
+		//    }
+
+	}
+}
