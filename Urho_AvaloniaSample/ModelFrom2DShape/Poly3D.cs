@@ -187,7 +187,8 @@ namespace ModelFrom2DShape
 		#endregion
 
 		#region --- Data ----------------------------------------
-		private float _textureScale = 1.0f / 4;//8;
+		// EXPLAIN: Good values?  Maybe want to set via INVERSE of this.
+		public float TextureScale = 1.0f / 4;//8;
 
 		public BoundingBox BoundingBox {
 			get {
@@ -404,7 +405,7 @@ namespace ModelFrom2DShape
             Vector3 horizDelta = vBR - vBL;
             float dx = horizDelta.LengthFast;
 
-			float deltaU = _textureScale * dx;
+			float deltaU = TextureScale * dx;
 			// Moving backwards in texture.
 			if (invertU) {
 				//deltaU = -deltaU;
@@ -414,7 +415,7 @@ namespace ModelFrom2DShape
 				CurrentEndU = CurrentStartU;
 			}
 
-			Vector2 uvScale = new Vector2(deltaU, _textureScale * dy);
+			Vector2 uvScale = new Vector2(deltaU, TextureScale * dy);
 			if (!invertU)
 				CurrentEndU = CurrentStartU + (invertU ? -deltaU : deltaU);
 			//CurrentEndU = CurrentStartU + deltaU;

@@ -12,6 +12,7 @@ using U = OU.Utils;
 using U2 = Global.Utils;
 using static OU.DistD;
 using System.Diagnostics;
+using ModelFrom2DShape;
 
 namespace AvaloniaSample
 {
@@ -35,6 +36,7 @@ namespace AvaloniaSample
 		const bool RandomColorBoxes = false;//true;
 		const bool RandomBoxRotation = true;
 		const float BoxScale = 5.0f;//5.0f;
+		internal const WallTexture BoxTexture = WallTexture.BrickWall19;//.StoneWall4;
 
 		const float _ZoneAmbient = 0.35f;//1.0f;//0.35f   TMS ttttt
 
@@ -778,20 +780,8 @@ namespace AvaloniaSample
 
 		public static string BoxMaterialName()
 		{
-			//return "Materials/Stone.xml";
-			//return "Materials/StoneWall4.xml";
-			//return "Materials/StoneWall4Normal.xml";
-			//return "Parallax/Materials/ParallaxStonesDemoVer.xml";
-			//return "Materials/StonesParallaxOffset.xml";
-			//return "Materials/StonesParallaxOcclusion.xml";
-			//return "Materials/StoneWall4ParallaxOffset.xml";
-			//return "Materials/StoneWall4ParallaxOcclusion.xml";
-
-			//return "Materials/BricksNormal.xml";
-			//return "Materials/BricksParallaxOffset.xml";
-			//return "Materials/BricksParallaxOcclusion.xml";
-			//return "Materials/BrickWall19.xml";
 			return "Materials/BrickWall19ParallaxOcclusion.xml";
+			return U2.MaterialNameFor(BoxTexture);
 		}
 
 		bool _wasVisible = false;

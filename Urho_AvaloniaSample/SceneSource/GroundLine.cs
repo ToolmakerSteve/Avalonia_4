@@ -25,7 +25,6 @@ namespace SceneSource
 		const bool CastShadows = true; //true;
         public const bool SingleGeometry = false;//false;   // TODO
         public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
-
 		
         #region --- data, new ----------------------------------------
         public DistD Width { get; set; }
@@ -423,7 +422,7 @@ namespace SceneSource
             U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
             U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
 			// Wall Segment: Top of wall.
-			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop);
+			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, true, false);
 
 			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
             U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
@@ -493,6 +492,7 @@ namespace SceneSource
 		{
 			var poly = new Poly3D();
 			poly.Init(sModel, HasNormals, HasUVs, HasTangents);
+			poly.TextureScale = U2.TextureScaleFor(AvaloniaSample.AvaloniaSample.BoxTexture);
 			return poly;
 		}
 
