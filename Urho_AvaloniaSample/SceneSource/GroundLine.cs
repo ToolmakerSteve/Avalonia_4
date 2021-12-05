@@ -481,59 +481,120 @@ namespace SceneSource
 		/// <param name="pt"></param>
 		private void _AddPointNow(Dist2D pt)
 		{
+			var rawMoves = AvaloniaSample.AvaloniaSample.It.CacheMouseMoves();
+			Debug.WriteLine($"--- rawMoves n={rawMoves.Count} ---");
+
 			if (Points.Count > 0 && pt.NearlyEquals(Points.LastElement()))
 				// Don't allow adjacent points to be (nearly) identical.
 				return;
 
 			Points.Add(pt);
-			FixRecentPoints();
+			SmoothRecentPoints();
+			// No, fix later when create quads. Need different triangulation at bend.
+			//FixRecentPoints();
 		}
 
-		// Highest index that has been checked for adding a corner.
-		private int _iCornerChecked = -1;
-		const float SmallBendDegreesLimit = 30;   // TBD: Good value?
+		private int _iSmoothed = -1;
+		static float MaxSmoothLength = AvaloniaSample.AvaloniaSample.MinWallSegmentLength * 2f;//1.6f;
+		private List<Dist2D> _tangents = new List<Dist2D>(); 
 
-		private void FixRecentPoints()
+		private void SmoothRecentPoints()
 		{
-			// Takes 3 points to form a corner.
-			if (Points.Count >= 3 && _iCornerChecked < Points.LastIndex()) {
-				// Check for recent corner.
+			// Need 3 points to smooth middle one.
+			if (Points.Count >= 3 && _iSmoothed < Points.LastIndex()) {
+				ExtendTangents();
+
 				var p1 = Points.NearEndElement(-3);
 				var p2 = Points.NearEndElement(-2);
 				var p3 = Points.LastElement();
-				// In range [-180,+180].
-				double signedDegrees = U2.CalcBendDegrees(p1, p2, p3);
-				// When there is no bend, angle is 180 degrees.
-				double degreesFromStraight = 180 - Math.Abs(signedDegrees);
-				if (degreesFromStraight > SmallBendDegreesLimit) {
-					// Add a new point, to have a segment within-which the bend is handled.
-					float lengthBeforeCorner = (float)(p2 - p1).Length.Value;
-					float joinLength = (float)(Math.Min(Width, lengthBeforeCorner / 2));   // TBD: Good value?
-					float joinWgt = 1 - (joinLength / lengthBeforeCorner);
-					// End of short join segment. Add this before p2.
-					var joinPt = U.Lerp(p1, p2, joinWgt);
-					// "2": Insert before p2.
-					Points.InsertBeforeLastN(2, joinPt);
 
-					// Move p2 so (p2,p3) starts outside the join area.
-					float lengthAfterCorner = (float)(p3 - p2).Length.Value;
-					joinLength = (float)(Math.Min(Width, lengthAfterCorner / 2));   // TBD: Good value?
-					joinWgt = joinLength / lengthAfterCorner;
-					joinPt = U.Lerp(p2, p3, joinWgt);
-					if (true) {
-						// "1": Insert after p2.
-						Points.InsertBeforeLastN(1, joinPt);
-					} else {
-						// "-2": replace p2.
-						Points[Points.Count - 2] = joinPt;
-					}
+				// ONLY smooth if points are close together.
+				float lengthBefore = (float)(p2 - p1).Length;
+				float lengthAfter = (float)(p3 - p2).Length;
+				if (lengthBefore < MaxSmoothLength && lengthAfter < MaxSmoothLength) {
+					// OK to smooth.
+
+					// Smooth at p2.
+					Points[Points.Count - 2] = SmoothPoint(p1, p2, p3);
 				}
 
-				// Technically, we checked a corner at NearEndElement(-2).
+				// Technically, we smoothed at NearEndElement(-2).
 				// But this matches the if-test done at start of this method.
-				_iCornerChecked = Points.LastIndex();
+				_iSmoothed = Points.LastIndex();
 			}
 		}
+
+		private void ExtendTangents()
+		{
+			int iLastIndex = Points.LastIndex();
+			if (iLastIndex == 0)
+				// Can't calculate any tangents.
+				return;
+
+			// "_iSmoothed-2": re-calc one or two tangents - may have changed due to added point.
+			for (int i = Math.Max(_iSmoothed - 2, 0); i <= iLastIndex; i++) {
+				var p2 = Points[i];
+				// "p2": If there is no point before, use current point as start of tangent.
+				var p1 = i > 0 ? Points[i - 1] : p2;
+				// "p2": If there is no point after, use current point as end of tangent.
+				var p3 = i < iLastIndex ? Points[i + 1] : p2;
+				var tanDelta = p3 - p1;
+				var tanLength = (double)tanDelta.Length;
+				if (tanLength.NearlyEquals(0)) {
+					// TODO: What should we do?
+				} else {
+					tanDelta = tanDelta.Normalize;
+				}
+				_tangents.SetOrAdd(i, tanDelta);
+			}
+		}
+
+		// Highest index that has been checked for adding a corner.
+		//private int _iCornerChecked = -1;
+		const float SmallBendDegreesLimit = 30;   // TBD: Good value?
+
+		//private void FixRecentPoints()
+		//{
+		//	// Takes 3 points to form a corner.
+		//	if (Points.Count >= 3 && _iCornerChecked < Points.LastIndex()) {
+		//		// Check for recent corner.
+		//		var p1 = Points.NearEndElement(-3);
+		//		var p2 = Points.NearEndElement(-2);
+		//		var p3 = Points.LastElement();
+		//		// In range [-180,+180].
+		//		double signedDegrees = U2.CalcBendDegrees(p1, p2, p3);
+		//		// When there is no bend, angle is 180 degrees.
+		//		double degreesFromStraight = 180 - Math.Abs(signedDegrees);
+		//		if (degreesFromStraight > SmallBendDegreesLimit) {
+		//			// Add a new point, to have a segment within-which the bend is handled.
+		//			float lengthBeforeCorner = (float)(p2 - p1).Length.Value;
+		//			float joinLength = (float)(Math.Min(Width, lengthBeforeCorner / 2));   // TBD: Good value?
+		//			float joinWgt = 1 - (joinLength / lengthBeforeCorner);
+		//			// End of short join segment. Add this before p2.
+		//			var joinPt = U.Lerp(p1, p2, joinWgt);
+		//			// "2": Insert before p2.
+		//			Points.InsertBeforeLastN(2, joinPt);
+
+		//			// Move p2 so (p2,p3) starts outside the join area.
+		//			float lengthAfterCorner = (float)(p3 - p2).Length.Value;
+		//			joinLength = (float)(Math.Min(Width, lengthAfterCorner / 2));   // TBD: Good value?
+		//			joinWgt = joinLength / lengthAfterCorner;
+		//			joinPt = U.Lerp(p2, p3, joinWgt);
+		//			if (true) {
+		//				// "1": Insert after p2.
+		//				Points.InsertBeforeLastN(1, joinPt);
+		//			} else {
+		//				// "-2": replace p2.
+		//				Points[Points.Count - 2] = joinPt;
+		//			}
+		//		}
+
+		//		// Technically, we checked a corner at NearEndElement(-2).
+		//		// But this matches the if-test done at start of this method.
+		//		_iCornerChecked = Points.LastIndex();
+		//	}
+		//}
+
 
 		internal void Flush()
 		{

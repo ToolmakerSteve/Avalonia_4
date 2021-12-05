@@ -47,11 +47,12 @@ namespace AvaloniaSample
 		const float InitialAltitude2 = 250;//tmstest 100;
 		static public bool ShowWireframe = false;//false;   // TMS
 		static public bool WireframeMaterialIsWall = true;   // However it won't show until set "ShowWireframe".
-		const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 5 : 0.5f;//1f;//0.5f;   // TBD: Good value.
+		public const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 5 : 0.5f;//1f;//0.5f;   // TBD: Good value.
 
 
 		public Scene Scene;
 		public Octree Octree;
+		private object MouseLock = new object();
 
 		Viewport Viewport1, Viewport2;
 		Viewport CurrentViewport => OverViewport2 ? Viewport2 : Viewport1;
@@ -136,7 +137,9 @@ namespace AvaloniaSample
 
             if (IncludeAvaloniaLayer)
                 _SetupAvaloniaUI();
-        }
+
+			InitMouseEventHandlers();
+		}
 
 		private void MaybeHardcodedWall()
 		{
@@ -173,6 +176,82 @@ namespace AvaloniaSample
 				CurrentWall.AddPoint((Dist2D)point);
 			}
 			FlushAndNullWall();
+		}
+		#endregion
+
+		#region --- CacheMouseMoves, GetCachedMouseMoves ----------------------------------------
+		// Double-buffer, to decouple consuming code from event code. MouseLoc must protect access to RawMouseMoves.
+		private List<Vector2> RawMouseMoves = new List<Vector2>();
+		private List<Vector2> MouseMoves2 = new List<Vector2>();
+		private List<float> t_deltaMilliseconds = new List<float>();
+		private long LastMoveEventTick = -1;
+
+		private void InitMouseEventHandlers()
+		{
+			var win = Graphics.SdlWindow;
+			//Input.MouseMoved += Input_MouseMoved;
+		}
+
+		private void Input_MouseMoved(MouseMovedEventArgs args)
+		{
+			long ticks = DateTime.Now.Ticks;
+			long deltaTicks = 0;
+			if (LastMoveEventTick >= 0) {
+				deltaTicks = (ticks - LastMoveEventTick) / TimeSpan.TicksPerMillisecond;
+			}
+			LastMoveEventTick = ticks;
+
+			if (!Input.GetMouseButtonDown(MouseButton.Left))
+				// Skip events when button is not pressed.
+				return;
+
+			var newPosition = new Vector2(args.X, args.Y);
+			if (RawMouseMoves.Count > 0 && newPosition == RawMouseMoves.LastElement()) {
+				// Don't store non-moves.
+				//tttt return;
+			}
+
+			if (t_deltaMilliseconds.Count < 1000)
+				t_deltaMilliseconds.Add(deltaTicks);
+
+			lock (MouseLock) {
+				RawMouseMoves.Add(newPosition);
+			}
+		}
+
+		/// <summary>
+		/// IMPORTANT: Each call clears MouseMoves2, then fills it with new events.
+		/// Caller should only call once per OnUpdate.
+		/// </summary>
+		/// <returns></returns>
+		public List<Vector2> CacheMouseMoves()
+		{
+			lock (MouseLock) {
+				bool test1 = true;
+				if (test1) {
+					// test whether we are gaining a point each time, by not clearing.
+					MouseMoves2 = new List<Vector2>(RawMouseMoves);
+				} else {
+					// Production code
+					// This is about to become RawMouseMoves. Clear it: event handler will add new move positions.
+					MouseMoves2.Clear();
+					U.Swap(ref RawMouseMoves, ref MouseMoves2);
+				}
+			}
+
+			return MouseMoves2;
+		}
+
+		/// <summary>
+		/// If need to access the mouse moves again (in same OnUpdate), call this.
+		/// This does NOT update the cache - call CacheMouseMoves first to do that.
+		/// IMPORTANT: Do not access the returned reference after the current OnUpdate ends -
+		/// the two buffers get swapped, so you might be referencing the "live" RawMouseMoves at a bad time.
+		/// </summary>
+		/// <returns></returns>
+		public List<Vector2> GetCachedMouseMoves()
+		{
+			return MouseMoves2;
 		}
 		#endregion
 

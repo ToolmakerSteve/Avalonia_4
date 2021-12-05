@@ -226,9 +226,10 @@ namespace OU
             return hash1;
         }
 
-        //        // If add more parameters, use primes about half as large each time. From that table:  .., 50331653, 25165843, 12582917, 6291469.
+        // MakeHash: If add more parameters, use primes about half as large each time. From that table:  .., 50331653, 25165843, 12582917, 6291469.
 
 
+        #region --- collections ----------------------------------------
         public const int INVALID_SIZE = -1;
 
 
@@ -571,6 +572,26 @@ namespace OU
         {
             return (Array.IndexOf(list, target) >= 0);
         }
+
+        /// <summary>
+        /// Set element list[index].
+        /// If list is one short, Add element at end. This will be at [index].
+        /// Exception if would need to add more than one element.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        public static void SetOrAdd<T>(this List<T> list, int index, T value)
+        {
+            if (list.LastIndex() < index - 1)
+                throw new InvalidProgramException("SetOrAdd - missing element");
+            else if (list.LastIndex() == index - 1)
+                list.Add(value);
+            else
+                list[index] = value;
+        }
+        #endregion
 
 
         //        // For displaying list elements, e.g. "{11, 22, 333}".
