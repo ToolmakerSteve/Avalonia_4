@@ -654,7 +654,7 @@ namespace ModelFrom2DShape
 
 			if (bake)
 				CalcTangents();
-			//DumpData();   // ttttt tmstest
+			//DumpData();   // tmstest
 
 			VBuffer.SetData(VData);
             IBuffer.SetData(IData);

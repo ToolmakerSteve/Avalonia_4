@@ -83,7 +83,7 @@ namespace SceneSource
 
             // Initialized to altitude zero.
             BaseAltitude = DistD.Zero;
-			//BaseAltitude = (DistD)3;   // ttttt
+			//BaseAltitude = (DistD)3;   // tmstest
 
             if (context == null)
                 context = Geo.NoContext.It;
@@ -235,7 +235,8 @@ namespace SceneSource
 					//_wallMaterial.SetShaderParameter("AmbientColor", Color.Black);
 
 					//_wallMaterial.PixelShaderDefines("")
-					//ttt _wallMaterial.CullMode = CullMode.Cw; // CullMode.Cw;
+					// Commented out this line: Designed to work with "Ccw", like Box model.
+					//NO _wallMaterial.CullMode = CullMode.Cw; // CullMode.Cw;
 
 					if (AvaloniaSample.AvaloniaSample.WireframeMaterialIsWall)
 						AvaloniaSample.AvaloniaSample.It.SetWireframeMaterial(_wallMaterial);

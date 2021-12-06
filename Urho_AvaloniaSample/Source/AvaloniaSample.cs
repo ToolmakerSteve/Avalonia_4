@@ -38,7 +38,7 @@ namespace AvaloniaSample
 		const float BoxScale = 5.0f;//5.0f;
 		internal const WallTexture BoxTexture = WallTexture.BrickWall19;//BrickWall19;//.StoneWall4;
 
-		const float _ZoneAmbient = 0.35f;//1.0f;//0.35f   TMS ttttt
+		const float _ZoneAmbient = 0.35f;//1.0f;//0.35f   TMS
 
 		public const bool StartCameraOnLand = IncludeWater;
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
@@ -188,8 +188,8 @@ namespace AvaloniaSample
 
 		private void InitMouseEventHandlers()
 		{
-			var win = Graphics.SdlWindow;
-			//Input.MouseMoved += Input_MouseMoved;
+			//var win = Graphics.SdlWindow;
+			Input.MouseMoved += Input_MouseMoved;
 		}
 
 		private void Input_MouseMoved(MouseMovedEventArgs args)
@@ -208,7 +208,7 @@ namespace AvaloniaSample
 			var newPosition = new Vector2(args.X, args.Y);
 			if (RawMouseMoves.Count > 0 && newPosition == RawMouseMoves.LastElement()) {
 				// Don't store non-moves.
-				//tttt return;
+				return;
 			}
 
 			if (t_deltaMilliseconds.Count < 1000)
@@ -748,7 +748,7 @@ namespace AvaloniaSample
 			if (ShadowCascade) {
 				light.ShadowCascade = new CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
 			}
-			//ttttt light.SpecularIntensity = 0.5f;
+			light.SpecularIntensity = 0.5f;   // TBD: Good value?
 			// true=Apply slightly overbright lighting to match the skybox
 			float bright = false ? 1.2f : 1.0f;
 			light.Color = new Color(bright, bright, bright);
