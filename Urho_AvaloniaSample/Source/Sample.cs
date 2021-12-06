@@ -44,6 +44,7 @@ namespace AvaloniaSample
 		Sprite logoSprite;
 		UI ui;
 
+		protected const int MaxFPS = 60;//60;//0;   // "0" to not limit.
         protected const bool ThirdPersonPerspective = true;//true;
         protected const bool ShowTwoViewports = true;//true;   // TMS
         // Camera not only goes up as terrain rises, it also goes down as terrain falls.
@@ -155,6 +156,8 @@ namespace AvaloniaSample
 			SetWindowAndTitleIcon ();
 			CreateConsoleAndDebugHud ();
 			Input.KeyDown += HandleKeyDown;
+			if (MaxFPS > 0)
+				Engine.MaxFps = MaxFPS;
 		}
 
 		protected override void OnUpdate(float timeStep)

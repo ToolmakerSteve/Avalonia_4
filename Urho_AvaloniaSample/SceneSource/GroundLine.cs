@@ -12,102 +12,131 @@ using U2 = Global.Utils;
 
 namespace SceneSource
 {
-    /// <summary>
-    /// Aka "Wall". A line drawn along the ground, to be converted into a 3D model.
-    /// TBD: Option for Point3Ds, to represent a variable altitude above/below ground?
-    /// </summary>
-    public class GroundLine : SourceItem
-    {
-        //private static ElementMask ElemMask = ElementMask.Position | ElementMask.Normal;
-
+	/// <summary>
+	/// Aka "Wall". A line drawn along the ground, to be converted into a 3D model.
+	/// TBD: Option for Point3Ds, to represent a variable altitude above/below ground?
+	/// </summary>
+	public class GroundLine : SourceItem
+	{
+		// true to create new wall BEFORE mouse down.
+		// TBD: Need code to throw away any "unused" wall, when done editing.
+		public const bool PreCreateWall = true;
 		// false to smooth while creating the quads.
-        public const bool AddOnlyNewQuads = false;//true;
+		// Will change to true once I have "fix-up" code on mouse up,
+		// that re-calculates the quads, to smooth curves and add bend transitions.
+		public const bool AddOnlyNewQuads = false;//true;
+												  // false: To save time, do this on mouse up. Can do it better then anyway.
+		const bool SmoothWhileAddPoints = false;
 		const bool CastShadows = true; //true;
-        public const bool SingleGeometry = false;//false;   // TODO
-        public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
-		
-        #region --- data, new ----------------------------------------
-        public DistD Width { get; set; }
-        public DistD Height { get; set; }
-        public DistD BaseAltitude { get; set; }
-        public bool HasNormals { get; private set; }
+		public const bool SingleGeometry = false;//false;   // TODO
+		public const bool SingleGeometryTEST = false;//false;   // TMS: Temporary changes.
+
+		#region --- data, new ----------------------------------------
+		public DistD Width { get; set; }
+		public DistD Height { get; set; }
+		public DistD BaseAltitude { get; set; }
+		public bool HasNormals { get; private set; }
 		public bool HasUVs { get; private set; }
 		public bool HasTangents { get; private set; }
 
 		private Model _model;
 
 		public Geo.IContext Context { get; set; }
-        /// <summary>
+		/// <summary>
 		/// CAUTION: Other classes are not allowed to alter Points directly;
 		/// call "AddPoint" instead. TBD Future: "RemovePointAt" needed.
-        /// Within coord system of a scene, "float" precision is sufficient;
-        /// TBD: Make "float" version of Distance2D.
-        /// </summary>
-        public List<Dist2D> Points { get; private set; }
+		/// Within coord system of a scene, "float" precision is sufficient;
+		/// TBD: Make "float" version of Distance2D.
+		/// </summary>
+		public List<Dist2D> Points { get; private set; }
 		public bool DoDeferPoint { get; set; }
 		private bool _hasDeferredPoint;
 		private Dist2D _deferredPoint;
 
-        private float WidthMetersF => (float)Width.Meters;
-        //USE_TopMetersF private float HeightMetersF => (float)Height.Value;
-        private float TopMetersF => (float)(Height + BaseAltitude).Meters;
-        // Project to ground. When at 0, go slightly below ground, to avoid "crack" at base.
-        private float BottomMetersF => (float)(BaseAltitude.Value == 0 ? -0.5 : BaseAltitude.Meters);
+		private float WidthMetersF => (float)Width.Meters;
+		//USE_TopMetersF private float HeightMetersF => (float)Height.Value;
+		private float TopMetersF => (float)(Height + BaseAltitude).Meters;
+		// Project to ground. When at 0, go slightly below ground, to avoid "crack" at base.
+		private float BottomMetersF => (float)(BaseAltitude.Value == 0 ? -0.5 : BaseAltitude.Meters);
 
-        // Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
-        // TBD: Start/EndPolys could be combined.
-        private Poly3D TopPoly, BottomPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
+		// Top & Sides: Separate polys needed, so can adjust "previous" wall segment.
+		// TBD: Start/EndPolys could be combined.
+		private Poly3D TopPoly, BottomPoly, FirstSidePoly, SecondSidePoly, StartPoly, EndPoly;
 
-        public GroundLine(bool hasUV = true, bool hasNormals = true) : this(DistD.Zero, DistD.Zero, Geo.NoContext.It, hasUV, hasNormals)
-        {
-        }
+		public GroundLine(bool hasUV = true, bool hasNormals = true) : this(DistD.Zero, DistD.Zero, Geo.NoContext.It, hasUV, hasNormals)
+		{
+		}
 
-        /// <summary>
-        /// ASSUME METERS.
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="context"></param>
-        public GroundLine(double width, double height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true, bool hasTangents = true)
-                : this(new DistD(width), new DistD(height), context, hasUV, hasNormals, hasTangents)
-        {
-        }
+		/// <summary>
+		/// ASSUME METERS.
+		/// </summary>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="context"></param>
+		public GroundLine(double width, double height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true, bool hasTangents = true)
+				: this(new DistD(width), new DistD(height), context, hasUV, hasNormals, hasTangents)
+		{
+		}
 
-        public GroundLine(DistD width, DistD height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true, bool hasTangents = true)
-        {
-            Width = width;
-            Height = height;
-            HasUVs = hasUV;
-            HasNormals = hasNormals;
+		public GroundLine(DistD width, DistD height, Geo.IContext context = null, bool hasUV = true, bool hasNormals = true, bool hasTangents = true)
+		{
+			Width = width;
+			Height = height;
+			HasUVs = hasUV;
+			HasNormals = hasNormals;
 			HasTangents = hasTangents;
 
-            // Initialized to altitude zero.
-            BaseAltitude = DistD.Zero;
+			// Initialized to altitude zero.
+			BaseAltitude = DistD.Zero;
 			//BaseAltitude = (DistD)3;   // tmstest
 
-            if (context == null)
-                context = Geo.NoContext.It;
-            Context = context;
+			if (context == null)
+				context = Geo.NoContext.It;
+			Context = context;
 
-            Points = new List<Dist2D>();
-        }
-        #endregion
+			Points = new List<Dist2D>();
+		}
+		#endregion
 
-        #region --- OnUpdate ----------------------------------------
-        internal void OnUpdate(bool bake = false)
-        {
-            // TBD: Ideally, add some representation when there is only one point.
-            // Given that we don't know what direction wall will go in,
-            // this will have to represent "a point".
-            // It could have the height and width of the wall. "Cylinder" would be ideal. "Rectangular Prism" would be okay.
-            if (Points.Count < 2)
-                return;
+		#region --- OnUpdate ----------------------------------------
+		private bool _hasDummyData;
 
-            Node wallNode = EnsureWallNode();
-            StaticModel wall = EnsureModel(wallNode);
+		internal void PreCreate()
+		{
+			Node wallNode = EnsureWallNode();
+			StaticModel wall = EnsureModel(wallNode);
+			// This may be the first slow step.
+			// HOWEVER, doing it only reduces the later "glitch" from 46 ms to 40-42 ms.
+			// It seems that the first update that actually includes contents causes a delay.
+			// IDEA: Put some dummy contents into buffers. If its offscreen, will it still help "consume" this "first time" delay?
+			// I did make sure BoundingBox was large. OR did that get cleared somewhere?
+			EnsureGeometry(wall);
+			if (true) {
+				_AddPointNow(new Dist2D(-55.5f, -9.2f, null));
+				_AddPointNow(new Dist2D(-54.7f, -9.0f, null));
+				// Add it to the scene. Hopefully this "consumes" the "first draw glitch".
+				OnUpdate();
+				// AFTER OnUpdate, which may remove dummy data if this is set.
+				_hasDummyData = true;
+			}
+		}
 
-            var it = AvaloniaSample.AvaloniaSample.It;
-            CreateGeometryFromPoints(wallNode, wall, it.Terrain);
+		internal void OnUpdate(bool bake = false)
+		{
+			RemoveDummyData();
+
+			// TBD: Ideally, add some representation when there is only one point.
+			// Given that we don't know what direction wall will go in,
+			// this will have to represent "a point".
+			// It could have the height and width of the wall. "Cylinder" would be ideal. "Rectangular Prism" would be okay.
+			if (Points.Count < 2)
+				return;
+
+			Node wallNode = EnsureWallNode();
+			StaticModel wall = EnsureModel(wallNode);
+
+			var it = AvaloniaSample.AvaloniaSample.It;
+			CreateGeometryFromPoints(wallNode, wall, it.Terrain);
 
 			UpdateBufferData(bake);
 			// TBD OPTIMIZE: Could expand as add points, so don't have to calculate from scratch.
@@ -149,75 +178,68 @@ namespace SceneSource
 
 		#region --- public methods ----------------------------------------
 		private Node EnsureWallNode()
-        {
-            var it = AvaloniaSample.AvaloniaSample.It;
-            if (it.WallsNode == null)
-                it.WallsNode = it.Scene.CreateChild("Walls");
-            if (it.CurrentWallNode == null)
-                it.CurrentWallNode = it.WallsNode.CreateChild($"Wall{it.WallsNode.GetNumChildren()+1}");
+		{
+			var it = AvaloniaSample.AvaloniaSample.It;
+			if (it.WallsNode == null)
+				it.WallsNode = it.Scene.CreateChild("Walls");
+			if (it.CurrentWallNode == null)
+				it.CurrentWallNode = it.WallsNode.CreateChild($"Wall{it.WallsNode.GetNumChildren() + 1}");
 
-            return it.CurrentWallNode;
-        }
+			return it.CurrentWallNode;
+		}
 
-        public StaticModel EnsureModel(Node node)
-        {
-            StaticModel sModel = node.GetComponent<StaticModel>();
-            if (sModel == null)
-            {
-                sModel = node.CreateComponent<StaticModel>();
-            }
-            return sModel;
-        }
+		public StaticModel EnsureModel(Node node)
+		{
+			StaticModel sModel = node.GetComponent<StaticModel>();
+			if (sModel == null) {
+				sModel = node.CreateComponent<StaticModel>();
+			}
+			return sModel;
+		}
 
-        /// <summary>
-        /// Sets TopPoly, FirstSidePoly, SecondSidePoly.
-        /// </summary>
-        /// <param name="sModel"></param>
-        public void EnsureGeometry(StaticModel sModel)
-        {
-            if (TopPoly == null)
-            {
-                TopPoly = CreateAndInitPoly(sModel);
-                if (SingleGeometry)
-                {
-                    // HACK to make !SingleGeometry flag possible.
-                    BottomPoly = TopPoly;
-                    FirstSidePoly = TopPoly;
-                    SecondSidePoly = TopPoly;
-                    StartPoly = TopPoly;
-                    EndPoly = TopPoly;
-                }
-                else
-                {
-                    BottomPoly = CreateAndInitPoly(sModel);
-                    FirstSidePoly = CreateAndInitPoly(sModel);
-                    SecondSidePoly = CreateAndInitPoly(sModel);
-                    StartPoly = CreateAndInitPoly(sModel);
-                    EndPoly = CreateAndInitPoly(sModel);
-                }
-            }
+		/// <summary>
+		/// Sets TopPoly, FirstSidePoly, SecondSidePoly.
+		/// </summary>
+		/// <param name="sModel"></param>
+		public void EnsureGeometry(StaticModel sModel)
+		{
+			if (TopPoly == null) {
+				TopPoly = CreateAndInitPoly(sModel);
+				if (SingleGeometry) {
+					// HACK to make !SingleGeometry flag possible.
+					BottomPoly = TopPoly;
+					FirstSidePoly = TopPoly;
+					SecondSidePoly = TopPoly;
+					StartPoly = TopPoly;
+					EndPoly = TopPoly;
+				} else {
+					BottomPoly = CreateAndInitPoly(sModel);
+					FirstSidePoly = CreateAndInitPoly(sModel);
+					SecondSidePoly = CreateAndInitPoly(sModel);
+					StartPoly = CreateAndInitPoly(sModel);
+					EndPoly = CreateAndInitPoly(sModel);
+				}
+			}
 
 			_model = sModel.Model;
-            if (_model == null)
-            {
-                _model = new Model();
-                _model.NumGeometries = SingleGeometry ? 1 : 6;
-                _model.SetGeometry(0, 0, TopPoly.Geom);
-                if (!SingleGeometry)
-                {
-                    _model.SetGeometry(1, 0, BottomPoly.Geom);
-                    _model.SetGeometry(2, 0, FirstSidePoly.Geom);
-                    _model.SetGeometry(3, 0, SecondSidePoly.Geom);
-                    _model.SetGeometry(4, 0, StartPoly.Geom);
-                    _model.SetGeometry(5, 0, EndPoly.Geom);
-                }
+			if (_model == null) {
+				_model = new Model();
+				_model.NumGeometries = SingleGeometry ? 1 : 6;
+				_model.SetGeometry(0, 0, TopPoly.Geom);
+				if (!SingleGeometry) {
+					_model.SetGeometry(1, 0, BottomPoly.Geom);
+					_model.SetGeometry(2, 0, FirstSidePoly.Geom);
+					_model.SetGeometry(3, 0, SecondSidePoly.Geom);
+					_model.SetGeometry(4, 0, StartPoly.Geom);
+					_model.SetGeometry(5, 0, EndPoly.Geom);
+				}
 				// Make sure it is visible, until do better calculation later in code.
 				_model.BoundingBox = new BoundingBox(-10000, 10000);
 				sModel.Model = _model;
 				sModel.CastShadows = CastShadows;
 				sModel.SetMaterial(WallMaterial);
-            }
-        }
+			}
+		}
 
 		private static Material WallMaterial {
 			get {
@@ -259,71 +281,64 @@ namespace SceneSource
 		}
 
 		public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
-        {
-            if (Points.Count < 2)
-                return;
+		{
+			if (Points.Count < 2)
+				return;
 
 			//DumpPoints();
 
-            //Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
-            EnsureAndMaybeClearGeometry(node, model);
+			//Debug.WriteLine("\n\n------- CreateGeometryFromPoints -------");
+			EnsureAndMaybeClearGeometry(node, model);
 
-            // TODO: TO calc good perpendicular (to give wall its width), need THREE points (except at ends).
-            // TODO: Need to detect "closed shape", for good perpendicular when wraps.
+			// TODO: TO calc good perpendicular (to give wall its width), need THREE points (except at ends).
+			// TODO: Need to detect "closed shape", for good perpendicular when wraps.
 
-            bool firstPoint = true;
-            bool firstPerpendicular = true;
-            // Initial values not used; avoid uninitialized warning.
-            // These are on wall's center line.
-            Vector3 cl0 = new Vector3();
-            Vector3 cl1 = new Vector3();
-            Vector2 perp0 = new Vector2();
-            Vector2 perp1 = new Vector2();
-            Vector3?[] normals = new Vector3?[4];
+			bool firstPoint = true;
+			bool firstPerpendicular = true;
+			// Initial values not used; avoid uninitialized warning.
+			// These are on wall's center line.
+			Vector3 cl0 = new Vector3();
+			Vector3 cl1 = new Vector3();
+			Vector2 perp0 = new Vector2();
+			Vector2 perp1 = new Vector2();
+			Vector3?[] normals = new Vector3?[4];
 
-            foreach (Dist2D srcPt in Points)
-            {
-                // On wall's center line.
-                Vector3 cl2 = Global.Utils.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
-                if (firstPoint)
-                {
-                    cl1 = cl2;
-                    // TODO: Can't calc normal yet.
-                    firstPoint = false;
-                }
-                else
-                {
-                    // Make quad between cl0 and cl1.
-                    if (firstPerpendicular)
-                    {
-                        // We had no way to compute perpendicular at pt0; now we can.
-                        firstPerpendicular = false;
-                        // EXPLAIN: We're only on the second point, so cl0=cl1.
-                        // There is only one perpendicular possible, from that point to cl2.
-                        // Put it in perp0; this will get transferred to perp0 at end of loop.
-                        // So it is perp0 for NEXT iteration.
-                        perp1 = CalcPerpendicularXZ(cl0, cl2);
-                    }
-                    else
-                    {
-                        // GUESS that a good perpendicular at cl1 is tangent to the neighboring points.
-                        // TBD: Adjust for relative distances to those points?
-                        perp1 = CalcPerpendicularXZ(cl0, cl2);
+			foreach (Dist2D srcPt in Points) {
+				// On wall's center line.
+				Vector3 cl2 = Global.Utils.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
+				if (firstPoint) {
+					cl1 = cl2;
+					// TODO: Can't calc normal yet.
+					firstPoint = false;
+				} else {
+					// Make quad between cl0 and cl1.
+					if (firstPerpendicular) {
+						// We had no way to compute perpendicular at pt0; now we can.
+						firstPerpendicular = false;
+						// EXPLAIN: We're only on the second point, so cl0=cl1.
+						// There is only one perpendicular possible, from that point to cl2.
+						// Put it in perp0; this will get transferred to perp0 at end of loop.
+						// So it is perp0 for NEXT iteration.
+						perp1 = CalcPerpendicularXZ(cl0, cl2);
+					} else {
+						// GUESS that a good perpendicular at cl1 is tangent to the neighboring points.
+						// TBD: Adjust for relative distances to those points?
+						perp1 = CalcPerpendicularXZ(cl0, cl2);
 
 						// TODO: Use cl2 to smooth normal.
 						// Easiest might be to calculate each "slice" of 4 points,
 						// Pass "future" points to algorithm.
 						// (But future points not known until have "perp2", right?)
-                        AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
-                    }
-                }
+						AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
+					}
+				}
 
-                cl0 = cl1;
-                cl1 = cl2;
-                perp0 = perp1;
-            }
+				cl0 = cl1;
+				cl1 = cl2;
+				perp0 = perp1;
+			}
 
-            // Final quad.
+			// Final quad.
 			if (SingleGeometryTEST) {
 				//// Hardcoded segment.
 				//float x0 = 0;//-30;
@@ -338,26 +353,25 @@ namespace SceneSource
 			AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
 
 			FinishGeometry();
-        }
+		}
 
 		private void DumpPoints()
 		{
-			Debug.WriteLine($"\n----- Points n={Points.Count} -----");
+			//Debug.WriteLine($"\n----- Points n={Points.Count} -----");
 			for (int iPoint = 0; iPoint < Points.Count; iPoint++) {
-				Debug.WriteLine($"{iPoint}: {Points[iPoint]}");
+				//Debug.WriteLine($"{iPoint}: {Points[iPoint]}");
 			}
-			Debug.WriteLine($"-----  -----\n");
+			//Debug.WriteLine($"-----  -----\n");
 		}
 
 		private void EnsureAndMaybeClearGeometry(Node node, StaticModel model)
-        {
-            _currentWallSegmentCount = 0;
-            EnsureGeometry(model);
+		{
+			_currentWallSegmentCount = 0;
+			EnsureGeometry(model);
 
-            if (!AddOnlyNewQuads)
-            {
-                // Recreating all quads each time.
-                TopPoly.Clear();
+			if (!AddOnlyNewQuads) {
+				// Recreating all quads each time.
+				TopPoly.Clear();
 				if (!SingleGeometry) {
 					BottomPoly.Clear();
 					FirstSidePoly.Clear();
@@ -366,12 +380,12 @@ namespace SceneSource
 					EndPoly.Clear();
 				}
 			}
-        }
+		}
 
-        private void FinishGeometry()
-        {
-            _prevWallSegmentCount = _currentWallSegmentCount;
-        }
+		private void FinishGeometry()
+		{
+			_prevWallSegmentCount = _currentWallSegmentCount;
+		}
 
 		/// <summary>
 		/// CAUTION: No longer tells Poly3D to UpdateBufferData.
@@ -384,27 +398,27 @@ namespace SceneSource
 		/// <param name="terrain"></param>
 		/// <param name="normals"></param>
 		private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
-        {
-            if (SingleGeometryTEST && _currentWallSegmentCount >= 1)
-                return;   // TEST - only one segment
+		{
+			if (SingleGeometryTEST && _currentWallSegmentCount >= 1)
+				return;   // TEST - only one segment
 
-            _currentWallSegmentCount++;
+			_currentWallSegmentCount++;
 
 			// Accumulate previous values. For averaging adjacent segment normals.
-            Vector3? normTop = normals[0];
-            Vector3? normBtm = normals[1];
-            Vector3? normSide1 = normals[2];
-            Vector3? normSide2 = normals[3];
+			Vector3? normTop = normals[0];
+			Vector3? normBtm = normals[1];
+			Vector3? normSide1 = normals[2];
+			Vector3? normSide2 = normals[3];
 
-            // On top of wall.
-            U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
-            U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
+			// On top of wall.
+			U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
+			U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
 			// Wall Segment: Top of wall.
 			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, false, false);
 			//AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, true, false);
 
 			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
-            U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
+			U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
 
 			// Wall Segment: Bottom of wall.
 			//AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.WallBottom, ref normBtm);
@@ -420,23 +434,22 @@ namespace SceneSource
 			// Wall Segment: Second side of wall.
 			// Must specify such that the second pair is at far end - these get adjusted when next quad is added.
 			U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
-            U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
+			U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
 			//AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall2, ref normSide2, true);
 			AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall1, ref normSide2, true, true, true);
 
 			normals[0] = normTop;
-            normals[1] = normBtm;
-            normals[2] = normSide1;
-            normals[3] = normSide2;
+			normals[1] = normBtm;
+			normals[2] = normSide1;
+			normals[3] = normSide2;
 
 
-            if (Points.Count >= 2 && (SingleGeometry || !StartPoly.HasContents))
-            {
-                // Now that we know wall direction, create StartPoly.
-                CreateStartPoly(wallPair0, groundPair0, terrain);
-            }
-            CreateEndPoly(wallPair1, groundPair1, terrain);
-        }
+			if (Points.Count >= 2 && (SingleGeometry || !StartPoly.HasContents)) {
+				// Now that we know wall direction, create StartPoly.
+				CreateStartPoly(wallPair0, groundPair0, terrain);
+			}
+			CreateEndPoly(wallPair1, groundPair1, terrain);
+		}
 
 		//internal void CalcTangents()
 		//{
@@ -482,17 +495,28 @@ namespace SceneSource
 		/// <param name="pt"></param>
 		private void _AddPointNow(Dist2D pt)
 		{
-			var rawMoves = AvaloniaSample.AvaloniaSample.It.CacheMouseMoves();
-			Debug.WriteLine($"--- rawMoves n={rawMoves.Count} ---");
+			//TBD_HIGHER_LEVEL var rawMoves = AvaloniaSample.AvaloniaSample.It.CacheMouseMoves();
+			RemoveDummyData();
 
 			if (Points.Count > 0 && pt.NearlyEquals(Points.LastElement()))
 				// Don't allow adjacent points to be (nearly) identical.
 				return;
 
 			Points.Add(pt);
-			SmoothRecentPoints();
+
+			if (SmoothWhileAddPoints)
+				SmoothRecentPoints();
 			// No, fix later when create quads. Need different triangulation at bend.
 			//FixRecentPoints();
+		}
+
+		private void RemoveDummyData()
+		{
+			if (_hasDummyData) {
+				Points.Clear();
+				// TODO: What else do we need to clear??
+				_hasDummyData = false;
+			}
 		}
 
 		private int _iSmoothed = -1;

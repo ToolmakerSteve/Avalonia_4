@@ -675,18 +675,18 @@ namespace ModelFrom2DShape
 		#region --- DumpData, GetVertex.., Positions ----------------------------------------
 		private void DumpData()
 		{
-			Debug.WriteLine($"\n----- VData n={_numVertices} -----");
+			//Debug.WriteLine($"\n----- VData n={_numVertices} -----");
 			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
 				GetVertexData(iVertex, out Vector3 position, out Vector3 normal,
 							  out Vector2 uv, out Vector4 tangent);
-				Debug.WriteLine($"{position}, {normal}, {uv}, {tangent}");
+				//Debug.WriteLine($"{position}, {normal}, {uv}, {tangent}");
 			}
-			Debug.WriteLine($"\n----- IData n={_numIndices} -----");
+			//Debug.WriteLine($"\n----- IData n={_numIndices} -----");
 			for (int iIndex = 0; iIndex < _numIndices; iIndex++) {
 				float index = IData[iIndex];
-				Debug.WriteLine($"{index}");
+				//Debug.WriteLine($"{index}");
 			}
-			Debug.WriteLine($"-----  -----\n");
+			//Debug.WriteLine($"-----  -----\n");
 		}
 
 		private void GetVertexData(int iVertex, out Vector3 position, out Vector3 normal,

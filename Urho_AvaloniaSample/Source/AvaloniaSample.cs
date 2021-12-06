@@ -20,6 +20,7 @@ namespace AvaloniaSample
 	{
         public static AvaloniaSample It;   // TMS
 
+		public const bool LogMouseEvents = false;   // tmstest. "false" for production.
 		const bool HardcodedWall = false;//false; tmstest
         const bool IncludeAvaloniaLayer = false;
 		// False uses MushroomScene, which has a flat plane
@@ -30,7 +31,7 @@ namespace AvaloniaSample
 		const bool ShadowCascade = true;//TBD
 
 		const bool IncludeScatteredModels = true;//true;
-		const int NScatteredModels = 100;//1000;
+		const int NScatteredModels = 500;//100;//1000;
 		const bool ScatteredModelsAreBoxes = true;
 		const bool BoxesHaveShadows = true;//true;  // TMS
 		const bool RandomColorBoxes = false;//true;
@@ -128,6 +129,7 @@ namespace AvaloniaSample
             else
                 SetupOneViewport();
 
+			MaybePreCreateEmptyWall();
 			MaybeHardcodedWall();
 
             UI.Root.SetDefaultStyle(ResourceCache.GetXmlFile("UI/DefaultStyle.xml"));
@@ -138,7 +140,19 @@ namespace AvaloniaSample
             if (IncludeAvaloniaLayer)
                 _SetupAvaloniaUI();
 
-			InitMouseEventHandlers();
+			if (LogMouseEvents)
+				InitMouseEventHandlers();
+		}
+
+		private void MaybePreCreateEmptyWall()
+		{
+			if (!GroundLine.PreCreateWall)
+				return;
+
+			// Create an empty wall and its geometries BEFORE mouse down.
+			// To avoid a delay on first segment, which resulted in a long segment
+			// due to missing a few mouse moves.
+			StartWall();
 		}
 
 		private void MaybeHardcodedWall()
@@ -182,8 +196,11 @@ namespace AvaloniaSample
 		#region --- CacheMouseMoves, GetCachedMouseMoves ----------------------------------------
 		// Double-buffer, to decouple consuming code from event code. MouseLoc must protect access to RawMouseMoves.
 		private List<Vector2> RawMouseMoves = new List<Vector2>();
+		private Vector2 LastMousePosition;
 		private List<Vector2> MouseMoves2 = new List<Vector2>();
-		private List<float> t_deltaMilliseconds = new List<float>();
+		private List<string> t_mouseMoveMsg = new List<string>();
+		//private List<float> t_deltaMilliseconds = new List<float>();
+		private List<string> t_debugMsgs = new List<string>();
 		private long LastMoveEventTick = -1;
 
 		private void InitMouseEventHandlers()
@@ -195,9 +212,9 @@ namespace AvaloniaSample
 		private void Input_MouseMoved(MouseMovedEventArgs args)
 		{
 			long ticks = DateTime.Now.Ticks;
-			long deltaTicks = 0;
+			float deltaMillis = 0;
 			if (LastMoveEventTick >= 0) {
-				deltaTicks = (ticks - LastMoveEventTick) / TimeSpan.TicksPerMillisecond;
+				deltaMillis = (ticks - LastMoveEventTick) / TimeSpan.TicksPerMillisecond;
 			}
 			LastMoveEventTick = ticks;
 
@@ -206,16 +223,23 @@ namespace AvaloniaSample
 				return;
 
 			var newPosition = new Vector2(args.X, args.Y);
-			if (RawMouseMoves.Count > 0 && newPosition == RawMouseMoves.LastElement()) {
-				// Don't store non-moves.
-				return;
-			}
+			////if (RawMouseMoves.Count > 0 && newPosition == RawMouseMoves.LastElement()) {
+			////	// Don't store non-moves.
+			////	return;
+			////}
 
-			if (t_deltaMilliseconds.Count < 1000)
-				t_deltaMilliseconds.Add(deltaTicks);
+			float deltaMove = 0;
+			if (LastMousePosition.X != 0 || LastMousePosition.Y != 0) {
+				deltaMove = (newPosition - LastMousePosition).Length;
+			}
+			LastMousePosition = newPosition;
 
 			lock (MouseLock) {
 				RawMouseMoves.Add(newPosition);
+				if (t_mouseMoveMsg.Count < 1000) {
+					//t_deltaMilliseconds.Add(deltaMillis);
+					t_mouseMoveMsg.Add($"{U.Round2(deltaMove)} @ {U.Round2(deltaMillis)}");
+				}
 			}
 		}
 
@@ -226,18 +250,31 @@ namespace AvaloniaSample
 		/// <returns></returns>
 		public List<Vector2> CacheMouseMoves()
 		{
+			string msg = "";
 			lock (MouseLock) {
-				bool test1 = true;
+				bool test1 = false;
 				if (test1) {
 					// test whether we are gaining a point each time, by not clearing.
 					MouseMoves2 = new List<Vector2>(RawMouseMoves);
 				} else {
+#if DEBUG
+					string msg2 = "";
+					for (int i = 0; i < RawMouseMoves.Count; i++) {
+						msg2 = msg2 + t_mouseMoveMsg[i] + ", ";
+					}
+					msg = $"--- rawMoves n={RawMouseMoves.Count} ({msg2}) ---";
+#endif
 					// Production code
 					// This is about to become RawMouseMoves. Clear it: event handler will add new move positions.
 					MouseMoves2.Clear();
 					U.Swap(ref RawMouseMoves, ref MouseMoves2);
+					// So these will always match RawMouseMoves.
+					t_mouseMoveMsg.Clear();
 				}
 			}
+
+			if (msg.Length > 0)
+				t_debugMsgs.Add(msg);
 
 			return MouseMoves2;
 		}
@@ -252,6 +289,14 @@ namespace AvaloniaSample
 		public List<Vector2> GetCachedMouseMoves()
 		{
 			return MouseMoves2;
+		}
+
+		private void DumpMouseMoves()
+		{
+			foreach (var msg in t_debugMsgs) {
+				Debug.WriteLine(msg);
+			}
+			t_debugMsgs.Clear();
 		}
 		#endregion
 
@@ -358,12 +403,13 @@ namespace AvaloniaSample
 			// Keep existing wall, if it has contents.
 			if (CurrentWall != null)
             {
-                if (CurrentWall.Points.Count <= 0)
+                if (!CurrentWall.HasContents())
                 {
                     // Its empty, so use it. Happens if StartNewWall twice, without adding contents.
+					// Commented out below code, so can PreCreate wall.
                     // Starting over.
-                    WallDrawStarted = false;
-					CurrentWall.Clear();
+     //               WallDrawStarted = false;
+					//CurrentWall.Clear();
                     return;
                 }
                 else
@@ -456,7 +502,13 @@ namespace AvaloniaSample
 					_suppressWallDraw = true;
 				if (_suppressWallDraw)
 					return;
-				SetDoDeferPoint(GroundLine.AddOnlyNewQuads && !GroundLine.SingleGeometryTEST);
+
+				if (LogMouseEvents) {
+					// tmstest: to dump mouse moves on mouse up.
+					var rawMoves = CacheMouseMoves();
+				}
+				// No, because we will fix up at mouse up.
+				//SetDoDeferPoint(GroundLine.AddOnlyNewQuads && !GroundLine.SingleGeometryTEST);
 				if (MousePositionOnGroundPlane(out Vector2 groundPt))
 					ExtendWall(groundPt);
 				_prevModeWasFreehand = true;
@@ -521,7 +573,7 @@ namespace AvaloniaSample
 		{
 			// NOTE: Currently we don't allow you to draw a "single-point" wall.
 			if (CurrentWall != null && CurrentWall.Points.Count > 0) {
-				// When freehand drawing, catch up to mouse position.
+				// When freehand drawing, and deferring a point for smoothing, catch up to mouse position.
 				CurrentWall.Flush();
 				// NOTE: Currently we don't allow you to draw a "single-point" wall.
 				if (!LastPenPosition2D.NearlyEquals(LastWallPosition2D, 0.05f)) {
@@ -537,6 +589,8 @@ namespace AvaloniaSample
 
 			// Done with this wall.  TBD: Interferes with point-to-point drawing?
 			//MAYBE WallDrawStarted = false;
+			if (LogMouseEvents)
+				DumpMouseMoves();
 		}
 
 		private void FlushAndNullWall()
@@ -599,13 +653,21 @@ namespace AvaloniaSample
 		private void StartWall()
         {
 			FlushAndNullWall();
-			
-			WallDrawStarted = true;
-            CurrentWall = new GroundLine(2, 8);
-			// Uncomment for "floating wall".
-			//CurrentWall.BaseAltitude = 8 * DistD.OneDefaultUnit;   // tmstest
-			//Debug.WriteLine($"--- StartWall N walls={Walls.Count} ---");
-        }
+
+			// If the wall exists, but has no contents, we have pre-created it.
+			// OK to use the one that exists.
+			if (!WallDrawStarted || CurrentWall == null) {
+				WallDrawStarted = true;
+				CurrentWall = new GroundLine(2, 8);
+				// Uncomment for "floating wall".
+				//CurrentWall.BaseAltitude = 8 * DistD.OneDefaultUnit;   // tmstest
+				//Debug.WriteLine($"--- StartWall N walls={Walls.Count} ---");
+
+				if (GroundLine.PreCreateWall) {
+					CurrentWall.PreCreate();
+				}
+			}
+		}
 
         /// <summary>
         /// For test, where create a model at each point.
