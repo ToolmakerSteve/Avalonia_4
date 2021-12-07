@@ -824,14 +824,9 @@ namespace SceneSource
 				first.Y = U2.GetTerrainHeight(terrain, first) + wallTop;
 				second.Y = U2.GetTerrainHeight(terrain, second) + wallTop;
 			} else {
-				float y1 = U2.GetTerrainHeight(terrain, first) + wallTop;
-				float y2 = U2.GetTerrainHeight(terrain, second) + wallTop;
-				float avg = U.Average(y1, y2);
-				float terrainHeight = U.Average(U2.GetTerrainHeight(terrain, first), U2.GetTerrainHeight(terrain, second));
+				float terrainHeight = U.Average(U2.GetTerrainHeight(terrain, first),
+												U2.GetTerrainHeight(terrain, second));
 				float wallAltitude = terrainHeight + wallTop;
-				if (Math.Abs(avg - y1) > 1) {
-					U.Trouble();
-				}
 				first.Y = wallAltitude;
 				second.Y = wallAltitude;
 			}
