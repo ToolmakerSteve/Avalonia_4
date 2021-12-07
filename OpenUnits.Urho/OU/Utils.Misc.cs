@@ -1131,7 +1131,7 @@ namespace OU
         public static DistD Average(DistD a, DistD b)
         {
             // Equivalent.
-            return (DistD)((a + b) / 0.5);
+            return (DistD)((a + b) * 0.5);
             //return Lerp(a, b, 0.5);
         }
         public static Vector3 Average(Vector3 a, Vector3 b)

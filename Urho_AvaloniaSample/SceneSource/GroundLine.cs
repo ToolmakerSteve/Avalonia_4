@@ -819,8 +819,22 @@ namespace SceneSource
             Vector3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
             Vector3 first = wallCenter - halfPerp;
             Vector3 second = wallCenter + halfPerp;
-            first.Y = U2.GetTerrainHeight(terrain, first) + wallTop;
-            second.Y = U2.GetTerrainHeight(terrain, second) + wallTop;
+			if (false) {
+				// This results in an "uneven top" cross-section, if ground slopes perpendicular to the wall.
+				first.Y = U2.GetTerrainHeight(terrain, first) + wallTop;
+				second.Y = U2.GetTerrainHeight(terrain, second) + wallTop;
+			} else {
+				float y1 = U2.GetTerrainHeight(terrain, first) + wallTop;
+				float y2 = U2.GetTerrainHeight(terrain, second) + wallTop;
+				float avg = U.Average(y1, y2);
+				float terrainHeight = U.Average(U2.GetTerrainHeight(terrain, first), U2.GetTerrainHeight(terrain, second));
+				float wallAltitude = terrainHeight + wallTop;
+				if (Math.Abs(avg - y1) > 1) {
+					U.Trouble();
+				}
+				first.Y = wallAltitude;
+				second.Y = wallAltitude;
+			}
 
             return new U.Pair<Vector3>(first, second);
         }
