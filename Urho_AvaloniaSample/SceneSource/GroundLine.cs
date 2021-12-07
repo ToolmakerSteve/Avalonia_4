@@ -25,7 +25,12 @@ namespace SceneSource
 		// Will change to true once I have "fix-up" code on mouse up,
 		// that re-calculates the quads, to smooth curves and add bend transitions.
 		public const bool AddOnlyNewQuads = false;//true;
-												  // false: To save time, do this on mouse up. Can do it better then anyway.
+
+		public const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 5 : 0.5f;//1f;//0.5f;   // TBD: Good value.
+		// To better follow ground unevenness. TBD: Should examine ground underneath, adapt as needed.
+		public static float MaxWallSegmentLength = Math.Max(5, MinWallSegmentLength + U.VerySmallF);
+
+		// false: To save time, do this on mouse up. Can do it better then anyway.
 		const bool SmoothWhileAddPoints = false;
 		const bool CastShadows = true; //true;
 		public const bool SingleGeometry = false;//false;   // TODO
@@ -329,7 +334,7 @@ namespace SceneSource
 						// Easiest might be to calculate each "slice" of 4 points,
 						// Pass "future" points to algorithm.
 						// (But future points not known until have "perp2", right?)
-						AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
+						AddWallSegments(cl0, cl1, perp0, perp1, terrain, normals);
 					}
 				}
 
@@ -350,7 +355,7 @@ namespace SceneSource
 				//perp0 = CalcPerpendicularXZ(cl0, cl1);
 				//perp1 = perp0;
 			}
-			AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
+			AddWallSegments(cl0, cl1, perp0, perp1, terrain, normals);
 
 			FinishGeometry();
 		}
@@ -387,12 +392,47 @@ namespace SceneSource
 			_prevWallSegmentCount = _currentWallSegmentCount;
 		}
 
+		private void AddWallSegments(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
+		{
+			// Decide whether to break into smaller pieces, to better follow terrain.
+			float segmentLength = (cl1 - cl0).LengthFast;
+			if (segmentLength > MaxWallSegmentLength) {
+				// Smallest number of segments such that no segment is greater than Max.
+				int nSegments = (int)Math.Ceiling(segmentLength / MaxWallSegmentLength);
+
+				// IGNORE perp0 & perp1: those were calculated assuming this segment and its neighbors form a curve.
+				// Rather, this section of wall is straight (point-to-point clicks).
+				perp0 = CalcPerpendicularXZ(cl0, cl1);
+				perp1 = perp0;
+
+				int lastI = nSegments - 1;
+				// First "tween" (in-between) segment starts here.
+				Vector3 startTweenPt = cl0;
+				for (int iStep = 0; iStep < nSegments; iStep++) {
+					//float startTweenWgt = iStep / (float)nSegments;
+					float endTweenWgt = (iStep + 1) / (float)nSegments;
+					Vector3 endTweenPt;
+					if (iStep == lastI) {
+						// Use the exact value of final point.
+						endTweenPt = cl1;
+					} else
+						endTweenPt = U.Lerp(cl0, cl1, endTweenWgt);
+					AddWallSegment(startTweenPt, endTweenPt, perp0, perp1, terrain, normals);
+					// Prep next.
+					startTweenPt = endTweenPt;
+				}
+			} else {
+				// Single segment.
+				AddWallSegment(cl0, cl1, perp0, perp1, terrain, normals);
+			}
+		}
+
 		/// <summary>
 		/// CAUTION: No longer tells Poly3D to UpdateBufferData.
 		/// Call UpdateBufferData directly, on all polys, after all segments added.
 		/// </summary>
-		/// <param name="cl0"></param>
-		/// <param name="cl1"></param>
+		/// <param name="cl0">Center-line point at start of segment</param>
+		/// <param name="cl1">Center-line point at end of segment</param>
 		/// <param name="perp0"></param>
 		/// <param name="perp1"></param>
 		/// <param name="terrain"></param>
@@ -520,7 +560,7 @@ namespace SceneSource
 		}
 
 		private int _iSmoothed = -1;
-		static float MaxSmoothLength = AvaloniaSample.AvaloniaSample.MinWallSegmentLength * 2f;//1.6f;
+		static float MaxSmoothLength = MinWallSegmentLength * 2f;//1.6f;
 		private List<Dist2D> _tangents = new List<Dist2D>(); 
 
 		private void SmoothRecentPoints()

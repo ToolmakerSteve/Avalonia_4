@@ -48,7 +48,6 @@ namespace AvaloniaSample
 		const float InitialAltitude2 = 250;//tmstest 100;
 		static public bool ShowWireframe = false;//false;   // TMS
 		static public bool WireframeMaterialIsWall = true;   // However it won't show until set "ShowWireframe".
-		public const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 5 : 0.5f;//1f;//0.5f;   // TBD: Good value.
 
 
 		public Scene Scene;
@@ -618,7 +617,7 @@ namespace AvaloniaSample
 				doAddPoint = true;
 			} else {
 				length = Vector2.Subtract(penPosition2D, LastWallPosition2D).Length;
-				if (length > MinWallSegmentLength)
+				if (length > GroundLine.MinWallSegmentLength)
 					doAddPoint = true;
 			}
 
@@ -677,7 +676,7 @@ namespace AvaloniaSample
         {
             //float boxScale = MinWallSegmentLength / 2;
             // "- small-value": Deliberate gap to see segments.
-            float boxScale = MinWallSegmentLength - 0.1f;
+            float boxScale = GroundLine.MinWallSegmentLength - 0.1f;
             AddBoxToScene(Scene, FromGroundPlane(penPosition2D), boxScale, true);
         }
         #endregion
