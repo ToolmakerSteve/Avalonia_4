@@ -527,50 +527,50 @@ namespace OU
         public static readonly float OneDegreeAsRadiansF = ((float)Math.PI / 180.0f);
         public static readonly float OneRadianAsDegreesF = (180.0f / (float)Math.PI);
 
-        public static double radiansToDegrees(double radians)
+        public static double RadiansToDegrees(double radians)
         {
             return OneRadianAsDegreesD * radians;
         }
 
-        public static double degreesToRadians(double degrees)
+        public static double DegreesToRadians(double degrees)
         {
             return OneDegreeAsRadiansD * degrees;
         }
 
-        public static float degreesToRadians(float degrees)
+        public static float DegreesToRadians(float degrees)
         {
             return OneDegreeAsRadiansF * degrees;
         }
 
-        //        public static double getAngleDegrees(Dist2D origin, Dist2D aimPt)
-        //        {
-        //            return getAngleDegrees(origin.X, origin.Y, aimPt.X, aimPt.Y);
-        //        }
+        public static double GetAngleDegrees(Dist2D origin, Dist2D aimPt)
+        {
+            return GetAngleDegrees(origin.X, origin.Y, aimPt.X, aimPt.Y);
+        }
 
-        //        public static double getAngleDegrees(double originX, double originY, double aimPtX, double aimPtY)
-        //        {
-        //            double angle = Math.Atan2(aimPtY - originY, aimPtX - originX) * (180 / Math.PI);
+        public static double GetAngleDegrees(double originX, double originY, double aimPtX, double aimPtY)
+        {
+            double angle = Math.Atan2(aimPtY - originY, aimPtX - originX) * (180 / Math.PI);
 
-        //            if (angle < 0)
-        //                angle += 360.0;
+            if (angle < 0)
+                angle += 360.0;
 
-        //            return angle;
-        //        }
+            return angle;
+        }
 
 
-        //        // ========== Degrees and Radians - "float" for OpenGL ==========
+        // ========== Degrees and Radians - "float" for OpenGL ==========
 
-        //        // OpenGL works in floats. We could make these double for internal accuracy,
-        //        // and then convert to float at a later step.
-        //        public static float asDegrees(float radians)
-        //        {
-        //            return (float)(OneRadianAsDegreesF * radians);
-        //        }
+        // OpenGL works in floats. We could make these double for internal accuracy,
+        // and then convert to float at a later step.
+        public static float AsDegrees(float radians)
+        {
+            return (float)(OneRadianAsDegreesF * radians);
+        }
 
-        //        public static float asRadians(float degrees)
-        //        {
-        //            return (float)(OneDegreeAsRadiansF * degrees);
-        //        }
+        public static float AsRadians(float degrees)
+        {
+            return (float)(OneDegreeAsRadiansF * degrees);
+        }
 
 
         //        // ========== Headings (rotation & directions) ==========
@@ -3425,7 +3425,7 @@ namespace OU
 
         public static Vector2 RotateByDegrees(Vector2 pos, float degrees)
         {
-            return RotateByRadians(pos, degreesToRadians(degrees));
+            return RotateByRadians(pos, DegreesToRadians(degrees));
         }
 
         public static Vector2 RotateByRadians(Vector2 pos, float radians)
@@ -3440,7 +3440,7 @@ namespace OU
 
         public static Dist2D RotateByDegrees(Dist2D pos, double degrees)
         {
-            return rotateByRadians(pos, degreesToRadians(degrees));
+            return rotateByRadians(pos, DegreesToRadians(degrees));
         }
 
         public static Dist2D rotateByRadians(Dist2D pos, double radians)

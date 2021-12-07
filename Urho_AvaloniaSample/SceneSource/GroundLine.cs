@@ -335,12 +335,12 @@ namespace SceneSource
 						Vec2 p1 = cl0.XZ();
 						Vec2 p2 = cl1.XZ();
 						Vec2 p3 = cl2.XZ();
-						if (IsBendLarge(p1, p2, p3)) {
+						if (IsBendLarge(p1, p2, p3, out float degreesFromStraight)) {
 							// NOTE: First parameter is the point NEAR to bend.
 							// TODO HACK: We "know" AddWallSegment ignores y, so we simply use zero.
 							// Better would be to change all the Vec3s to Vec2s.
-							Vector3 joinPtBefore = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p1));
-							Vector3 joinPtAfter = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p3));
+							Vector3 joinPtBefore = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p1, degreesFromStraight));
+							Vector3 joinPtAfter = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p3, degreesFromStraight));
 							// TODO: perp1 is wrong. Works for long segment because it is ignored.
 							AddWallSegments(cl0, joinPtBefore, perp0, perp1, terrain, normals);
 							Vector2 bendPerp0 = CalcPerpendicularXZ(cl0, cl1);
@@ -643,16 +643,16 @@ namespace SceneSource
 				var p1 = Points.NearEndElement(-3);
 				var p2 = Points.NearEndElement(-2);
 				var p3 = Points.LastElement();
-				if (IsBendLarge((Vec2)p1, (Vec2)p2, (Vec2)p3)) {
+				if (IsBendLarge((Vec2)p1, (Vec2)p2, (Vec2)p3, out float degreesFromStraight)) {
 					// Add a new point, to have a segment within-which the bend is handled.
 					// NOTE: First parameter is the point NEAR to bend.
-					Dist2D joinPt = CalcJoinPoint(p2, p1);
+					Dist2D joinPt = CalcJoinPoint(p2, p1, degreesFromStraight);
 					// "2": Insert before p2.
 					Points.InsertBeforeLastN(2, joinPt);
 
 					// Move p2 so (p2,p3) starts outside the join area.
 					// NOTE: First parameter is the point NEAR to bend.
-					joinPt = CalcJoinPoint(p2, p3);
+					joinPt = CalcJoinPoint(p2, p3, degreesFromStraight);
 					if (true) {
 						// "1": Insert after p2.
 						Points.InsertBeforeLastN(1, joinPt);
@@ -674,11 +674,17 @@ namespace SceneSource
 		/// <param name="pNearBend">The endpoint of segment that is NEAR to bend.</param>
 		/// <param name="pFarFromBend">The endpoing of segment that is FAR from bend.</param>
 		/// <returns></returns>
-		private Dist2D CalcJoinPoint(Dist2D pNearBend, Dist2D pFarFromBend)
+		private Dist2D CalcJoinPoint(Dist2D pNearBend, Dist2D pFarFromBend, float degreesFromStraight)
 		{
 			float segmentLength = (float)(pFarFromBend - pNearBend).Length.Value;
-			float lengthFrac = 0.5f;//0.5f;   // TODO: Calculate based on bend angle, so that inside of corner is zero length.
-									// "segmentLength / 2": arbitrarily decided not to allow bend to consume more than half the neighboring segments.
+			// Calculate based on bend angle, so that inside of corner is zero length.
+			//var cos = Math.Cos(U.AsRadians(degreesFromStraight));
+			var sin = Math.Sin(U.AsRadians(degreesFromStraight));
+			// TODO: Handle divisor near zero. (wall doubling-back on itself)
+			// TODO: This isn't quite right. "1/cos" was completely wrong; is there some offset or half-wall needed?
+			float lengthFrac = 1 / (float)Math.Abs(sin);
+			lengthFrac -= 0.5f;   // ttttt trying to find the missing factor.
+			// "segmentLength / 2": arbitrarily decided not to allow bend to consume more than half the neighboring segments.
 			float joinLength = (float)(Math.Min(Width * lengthFrac, segmentLength / 2));
 			float joinFraction = joinLength / segmentLength;
 			float joinWgt = joinFraction;
@@ -687,12 +693,12 @@ namespace SceneSource
 			return joinPt;
 		}
 
-		private static bool IsBendLarge(Vec2 p1, Vec2 p2, Vec2 p3)
+		private static bool IsBendLarge(Vec2 p1, Vec2 p2, Vec2 p3, out float degreesFromStraight)
 		{
-			// In range [-180,+180].
+			// In range [-180,+180]. Zero when the points are all on a straight line.
 			double signedDegrees = U2.CalcBendDegrees(p1, p2, p3);
-			// When there is no bend, angle is 180 degrees.
-			double degreesFromStraight = 180 - Math.Abs(signedDegrees);
+			//degreesFromStraight = (float)(180 - Math.Abs(signedDegrees));
+			degreesFromStraight = (float)Math.Abs(signedDegrees);
 			bool bendIsLarge = degreesFromStraight > SmallBendDegreesLimit;
 			return bendIsLarge;
 		}
