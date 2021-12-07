@@ -181,7 +181,7 @@ namespace SceneSource
 		}
 		#endregion
 
-		#region --- public methods ----------------------------------------
+		#region --- Ensure.., HasContents, Clear, CreateGeometryFromPoints ----------------------------------------
 		private Node EnsureWallNode()
 		{
 			var it = AvaloniaSample.AvaloniaSample.It;
@@ -285,6 +285,7 @@ namespace SceneSource
 			_hasDeferredPoint = false;
 		}
 
+
 		public void CreateGeometryFromPoints(Node node, StaticModel model, Terrain terrain)
 		{
 			if (Points.Count < 2)
@@ -309,7 +310,7 @@ namespace SceneSource
 			Vector3?[] normals = new Vector3?[4];
 
 			foreach (Dist2D srcPt in Points) {
-				// On wall's center line.
+				// On wall's center line. TBD: Should this be Vec2 in ground plane?
 				Vector3 cl2 = Global.Utils.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
 				if (firstPoint) {
 					cl1 = cl2;
@@ -330,11 +331,27 @@ namespace SceneSource
 						// TBD: Adjust for relative distances to those points?
 						perp1 = CalcPerpendicularXZ(cl0, cl2);
 
-						// TODO: Use cl2 to smooth normal.
-						// Easiest might be to calculate each "slice" of 4 points,
-						// Pass "future" points to algorithm.
-						// (But future points not known until have "perp2", right?)
-						AddWallSegments(cl0, cl1, perp0, perp1, terrain, normals);
+						// TODO: Find sharp bends, add special segment.
+						Vec2 p1 = cl0.XZ();
+						Vec2 p2 = cl1.XZ();
+						Vec2 p3 = cl2.XZ();
+						if (IsBendLarge(p1, p2, p3)) {
+							// NOTE: First parameter is the point NEAR to bend.
+							// TODO HACK: We "know" AddWallSegment ignores y, so we simply use zero.
+							// Better would be to change all the Vec3s to Vec2s.
+							Vector3 joinPtBefore = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p1));
+							Vector3 joinPtAfter = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p3));
+							// TODO: perp1 is wrong. Works for long segment because it is ignored.
+							AddWallSegments(cl0, joinPtBefore, perp0, perp1, terrain, normals);
+							Vector2 bendPerp0 = CalcPerpendicularXZ(cl0, cl1);
+							Vector2 bendPerp1 = CalcPerpendicularXZ(cl1, cl2);
+							// TODO: Add bend segment. That needs a special shape; this is an approximation to that.
+							AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
+							// Adjust next segment to start after bend.
+							cl1 = joinPtAfter;
+						} else {
+							AddWallSegments(cl0, cl1, perp0, perp1, terrain, normals);
+						}
 					}
 				}
 
@@ -615,51 +632,70 @@ namespace SceneSource
 		}
 
 		// Highest index that has been checked for adding a corner.
-		//private int _iCornerChecked = -1;
+		private int _iCornerChecked = -1;
 		const float SmallBendDegreesLimit = 30;   // TBD: Good value?
 
-		//private void FixRecentPoints()
-		//{
-		//	// Takes 3 points to form a corner.
-		//	if (Points.Count >= 3 && _iCornerChecked < Points.LastIndex()) {
-		//		// Check for recent corner.
-		//		var p1 = Points.NearEndElement(-3);
-		//		var p2 = Points.NearEndElement(-2);
-		//		var p3 = Points.LastElement();
-		//		// In range [-180,+180].
-		//		double signedDegrees = U2.CalcBendDegrees(p1, p2, p3);
-		//		// When there is no bend, angle is 180 degrees.
-		//		double degreesFromStraight = 180 - Math.Abs(signedDegrees);
-		//		if (degreesFromStraight > SmallBendDegreesLimit) {
-		//			// Add a new point, to have a segment within-which the bend is handled.
-		//			float lengthBeforeCorner = (float)(p2 - p1).Length.Value;
-		//			float joinLength = (float)(Math.Min(Width, lengthBeforeCorner / 2));   // TBD: Good value?
-		//			float joinWgt = 1 - (joinLength / lengthBeforeCorner);
-		//			// End of short join segment. Add this before p2.
-		//			var joinPt = U.Lerp(p1, p2, joinWgt);
-		//			// "2": Insert before p2.
-		//			Points.InsertBeforeLastN(2, joinPt);
+		private void FixRecentPoints()
+		{
+			// Takes 3 points to form a corner.
+			if (Points.Count >= 3 && _iCornerChecked < Points.LastIndex()) {
+				// Check for recent corner.
+				var p1 = Points.NearEndElement(-3);
+				var p2 = Points.NearEndElement(-2);
+				var p3 = Points.LastElement();
+				if (IsBendLarge((Vec2)p1, (Vec2)p2, (Vec2)p3)) {
+					// Add a new point, to have a segment within-which the bend is handled.
+					// NOTE: First parameter is the point NEAR to bend.
+					Dist2D joinPt = CalcJoinPoint(p2, p1);
+					// "2": Insert before p2.
+					Points.InsertBeforeLastN(2, joinPt);
 
-		//			// Move p2 so (p2,p3) starts outside the join area.
-		//			float lengthAfterCorner = (float)(p3 - p2).Length.Value;
-		//			joinLength = (float)(Math.Min(Width, lengthAfterCorner / 2));   // TBD: Good value?
-		//			joinWgt = joinLength / lengthAfterCorner;
-		//			joinPt = U.Lerp(p2, p3, joinWgt);
-		//			if (true) {
-		//				// "1": Insert after p2.
-		//				Points.InsertBeforeLastN(1, joinPt);
-		//			} else {
-		//				// "-2": replace p2.
-		//				Points[Points.Count - 2] = joinPt;
-		//			}
-		//		}
+					// Move p2 so (p2,p3) starts outside the join area.
+					// NOTE: First parameter is the point NEAR to bend.
+					joinPt = CalcJoinPoint(p2, p3);
+					if (true) {
+						// "1": Insert after p2.
+						Points.InsertBeforeLastN(1, joinPt);
+					} else {
+						// "-2": replace p2.
+						Points[Points.Count - 2] = joinPt;
+					}
+				}
 
-		//		// Technically, we checked a corner at NearEndElement(-2).
-		//		// But this matches the if-test done at start of this method.
-		//		_iCornerChecked = Points.LastIndex();
-		//	}
-		//}
+				// Technically, we checked a corner at NearEndElement(-2).
+				// But this matches the if-test done at start of this method.
+				_iCornerChecked = Points.LastIndex();
+			}
+		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="pNearBend">The endpoint of segment that is NEAR to bend.</param>
+		/// <param name="pFarFromBend">The endpoing of segment that is FAR from bend.</param>
+		/// <returns></returns>
+		private Dist2D CalcJoinPoint(Dist2D pNearBend, Dist2D pFarFromBend)
+		{
+			float segmentLength = (float)(pFarFromBend - pNearBend).Length.Value;
+			float lengthFrac = 0.5f;//0.5f;   // TODO: Calculate based on bend angle, so that inside of corner is zero length.
+									// "segmentLength / 2": arbitrarily decided not to allow bend to consume more than half the neighboring segments.
+			float joinLength = (float)(Math.Min(Width * lengthFrac, segmentLength / 2));
+			float joinFraction = joinLength / segmentLength;
+			float joinWgt = joinFraction;
+			// End of short join segment. Add this before p2.
+			var joinPt = U.Lerp(pNearBend, pFarFromBend, joinWgt);
+			return joinPt;
+		}
+
+		private static bool IsBendLarge(Vec2 p1, Vec2 p2, Vec2 p3)
+		{
+			// In range [-180,+180].
+			double signedDegrees = U2.CalcBendDegrees(p1, p2, p3);
+			// When there is no bend, angle is 180 degrees.
+			double degreesFromStraight = 180 - Math.Abs(signedDegrees);
+			bool bendIsLarge = degreesFromStraight > SmallBendDegreesLimit;
+			return bendIsLarge;
+		}
 
 		internal void Flush()
 		{

@@ -24,7 +24,7 @@ namespace OU
 			X = x;
 			Y = y;
 		}
-		#endregion
+        #endregion
 
 
         static public implicit operator Urho.Vector2(Vec2 v2)
@@ -32,5 +32,10 @@ namespace OU
             return new Urho.Vector2(v2.X, v2.Y);
         }
 
-	}
+        static public implicit operator Vec2(Urho.Vector2 v2)
+        {
+            return new Vec2(v2.X, v2.Y);
+        }
+
+    }
 }
