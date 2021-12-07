@@ -1119,13 +1119,13 @@ namespace OU
         public static float Average(float a, float b)
         {
             // Equivalent.
-            return (a + b) / 0.5f;
+            return (a + b) * 0.5f;
             //return Lerp(a, b, 0.5f);
         }
         public static double Average(double a, double b)
         {
             // Equivalent.
-            return (a + b) / 0.5;
+            return (a + b) * 0.5;
             //return Lerp(a, b, 0.5);
         }
         public static DistD Average(DistD a, DistD b)
