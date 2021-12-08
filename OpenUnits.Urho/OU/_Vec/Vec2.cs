@@ -36,6 +36,5 @@ namespace OU
         {
             return new Vec2(v2.X, v2.Y);
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OU;
+using System;
 using System.Collections.Generic;
 using Urho;
 
@@ -16,28 +17,28 @@ namespace Global
 		public const uint FloatsForVertexTangent = 4;
 
 		/// <summary>
-		/// Access 2 elements as a Vector2.
+		/// Access 2 elements as a Vec2.
 		/// REQUIRE: Offset in "# elements" not "# bytes".
 		/// </summary>
 		/// <param name="vertexData"></param>
 		/// <param name="offset">to first element to get. Units are "# elements" not "# bytes"</param>
 		/// <returns></returns>
-		public static Vector2 AsVector2(float[] vertexData, uint offset)
+		public static Vec2 AsVector2(float[] vertexData, uint offset)
 		{
-			return new Vector2(vertexData[offset],
+			return new Vec2(vertexData[offset],
 							   vertexData[offset + 1]);
 		}
 
 		/// <summary>
-		/// Access 3 elements as a Vector3.
+		/// Access 3 elements as a Vec3.
 		/// REQUIRE: Offset in "# elements" not "# bytes".
 		/// </summary>
 		/// <param name="vertexData"></param>
 		/// <param name="offset">to first element to get. Units are "# elements" not "# bytes"</param>
 		/// <returns></returns>
-		public static Vector3 AsVector3(float[] vertexData, uint offset)
+		public static Vec3 AsVector3(float[] vertexData, uint offset)
 		{
-			return new Vector3(vertexData[offset],
+			return new Vec3(vertexData[offset],
 							   vertexData[offset + 1],
 							   vertexData[offset + 2]);
 		}
@@ -61,24 +62,31 @@ namespace Global
 
 		#region --- terrain in XZ plane ----------------------------------------
 		/// <summary>
-		/// 
 		/// </summary>
 		/// <param name="pt"></param>
-		/// <returns>pt.Z becomes Vector2.Y</returns>
-		static public Vector2 XZ(this Vector3 pt)
-        {
-            return new Vector2(pt.X, pt.Z);
-        }
+		/// <returns>pt.Z becomes Vec2.Y</returns>
+		static public Vec2 XZ(this Vec3 pt)
+		{
+			return new Vec2(pt.X, pt.Z);
+		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pt"></param>
-        /// <param name="altitude"></param>
-        /// <returns>altitude becomes Vector3.Y, pt.Y becomes Vector3.Z</returns>
-        static public Vector3 FromXZ(this Vector2 pt, float altitude = 0)
+		/// <summary>
+		/// </summary>
+		/// <param name="pt"></param>
+		/// <returns>pt.Z becomes Vec2.Y</returns>
+		static public Vec2 XZ(this Vec3 pt)
+		{
+			return new Vec2(pt.X, pt.Z);
+		}
+
+		/// <summary>
+		/// </summary>
+		/// <param name="pt"></param>
+		/// <param name="altitude"></param>
+		/// <returns>altitude becomes Vec3.Y, pt.Y becomes Vec3.Z</returns>
+		static public Vec3 FromXZ(this Vec2 pt, float altitude = 0)
         {
-            return new Vector3(pt.X, altitude, pt.Y);
+            return new Vec3(pt.X, altitude, pt.Y);
         }
 
 
@@ -88,15 +96,15 @@ namespace Global
 		/// <param name="terrain"></param>
 		/// <param name="srcPt"></param>
 		/// <returns></returns>
-		static public Vector3 PlaceOnTerrain(Terrain terrain, Vector2 srcPt, float altitude = 0)
+		static public Vec3 PlaceOnTerrain(Terrain terrain, Vec2 srcPt, float altitude = 0)
 		{
-			Vector3 destPt = srcPt.ToXZ();
+			Vec3 destPt = srcPt.AsXZ();
 			// Y is altitude.
 			destPt.Y = GetTerrainHeight(terrain, destPt) + altitude;
 			return destPt;
 		}
 
-		static public float GetTerrainHeight(Terrain terrain, Vector3 pt)
+		static public float GetTerrainHeight(Terrain terrain, Vec3 pt)
 		{
 			return terrain == null ? 0 : terrain.GetHeight(pt);
 		}

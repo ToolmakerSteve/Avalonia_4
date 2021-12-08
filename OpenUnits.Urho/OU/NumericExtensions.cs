@@ -21,5 +21,14 @@ namespace OU
         static public Dist2D asDist(this Vector2 v2) { return new Dist2D(DistD.FromDefaultUnits(v2.X), DistD.FromDefaultUnits(v2.Y)); }
         static public Dist2D asMeters(this Vector2 v2) { return Dist2D.FromMeters(v2.X, v2.Y); }
 
+
+        /// <summary>
+        /// </summary>
+        /// <param name="it"></param>
+        /// <returns>it becomes X and Z fields.</returns>
+        static public Vec3 AsXZ(this Vec2 it)
+        {
+            return new Vec3(it.X, 0, it.Y);
+        }
     }
 }

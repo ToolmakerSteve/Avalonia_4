@@ -1107,6 +1107,14 @@ namespace OU
         {
             return new Dist3D(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB), Lerp(a.Z, b.Z, wgtB));
         }
+        public static Vec3 Lerp(Vec3 a, Vec3 b, float wgtB)
+        {
+            return new Vec3(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB), Lerp(a.Z, b.Z, wgtB));
+        }
+        public static Vec2 Lerp(Vec2 a, Vec2 b, float wgtB)
+        {
+            return new Vec2(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB));
+        }
         public static Vector3 Lerp(Vector3 a, Vector3 b, float wgtB)
         {
             return new Vector3(Lerp(a.X, b.X, wgtB), Lerp(a.Y, b.Y, wgtB), Lerp(a.Z, b.Z, wgtB));

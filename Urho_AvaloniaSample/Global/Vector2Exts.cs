@@ -6,7 +6,11 @@ namespace Global
 {
     public static class Vector2Exts
     {
-        public static Vector3 ToXZ(this Vector2 it)
+		/// <summary>
+		/// </summary>
+		/// <param name="it"></param>
+		/// <returns>it becomes X and Z fields.</returns>
+        public static Vector3 AsXZ(this Vector2 it)
         {
             return new Vector3(it.X, 0, it.Y);
         }

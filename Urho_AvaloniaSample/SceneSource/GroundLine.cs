@@ -18,6 +18,14 @@ namespace SceneSource
 	/// </summary>
 	public class GroundLine : SourceItem
 	{
+		enum SegmentShape
+		{
+			Quad,
+			// Triangle with zero width at end of segment.
+			CollapsedEnd,
+			// Triangle with zero width at start of segment.
+			CollapsedStart
+		}
 		// true to create new wall BEFORE mouse down.
 		// TBD: Need code to throw away any "unused" wall, when done editing.
 		public const bool PreCreateWall = true;
@@ -303,15 +311,15 @@ namespace SceneSource
 			bool firstPerpendicular = true;
 			// Initial values not used; avoid uninitialized warning.
 			// These are on wall's center line.
-			Vector3 cl0 = new Vector3();
-			Vector3 cl1 = new Vector3();
-			Vector2 perp0 = new Vector2();
-			Vector2 perp1 = new Vector2();
-			Vector3?[] normals = new Vector3?[4];
+			Vec3 cl0 = new Vec3();
+			Vec3 cl1 = new Vec3();
+			Vec2 perp0 = new Vec2();
+			Vec2 perp1 = new Vec2();
+			Vec3?[] normals = new Vec3?[4];
 
 			foreach (Dist2D srcPt in Points) {
 				// On wall's center line. TBD: Should this be Vec2 in ground plane?
-				Vector3 cl2 = Global.Utils.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
+				Vec3 cl2 = Global.Utils.PlaceOnTerrain(terrain, srcPt.ToVector2(), (float)BaseAltitude.Value);
 				if (firstPoint) {
 					cl1 = cl2;
 					// TODO: Can't calc normal yet.
@@ -335,18 +343,32 @@ namespace SceneSource
 						Vec2 p1 = cl0.XZ();
 						Vec2 p2 = cl1.XZ();
 						Vec2 p3 = cl2.XZ();
-						if (IsBendLarge(p1, p2, p3, out float degreesFromStraight)) {
+						if (IsBendLarge(p1, p2, p3, out float degreesFromStraight, out float midlineHeadingDegrees)) {
 							// NOTE: First parameter is the point NEAR to bend.
 							// TODO HACK: We "know" AddWallSegment ignores y, so we simply use zero.
 							// Better would be to change all the Vec3s to Vec2s.
-							Vector3 joinPtBefore = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p1, degreesFromStraight));
-							Vector3 joinPtAfter = U2.FromXZ((Vector2)CalcJoinPoint((Dist2D)p2, (Dist2D)p3, degreesFromStraight));
+							Vec3 joinPtBefore = U2.FromXZ((Vec2)CalcJoinPoint((Dist2D)p2, (Dist2D)p1, degreesFromStraight));
+							Vec3 joinPtAfter = U2.FromXZ((Vec2)CalcJoinPoint((Dist2D)p2, (Dist2D)p3, degreesFromStraight));
 							// TODO: perp1 is wrong. Works for long segment because it is ignored.
 							AddWallSegments(cl0, joinPtBefore, perp0, perp1, terrain, normals);
-							Vector2 bendPerp0 = CalcPerpendicularXZ(cl0, cl1);
-							Vector2 bendPerp1 = CalcPerpendicularXZ(cl1, cl2);
+							Vec2 bendPerp0 = CalcPerpendicularXZ(cl0, cl1);
+							Vec2 bendPerp1 = CalcPerpendicularXZ(cl1, cl2);
 							// TODO: Add bend segment. That needs a special shape; this is an approximation to that.
-							AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
+							if (false)
+								AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
+							else {
+								// Above shape gets very thin for sharp bend (doubling-back).
+								Vec2D adjustedJoinXZ = cl1.XZ();
+								// TBD: Only certain angle range?
+								if (true) {
+									float midlineHeadingRadians = U.ToRadians(midlineHeadingDegrees);
+									adjustedJoinXZ = U.MoveOnAngleRadians(adjustedJoinXZ, midlineHeadingRadians, Width / 2); ;
+								}
+								Vec3 adjustedJoin = ProjectToTerrain(adjustedJoinXZ, terrain, TopMetersF);
+								// See how it looks to extend join area to the center line point.
+								AddWallSegment(joinPtBefore, adjustedJoin, bendPerp0, bendPerp1, terrain, normals, SegmentShape.CollapsedEnd);
+								AddWallSegment(adjustedJoin, joinPtAfter, bendPerp0, bendPerp1, terrain, normals, SegmentShape.CollapsedStart);
+							}
 							// Adjust next segment to start after bend.
 							cl1 = joinPtAfter;
 						} else {
@@ -366,8 +388,8 @@ namespace SceneSource
 				//float x0 = 0;//-30;
 				//float z0 = 0;//-40;
 				//float dz = 10;//-20;//-5;
-				//cl0 = new Vector3(x0, 1, z0);
-				//cl1 = new Vector3(x0, 1, z0+dz);
+				//cl0 = new Vec3(x0, 1, z0);
+				//cl1 = new Vec3(x0, 1, z0+dz);
 				////U.Swap(ref cl0, ref cl1);   // To see what changes.
 				//perp0 = CalcPerpendicularXZ(cl0, cl1);
 				//perp1 = perp0;
@@ -409,7 +431,7 @@ namespace SceneSource
 			_prevWallSegmentCount = _currentWallSegmentCount;
 		}
 
-		private void AddWallSegments(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
+		private void AddWallSegments(Vec3 cl0, Vec3 cl1, Vec2 perp0, Vec2 perp1, Terrain terrain, Vec3?[] normals)
 		{
 			// Decide whether to break into smaller pieces, to better follow terrain.
 			float segmentLength = (cl1 - cl0).LengthFast;
@@ -424,11 +446,11 @@ namespace SceneSource
 
 				int lastI = nSegments - 1;
 				// First "tween" (in-between) segment starts here.
-				Vector3 startTweenPt = cl0;
+				Vec3 startTweenPt = cl0;
 				for (int iStep = 0; iStep < nSegments; iStep++) {
 					//float startTweenWgt = iStep / (float)nSegments;
 					float endTweenWgt = (iStep + 1) / (float)nSegments;
-					Vector3 endTweenPt;
+					Vec3 endTweenPt;
 					if (iStep == lastI) {
 						// Use the exact value of final point.
 						endTweenPt = cl1;
@@ -454,7 +476,8 @@ namespace SceneSource
 		/// <param name="perp1"></param>
 		/// <param name="terrain"></param>
 		/// <param name="normals"></param>
-		private void AddWallSegment(Vector3 cl0, Vector3 cl1, Vector2 perp0, Vector2 perp1, Terrain terrain, Vector3?[] normals)
+		private void AddWallSegment(Vec3 cl0, Vec3 cl1, Vec2 perp0, Vec2 perp1,
+									Terrain terrain, Vec3?[] normals, SegmentShape shape = SegmentShape.Quad)
 		{
 			if (SingleGeometryTEST && _currentWallSegmentCount >= 1)
 				return;   // TEST - only one segment
@@ -462,20 +485,35 @@ namespace SceneSource
 			_currentWallSegmentCount++;
 
 			// Accumulate previous values. For averaging adjacent segment normals.
-			Vector3? normTop = normals[0];
-			Vector3? normBtm = normals[1];
-			Vector3? normSide1 = normals[2];
-			Vector3? normSide2 = normals[3];
+			Vec3? normTop = normals[0];
+			Vec3? normBtm = normals[1];
+			Vec3? normSide1 = normals[2];
+			Vec3? normSide2 = normals[3];
 
 			// On top of wall.
-			U.Pair<Vector3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
-			U.Pair<Vector3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
+			U.Pair<Vec3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
+			U.Pair<Vec3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
+			if (shape == SegmentShape.CollapsedStart) {
+				var wallTop0 = ProjectToTerrain(cl0, terrain, TopMetersF);
+				wallPair0 = new U.Pair<Vec3>(wallTop0, wallTop0);
+			} else if (shape == SegmentShape.CollapsedEnd) {
+				var wallTop1 = ProjectToTerrain(cl1, terrain, TopMetersF);
+				wallPair1 = new U.Pair<Vec3>(wallTop1, wallTop1);
+			}
+
 			// Wall Segment: Top of wall.
 			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, false, false);
 			//AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, true, false);
 
-			U.Pair<Vector3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
-			U.Pair<Vector3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
+			U.Pair<Vec3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
+			U.Pair<Vec3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
+			if (shape == SegmentShape.CollapsedStart) {
+				var wallBottom0 = ProjectToTerrain(cl0, terrain, BottomMetersF);
+				groundPair0 = new U.Pair<Vec3>(wallBottom0, wallBottom0);
+			} else if (shape == SegmentShape.CollapsedEnd) {
+				var wallBottom1 = ProjectToTerrain(cl1, terrain, BottomMetersF);
+				groundPair1 = new U.Pair<Vec3>(wallBottom1, wallBottom1);
+			}
 
 			// Wall Segment: Bottom of wall.
 			//AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.WallBottom, ref normBtm);
@@ -483,15 +521,15 @@ namespace SceneSource
 
 			// Wall Segment: First side of wall.
 			// Must specify such that the second pair is at far end - these get adjusted when next quad is added.
-			U.Pair<Vector3> groundFirstSide0 = new U.Pair<Vector3>(wallPair0.First, groundPair0.First);
-			U.Pair<Vector3> groundFirstSide1 = new U.Pair<Vector3>(wallPair1.First, groundPair1.First);
+			U.Pair<Vec3> groundFirstSide0 = new U.Pair<Vec3>(wallPair0.First, groundPair0.First);
+			U.Pair<Vec3> groundFirstSide1 = new U.Pair<Vec3>(wallPair1.First, groundPair1.First);
 			// QuadVOrder re-orders the vertices to expected order and orientation (top left first).
 			AddQuad(FirstSidePoly, groundFirstSide0, groundFirstSide1, Poly3D.QuadVOrder.Wall1, ref normSide1);
 
 			// Wall Segment: Second side of wall.
 			// Must specify such that the second pair is at far end - these get adjusted when next quad is added.
-			U.Pair<Vector3> groundSecondSide0 = new U.Pair<Vector3>(wallPair0.Second, groundPair0.Second);
-			U.Pair<Vector3> groundSecondSide1 = new U.Pair<Vector3>(wallPair1.Second, groundPair1.Second);
+			U.Pair<Vec3> groundSecondSide0 = new U.Pair<Vec3>(wallPair0.Second, groundPair0.Second);
+			U.Pair<Vec3> groundSecondSide1 = new U.Pair<Vec3>(wallPair1.Second, groundPair1.Second);
 			//AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall2, ref normSide2, true);
 			AddQuad(SecondSidePoly, groundSecondSide0, groundSecondSide1, Poly3D.QuadVOrder.Wall1, ref normSide2, true, true, true);
 
@@ -643,7 +681,7 @@ namespace SceneSource
 				var p1 = Points.NearEndElement(-3);
 				var p2 = Points.NearEndElement(-2);
 				var p3 = Points.LastElement();
-				if (IsBendLarge((Vec2)p1, (Vec2)p2, (Vec2)p3, out float degreesFromStraight)) {
+				if (IsBendLarge((Vec2)p1, (Vec2)p2, (Vec2)p3, out float degreesFromStraight, out float midlineHeadingDegrees)) {
 					// Add a new point, to have a segment within-which the bend is handled.
 					// NOTE: First parameter is the point NEAR to bend.
 					Dist2D joinPt = CalcJoinPoint(p2, p1, degreesFromStraight);
@@ -678,27 +716,34 @@ namespace SceneSource
 		{
 			float segmentLength = (float)(pFarFromBend - pNearBend).Length.Value;
 			// Calculate based on bend angle, so that inside of corner is zero length.
-			//var cos = Math.Cos(U.AsRadians(degreesFromStraight));
-			var sin = Math.Sin(U.AsRadians(degreesFromStraight));
-			// TODO: Handle divisor near zero. (wall doubling-back on itself)
-			// TODO: This isn't quite right. "1/cos" was completely wrong; is there some offset or half-wall needed?
-			float lengthFrac = 1 / (float)Math.Abs(sin);
-			lengthFrac -= 0.5f;   // ttttt trying to find the missing factor.
-			// "segmentLength / 2": arbitrarily decided not to allow bend to consume more than half the neighboring segments.
-			float joinLength = (float)(Math.Min(Width * lengthFrac, segmentLength / 2));
-			float joinFraction = joinLength / segmentLength;
-			float joinWgt = joinFraction;
-			// End of short join segment. Add this before p2.
-			var joinPt = U.Lerp(pNearBend, pFarFromBend, joinWgt);
+			// An imaginary mid-line between the two segments forms a right triangle
+			// with angle Beta at the bend point. "/2" because that mid-line splits the angle.
+			float betaDegrees = (180 - degreesFromStraight) / 2;
+			// right triangle. midline is hypotenuse,
+			// one triangle edge has length "a * sin(beta)", but is also known to be "width/2".
+			// Solve for that "a", which is hypotenuse length.
+			float betaRadians = U.AsRadians(betaDegrees);
+			float midlineLength = (float)(Width / (2 * Math.Sin(betaRadians)));
+			// The OTHER side of that right triangle is distance to back away from bend point,
+			// such that the inside wall edges intersect.
+			float backoffLength = (float)(midlineLength * Math.Cos(betaRadians));
+			float joinFraction = backoffLength / segmentLength;
+			// End of short join segment.
+			var joinPt = U.Lerp(pNearBend, pFarFromBend, joinFraction);
 			return joinPt;
 		}
 
-		private static bool IsBendLarge(Vec2 p1, Vec2 p2, Vec2 p3, out float degreesFromStraight)
+		private static bool IsBendLarge(Vec2 p1, Vec2 p2, Vec2 p3,
+										out float degreesFromStraight, out float midlineHeadingDegrees)
 		{
 			// In range [-180,+180]. Zero when the points are all on a straight line.
-			double signedDegrees = U2.CalcBendDegrees(p1, p2, p3);
+			float signedDegrees = U2.CalcBendDegrees(p1, p2, p3, out float heading01, out float heading12);
 			//degreesFromStraight = (float)(180 - Math.Abs(signedDegrees));
 			degreesFromStraight = (float)Math.Abs(signedDegrees);
+
+			// Average the two headings. But reverse outgoing heading.
+			midlineHeadingDegrees = (heading01 - heading12) * 0.5f;
+
 			bool bendIsLarge = degreesFromStraight > SmallBendDegreesLimit;
 			return bendIsLarge;
 		}
@@ -751,20 +796,20 @@ namespace SceneSource
 			return poly;
 		}
 
-		private void CreateStartPoly(U.Pair<Vector3> wallPair0, U.Pair<Vector3> groundPair0, Terrain terrain)
+		private void CreateStartPoly(U.Pair<Vec3> wallPair0, U.Pair<Vec3> groundPair0, Terrain terrain)
 		{
 			if (!GroundLine.SingleGeometryTEST)
 				StartPoly.Clear();
-			Vector3? normal = null;
+			Vec3? normal = null;
 			//AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.Default, ref normal, true, true);
 			AddQuad(StartPoly, wallPair0, groundPair0, Poly3D.QuadVOrder.WallStart, ref normal, true, false, false);
 		}
 
-		private void CreateEndPoly(U.Pair<Vector3> wallPair1, U.Pair<Vector3> groundPair1, Terrain terrain)
+		private void CreateEndPoly(U.Pair<Vec3> wallPair1, U.Pair<Vec3> groundPair1, Terrain terrain)
 		{
 			if (!GroundLine.SingleGeometryTEST)
 				EndPoly.Clear();
-			Vector3? normal = null;
+			Vec3? normal = null;
 			AddQuad(EndPoly, wallPair1, groundPair1, Poly3D.QuadVOrder.WallEnd, ref normal, true, false, false);
 		}
 
@@ -775,23 +820,35 @@ namespace SceneSource
 		/// <param name="terrain"></param>
 		/// <param name="relAltitude">relative altitude: distance above terrain.</param>
 		/// <returns></returns>
-		private U.Pair<Vector3> ProjectToTerrain(U.Pair<Vector3> wallPair, Terrain terrain, float relAltitude)
+		private U.Pair<Vec3> ProjectToTerrain(U.Pair<Vec3> wallPair, Terrain terrain, float relAltitude)
 		{
-			Vector3 groundFirst = ProjectToTerrain(wallPair.First, terrain, relAltitude);
-			Vector3 groundSecond = ProjectToTerrain(wallPair.Second, terrain, relAltitude);
-			return new U.Pair<Vector3>(groundFirst, groundSecond);
+			Vec3 groundFirst = ProjectToTerrain(wallPair.First, terrain, relAltitude);
+			Vec3 groundSecond = ProjectToTerrain(wallPair.Second, terrain, relAltitude);
+			return new U.Pair<Vec3>(groundFirst, groundSecond);
 		}
 
 		/// <summary>
-		/// 
 		/// </summary>
 		/// <param name="vec"></param>
 		/// <param name="terrain"></param>
 		/// <param name="relAltitude">relative altitude: distance above terrain.</param>
 		/// <returns></returns>
-		private Vector3 ProjectToTerrain(Vector3 vec, Terrain terrain, float relAltitude)
+		private Vec3 ProjectToTerrain(Vec3 vec, Terrain terrain, float relAltitude)
 		{
 			float altitude = U2.GetTerrainHeight(terrain, vec) + relAltitude;
+			return U.WithAltitude(vec, altitude);
+		}
+
+		/// <summary>
+		/// </summary>
+		/// <param name="vec"></param>
+		/// <param name="terrain"></param>
+		/// <param name="relAltitude">relative altitude: distance above terrain.</param>
+		/// <returns></returns>
+		private Vec3 ProjectToTerrain(Vec2 vecXZ, Terrain terrain, float relAltitude)
+		{
+			var vec = vecXZ.AsXZ();
+			float altitude = U2.GetTerrainHeight(terrain, vecXZ.AsXZ()) + relAltitude;
 			return U.WithAltitude(vec, altitude);
 		}
 
@@ -810,8 +867,8 @@ namespace SceneSource
 		/// <param name="invertNorm"></param>
 		/// <param name="invertU"></param>
 		/// <param name="invertWinding"></param>
-		private void AddQuad(Poly3D poly, U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1,
-							 Poly3D.QuadVOrder quadVOrder, ref Vector3? normal,
+		private void AddQuad(Poly3D poly, U.Pair<Vec3> wallPair0, U.Pair<Vec3> wallPair1,
+							 Poly3D.QuadVOrder quadVOrder, ref Vec3? normal,
 							 bool invertNorm = false, bool invertU = false, bool invertWinding = false)
 		{
 			//if (!ReferenceEquals(poly, FirstSidePoly)) return;   // ttt
@@ -833,14 +890,14 @@ namespace SceneSource
 		/// <param name="pa"></param>
 		/// <param name="pb"></param>
 		/// <returns></returns>
-		private Vector2 CalcPerpendicularXZ(Vector3 pa, Vector3 pb)
+		private Vec2 CalcPerpendicularXZ(Vec3 pa, Vec3 pb)
         {
             // CAUTION: Altitude is in Y.
-            Vector2 pa2 = pa.XZ();
-            Vector2 pb2 = pb.XZ();
+            Vec2 pa2 = pa.XZ();
+            Vec2 pb2 = pb.XZ();
 
-            Vector2 delta = pb2 - pa2;
-            Vector2 perpendicularUnit = U.RotateByDegrees(delta, 90);
+            Vec2 delta = pb2 - pa2;
+            Vec2 perpendicularUnit = U.RotateByDegrees(delta, 90);
             perpendicularUnit.Normalize();
             return perpendicularUnit;
         }
@@ -854,13 +911,13 @@ namespace SceneSource
         /// <param name="wallTop">Distance above terrain</param>
         /// <param name="terrain"></param>
         /// <returns>Two points above terrain, perpendicular to wall center, "wallWidth" apart.</returns>
-        private U.Pair<Vector3> WallPerpendicularOnTerrain(
-                    Vector3 wallCenter, float wallWidth, Vector2 perpendicularUnit, float wallTop, Terrain terrain)
+        private U.Pair<Vec3> WallPerpendicularOnTerrain(
+                    Vec3 wallCenter, float wallWidth, Vec2 perpendicularUnit, float wallTop, Terrain terrain)
         {
             float halfWidth = wallWidth / 2.0f;
-            Vector3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
-            Vector3 first = wallCenter - halfPerp;
-            Vector3 second = wallCenter + halfPerp;
+            Vec3 halfPerp = (perpendicularUnit * halfWidth).FromXZ();
+            Vec3 first = wallCenter - halfPerp;
+            Vec3 second = wallCenter + halfPerp;
 			if (false) {
 				// This results in an "uneven top" cross-section, if ground slopes perpendicular to the wall.
 				first.Y = U2.GetTerrainHeight(terrain, first) + wallTop;
@@ -873,7 +930,7 @@ namespace SceneSource
 				second.Y = wallAltitude;
 			}
 
-            return new U.Pair<Vector3>(first, second);
+            return new U.Pair<Vec3>(first, second);
         }
         #endregion
 
