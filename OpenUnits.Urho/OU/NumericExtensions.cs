@@ -30,5 +30,10 @@ namespace OU
         {
             return new Vec3(it.X, 0, it.Y);
         }
+
+        public static Vec3 Normalize(this Vec3 value)
+        {
+            return Vec3.Normalize(value);
+        }
     }
 }

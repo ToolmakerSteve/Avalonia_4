@@ -1,7 +1,9 @@
 ﻿using OU;
 using System;
 using System.Collections.Generic;
-using Urho;
+using Ur = Urho;
+// TBD: Until we clone System.Numerics.Vector4 as OU.Vec4.
+using Vector4 = Urho.Vector4;
 
 namespace Global
 {
@@ -70,14 +72,6 @@ namespace Global
 			return new Vec2(pt.X, pt.Z);
 		}
 
-		/// <summary>
-		/// </summary>
-		/// <param name="pt"></param>
-		/// <returns>pt.Z becomes Vec2.Y</returns>
-		static public Vec2 XZ(this Vec3 pt)
-		{
-			return new Vec2(pt.X, pt.Z);
-		}
 
 		/// <summary>
 		/// </summary>
@@ -96,7 +90,7 @@ namespace Global
 		/// <param name="terrain"></param>
 		/// <param name="srcPt"></param>
 		/// <returns></returns>
-		static public Vec3 PlaceOnTerrain(Terrain terrain, Vec2 srcPt, float altitude = 0)
+		static public Vec3 PlaceOnTerrain(Ur.Terrain terrain, Vec2 srcPt, float altitude = 0)
 		{
 			Vec3 destPt = srcPt.AsXZ();
 			// Y is altitude.
@@ -104,9 +98,9 @@ namespace Global
 			return destPt;
 		}
 
-		static public float GetTerrainHeight(Terrain terrain, Vec3 pt)
+		static public float GetTerrainHeight(Ur.Terrain terrain, Vec3 pt)
 		{
-			return terrain == null ? 0 : terrain.GetHeight(pt);
+			return terrain == null ? 0 : terrain.GetHeight((Ur.Vector3)pt);
 		}
 		#endregion
 	}

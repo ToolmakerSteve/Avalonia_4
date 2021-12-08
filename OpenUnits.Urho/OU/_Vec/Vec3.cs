@@ -4,31 +4,31 @@ using System.Text;
 
 namespace OU
 {
-	// SAME AS Numerics - Vector2
-	/// <summary>Double-precision two-dimensional (XY) unitless vector value.   Same as a Vector2, but with double-precision.</summary>
-	public struct Vec3
+    // SAME AS Numerics - Vector3
+    public partial struct Vec3
 	{
-		public class Array : List<Vec3> // NOTE: this <Vector2> would be auto-gen'ed to the specified preferred library -- like Urho... or defaults to Numerics.Vector2
+        #region --- class Array ----------------------------------------
+        public class Array : List<Vec3> // NOTE: this <Vector2> would be auto-gen'ed to the specified preferred library -- like Urho... or defaults to Numerics.Vector2
 		{
 		}
+        #endregion
 
-		#region --- data ----------------------------------------
-		public float X;
-		public float Y;
-		public float Z;
-		#endregion
+        #region --- data (See Vec3.Intrinsics.cs) ----------------------------------------
+        #endregion
 
+        #region --- new (See Vec3.Intrinsics.cs) ----------------------------------------
+        #endregion
 
-		#region --- new ----------------------------------------
-		public Vec3(float x, float y, float z)
-		{
-			X = x;
-			Y = y;
-			Z = z;
-		}
-		#endregion
+        #region --- implicit operators ----------------------------------------
+        static public implicit operator Urho.Vector3(Vec3 vec)
+        {
+            return new Urho.Vector3(vec.X, vec.Y, vec.Z);
+        }
 
-
-
-	}
+        static public implicit operator Vec3(Urho.Vector3 vec)
+        {
+            return new Vec3(vec.X, vec.Y, vec.Z);
+        }
+        #endregion
+    }
 }

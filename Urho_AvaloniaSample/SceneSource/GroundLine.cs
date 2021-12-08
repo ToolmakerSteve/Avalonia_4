@@ -358,7 +358,7 @@ namespace SceneSource
 								AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
 							else {
 								// Above shape gets very thin for sharp bend (doubling-back).
-								Vec2D adjustedJoinXZ = cl1.XZ();
+								Vec2 adjustedJoinXZ = cl1.XZ();
 								// TBD: Only certain angle range?
 								if (true) {
 									float midlineHeadingRadians = U.ToRadians(midlineHeadingDegrees);

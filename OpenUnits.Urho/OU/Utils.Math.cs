@@ -263,7 +263,7 @@ namespace OU
             return (Math.Abs(number.Value - target.Value) <= tolerance);
         }
 
-        public static bool NearlyEquals(this Vector2 p1, Vector2 p2, float tolerance = EpsilonForOneF)
+        public static bool NearlyEquals(this Vec2 p1, Vec2 p2, float tolerance = EpsilonForOneF)
         {
             return (NearlyEquals(p1.X, p2.X, tolerance) && NearlyEquals(p1.Y, p2.Y, tolerance));
         }
@@ -278,9 +278,9 @@ namespace OU
             return (p1.X.NearlyEquals(p2.X, tolerance) && p1.Y.NearlyEquals(p2.Y, tolerance));
         }
         // TBD: If make this a compiler extension AND name it "NearlyEquals",
-        // then Poly2Tri.TriangulationPoint gets compiler error, because it can't resolve Vector3,
+        // then Poly2Tri.TriangulationPoint gets compiler error, because it can't resolve Vec3,
         // to determine which "NearlyEquals" is most applicable.
-        public static bool NearlyEquals3(this Vector3 p1, Vector3 p2, float tolerance = (float)NearZeroX10)
+        public static bool NearlyEquals3(this Vec3 p1, Vec3 p2, float tolerance = (float)NearZeroX10)
         {
             return (p1.X.NearlyEquals(p2.X, tolerance) && p1.Y.NearlyEquals(p2.Y, tolerance) && p1.Z.NearlyEquals(p2.Z, tolerance));
         }
@@ -301,14 +301,14 @@ namespace OU
         #endregion
 
 
-        public static N.Vector3 ToN(this Vector3 p)
+        public static N.Vector3 ToN(this Vec3 p)
         {
             return new N.Vector3(p.X, p.Y, p.Z);
         }
 
-        public static Vector3 ToU(this N.Vector3 p)
+        public static Vec3 ToU(this N.Vector3 p)
         {
-            return new Vector3(p.X, p.Y, p.Z);
+            return new Vec3(p.X, p.Y, p.Z);
         }
 
         //        // ========== Miscellaneous calculations ==========
@@ -393,20 +393,20 @@ namespace OU
         }
 
 
-        public static void InitMinMax(out Vector2 minV, out Vector2 maxV)
+        public static void InitMinMax(out Vec2 minV, out Vec2 maxV)
         {
             // Initialize each to the OPPOSITE end of the range,
             // so don't need special test on first AccumMinMax call.
-            minV = new Vector2(float.MaxValue, float.MaxValue);
-            maxV = new Vector2(float.MinValue, float.MinValue);
+            minV = new Vec2(float.MaxValue, float.MaxValue);
+            maxV = new Vec2(float.MinValue, float.MinValue);
         }
 
-        public static void InitMinMax(out Vector3 minV, out Vector3 maxV)
+        public static void InitMinMax(out Vec3 minV, out Vec3 maxV)
         {
             // Initialize each to the OPPOSITE end of the range,
             // so don't need special test on first AccumMinMax call.
-            minV = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            maxV = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+            minV = new Vec3(float.MaxValue, float.MaxValue, float.MaxValue);
+            maxV = new Vec3(float.MinValue, float.MinValue, float.MinValue);
         }
 
 
@@ -437,9 +437,9 @@ namespace OU
         }
 
         // Before first call,
-        // caller must initialize minV to New Vector2(Single.MaxValue),
-        // and maxV to New Vector2(Single.MinValue).
-        public static void AccumMinMax(Vector2 v, ref Vector2 minV, ref Vector2 maxV)
+        // caller must initialize minV to New Vec2(Single.MaxValue),
+        // and maxV to New Vec2(Single.MinValue).
+        public static void AccumMinMax(Vec2 v, ref Vec2 minV, ref Vec2 maxV)
         {
             if (v.X < minV.X)
                 minV.X = v.X;
@@ -453,9 +453,9 @@ namespace OU
         }
 
         // Before first call, call InitMinMax,
-        // to initialize minV to New Vector3(Single.MaxValue),
-        // and maxV to New Vector3(Single.MinValue).
-        public static void AccumMinMax(Vector3 v, ref Vector3 minV, ref Vector3 maxV)
+        // to initialize minV to New Vec3(Single.MaxValue),
+        // and maxV to New Vec3(Single.MinValue).
+        public static void AccumMinMax(Vec3 v, ref Vec3 minV, ref Vec3 maxV)
         {
             if (v.X < minV.X)
                 minV.X = v.X;
@@ -3423,17 +3423,17 @@ namespace OU
         //            return diTotal;
         //        }
 
-        public static Vector2 RotateByDegrees(Vector2 pos, float degrees)
+        public static Vec2 RotateByDegrees(Vec2 pos, float degrees)
         {
             return RotateByRadians(pos, DegreesToRadians(degrees));
         }
 
-        public static Vector2 RotateByRadians(Vector2 pos, float radians)
+        public static Vec2 RotateByRadians(Vec2 pos, float radians)
         {
             float cosR = (float)Math.Cos(radians);
             float sinR = (float)Math.Sin(radians);
 
-            Vector2 ret = new Vector2(pos.X * cosR - pos.Y * sinR, pos.X * sinR + pos.Y * cosR);
+            Vec2 ret = new Vec2(pos.X * cosR - pos.Y * sinR, pos.X * sinR + pos.Y * cosR);
 
             return ret;
         }
@@ -3470,14 +3470,14 @@ namespace OU
         //            return ret;
         //        }
 
-        //        public static Vector2 rotateAtByDegrees(Vector2 origo, Vector2 point, float degrees)
+        //        public static Vec2 rotateAtByDegrees(Vec2 origo, Vec2 point, float degrees)
         //        {
         //            return rotateAtByRadians(origo, point, degreesToRadians(degrees));
         //        }
 
-        //        public static Vector2 rotateAtByRadians(Vector2 origo, Vector2 point, float radians)
+        //        public static Vec2 rotateAtByRadians(Vec2 origo, Vec2 point, float radians)
         //        {
-        //            Vector2 ret = origo;   // Clone. (For a struct, can simply assign.)
+        //            Vec2 ret = origo;   // Clone. (For a struct, can simply assign.)
         //            double cosR = Math.Cos(radians);
         //            double sinR = Math.Sin(radians);
 
@@ -3694,9 +3694,9 @@ namespace OU
         /// <param name="src"></param>
         /// <param name="dst"></param>
         /// <returns></returns>
-        public static Vector3 CopyXZ(Vector3 src, Vector3 dst)
+        public static Vec3 CopyXZ(Vec3 src, Vec3 dst)
         {
-            return new Vector3(src.X, dst.Y, src.Z);
+            return new Vec3(src.X, dst.Y, src.Z);
         }
 
         /// <summary>
@@ -3706,9 +3706,9 @@ namespace OU
         /// <param name="altitude"></param>
         /// <param name="dst"></param>
         /// <returns></returns>
-        public static Vector3 WithAltitude(Vector3 dst, float altitude)
+        public static Vec3 WithAltitude(Vec3 dst, float altitude)
         {
-            return new Vector3(dst.X, altitude, dst.Z);
+            return new Vec3(dst.X, altitude, dst.Z);
         }
 
         /// <summary>
@@ -3717,13 +3717,13 @@ namespace OU
         /// <param name="v2"></param>
         /// <param name="v3"></param>
         /// <returns>Unit length vector perpendicular to the plane through three points.</returns>
-        public static Vector3 Normal(Vector3 v1, Vector3 v2, Vector3 v3)
+        public static Vec3 Normal(Vec3 v1, Vec3 v2, Vec3 v3)
         {
-            Vector3 delta12 = v2 - v1;
-            Vector3 delta13 = v3 - v1;
-            Vector3 normal = Vector3.Cross(delta13, delta12);
-            normal.Normalize();
-            return normal;
+            Vec3 delta12 = v2 - v1;
+            Vec3 delta13 = v3 - v1;
+            Vec3 normal = Vec3.Cross(delta13, delta12);
+            return normal.Normalize();
+            ;
         }
 
     }
