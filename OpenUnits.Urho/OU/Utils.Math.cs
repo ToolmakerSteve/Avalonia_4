@@ -3722,7 +3722,7 @@ namespace OU
             Vec3 delta12 = v2 - v1;
             Vec3 delta13 = v3 - v1;
             Vec3 normal = Vec3.Cross(delta13, delta12);
-            return normal.Normalize();
+            return normal.Normalized();
             ;
         }
 

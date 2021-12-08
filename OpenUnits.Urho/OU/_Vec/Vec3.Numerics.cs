@@ -162,25 +162,44 @@ namespace OU
         }
 
         /// <summary>
-        /// Returns a vector with the same direction as the given vector, but with a length of 1.
+        /// Like "Normalized", but acts "in place", on the current vector.
         /// </summary>
-        /// <param name="value">The vector to normalize.</param>
-        /// <returns>The normalized vector.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vec3 Normalize(Vec3 value)
+        public void Normalize(bool allowZero = false)
         {
-            float ls = value.X * value.X + value.Y * value.Y + value.Z * value.Z;
-            float length = (float)System.Math.Sqrt(ls);
-            return new Vec3(value.X / length, value.Y / length, value.Z / length);
-        }
+            float length = (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+			if (length != 0) {
+				X /= length;
+				Y /= length;
+				Z /= length;
+			} else if (!allowZero)
+				throw new InvalidOperationException("Attempt to Normalize a zero vector");
+		}
 
-        /// <summary>
-        /// Computes the cross product of two vectors.
-        /// </summary>
-        /// <param name="vector1">The first vector.</param>
-        /// <param name="vector2">The second vector.</param>
-        /// <returns>The cross product.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		/// <summary>
+		/// Returns a vector with the same direction, but with a length of 1.
+		/// </summary>
+		/// <returns>The normalized vector.</returns>
+		public Vec3 Normalized(bool allowZero = false)
+        {
+            float length = (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+			if (length == 0) {
+				if (allowZero)
+					return this;
+				else
+					throw new InvalidOperationException("Attempt to Normalize a zero vector");
+			} else {
+				float invNorm = 1.0f / length;
+				return new Vec3(X * invNorm, Y * invNorm, Z * invNorm);
+			}
+		}
+
+		/// <summary>
+		/// Computes the cross product of two vectors.
+		/// </summary>
+		/// <param name="vector1">The first vector.</param>
+		/// <param name="vector2">The second vector.</param>
+		/// <returns>The cross product.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vec3 Cross(Vec3 vector1, Vec3 vector2)
         {
             return new Vec3(

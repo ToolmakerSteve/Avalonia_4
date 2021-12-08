@@ -98,6 +98,11 @@ namespace Global
 			return destPt;
 		}
 
+		static public float GetTerrainHeight(Ur.Terrain terrain, Vec2 pt)
+		{
+			return terrain == null ? 0 : terrain.GetHeight((Ur.Vector3)pt.AsXZ());
+		}
+
 		static public float GetTerrainHeight(Ur.Terrain terrain, Vec3 pt)
 		{
 			return terrain == null ? 0 : terrain.GetHeight((Ur.Vector3)pt);

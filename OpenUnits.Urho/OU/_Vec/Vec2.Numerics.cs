@@ -153,19 +153,35 @@ namespace OU
         }
 
         /// <summary>
-        /// Returns a vector with the same direction as the given vector, but with a length of 1.
+        /// Like "Normalized", but acts "in place", on the current vector.
         /// </summary>
-        /// <param name="value">The vector to normalize.</param>
-        /// <returns>The normalized vector.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vec2 Normalize(Vec2 value)
+        public void Normalize(bool allowZero = false)
         {
-            float ls = value.X * value.X + value.Y * value.Y;
-            float invNorm = 1.0f / (float)Math.Sqrt((double)ls);
+            float length = (float)Math.Sqrt(X * X + Y * Y);
+            if (length != 0)
+            {
+                X /= length;
+                Y /= length;
+            } else if (!allowZero)
+				throw new InvalidOperationException("Attempt to Normalize a zero vector");
+		}
 
-            return new Vec2(
-                value.X * invNorm,
-                value.Y * invNorm);
+		/// <summary>
+		/// Returns a vector with the same direction, but with a length of 1.
+		/// </summary>
+		/// <returns>The normalized vector.</returns>
+		public Vec2 Normalized(bool allowZero = false)
+        {
+            float length = (float)Math.Sqrt(X * X + Y * Y);
+			if (length == 0) {
+				if (allowZero)
+					return this;
+				else
+					throw new InvalidOperationException("Attempt to Normalize a zero vector");
+			} else {
+				float invNorm = 1.0f / length;
+                return new Vec2(X * invNorm, Y * invNorm);
+            }
         }
 
         /// <summary>

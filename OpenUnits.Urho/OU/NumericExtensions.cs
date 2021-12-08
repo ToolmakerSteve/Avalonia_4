@@ -23,13 +23,6 @@ namespace OU
 
 
 
-        public static Vec2 Normalize(this Vec2 value)
-        {
-            return Vec2.Normalize(value);
-        }
-
-
-
         /// <summary>
         /// </summary>
         /// <param name="it"></param>
@@ -37,11 +30,6 @@ namespace OU
         static public Vec3 AsXZ(this Vec2 it)
         {
             return new Vec3(it.X, 0, it.Y);
-        }
-
-        public static Vec3 Normalize(this Vec3 value)
-        {
-            return Vec3.Normalize(value);
         }
     }
 }

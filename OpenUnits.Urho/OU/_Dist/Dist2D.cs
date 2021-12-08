@@ -217,15 +217,12 @@ namespace OU
 		}
 
 		// Return point with units length (or zero, if Me is zero).
-		public Dist2D Normalize
+		public Dist2D Normalized()
 		{
-			get
-			{
-				double len = Length.Value;
-				if (len == 0)
-					return this;
-				return this / len;
-			}
+			double len = Length.Value;
+			if (len == 0)
+				return this;
+			return this / len;
 		}
 
 		public PointF ToPointF()
@@ -359,7 +356,7 @@ namespace OU
 		public Dist2D SegmentNormal(Dist2D p2)
 		{
 			Dist2D normal1 = new Dist2D(-(p2.Y - Y), p2.X - X);
-			normal1 = normal1.Normalize;
+			normal1 = normal1.Normalized();
 			return normal1;
 		}
 

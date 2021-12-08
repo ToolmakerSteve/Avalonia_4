@@ -133,13 +133,10 @@ namespace OU
 		public DistD Length => DistD.FromDefaultUnits(Math.Sqrt(X.Value * X.Value + Y.Value * Y.Value + Z.Value * Z.Value));
 
 		// Return point with units length (or zero, if Me is zero).
-		public Dist3D Normalize
+		public Dist3D Normalized()
 		{
-			get
-			{
-				double len = this.Length.Value;
-				return len == 0 ? this : this / len;
-			}
+			double len = this.Length.Value;
+			return len == 0 ? this : this / len;
 		}
 
 
