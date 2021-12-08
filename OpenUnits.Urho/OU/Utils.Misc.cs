@@ -1136,13 +1136,23 @@ namespace OU
             return (a + b) * 0.5;
             //return Lerp(a, b, 0.5);
         }
-        public static DistD Average(DistD a, DistD b)
-        {
-            // Equivalent.
-            return (DistD)((a + b) * 0.5);
-            //return Lerp(a, b, 0.5);
-        }
-        public static Vector3 Average(Vector3 a, Vector3 b)
+		public static DistD Average(DistD a, DistD b)
+		{
+			// Equivalent.
+			return (a + b) * 0.5;
+			//return Lerp(a, b, 0.5);
+		}
+
+		public static Vec2 Average(Vec2 a, Vec2 b)
+		{
+			return ((a + b) * 0.5f);
+		}
+		public static Vec3 Average(Vec3 a, Vec3 b)
+		{
+			return ((a + b) * 0.5f);
+		}
+
+		public static Vector3 Average(Vector3 a, Vector3 b)
         {
             return Vector3.Lerp(a, b, 0.5F);
         }
@@ -1951,6 +1961,7 @@ namespace OU
         public const double Pi = 3.1415926535897931;  // NOTE: Double precision rounds final "2" to "1"
         public const double PiOver2 = Pi / 2;
         public const double PiOver4 = Pi / 4;
+		public static double Sqrt2 = Math.Sqrt(2);
 
         //        // Polar Coordinates
         //        public struct PolarPoint

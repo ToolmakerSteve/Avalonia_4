@@ -769,8 +769,35 @@ namespace OU
             return heading;
         }
 
-        // vector "heading" must have length 1.
-        public static Vec2 MoveOnHeading(Vec2 origin, Vec2 heading, float distance)
+		/// <summary>
+		/// </summary>
+		/// <param name="origin"></param>
+		/// <param name="destination"></param>
+		/// <returns>Unit vector that points from origin towards destination.</returns>
+		public static Vec2 HeadingTowards(Vec2 origin, Vec2 destination)
+		{
+			return (destination - origin).Normalized();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="origin">Place to start.</param>
+		/// <param name="destination">Place to move towards.</param>
+		/// <param name="distance">Distance to move.</param>
+		/// <returns></returns>
+		public static Vec2 MoveTowards(Vec2 origin, Vec2 destination, float distance)
+		{
+			return MoveOnHeading(origin, HeadingTowards(origin, destination), distance);
+		}
+		/// <summary>
+		/// vector "heading" must have length 1. (be Normalized)
+		/// </summary>
+		/// <param name="origin">Place to start.</param>
+		/// <param name="heading">Normalized direction to move in.</param>
+		/// <param name="distance">Distance to move.</param>
+		/// <returns></returns>
+		public static Vec2 MoveOnHeading(Vec2 origin, Vec2 heading, float distance)
         {
             return new Vec2(origin.X + distance * heading.X, origin.Y + distance * heading.Y);
         }

@@ -45,7 +45,7 @@ namespace AvaloniaSample
         public const bool WallKeys = true;   // Keys to control Wall Drawing. (StartNewWall)
         public const bool DrawWallPressDrag = true;   // In Top View.
         public const bool DrawWallAsFly = false && !DrawWallPressDrag;   // In Perspective View. TMS
-		const float InitialAltitude2 = 250;//tmstest 100;
+		const float InitialAltitude2 = 100;//tmstest 100;
 		static public bool ShowWireframe = false;//false;   // TMS
 		static public bool WireframeMaterialIsWall = true;   // However it won't show until set "ShowWireframe".
 

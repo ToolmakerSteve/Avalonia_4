@@ -342,34 +342,7 @@ namespace SceneSource
 
 						// TODO: Find sharp bends, add special segment.
 						if (IsBendLarge(cl0, cl1, cl2, out float degreesFromStraight, out float midlineHeadingDegrees)) {
-							// NOTE: First parameter is the point NEAR to bend.
-							// TODO HACK: We "know" AddWallSegment ignores y, so we simply use zero.
-							// Better would be to change all the Vec3s to Vec2s.
-							Vec2 joinPtBefore = CalcJoinPoint(cl1, cl0, degreesFromStraight);
-							Vec2 joinPtAfter = CalcJoinPoint(cl1, cl2, degreesFromStraight);
-							// TODO: perp1 is wrong. Works for long segment because it is ignored.
-							AddWallSegments(cl0, joinPtBefore, perp0, perp1, terrain, normals);
-							Vec2 bendPerp0 = CalcPerpendicular(cl0, cl1);
-							Vec2 bendPerp1 = CalcPerpendicular(cl1, cl2);
-							// TODO: Add bend segment. Need a special shape; this is an approximation to that.
-							if (false)
-								// This shape gets very thin for sharp bend (doubling-back).
-								AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
-							else {
-								Vec2 adjustedJoinXZ = cl1;
-								// TBD: Only certain angle range?
-								if (false) {
-									float midlineHeadingRadians = U.ToRadians(midlineHeadingDegrees);
-									adjustedJoinXZ = U.MoveOnAngleRadians(adjustedJoinXZ, midlineHeadingRadians, (float)Width / 2); ;
-								}
-								//Vec3 adjustedJoin = ProjectToTerrain(adjustedJoinXZ, terrain, TopMetersF);
-								// See how it looks to extend join area to the center line point.
-								// TODO: This should be along "midline".
-								Vec2 bendPerpMid = CalcPerpendicular(joinPtBefore, joinPtAfter);
-								// TODO: CollapsedStart or End makes bend segment - and a trailing segment - dark on top.
-								AddWallSegment(joinPtBefore, adjustedJoinXZ, bendPerp0, bendPerpMid, terrain, normals);//ttt, SegmentShape.CollapsedEnd);
-								AddWallSegment(adjustedJoinXZ, joinPtAfter, bendPerpMid, bendPerp1, terrain, normals);//ttt, SegmentShape.CollapsedStart);
-							}
+							Vec2 joinPtAfter = AddWallSegmentsForBend(terrain, cl0, cl1, cl2, perp0, perp1, degreesFromStraight, midlineHeadingDegrees, normals);
 							// Adjust next segment to start after bend.
 							cl1 = joinPtAfter;
 						} else {
@@ -398,6 +371,150 @@ namespace SceneSource
 			AddWallSegments(cl0, cl1, perp0, perp1, terrain, normals);
 
 			FinishGeometry();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="terrain"></param>
+		/// <param name="cl0">Previous point.</param>
+		/// <param name="cl1">Bend point (on center-line)</param>
+		/// <param name="cl2">Next point.</param>
+		/// <param name="perp0"></param>
+		/// <param name="perp1"></param>
+		/// <param name="degreesFromStraight"></param>
+		/// <param name="midlineHeadingDegrees"></param>
+		/// <param name="normals"></param>
+		/// <returns></returns>
+		private Vec2 AddWallSegmentsForBend(Terrain terrain, Vec2 cl0, Vec2 cl1, Vec2 cl2, Vec2 perp0, Vec2 perp1,
+											float degreesFromStraight, float midlineHeadingDegrees, Vec3?[] normals)
+		{
+			// NOTE: First parameter is the point NEAR to bend.
+			// TODO HACK: We "know" AddWallSegment ignores y, so we simply use zero.
+			// Better would be to change all the Vec3s to Vec2s.
+			Vec2 joinPtBefore = CalcJoinPoint(cl1, cl0, degreesFromStraight);
+			Vec2 joinPtAfter = CalcJoinPoint(cl1, cl2, degreesFromStraight);
+			// TODO: perp1 is wrong. Works for long segment because it is ignored.
+			AddWallSegments(cl0, joinPtBefore, perp0, perp1, terrain, normals);
+			Vec2 bendPerp0 = CalcPerpendicular(cl0, cl1);
+			Vec2 bendPerp1 = CalcPerpendicular(cl1, cl2);
+			// TBD: Good value? Somewhat less than 90.
+			float shallowBendDegrees = 75;
+			// Add bend segment. TODO: Need a special shape; this is an approximation to that.
+			// Find where inner walls intersect.
+			Vec2 innerIntersection = CalcInnerIntersection(cl0, cl1, cl2, joinPtBefore, joinPtAfter,
+														   bendPerp0, bendPerp1,
+														   out Vec2 outsidePtBefore, out Vec2 outsidePtAfter);
+			if (degreesFromStraight < shallowBendDegrees) {
+				// This shape would get very thin for sharp bend (doubling-back).
+				//AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
+				AddShallowBendSegment(innerIntersection, outsidePtBefore, outsidePtAfter,
+									  terrain, normals);
+			} else {
+				// This will be CENTER of this approx shape.
+				// TODO: Unless we alter the WIDTH, the shape won't blend well with wall...
+				Vec2 adjustedJoin = cl1;
+				if (true) {
+					// Find point along midline (from innerInt. to bend point) - don't let it go too long.
+					float insideLength = (cl1 - innerIntersection).Length();
+					float limitLength = (float)(U.Sqrt2 * Width);
+					if (insideLength < limitLength) {
+						//// Don't be longer than 2*insideLength.
+						//limitLength = Math.Min(2 * insideLength, limitLength);
+						// HACK: Adjust back towards center, from outside point. So drawing with Width will put outside point at previous limitLength.
+						float halfWidth = (float)(0.5f * Width);
+						limitLength -= halfWidth;
+						adjustedJoin = U.MoveTowards(innerIntersection, cl1, limitLength);
+					}
+				}
+				// TBD: Only certain angle range?
+				if (false) {
+					float midlineHeadingRadians = U.ToRadians(midlineHeadingDegrees);
+					adjustedJoin = U.MoveOnAngleRadians(adjustedJoin, midlineHeadingRadians, (float)Width / 2); ;
+				}
+				// See how it looks to extend join area to the center line point.
+				// TODO: This should be along "midline".
+				Vec2 bendPerpMid = CalcPerpendicular(joinPtBefore, joinPtAfter);
+				// TODO: CollapsedStart or End makes bend segment - and a trailing segment - dark on top.
+				AddWallSegment(joinPtBefore, adjustedJoin, bendPerp0, bendPerpMid, terrain, normals);//ttt, SegmentShape.CollapsedEnd);
+				AddWallSegment(adjustedJoin, joinPtAfter, bendPerpMid, bendPerp1, terrain, normals);//ttt, SegmentShape.CollapsedStart);
+			}
+
+			return joinPtAfter;
+		}
+
+		private void AddShallowBendSegment(Vec2 innerIntersection, Vec2 outsidePtBefore, Vec2 outsidePtAfter,
+										   Terrain terrain, Vec3?[] normals)
+		{
+			// To specify how UVs should be assigned, we make this "triangle" into a quad with very close endpoints on inside.
+			Vec2 unitDelta = (outsidePtAfter - outsidePtBefore).Normalized();
+			Vec2 tinyDelta = 0.001f * unitDelta;
+			// Move these parallel to outside edge, an invisibly small amount.
+			Vec2 insidePtBeforeXZ = innerIntersection - tinyDelta;
+			Vec2 insidePtAfterXZ = innerIntersection + tinyDelta;
+			// TODO: What is best way to deal with uneven ground near bend?
+			// --- this approach forces inside to be flat and outside to be flat. But there can be "gap" with neighboring segments.
+			//var wallTopInsidePts = ProjectPointsToWallTop(insidePtBeforeXZ, insidePtAfterXZ, TopMetersF, terrain);
+			//var wallTopOutsidePts = ProjectPointsToWallTop(outsidePtBefore, outsidePtAfter, TopMetersF, terrain);
+			//var wallPair0 = new U.Pair<Vec3>(wallTopInsidePts.First, wallTopOutsidePts.First);
+			//var wallPair1 = new U.Pair<Vec3>(wallTopInsidePts.Second, wallTopOutsidePts.Second);
+			// --- this approach (approximately) matches each edge with the neighboring segment --
+			var wallPair0 = ProjectPointsToWallTop(insidePtBeforeXZ, outsidePtBefore, TopMetersF, terrain);
+			var wallPair1 = ProjectPointsToWallTop(insidePtAfterXZ, outsidePtAfter, TopMetersF, terrain);
+			_AddWallSegment(wallPair0, wallPair1, terrain, normals);
+		}
+
+		private Vec2 CalcInnerIntersection(Vec2 cl0, Vec2 cl1, Vec2 cl2,
+										   Vec2 joinPtBefore, Vec2 joinPtAfter, Vec2 bendPerp0, Vec2 bendPerp1,
+										   out Vec2 outsidePtBefore, out Vec2 outsidePtAfter)
+		{
+			// HACK: Rather than figure out WHICH wall sides are closest, calculate both sides,
+			// find closest ones.
+			U.Pair<Vec3> sidesBefore = WallPerpendicularOnTerrain(joinPtBefore, WidthMetersF, bendPerp0, 0, null);
+			U.Pair<Vec3> sidesAfter = WallPerpendicularOnTerrain(joinPtAfter, WidthMetersF, bendPerp1, 0, null);
+			U.Pair<Vec2> closestSidePts = ClosestSidePtsXZ(sidesBefore, sidesAfter,
+														   out outsidePtBefore, out outsidePtAfter);
+			//float error = (closestSidePts.Second - closestSidePts.First).Length();
+			//if (error > 0.1)
+			//	U.Dubious();
+
+			Vec2 innerIntersection = U.Average(closestSidePts.First, closestSidePts.Second);
+			return innerIntersection;
+		}
+
+		private U.Pair<Vec2> ClosestSidePtsXZ(U.Pair<Vec3> a, U.Pair<Vec3> b,
+											  out Vec2 farPtA, out Vec2 farPtB)
+		{
+			Vec2 a1 = a.First.XZ();
+			var a2 = a.Second.XZ();
+			var b1 = b.First.XZ();
+			var b2 = b.Second.XZ();
+
+			// Accumulate closest solution.
+			float minDistSq = float.MaxValue;
+			Vec2 bestA = a1;   // Overridden in first call below.
+			Vec2 bestB = b1;
+			AccumMinDistSq(a1, b1, ref minDistSq, ref bestA, ref bestB);
+			AccumMinDistSq(a1, b2, ref minDistSq, ref bestA, ref bestB);
+			AccumMinDistSq(a2, b1, ref minDistSq, ref bestA, ref bestB);
+			AccumMinDistSq(a2, b2, ref minDistSq, ref bestA, ref bestB);
+
+			// The far points are the ones not chosen.
+			farPtA = bestA == a1 ? a2 : a1;
+			farPtB = bestB == b1 ? b2 : b1;
+			
+			return new U.Pair<Vec2>(bestA, bestB);
+		}
+
+		private void AccumMinDistSq(Vec2 a, Vec2 b,
+								    ref float minDistSq, ref Vec2 bestA, ref Vec2 bestB)
+		{
+			float distSq = (b - a).LengthSquared();
+			if (distSq < minDistSq) {
+				minDistSq = distSq;
+				bestA = a;
+				bestB = b;
+			}
 		}
 
 		private void DumpPoints()
@@ -485,22 +602,29 @@ namespace SceneSource
 
 			_currentWallSegmentCount++;
 
+			// On top of wall.
+			U.Pair<Vec3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
+			U.Pair<Vec3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
+			_AddWallSegment(wallPair0, wallPair1, terrain, normals);
+		}
+
+		private void _AddWallSegment(U.Pair<Vec3> wallPair0, U.Pair<Vec3> wallPair1,
+									 Terrain terrain, Vec3?[] normals)
+		{
+
 			// Accumulate previous values. For averaging adjacent segment normals.
 			Vec3? normTop = normals[0];
 			Vec3? normBtm = normals[1];
 			Vec3? normSide1 = normals[2];
 			Vec3? normSide2 = normals[3];
 
-			// On top of wall.
-			U.Pair<Vec3> wallPair0 = WallPerpendicularOnTerrain(cl0, WidthMetersF, perp0, TopMetersF, terrain);
-			U.Pair<Vec3> wallPair1 = WallPerpendicularOnTerrain(cl1, WidthMetersF, perp1, TopMetersF, terrain);
-			if (shape == SegmentShape.CollapsedStart) {
-				var wallTop0 = ProjectToTerrain(cl0, terrain, TopMetersF);
-				wallPair0 = new U.Pair<Vec3>(wallTop0, wallTop0);
-			} else if (shape == SegmentShape.CollapsedEnd) {
-				var wallTop1 = ProjectToTerrain(cl1, terrain, TopMetersF);
-				wallPair1 = new U.Pair<Vec3>(wallTop1, wallTop1);
-			}
+			//if (shape == SegmentShape.CollapsedStart) {
+			//	var wallTop0 = ProjectToTerrain(cl0, terrain, TopMetersF);
+			//	wallPair0 = new U.Pair<Vec3>(wallTop0, wallTop0);
+			//} else if (shape == SegmentShape.CollapsedEnd) {
+			//	var wallTop1 = ProjectToTerrain(cl1, terrain, TopMetersF);
+			//	wallPair1 = new U.Pair<Vec3>(wallTop1, wallTop1);
+			//}
 
 			// Wall Segment: Top of wall.
 			AddQuad(TopPoly, wallPair0, wallPair1, Poly3D.QuadVOrder.WallTop, ref normTop, false, false, false);
@@ -508,13 +632,13 @@ namespace SceneSource
 
 			U.Pair<Vec3> groundPair0 = ProjectToTerrain(wallPair0, terrain, BottomMetersF);
 			U.Pair<Vec3> groundPair1 = ProjectToTerrain(wallPair1, terrain, BottomMetersF);
-			if (shape == SegmentShape.CollapsedStart) {
-				var wallBottom0 = ProjectToTerrain(cl0, terrain, BottomMetersF);
-				groundPair0 = new U.Pair<Vec3>(wallBottom0, wallBottom0);
-			} else if (shape == SegmentShape.CollapsedEnd) {
-				var wallBottom1 = ProjectToTerrain(cl1, terrain, BottomMetersF);
-				groundPair1 = new U.Pair<Vec3>(wallBottom1, wallBottom1);
-			}
+			//if (shape == SegmentShape.CollapsedStart) {
+			//	var wallBottom0 = ProjectToTerrain(cl0, terrain, BottomMetersF);
+			//	groundPair0 = new U.Pair<Vec3>(wallBottom0, wallBottom0);
+			//} else if (shape == SegmentShape.CollapsedEnd) {
+			//	var wallBottom1 = ProjectToTerrain(cl1, terrain, BottomMetersF);
+			//	groundPair1 = new U.Pair<Vec3>(wallBottom1, wallBottom1);
+			//}
 
 			// Wall Segment: Bottom of wall.
 			//AddQuad(BottomPoly, groundPair0, groundPair1, Poly3D.QuadVOrder.WallBottom, ref normBtm);
@@ -546,10 +670,6 @@ namespace SceneSource
 			}
 			CreateEndPoly(wallPair1, groundPair1, terrain);
 		}
-
-		//internal void CalcTangents()
-		//{
-		//}
 		#endregion
 
 		#region --- AddPoint, Flush ----------------------------------------
@@ -923,28 +1043,39 @@ namespace SceneSource
 		/// <returns>Two points above terrain, perpendicular to wall center, "wallWidth" apart.</returns>
 		private U.Pair<Vec3> WallPerpendicularOnTerrain(
                     Vec2 wallCenter, float wallWidth, Vec2 perpendicularUnit, float wallTop, Terrain terrain)
-        {
-            float halfWidth = wallWidth / 2.0f;
-            Vec2 halfPerp = perpendicularUnit * halfWidth;
-            Vec2 firstXZ = wallCenter - halfPerp;
-            Vec2 secondXZ = wallCenter + halfPerp;
+		{
+			float halfWidth = wallWidth / 2.0f;
+			Vec2 halfPerp = perpendicularUnit * halfWidth;
+			Vec2 firstXZ = wallCenter - halfPerp;
+			Vec2 secondXZ = wallCenter + halfPerp;
+			return ProjectPointsToWallTop(firstXZ, secondXZ, wallTop, terrain);
+		}
+
+		private static U.Pair<Vec3> ProjectPointsToWallTop(Vec2 firstXZ, Vec2 secondXZ, float wallTop, Terrain terrain)
+		{
 			float firstAltitude, secondAltitude;
 			if (false) {
 				// This results in an "uneven top" cross-section, if ground slopes perpendicular to the wall.
 				firstAltitude = U2.GetTerrainHeight(terrain, firstXZ) + wallTop;
 				secondAltitude = U2.GetTerrainHeight(terrain, secondXZ) + wallTop;
 			} else {
-				float terrainHeight = U.Average(U2.GetTerrainHeight(terrain, firstXZ),
-												U2.GetTerrainHeight(terrain, secondXZ));
+				float terrainHeight;
+				if (false) {
+					terrainHeight = U.Average(U2.GetTerrainHeight(terrain, firstXZ),
+											  U2.GetTerrainHeight(terrain, secondXZ));
+				} else {
+					// To make it easier to match at bend, we take height on centerline point.
+					terrainHeight = U2.GetTerrainHeight(terrain, U.Average(firstXZ, secondXZ));
+				}
 				float wallAltitude = terrainHeight + wallTop;
 				firstAltitude = wallAltitude;
 				secondAltitude = wallAltitude;
 			}
 
-            return new U.Pair<Vec3>(U2.FromXZ(firstXZ, firstAltitude),
+			return new U.Pair<Vec3>(U2.FromXZ(firstXZ, firstAltitude),
 									U2.FromXZ(secondXZ, secondAltitude));
-        }
-        #endregion
+		}
+		#endregion
 
-    }
+	}
 }
