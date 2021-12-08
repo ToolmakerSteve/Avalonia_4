@@ -577,7 +577,7 @@ namespace OU
 
         //        // Given start and end directions in XY, return rotation in radians that
         //        // will move from start to end.
-        //        public static float headingChangeAsRotationRadians2D(Vec2D startHeading, Vec2D endHeading)
+        //        public static float headingChangeAsRotationRadians2D(Vec2 startHeading, Vec2 endHeading)
         //        {
         //            float rotationRadians = headingAsAngleRadians2D(endHeading) - headingAsAngleRadians2D(startHeading);
         //            return rotationRadians;
@@ -587,12 +587,12 @@ namespace OU
         //        // Is that "0" direction (1, 0)?
         //        public static float headingAsAngleRadians2D(Dist2D heading)
         //        {
-        //            return headingAsAngleRadians2D(new Vec2D(heading));
+        //            return headingAsAngleRadians2D(new Vec2(heading));
         //        }
 
         //        // Atan2 implicitly makes some direction "angle 0".
         //        // Is that "0" direction (1, 0)?
-        //        public static float headingAsAngleRadians2D(Vec2D heading)
+        //        public static float headingAsAngleRadians2D(Vec2 heading)
         //        {
         //            float angleRadians = (float)Math.Atan2(heading.Y, heading.X);
         //            return angleRadians;
@@ -759,9 +759,9 @@ namespace OU
 
 
 
-        public static Vec2D AngleRadiansAsHeading(float angleRadians)
+        public static Vec2 AngleRadiansAsHeading(float angleRadians)
         {
-            Vec2D heading = new Vec2D(Math.Cos(angleRadians), Math.Sin(angleRadians));
+            Vec2 heading = new Vec2((float)Math.Cos(angleRadians), (float)Math.Sin(angleRadians));
 
             // Verify ~ "angleRadians".
             //float verifyAngle = HeadingAsAngleRadians2D(heading);
@@ -770,22 +770,22 @@ namespace OU
         }
 
         // vector "heading" must have length 1.
-        public static Vec2D MoveOnHeading(Vec2D origin, Vec2D heading, double distance)
+        public static Vec2 MoveOnHeading(Vec2 origin, Vec2 heading, float distance)
         {
-            return new Vec2D(origin.X + distance * heading.X, origin.Y + distance * heading.Y);
+            return new Vec2(origin.X + distance * heading.X, origin.Y + distance * heading.Y);
         }
 
-        public static Vec2D MoveOnAngleRadians(Vec2D origin, float angleRadians, double distance)
+        public static Vec2 MoveOnAngleRadians(Vec2 origin, float angleRadians, float distance)
         {
-            Vec2D heading = AngleRadiansAsHeading(angleRadians);
+            Vec2 heading = AngleRadiansAsHeading(angleRadians);
             return MoveOnHeading(origin, heading, distance);
         }
 
         // Ignores origin.Z. TODO: Need option for XZ ground plane (ignores Y).
-        public static Vec2D MoveOnAngleRadians(Vec3D origin, float angleRadians, double distance)
+        public static Vec2 MoveOnAngleRadians(Vec3 origin, float angleRadians, float distance)
         {
-            Vec2D heading = AngleRadiansAsHeading(angleRadians);
-            return MoveOnHeading(new Vec2D(origin.X, origin.Y), heading, distance);
+            Vec2 heading = AngleRadiansAsHeading(angleRadians);
+            return MoveOnHeading(new Vec2(origin.X, origin.Y), heading, distance);
         }
 
 

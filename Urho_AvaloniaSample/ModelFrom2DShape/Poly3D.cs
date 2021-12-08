@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using LineLayer3D;
+using OU;
 using SceneSource;
 using Urho;
 using U = OU.Utils;
@@ -102,16 +103,16 @@ namespace ModelFrom2DShape
 			}
 		}
 
-		static private void FindCorner(int ii, CwCorner[] corners, int[] lookups, Vector3[] vertices,
-										  out Vector3 vertex, out Vector2 uv)
+		static private void FindCorner(int ii, CwCorner[] corners, int[] lookups, Vec3[] vertices,
+										  out Vec3 vertex, out Vector2 uv)
 		{
 			vertex = FindCornerVertex(ii, lookups, vertices);
 			uv = FindCornerUV(ii, corners);
 		}
 
-		private static Vector3 FindCornerVertex(int ii, int[] lookups, Vector3[] vertices)
+		private static Vec3 FindCornerVertex(int ii, int[] lookups, Vec3[] vertices)
 		{
-			Vector3 vertex;
+			Vec3 vertex;
 			int lookup = lookups[ii];
 			vertex = vertices[lookup];
 			return vertex;
@@ -326,7 +327,7 @@ namespace ModelFrom2DShape
 				// TBD: What should bounds be?
 				return _boundingBox;
 
-			Vector3 minV, maxV;
+			Vec3 minV, maxV;
 			U.InitMinMax(out minV, out maxV);
 
 			foreach (var vec in Positions()) {
@@ -335,7 +336,7 @@ namespace ModelFrom2DShape
 
 			_boundingBox = new BoundingBox(minV, maxV);
 			//// tmstest: Does it help lighting to be larger?
-			_boundingBox = new BoundingBox(minV - new Vector3(1,1,1), maxV + new Vector3(1, 1, 1));
+			_boundingBox = new BoundingBox(minV - new Vec3(1,1,1), maxV + new Vec3(1, 1, 1));
 			return _boundingBox;
 		}
 
@@ -358,15 +359,15 @@ namespace ModelFrom2DShape
 		/// <param name="invertU"></param>
 		/// <param name="invertWinding"></param>
 		/// <param name="doUpdateBuffers">default true. Can be false until last quad. Or call UpdateBufferData directly.</param>
-		internal void AddQuad(U.Pair<Vector3> wallPair0, U.Pair<Vector3> wallPair1, QuadVOrder quadVOrder,
-							  ref Vector3? normal, bool invertNorm, bool invertU, bool invertWinding,
+		internal void AddQuad(U.Pair<Vec3> wallPair0, U.Pair<Vec3> wallPair1, QuadVOrder quadVOrder,
+							  ref Vec3? normal, bool invertNorm, bool invertU, bool invertWinding,
 							  bool doUpdateBuffers = true)
         {
             NumQuads++;
 
-			Vector3[] vertices0 = new[] {wallPair0.First, wallPair0.Second, wallPair1.First, wallPair1.Second};
+			Vec3[] vertices0 = new[] {wallPair0.First, wallPair0.Second, wallPair1.First, wallPair1.Second};
 			// Re-arrange to form quad. Clockwise order.
-			Vector3[] verticesQ = ReorderVertices(vertices0, quadVOrder);
+			Vec3[] verticesQ = ReorderVertices(vertices0, quadVOrder);
 			var vTL = verticesQ[0];
 			var vTR = verticesQ[1];
 			var vBR = verticesQ[2];
@@ -374,11 +375,11 @@ namespace ModelFrom2DShape
 
 			// TL, TR, BL - 3 corners forming "L". Clockwise.
 			// "-" EXPLAIN: Pointing out instead of pointing in. (OR I may have it reversed elsewhere.)
-			Vector3 newNormal = -U.Normal(vTL, vTR, vBL);
+			Vec3 newNormal = -U.Normal(vTL, vTR, vBL);
 			if (invertNorm)
 				newNormal *= -1;
 
-			Vector3 avgNormal = (normal.HasValue) ? (0.5f * (newNormal + normal.Value)) : newNormal;
+			Vec3 avgNormal = (normal.HasValue) ? (0.5f * (newNormal + normal.Value)) : newNormal;
             if (GroundLine.SingleGeometryTEST)
             {
                 avgNormal = newNormal;   // for test, normals are not related.
@@ -400,11 +401,11 @@ namespace ModelFrom2DShape
    //             }
    //         }
 
-			float dy1 = (vBL - vTL).LengthFast;
-			float dy2 = (vBR - vTR).LengthFast;
-            float dy = Math.Max(dy1, dy2);
-			float dx1 = (vTR - vTL).LengthFast;
-			float dx2 = (vBR - vBL).LengthFast;
+			float dy1 = (vBL - vTL).Length(); //TBD: LengthFast;
+			float dy2 = (vBR - vTR).Length(); //TBD: LengthFast;
+			float dy = Math.Max(dy1, dy2);
+			float dx1 = (vTR - vTL).Length(); //TBD: LengthFast;
+			float dx2 = (vBR - vBL).Length(); //TBD: LengthFast;
 			float dx = Math.Max(dx1, dx2);
 
 			float deltaU = TextureScale * dx;
@@ -478,11 +479,11 @@ namespace ModelFrom2DShape
 
 			return s_LookupCorners_Default;
 		}
-		static private Vector3[] ReorderVertices(Vector3[] vertices0, QuadVOrder quadVOrder)
+		static private Vec3[] ReorderVertices(Vec3[] vertices0, QuadVOrder quadVOrder)
 		{
 			var lookups = GetLookupCorners(quadVOrder);
 
-			Vector3[] vertices = new Vector3[4];
+			Vec3[] vertices = new Vec3[4];
 			for (int ii = 0; ii < lookups.Length; ii++) {
 				var lookup = lookups[ii];
 				//vertices[lookup] = vertices0[ii];
@@ -505,7 +506,7 @@ namespace ModelFrom2DShape
 		//}
 
 
-		private void AppendVertex(Vector3 position, uint uvIdx, Vector3 normal, Vector2 uvScale)
+		private void AppendVertex(Vec3 position, uint uvIdx, Vec3 normal, Vector2 uvScale)
         {
             if (_usedVertices >= _numVertices)
                 throw new InvalidProgramException("AppendVertex - must extend capacity beforehand");
@@ -519,7 +520,7 @@ namespace ModelFrom2DShape
 		/// </summary>
 		/// <param name="position"></param>
 		/// <param name="relIndex">-1 for previous vertex, -2 for one before that.</param>
-		private void UpdateRecentVertex(Vector3 position, int relIndex, uint uvIdx, Vector3 adjNormal)
+		private void UpdateRecentVertex(Vec3 position, int relIndex, uint uvIdx, Vec3 adjNormal)
         {
 			return;   // TODO: No longer valid; vertices have been re-ordered to be quad.
             uint floatIndex = (uint)(_usedVFloats + (FloatsPerVertex * relIndex));
@@ -535,8 +536,8 @@ namespace ModelFrom2DShape
 		/// <param name="normal"></param>
 		/// <param name="uvScale">Used when updateUV=true</param>
 		/// <param name="updateUV"></param>
-        private void UpdateVertex(Vector3 position, uint uvIdx, uint iVFloat,
-								  Vector3 normal, Vector2? uvScale)
+        private void UpdateVertex(Vec3 position, uint uvIdx, uint iVFloat,
+								  Vec3 normal, Vector2? uvScale)
         {
             VData[iVFloat++] = position.X;
             VData[iVFloat++] = position.Y;
@@ -677,7 +678,7 @@ namespace ModelFrom2DShape
 		{
 			//Debug.WriteLine($"\n----- VData n={_numVertices} -----");
 			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
-				GetVertexData(iVertex, out Vector3 position, out Vector3 normal,
+				GetVertexData(iVertex, out Vec3 position, out Vec3 normal,
 							  out Vector2 uv, out Vector4 tangent);
 				//Debug.WriteLine($"{position}, {normal}, {uv}, {tangent}");
 			}
@@ -689,7 +690,7 @@ namespace ModelFrom2DShape
 			//Debug.WriteLine($"-----  -----\n");
 		}
 
-		private void GetVertexData(int iVertex, out Vector3 position, out Vector3 normal,
+		private void GetVertexData(int iVertex, out Vec3 position, out Vec3 normal,
 								   out Vector2 uv, out Vector4 tangent)
 		{
 			position = GetVertexPosition(iVertex);
@@ -698,17 +699,17 @@ namespace ModelFrom2DShape
 			tangent = GetVertexTangent(iVertex);
 		}
 
-		public Vector3 GetVertexPosition(int iVertex)
+		public Vec3 GetVertexPosition(int iVertex)
 		{
 			return U2.AsVector3(VData, (uint)(FloatsPerVertex * iVertex + PositionOffset));
 		}
 
-		public Vector3 GetVertexNormal(int iVertex)
+		public Vec3 GetVertexNormal(int iVertex)
 		{
 			if (HasNormals)
 				return U2.AsVector3(VData, (uint)(FloatsPerVertex * iVertex + NormalOffset));
 			else
-				return new Vector3();
+				return new Vec3();
 		}
 
 		public Vector2 GetVertexUV(int iVertex)
@@ -728,11 +729,11 @@ namespace ModelFrom2DShape
 		}
 
 
-		private IEnumerable<Vector3> Positions()
+		private IEnumerable<Vec3> Positions()
 		{
 			uint offset = PositionOffset;
 			for (int iVertex = 0; iVertex < _numVertices; iVertex++) {
-				Vector3 vec = new Vector3(
+				Vec3 vec = new Vec3(
 					VData[offset], VData[offset + 1], VData[offset + 2]);
 				yield return vec;
 				offset += FloatsPerVertex;

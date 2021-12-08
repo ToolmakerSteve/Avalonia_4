@@ -360,9 +360,9 @@ namespace SceneSource
 								// Above shape gets very thin for sharp bend (doubling-back).
 								Vec2 adjustedJoinXZ = cl1.XZ();
 								// TBD: Only certain angle range?
-								if (true) {
+								if (false) {
 									float midlineHeadingRadians = U.ToRadians(midlineHeadingDegrees);
-									adjustedJoinXZ = U.MoveOnAngleRadians(adjustedJoinXZ, midlineHeadingRadians, Width / 2); ;
+									adjustedJoinXZ = U.MoveOnAngleRadians(adjustedJoinXZ, midlineHeadingRadians, (float)Width / 2); ;
 								}
 								Vec3 adjustedJoin = ProjectToTerrain(adjustedJoinXZ, terrain, TopMetersF);
 								// See how it looks to extend join area to the center line point.
@@ -434,7 +434,7 @@ namespace SceneSource
 		private void AddWallSegments(Vec3 cl0, Vec3 cl1, Vec2 perp0, Vec2 perp1, Terrain terrain, Vec3?[] normals)
 		{
 			// Decide whether to break into smaller pieces, to better follow terrain.
-			float segmentLength = (cl1 - cl0).LengthFast;
+			float segmentLength = (cl1 - cl0).Length(); //TBD: LengthFast;
 			if (segmentLength > MaxWallSegmentLength) {
 				// Smallest number of segments such that no segment is greater than Max.
 				int nSegments = (int)Math.Ceiling(segmentLength / MaxWallSegmentLength);

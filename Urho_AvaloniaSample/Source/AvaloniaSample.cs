@@ -536,7 +536,7 @@ namespace AvaloniaSample
 			Ray cameraRay = CurrentCamera.GetScreenRay(normScreenPt.X, normScreenPt.Y);
 			var result = Octree.RaycastSingle(cameraRay, RayQueryLevel.Triangle, 10000, DrawableFlags.Geometry);
 			if (result != null) {
-				groundPt = result.Value.Position.XZ();
+				groundPt = ((Vec3)result.Value.Position).XZ();
 				//Debug.WriteLine($"--- mouse={Input.MousePosition} -> {groundPt} in scene ---");
 				return true;
 			}
@@ -575,7 +575,7 @@ namespace AvaloniaSample
 				// When freehand drawing, and deferring a point for smoothing, catch up to mouse position.
 				CurrentWall.Flush();
 				// NOTE: Currently we don't allow you to draw a "single-point" wall.
-				if (!LastPenPosition2D.NearlyEquals(LastWallPosition2D, 0.05f)) {
+				if (!((Vec2)LastPenPosition2D).NearlyEquals(LastWallPosition2D, 0.05f)) {
 					CurrentWall.AddPoint(LastPenPosition2D.asDist());
 					LastWallPosition2D = LastPenPosition2D;
 					CurrentWall.Flush();

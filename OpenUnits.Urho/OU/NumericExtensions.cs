@@ -22,6 +22,14 @@ namespace OU
         static public Dist2D asMeters(this Vector2 v2) { return Dist2D.FromMeters(v2.X, v2.Y); }
 
 
+
+        public static Vec2 Normalize(this Vec2 value)
+        {
+            return Vec2.Normalize(value);
+        }
+
+
+
         /// <summary>
         /// </summary>
         /// <param name="it"></param>
