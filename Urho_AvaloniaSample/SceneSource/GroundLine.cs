@@ -354,7 +354,7 @@ namespace SceneSource
 							Vec2 bendPerp0 = CalcPerpendicularXZ(cl0, cl1);
 							Vec2 bendPerp1 = CalcPerpendicularXZ(cl1, cl2);
 							// TODO: Add bend segment. That needs a special shape; this is an approximation to that.
-							if (true)
+							if (false)
 								AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
 							else {
 								// Above shape gets very thin for sharp bend (doubling-back).
@@ -366,8 +366,11 @@ namespace SceneSource
 								}
 								Vec3 adjustedJoin = ProjectToTerrain(adjustedJoinXZ, terrain, TopMetersF);
 								// See how it looks to extend join area to the center line point.
-								AddWallSegment(joinPtBefore, adjustedJoin, bendPerp0, bendPerp1, terrain, normals, SegmentShape.CollapsedEnd);
-								AddWallSegment(adjustedJoin, joinPtAfter, bendPerp0, bendPerp1, terrain, normals, SegmentShape.CollapsedStart);
+								// TODO: This should be along "midline".
+								Vec2 bendPerpMid = CalcPerpendicularXZ(joinPtBefore, joinPtAfter);
+								// TODO: CollapsedStart or End makes bend segment - and a trailing segment - dark on top.
+								AddWallSegment(joinPtBefore, adjustedJoin, bendPerp0, bendPerpMid, terrain, normals);//ttt, SegmentShape.CollapsedEnd);
+								AddWallSegment(adjustedJoin, joinPtAfter, bendPerpMid, bendPerp1, terrain, normals);//ttt, SegmentShape.CollapsedStart);
 							}
 							// Adjust next segment to start after bend.
 							cl1 = joinPtAfter;
