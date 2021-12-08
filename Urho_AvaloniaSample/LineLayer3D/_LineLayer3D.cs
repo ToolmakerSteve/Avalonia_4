@@ -237,6 +237,7 @@ namespace LineLayer3D
 		{
 			nextDelta = nextEP - curEP;
 			nextDir = nextDelta;
+			// Urho's Normalize changes the source vector (instead of returning a new vector).
 			nextDir.NormalizeFast(); // Normalize();
 
 			Vector2 nextPerpDir = new Vector2(nextDir.Y, -nextDir.X);

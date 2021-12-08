@@ -28,14 +28,14 @@ namespace SceneSource
 		}
 		// true to create new wall BEFORE mouse down.
 		// TBD: Need code to throw away any "unused" wall, when done editing.
-		public const bool PreCreateWall = true;
+		public const bool PreCreateWall = false;//true;
 		// false to smooth while creating the quads.
 		// Will change to true once I have "fix-up" code on mouse up,
 		// that re-calculates the quads, to smooth curves and add bend transitions.
 		public const bool AddOnlyNewQuads = false;//true;
 
 		public const float MinWallSegmentLength = GroundLine.SingleGeometryTEST ? 5 : 0.5f;//1f;//0.5f;   // TBD: Good value.
-		// To better follow ground unevenness. TBD: Should examine ground underneath, adapt as needed.
+																						   // To better follow ground unevenness. TBD: Should examine ground underneath, adapt as needed.
 		public static float MaxWallSegmentLength = Math.Max(5, MinWallSegmentLength + U.VerySmallF);
 
 		// false: To save time, do this on mouse up. Can do it better then anyway.
@@ -354,7 +354,7 @@ namespace SceneSource
 							Vec2 bendPerp0 = CalcPerpendicularXZ(cl0, cl1);
 							Vec2 bendPerp1 = CalcPerpendicularXZ(cl1, cl2);
 							// TODO: Add bend segment. That needs a special shape; this is an approximation to that.
-							if (false)
+							if (true)
 								AddWallSegment(joinPtBefore, joinPtAfter, bendPerp0, bendPerp1, terrain, normals);
 							else {
 								// Above shape gets very thin for sharp bend (doubling-back).
@@ -898,8 +898,7 @@ namespace SceneSource
 
             Vec2 delta = pb2 - pa2;
             Vec2 perpendicularUnit = U.RotateByDegrees(delta, 90);
-            perpendicularUnit.Normalize();
-            return perpendicularUnit;
+            return perpendicularUnit.Normalize();
         }
 
 

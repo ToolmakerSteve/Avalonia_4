@@ -104,6 +104,7 @@ namespace ModelFrom2DShape
 
 				// Gram-Schmidt orthogonalize
 				Vector3 temp1 = t - n * Vector3.Dot(n, t);
+				// Urho's Normalize changes the source vector (instead of returning a new vector).
 				temp1.Normalize();
 				xyz = temp1;
 
