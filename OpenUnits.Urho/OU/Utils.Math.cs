@@ -802,14 +802,20 @@ namespace OU
             return new Vec2(origin.X + distance * heading.X, origin.Y + distance * heading.Y);
         }
 
-        public static Vec2 MoveOnAngleRadians(Vec2 origin, float angleRadians, float distance)
-        {
-            Vec2 heading = AngleRadiansAsHeading(angleRadians);
-            return MoveOnHeading(origin, heading, distance);
-        }
+		public static Vec2 MoveOnAngleDegrees(Vec2 origin, float angleDegrees, float distance)
+		{
+			Vec2 heading = AngleRadiansAsHeading(ToRadians(angleDegrees));
+			return MoveOnHeading(origin, heading, distance);
+		}
 
-        // Ignores origin.Z. TODO: Need option for XZ ground plane (ignores Y).
-        public static Vec2 MoveOnAngleRadians(Vec3 origin, float angleRadians, float distance)
+		public static Vec2 MoveOnAngleRadians(Vec2 origin, float angleRadians, float distance)
+		{
+			Vec2 heading = AngleRadiansAsHeading(angleRadians);
+			return MoveOnHeading(origin, heading, distance);
+		}
+
+		// Ignores origin.Z. TODO: Need option for XZ ground plane (ignores Y).
+		public static Vec2 MoveOnAngleRadians(Vec3 origin, float angleRadians, float distance)
         {
             Vec2 heading = AngleRadiansAsHeading(angleRadians);
             return MoveOnHeading(new Vec2(origin.X, origin.Y), heading, distance);

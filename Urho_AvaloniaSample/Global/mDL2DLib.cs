@@ -3595,12 +3595,12 @@ namespace Global
 // Angle change or "bend" at the middle point of a sequence of three points p0-p1-p2 (forming two line segments).
 // Zero when the points are all on a straight line. +-90 when they form a right angle.
 // This is "180 - central-angle". (The central angle p0-p1-p2 is 180 degrees when points are on a straight line.)
-public static float CalcBendDegrees(Vec2 p0, Vec2 p1, Vec2 p2, out float heading01, out float heading12)
+public static float CalcBendDegrees(Vec2 p0, Vec2 p1, Vec2 p2, out float heading01Degrees, out float heading12Degrees)
 {
-	heading01 = (float)GetAngleDegrees2D(p0, p1);
-	heading12 = (float)GetAngleDegrees2D(p1, p2);
+	heading01Degrees = (float)GetAngleDegrees2D(p0, p1);
+	heading12Degrees = (float)GetAngleDegrees2D(p1, p2);
 	// From -180 to +180.
-	return (float)AngleDegreesAsShorterDirection(heading12 - heading01);
+	return (float)AngleDegreesAsShorterDirection(heading12Degrees - heading01Degrees);
 }
 
 		//    // This calculation works if angle change <= 90 degrees. Beyond that, is +-"180 - correct_answer".

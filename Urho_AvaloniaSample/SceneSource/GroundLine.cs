@@ -340,12 +340,18 @@ namespace SceneSource
 						// TBD: Adjust for relative distances to those points?
 						perp1 = CalcPerpendicular(cl0, cl2);
 
-						// TODO: Find sharp bends, add special segment.
-						if (IsBendLarge(cl0, cl1, cl2, out float degreesFromStraight, out float midlineHeadingDegrees)) {
-							Vec2 joinPtAfter = AddWallSegmentsForBend(terrain, cl0, cl1, cl2, perp0, perp1, degreesFromStraight, midlineHeadingDegrees, normals);
+						// Find sharp bends, add special segment.
+						// TODO: Currently this returns "false" when freehand drawing,
+						// because logic doesn't handle large bends on short segments.
+						if (IsBendLarge(cl0, cl1, cl2, out float degreesFromStraight,
+										out float midlineHeadingDegrees, out float heading01Degrees, out float heading12Degrees)) {
+							Vec2 joinPtAfter = AddWallSegmentsForBend(terrain, cl0, cl1, cl2, perp0, perp1, degreesFromStraight,
+																	  midlineHeadingDegrees, heading01Degrees, heading12Degrees, normals);
 							// Adjust next segment to start after bend.
 							cl1 = joinPtAfter;
 						} else {
+							// TODO: If this segment is preceded or followed by a bend,
+							// the matching end-elevation should be adjusted (to average with neighbor segment).
 							AddWallSegments(cl0, cl1, perp0, perp1, terrain, normals);
 						}
 					}
@@ -387,7 +393,8 @@ namespace SceneSource
 		/// <param name="normals"></param>
 		/// <returns></returns>
 		private Vec2 AddWallSegmentsForBend(Terrain terrain, Vec2 cl0, Vec2 cl1, Vec2 cl2, Vec2 perp0, Vec2 perp1,
-											float degreesFromStraight, float midlineHeadingDegrees, Vec3?[] normals)
+											float degreesFromStraight, float midlineHeadingDegrees,
+											float heading01Degrees, float heading12Degrees, Vec3?[] normals)
 		{
 			// NOTE: First parameter is the point NEAR to bend.
 			// TODO HACK: We "know" AddWallSegment ignores y, so we simply use zero.
@@ -398,8 +405,8 @@ namespace SceneSource
 			AddWallSegments(cl0, joinPtBefore, perp0, perp1, terrain, normals);
 			Vec2 bendPerp0 = CalcPerpendicular(cl0, cl1);
 			Vec2 bendPerp1 = CalcPerpendicular(cl1, cl2);
-			// TBD: Good value? Somewhat less than 90.
-			float shallowBendDegrees = 75;
+			// VERSION: Sharp algorithm requires >90, otherwise extension points will "cross'.
+			float shallowBendDegrees = 91;
 			// Add bend segment. TODO: Need a special shape; this is an approximation to that.
 			// Find where inner walls intersect.
 			Vec2 innerIntersection = CalcInnerIntersection(cl0, cl1, cl2, joinPtBefore, joinPtAfter,
@@ -411,33 +418,13 @@ namespace SceneSource
 				AddShallowBendSegment(innerIntersection, outsidePtBefore, outsidePtAfter,
 									  terrain, normals);
 			} else {
-				// This will be CENTER of this approx shape.
-				// TODO: Unless we alter the WIDTH, the shape won't blend well with wall...
-				Vec2 adjustedJoin = cl1;
-				if (true) {
-					// Find point along midline (from innerInt. to bend point) - don't let it go too long.
-					float insideLength = (cl1 - innerIntersection).Length();
-					float limitLength = (float)(U.Sqrt2 * Width);
-					if (insideLength < limitLength) {
-						//// Don't be longer than 2*insideLength.
-						//limitLength = Math.Min(2 * insideLength, limitLength);
-						// HACK: Adjust back towards center, from outside point. So drawing with Width will put outside point at previous limitLength.
-						float halfWidth = (float)(0.5f * Width);
-						limitLength -= halfWidth;
-						adjustedJoin = U.MoveTowards(innerIntersection, cl1, limitLength);
-					}
-				}
-				// TBD: Only certain angle range?
-				if (false) {
-					float midlineHeadingRadians = U.ToRadians(midlineHeadingDegrees);
-					adjustedJoin = U.MoveOnAngleRadians(adjustedJoin, midlineHeadingRadians, (float)Width / 2); ;
-				}
-				// See how it looks to extend join area to the center line point.
-				// TODO: This should be along "midline".
-				Vec2 bendPerpMid = CalcPerpendicular(joinPtBefore, joinPtAfter);
-				// TODO: CollapsedStart or End makes bend segment - and a trailing segment - dark on top.
-				AddWallSegment(joinPtBefore, adjustedJoin, bendPerp0, bendPerpMid, terrain, normals);//ttt, SegmentShape.CollapsedEnd);
-				AddWallSegment(adjustedJoin, joinPtAfter, bendPerpMid, bendPerp1, terrain, normals);//ttt, SegmentShape.CollapsedStart);
+				// Move each outside point forward by wall width.
+				Vec2 outsidePtBeforeExtended = U.MoveOnAngleDegrees(outsidePtBefore, heading01Degrees, (float)Width);
+				// "-": Move back towards bend.
+				Vec2 outsidePtAfterExtendedBack = U.MoveOnAngleDegrees(outsidePtAfter, heading12Degrees, -(float)Width);
+				Vec2 outsideMidPtXZ = U.Average(outsidePtBeforeExtended, outsidePtAfterExtendedBack);
+				_AddWallSegmentXZs(innerIntersection, outsidePtBefore, outsideMidPtXZ, outsidePtBeforeExtended, terrain, normals);
+				_AddWallSegmentXZs(outsideMidPtXZ, outsidePtAfterExtendedBack, innerIntersection, outsidePtAfter, terrain, normals);
 			}
 
 			return joinPtAfter;
@@ -452,6 +439,21 @@ namespace SceneSource
 			// Move these parallel to outside edge, an invisibly small amount.
 			Vec2 insidePtBeforeXZ = innerIntersection - tinyDelta;
 			Vec2 insidePtAfterXZ = innerIntersection + tinyDelta;
+			_AddWallSegmentXZs(insidePtBeforeXZ, outsidePtBefore, insidePtAfterXZ, outsidePtAfter, terrain, normals);
+		}
+
+		/// <summary>
+		/// Like AddWallSegment, but given XZs rather than Vec3.
+		/// </summary>
+		/// <param name="insidePtBeforeXZ"></param>
+		/// <param name="outsidePtBeforeXZ"></param>
+		/// <param name="insidePtAfterXZ"></param>
+		/// <param name="outsidePtAfterXZ"></param>
+		/// <param name="terrain"></param>
+		/// <param name="normals"></param>
+		private void _AddWallSegmentXZs(Vec2 insidePtBeforeXZ, Vec2 outsidePtBeforeXZ,
+										Vec2 insidePtAfterXZ, Vec2 outsidePtAfterXZ, Terrain terrain, Vec3?[] normals)
+		{
 			// TODO: What is best way to deal with uneven ground near bend?
 			// --- this approach forces inside to be flat and outside to be flat. But there can be "gap" with neighboring segments.
 			//var wallTopInsidePts = ProjectPointsToWallTop(insidePtBeforeXZ, insidePtAfterXZ, TopMetersF, terrain);
@@ -459,8 +461,8 @@ namespace SceneSource
 			//var wallPair0 = new U.Pair<Vec3>(wallTopInsidePts.First, wallTopOutsidePts.First);
 			//var wallPair1 = new U.Pair<Vec3>(wallTopInsidePts.Second, wallTopOutsidePts.Second);
 			// --- this approach (approximately) matches each edge with the neighboring segment --
-			var wallPair0 = ProjectPointsToWallTop(insidePtBeforeXZ, outsidePtBefore, TopMetersF, terrain);
-			var wallPair1 = ProjectPointsToWallTop(insidePtAfterXZ, outsidePtAfter, TopMetersF, terrain);
+			var wallPair0 = ProjectPointsToWallTop(insidePtBeforeXZ, outsidePtBeforeXZ, TopMetersF, terrain);
+			var wallPair1 = ProjectPointsToWallTop(insidePtAfterXZ, outsidePtAfterXZ, TopMetersF, terrain);
 			_AddWallSegment(wallPair0, wallPair1, terrain, normals);
 		}
 
@@ -608,6 +610,12 @@ namespace SceneSource
 			_AddWallSegment(wallPair0, wallPair1, terrain, normals);
 		}
 
+		/// <summary>
+		/// </summary>
+		/// <param name="wallPair0">Start edge of quad</param>
+		/// <param name="wallPair1">End edge of quad</param>
+		/// <param name="terrain"></param>
+		/// <param name="normals"></param>
 		private void _AddWallSegment(U.Pair<Vec3> wallPair0, U.Pair<Vec3> wallPair1,
 									 Terrain terrain, Vec3?[] normals)
 		{
@@ -802,7 +810,8 @@ namespace SceneSource
 				var p1 = Points.NearEndElement(-3);
 				var p2 = Points.NearEndElement(-2);
 				var p3 = Points.LastElement();
-				if (IsBendLarge((Vec2)p1, (Vec2)p2, (Vec2)p3, out float degreesFromStraight, out float midlineHeadingDegrees)) {
+				if (IsBendLarge((Vec2)p1, (Vec2)p2, (Vec2)p3, out float degreesFromStraight,
+								out float midlineHeadingDegrees, out float heading01Degrees, out float heading12Degrees)) {
 					// Add a new point, to have a segment within-which the bend is handled.
 					// NOTE: First parameter is the point NEAR to bend.
 					Dist2D joinPt = CalcJoinPoint(p2, p1, degreesFromStraight);
@@ -858,16 +867,29 @@ namespace SceneSource
 			return joinPt;
 		}
 
-		private static bool IsBendLarge(Vec2 p1, Vec2 p2, Vec2 p3,
-										out float degreesFromStraight, out float midlineHeadingDegrees)
+		private bool IsBendLarge(Vec2 p1, Vec2 p2, Vec2 p3,
+										out float degreesFromStraight, out float midlineHeadingDegrees,
+										out float heading01Degrees, out float heading12Degrees)
 		{
+			float SafeLength = 2 * (float)Width;
+			// "p3 -p1" tests for shortness due to doubling back on self (which needs a greater length).
+			if ((p2 - p1).Length() < SafeLength || (p3 - p2).Length() < SafeLength ||
+				(p3 - p1).Length() < SafeLength) {
+				degreesFromStraight = 0;
+				midlineHeadingDegrees = 0;
+				heading01Degrees = 0;
+				heading12Degrees = 0;
+				// TODO: Currently bend logic can't handle short segments.
+				return false;
+			}
+
 			// In range [-180,+180]. Zero when the points are all on a straight line.
-			float signedDegrees = U2.CalcBendDegrees(p1, p2, p3, out float heading01, out float heading12);
+			float signedDegrees = U2.CalcBendDegrees(p1, p2, p3, out heading01Degrees, out heading12Degrees);
 			//degreesFromStraight = (float)(180 - Math.Abs(signedDegrees));
 			degreesFromStraight = (float)Math.Abs(signedDegrees);
 
 			// Average the two headings. But reverse outgoing heading.
-			midlineHeadingDegrees = (heading01 - heading12) * 0.5f;
+			midlineHeadingDegrees = (heading01Degrees - heading12Degrees) * 0.5f;
 
 			bool bendIsLarge = degreesFromStraight > SmallBendDegreesLimit;
 			return bendIsLarge;
